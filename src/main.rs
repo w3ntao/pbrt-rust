@@ -3,6 +3,7 @@ use std::fs::OpenOptions;
 use std::io::prelude::*;
 
 mod vector;
+mod triangle;
 
 use crate::vector::*;
 
