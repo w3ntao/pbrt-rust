@@ -2,16 +2,17 @@ use crate::vector::*;
 use crate::ray::*;
 use crate::triangle::*;
 use crate::intersection::*;
+use crate::primitive::Primitive;
 
 #[derive(Default)]
 pub struct Group {
-    primitives: Vec<Triangle>,
+    primitives: Vec<Box<dyn Primitive>>,
 }
 
 impl Group {
     pub fn new() -> Self { Default::default() }
 
-    pub fn add(&mut self, triangle: Triangle) {
+    pub fn add(&mut self, triangle: Box<dyn Primitive>) {
         self.primitives.push(triangle);
     }
 

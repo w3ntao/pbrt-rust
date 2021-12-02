@@ -1,6 +1,7 @@
 use crate::vector::*;
 use crate::ray::*;
 use crate::intersection::*;
+use crate::primitive::Primitive;
 
 #[derive(Copy, Clone)]
 pub struct Triangle {
@@ -21,8 +22,10 @@ impl Triangle {
             normal: cross(_span0, _span1).normalize(),
         };
     }
+}
 
-    pub fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
+impl Primitive for Triangle {
+    fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
         let ab = cross(self.span0, self.span1);
         let det = -dot(ab, ray.direction);
         if det == 0.0 {

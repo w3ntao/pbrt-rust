@@ -4,6 +4,7 @@ use crate::perspective_camera::PerspectiveCamera;
 use crate::ray_casting_integrator::RayCastingIntegrator;
 use crate::renderer::Renderer;
 use crate::triangle::Triangle;
+use crate::vector::Vector;
 
 mod vector;
 mod triangle;
@@ -14,8 +15,8 @@ mod ray_casting_integrator;
 mod group;
 mod renderer;
 mod image;
+mod primitive;
 
-use crate::vector::*;
 
 fn main() {
     const IMAGE_WIDTH: usize = 640;
@@ -29,14 +30,14 @@ fn main() {
         std::f32::consts::PI / 3.0);
 
     let mut world = Group::new();
-    world.add(Triangle::new(
+    world.add(Box::new(Triangle::new(
         Vector::new(-2.0, 3.7, 0.0),
         Vector::new(1.0, 2.0, 1.0),
-        Vector::new(3.0, 2.8, -2.0)));
-    world.add(Triangle::new(
+        Vector::new(3.0, 2.8, -2.0))));
+    world.add(Box::new(Triangle::new(
         Vector::new(3.0, 2.0, 3.0),
         Vector::new(3.0, 2.0, -3.0),
-        Vector::new(-3.0, 2.0, -3.0)));
+        Vector::new(-3.0, 2.0, -3.0))));
 
     let integrator = RayCastingIntegrator::new(world);
     let renderer = Renderer::new(camera, integrator);
