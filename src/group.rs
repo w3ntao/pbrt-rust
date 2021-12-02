@@ -1,6 +1,4 @@
-use crate::vector::*;
 use crate::ray::*;
-use crate::triangle::*;
 use crate::intersection::*;
 use crate::primitive::Primitive;
 

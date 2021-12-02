@@ -13,4 +13,8 @@ impl Ray {
             direction: _direction,
         };
     }
+
+    pub fn get_point(&self, distance: f32) -> Vector {
+        return self.origin + distance * self.direction;
+    }
 }
