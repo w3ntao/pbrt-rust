@@ -5,7 +5,7 @@ pub struct RayCastingIntegrator {
 }
 
 impl RayCastingIntegrator {
-    pub fn get_radiance(self, ray: Ray) -> Vector {
+    pub fn get_radiance(&self, ray: Ray) -> Vector {
         return Vector::zero();
     }
 }

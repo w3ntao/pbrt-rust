@@ -31,7 +31,7 @@ impl PerspectiveCamera {
         };
     }
 
-    pub fn getPrimaryRay(self, x: f32, y: f32) -> Ray {
+    pub fn getPrimaryRay(&self, x: f32, y: f32) -> Ray {
         let x = x * self.xPixelMultiplier;
         let y = y * self.yPixelMultiplier;
 

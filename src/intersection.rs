@@ -25,7 +25,7 @@ impl Intersection {
         };
     }
 
-    pub fn hit(self) -> bool {
+    pub fn hit(&self) -> bool {
         return self.distance.is_finite();
     }
 }

@@ -24,7 +24,7 @@ impl Vector {
         return dot(self, self);
     }
 
-    pub fn length(self) -> f32 {
+    pub fn length(&self) -> f32 {
         return self.length_squared().sqrt();
     }
 
@@ -116,12 +116,6 @@ impl ops::MulAssign<Vector> for Vector {
         self.x *= rhs.x;
         self.y *= rhs.y;
         self.z *= rhs.z;
-    }
-}
-
-impl ops::DivAssign<f32> for Vector {
-    fn div_assign(&mut self, rhs: f32) {
-        *self = *self / rhs;
     }
 }
 

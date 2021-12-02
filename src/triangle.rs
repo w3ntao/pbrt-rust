@@ -22,7 +22,7 @@ impl Triangle {
         };
     }
 
-    pub fn intersect(self, ray: Ray, previous_distance: f32) -> Intersection {
+    pub fn intersect(&self, ray: Ray, previous_distance: f32) -> Intersection {
         let ab = cross(self.span0, self.span1);
         let det = -dot(ab, ray.direction);
         if det == 0.0 {
