@@ -11,6 +11,10 @@ pub struct Group {
 impl Group {
     pub fn new() -> Self { Default::default() }
 
+    pub fn add(&mut self, triangle: Triangle) {
+        self.primitives.push(triangle);
+    }
+
     pub fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
         let mut intersect = Intersection::failure();
         let mut closest_distance = previous_distance;

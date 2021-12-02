@@ -1,9 +1,11 @@
 use std::fs;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
-use crate::perspective_camera::PerspectiveCamera;
-use crate::ray_casting_integrator::RayCastingIntegrator;
-use crate::renderer::Renderer;
+use crate::group::*;
+use crate::perspective_camera::*;
+use crate::ray_casting_integrator::*;
+use crate::renderer::*;
+use crate::triangle::Triangle;
 
 mod vector;
 mod triangle;
@@ -17,8 +19,8 @@ mod renderer;
 use crate::vector::*;
 
 fn main() {
-    const IMAGE_WIDTH: usize = 256;
-    const IMAGE_HEIGHT: usize = 256;
+    const IMAGE_WIDTH: usize = 640;
+    const IMAGE_HEIGHT: usize = 480;
 
     let camera = PerspectiveCamera::new(
         Vector::new(0.0, 0.0, 10.0),
@@ -27,10 +29,20 @@ fn main() {
         std::f32::consts::PI / 4.0,
         std::f32::consts::PI / 3.0);
 
-    let integrator = RayCastingIntegrator::new();
+    let mut world = Group::new();
+    world.add(Triangle::new(
+        Vector::new(-2.0, 3.7, 0.0),
+        Vector::new(1.0, 2.0, 1.0),
+        Vector::new(3.0, 2.8, -2.0)));
+    world.add(Triangle::new(
+        Vector::new(3.0, 2.0, 3.0),
+        Vector::new(3.0, 2.0, -3.0),
+        Vector::new(-3.0, 2.0, -3.0)));
 
+    let integrator = RayCastingIntegrator::new(world);
     let renderer = Renderer::new(camera, integrator);
-    let pixels = renderer.dummy_render(IMAGE_WIDTH, IMAGE_HEIGHT);
+    let pixels = renderer.render(IMAGE_WIDTH, IMAGE_HEIGHT);
+    //let pixels = renderer.dummy_render(IMAGE_WIDTH, IMAGE_HEIGHT);
     {
         let ppm_head = format!("P3\n{} {}\n255\n", pixels[0].len(), pixels.len());
         let ppm_file_name = "out.ppm";
