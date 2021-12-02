@@ -17,6 +17,7 @@ use solid::triangle::Triangle;
 use crate::solid::sphere::Sphere;
 use fundamental::point::Point;
 use fundamental::vector::Vector;
+use crate::solid::quad::Quad;
 
 fn main() {
     let camera = PerspectiveCamera::new(
@@ -38,7 +39,10 @@ fn main() {
     world.add(Box::new(Sphere::new(Point::new(-2.0, 1.7, 0.0), 2.0)));
     world.add(Box::new(Sphere::new(Point::new(1.0, -1.0, 1.0), 2.2)));
     world.add(Box::new(Sphere::new(Point::new(3.0, 0.8, -2.0), 2.0)));
+    world.add(Box::new(Quad::new(Point::new(1.0, -0.9, 4.5), Vector::new(-2.0, 0.0, 0.0), Vector::new(0.0, 0.1, -2.0))));
+
     let world = world;
+
     let integrator = RayCastingIntegrator::new(world);
     let renderer = Renderer::new(camera, integrator);
     let image = renderer.render(640, 480);

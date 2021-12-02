@@ -1,0 +1,48 @@
+use crate::fundamental::point::*;
+use crate::fundamental::vector::*;
+use crate::ray::*;
+use crate::intersection::*;
+use crate::primitive::Primitive;
+
+#[derive(Copy, Clone)]
+pub struct Quad {
+    pub origin: Point,
+    pub span0: Vector,
+    pub span1: Vector,
+    pub normal: Vector,
+}
+
+impl Quad {
+    pub fn new(v0: Point, _span0: Vector, _span1: Vector) -> Self {
+        return Self {
+            origin: v0,
+            span0: _span0,
+            span1: _span1,
+            normal: cross(_span0, _span1).normalize(),
+        };
+    }
+}
+
+impl Primitive for Quad {
+    fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
+        let ab = cross(self.span0, self.span1);
+        let det = -dot(ab, ray.direction);
+        if det == 0.0 {
+            return Intersection::failure();
+        }
+
+        let c = ray.origin - self.origin;
+        let det_t = dot(ab, c);
+        let t = det_t / det;
+        if t < 0.0 || t > previous_distance {
+            return Intersection::failure();
+        }
+        let beta = dot(c, cross(ray.direction, self.span1)) / det;
+        let gamma = dot(self.span0, cross(ray.direction, c)) / det;
+        if beta < 0.0 || beta > 1.0 || gamma < 0.0 || gamma > 1.0 {
+            return Intersection::failure();
+        }
+
+        return Intersection::new(t, ray, ab.normalize());
+    }
+}
