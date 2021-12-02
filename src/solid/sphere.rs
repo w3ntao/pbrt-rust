@@ -29,8 +29,8 @@ impl Primitive for Sphere {
             return Intersection::failure();
         }
 
-        let dSqrt = discriminant.sqrt();
-        let t1 = dt - dSqrt;
+        let d_sqrt = discriminant.sqrt();
+        let t1 = dt - d_sqrt;
 
         if t1 > previous_distance {
             // previous intersection was closer
@@ -42,7 +42,7 @@ impl Primitive for Sphere {
             return Intersection::new(t1, ray, diff);
         }
 
-        let t2 = dt + dSqrt;
+        let t2 = dt + d_sqrt;
         if t2 < 0.0 || t2 > previous_distance {
             // either the intersection is farther than the closest one, or behind
             return Intersection::failure();

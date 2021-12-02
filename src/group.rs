@@ -20,7 +20,7 @@ impl Group {
 
         for p in &self.primitives {
             let temp = p.intersect(ray, closest_distance);
-            if temp.hit() {
+            if temp.intersected() {
                 intersect = temp;
                 closest_distance = temp.distance;
             }

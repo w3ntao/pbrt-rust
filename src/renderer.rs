@@ -18,12 +18,12 @@ impl Renderer {
     pub fn render(self, width: usize, height: usize) -> Image {
         let mut image = Image::new(width, height);
         for x in 0usize..image.width {
-            let ndcX = 2.0 * (x as f32) / (image.width as f32) - 1.0;
+            let ndc_x = 2.0 * (x as f32) / (image.width as f32) - 1.0;
             for y in 0usize..image.height {
-                let ndcY = -2.0 * (y as f32) / (image.height as f32) + 1.0;
-                let ray = self.camera.getPrimaryRay(
-                    ndcX + 1.0 / (image.width as f32),
-                    ndcY - 1.0 / (image.height as f32));
+                let ndc_y = -2.0 * (y as f32) / (image.height as f32) + 1.0;
+                let ray = self.camera.get_primary_ray(
+                    ndc_x + 1.0 / (image.width as f32),
+                    ndc_y - 1.0 / (image.height as f32));
                 image.fill(self.integrator.get_radiance(&ray), y, x);
             }
         }

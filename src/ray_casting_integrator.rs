@@ -1,7 +1,6 @@
 use crate::fundamental::vector::*;
 use crate::ray::*;
 use crate::group::*;
-use crate::intersection::Intersection;
 
 pub struct RayCastingIntegrator {
     world: Group,
@@ -14,7 +13,7 @@ impl RayCastingIntegrator {
 
     pub fn get_radiance(&self, ray: &Ray) -> Vector {
         let intersect = self.world.intersect(ray, f32::INFINITY);
-        if !intersect.hit() {
+        if !intersect.intersected() {
             return Vector::zero();
         }
 
