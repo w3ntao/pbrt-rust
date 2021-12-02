@@ -1,11 +1,3 @@
-use crate::group::Group;
-use crate::image::Image;
-use crate::perspective_camera::PerspectiveCamera;
-use crate::ray_casting_integrator::RayCastingIntegrator;
-use crate::renderer::Renderer;
-use crate::triangle::Triangle;
-use crate::vector::Vector;
-
 mod vector;
 mod triangle;
 mod ray;
@@ -16,6 +8,15 @@ mod group;
 mod renderer;
 mod image;
 mod primitive;
+mod solid;
+
+use crate::group::Group;
+use crate::image::Image;
+use crate::perspective_camera::PerspectiveCamera;
+use crate::ray_casting_integrator::RayCastingIntegrator;
+use crate::renderer::Renderer;
+use crate::triangle::Triangle;
+use crate::vector::Vector;
 
 
 fn main() {
