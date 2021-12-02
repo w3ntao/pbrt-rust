@@ -4,6 +4,8 @@ use std::io::prelude::*;
 
 mod vector;
 mod triangle;
+mod ray;
+mod intersection;
 
 use crate::vector::*;
 

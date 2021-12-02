@@ -1,0 +1,16 @@
+use crate::vector::*;
+
+#[derive(Copy, Clone)]
+pub struct Ray {
+    pub origin: Vector,
+    pub direction: Vector,
+}
+
+impl Ray {
+    pub fn new(_origin: Vector, _direction: Vector) -> Self {
+        return Self {
+            origin: _origin,
+            direction: _direction,
+        };
+    }
+}
