@@ -1,3 +1,4 @@
+use crate::fundamental::point::*;
 use crate::fundamental::vector::*;
 use crate::ray::*;
 use crate::intersection::*;
@@ -5,12 +6,12 @@ use crate::primitive::Primitive;
 
 #[derive(Copy, Clone)]
 pub struct Sphere {
-    pub center: Vector,
+    pub center: Point,
     pub radius: f32,
 }
 
 impl Sphere {
-    pub fn new(_center: Vector, _radius: f32) -> Self {
+    pub fn new(_center: Point, _radius: f32) -> Self {
         return Self {
             center: _center,
             radius: _radius,

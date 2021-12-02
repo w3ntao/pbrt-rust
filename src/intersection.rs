@@ -1,3 +1,4 @@
+use crate::fundamental::point::*;
 use crate::fundamental::vector::*;
 use crate::ray::*;
 
@@ -19,7 +20,7 @@ impl Intersection {
 
     pub fn failure() -> Self {
         return Self {
-            ray: Ray::new(Vector::zero(), Vector::zero()),
+            ray: Ray::new(Point::zero(), Vector::zero()),
             distance: f32::INFINITY,
             normal: Vector::zero(),
         };

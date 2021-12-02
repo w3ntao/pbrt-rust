@@ -13,7 +13,7 @@ impl Image {
         return Self {
             width: _width,
             height: _height,
-            pixels: vec![vec![Color::zero(); _width]; _height],
+            pixels: vec![vec![Vector::zero(); _width]; _height],
         };
     }
 

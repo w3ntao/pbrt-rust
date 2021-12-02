@@ -1,8 +1,9 @@
+use crate::fundamental::point::*;
 use crate::fundamental::vector::*;
 use crate::ray::*;
 
 pub struct PerspectiveCamera {
-    center: Vector,
+    center: Point,
     forward: Vector,
     up: Vector,
     horizontal: Vector,
@@ -13,7 +14,7 @@ pub struct PerspectiveCamera {
 }
 
 impl PerspectiveCamera {
-    pub fn new(_center: Vector, _forward: Vector, _up: Vector,
+    pub fn new(_center: Point, _forward: Vector, _up: Vector,
                _verticalOpeningAngle: f32, _horizontalOpeningAngle: f32) -> Self {
         let _forward = _forward.normalize();
         let _up = _up.normalize();

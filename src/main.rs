@@ -15,11 +15,12 @@ use crate::ray_casting_integrator::RayCastingIntegrator;
 use crate::renderer::Renderer;
 use solid::triangle::Triangle;
 use crate::solid::sphere::Sphere;
+use fundamental::point::Point;
 use fundamental::vector::Vector;
 
 fn main() {
     let camera = PerspectiveCamera::new(
-        Vector::new(0.0, 0.0, 10.0),
+        Point::new(0.0, 0.0, 10.0),
         Vector::new(0.0, 0.0, -1.0),
         Vector::new(0.0, 1.0, 0.0),
         std::f32::consts::PI / 4.0,
@@ -27,19 +28,17 @@ fn main() {
 
     let mut world = Group::new();
     world.add(Box::new(Triangle::new(
-        Vector::new(-2.0, 3.7, 0.0),
-        Vector::new(1.0, 2.0, 1.0),
-        Vector::new(3.0, 2.8, -2.0))));
+        Point::new(-2.0, 3.7, 0.0),
+        Point::new(1.0, 2.0, 1.0),
+        Point::new(3.0, 2.8, -2.0))));
     world.add(Box::new(Triangle::new(
-        Vector::new(3.0, 2.0, 3.0),
-        Vector::new(3.0, 2.0, -3.0),
-        Vector::new(-3.0, 2.0, -3.0))));
-
-    world.add(Box::new(Sphere::new(Vector::new(-2.0, 1.7, 0.0), 2.0)));
-    world.add(Box::new(Sphere::new(Vector::new(1.0, -1.0, 1.0), 2.2)));
-    world.add(Box::new(Sphere::new(Vector::new(3.0, 0.8, -2.0), 2.0)));
+        Point::new(3.0, 2.0, 3.0),
+        Point::new(3.0, 2.0, -3.0),
+        Point::new(-3.0, 2.0, -3.0))));
+    world.add(Box::new(Sphere::new(Point::new(-2.0, 1.7, 0.0), 2.0)));
+    world.add(Box::new(Sphere::new(Point::new(1.0, -1.0, 1.0), 2.2)));
+    world.add(Box::new(Sphere::new(Point::new(3.0, 0.8, -2.0), 2.0)));
     let world = world;
-
     let integrator = RayCastingIntegrator::new(world);
     let renderer = Renderer::new(camera, integrator);
     let image = renderer.render(640, 480);

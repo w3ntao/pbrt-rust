@@ -1,4 +1,5 @@
 use std::ops;
+use crate::fundamental::point::*;
 
 #[derive(Copy, Clone)]
 pub struct Vector {
@@ -55,24 +56,24 @@ impl ops::Add<Vector> for Vector {
     }
 }
 
-impl ops::Sub<Vector> for Vector {
-    type Output = Vector;
-    fn sub(self, rhs: Vector) -> Vector {
-        return Vector {
-            x: self.x - rhs.x,
-            y: self.y - rhs.y,
-            z: self.z - rhs.z,
+impl ops::Add<Vector> for Point {
+    type Output = Point;
+    fn add(self, rhs: Vector) -> Point {
+        return Point {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z,
         };
     }
 }
 
-impl ops::Mul<Vector> for Vector {
+impl ops::Sub<Point> for Point {
     type Output = Vector;
-    fn mul(self, rhs: Vector) -> Vector {
+    fn sub(self, rhs: Point) -> Vector {
         return Vector {
-            x: self.x * rhs.x,
-            y: self.y * rhs.y,
-            z: self.z * rhs.z,
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+            z: self.z - rhs.z,
         };
     }
 }
@@ -130,5 +131,3 @@ pub fn cross(a: Vector, b: Vector) -> Vector {
         z: a.x * b.y - a.y * b.x,
     };
 }
-
-pub type Color = Vector;
