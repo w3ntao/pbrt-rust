@@ -1,6 +1,6 @@
 use std::ops;
 
-#[derive(Default, Copy, Clone)]
+#[derive(Copy, Clone)]
 pub struct Vector {
     pub x: f32,
     pub y: f32,
@@ -15,8 +15,9 @@ impl Vector {
             z: _z,
         };
     }
+
     pub fn zero() -> Self {
-        return Default::default();
+        return Vector::new(0.0, 0.0, 0.0);
     }
 
     pub fn length_squared(self) -> f32 {
