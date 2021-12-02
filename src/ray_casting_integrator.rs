@@ -6,6 +6,7 @@ pub struct RayCastingIntegrator {
 
 impl RayCastingIntegrator {
     pub fn get_radiance(&self, ray: Ray) -> Vector {
+        // TODO: unfinished
         return Vector::zero();
     }
 }

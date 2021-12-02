@@ -8,6 +8,7 @@ mod ray;
 mod intersection;
 mod perspective_camera;
 mod ray_casting_integrator;
+mod group;
 
 use crate::vector::*;
 

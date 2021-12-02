@@ -9,10 +9,10 @@ pub struct Intersection {
 }
 
 impl Intersection {
-    pub fn new(_distance: f32, _ray: Ray, _normal: Vector) -> Self {
+    pub fn new(_distance: f32, _ray: &Ray, _normal: Vector) -> Self {
         return Self {
             distance: _distance,
-            ray: _ray,
+            ray: *_ray,
             normal: _normal,
         };
     }
