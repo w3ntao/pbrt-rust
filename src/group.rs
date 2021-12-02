@@ -10,8 +10,8 @@ pub struct Group {
 impl Group {
     pub fn new() -> Self { Default::default() }
 
-    pub fn add(&mut self, triangle: Box<dyn Primitive>) {
-        self.primitives.push(triangle);
+    pub fn add(&mut self, primitive: Box<dyn Primitive>) {
+        self.primitives.push(primitive);
     }
 
     pub fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {

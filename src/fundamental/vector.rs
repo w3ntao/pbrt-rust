@@ -1,4 +1,5 @@
 use std::ops;
+use std::ops::{Index, IndexMut};
 use crate::fundamental::point::*;
 
 #[derive(Copy, Clone)]
@@ -31,6 +32,33 @@ impl Vector {
 
     pub fn normalize(self) -> Vector {
         return self / self.length();
+    }
+}
+
+impl Index<usize> for Vector {
+    type Output = f32;
+    fn index(&self, index: usize) -> &f32 {
+        return match index {
+            0 => &self.x,
+            1 => &self.y,
+            2 => &self.z,
+            _ => {
+                panic!("Vector: illegal index: {}", index);
+            }
+        };
+    }
+}
+
+impl IndexMut<usize> for Vector {
+    fn index_mut(&mut self, index: usize) -> &mut f32 {
+        return match index {
+            0 => &mut self.x,
+            1 => &mut self.y,
+            2 => &mut self.z,
+            _ => {
+                panic!("Vector: illegal index: {}", index);
+            }
+        };
     }
 }
 

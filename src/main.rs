@@ -17,6 +17,7 @@ use solid::triangle::Triangle;
 use crate::solid::sphere::Sphere;
 use fundamental::point::Point;
 use fundamental::vector::Vector;
+use crate::solid::axis_aligned_box::AxisAlignedBox;
 use crate::solid::quad::Quad;
 
 fn main() {
@@ -36,10 +37,14 @@ fn main() {
         Point::new(3.0, 2.0, 3.0),
         Point::new(3.0, 2.0, -3.0),
         Point::new(-3.0, 2.0, -3.0))));
+
     world.add(Box::new(Sphere::new(Point::new(-2.0, 1.7, 0.0), 2.0)));
     world.add(Box::new(Sphere::new(Point::new(1.0, -1.0, 1.0), 2.2)));
     world.add(Box::new(Sphere::new(Point::new(3.0, 0.8, -2.0), 2.0)));
+
     world.add(Box::new(Quad::new(Point::new(1.0, -0.9, 4.5), Vector::new(-2.0, 0.0, 0.0), Vector::new(0.0, 0.1, -2.0))));
+
+    world.add(Box::new(AxisAlignedBox::new(Point::new(2.0, 1.5, -0.5), Point::new(3.0, 2.5, 2.5))));
 
     let world = world;
 
