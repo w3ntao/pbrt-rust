@@ -41,7 +41,7 @@ impl Triangle {
             // if the intersection is outside of the triangle
             return Intersection::failure();
         }
-        
+
         return Intersection::new(t, ray, self.normal);
     }
 }

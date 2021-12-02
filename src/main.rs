@@ -6,6 +6,8 @@ mod vector;
 mod triangle;
 mod ray;
 mod intersection;
+mod perspective_camera;
+mod ray_casting_integrator;
 
 use crate::vector::*;
 
