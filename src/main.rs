@@ -1,22 +1,21 @@
-mod vector;
 mod ray;
 mod intersection;
 mod perspective_camera;
 mod ray_casting_integrator;
 mod group;
 mod renderer;
-mod image;
 mod solid;
 mod primitive;
+mod fundamental;
 
 use crate::group::Group;
-use crate::image::Image;
+use fundamental::image::Image;
 use crate::perspective_camera::PerspectiveCamera;
 use crate::ray_casting_integrator::RayCastingIntegrator;
 use crate::renderer::Renderer;
 use solid::triangle::Triangle;
 use crate::solid::sphere::Sphere;
-use crate::vector::Vector;
+use fundamental::vector::Vector;
 
 fn main() {
     let camera = PerspectiveCamera::new(

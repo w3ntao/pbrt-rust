@@ -1,4 +1,4 @@
-use crate::vector::*;
+use crate::fundamental::vector::*;
 use crate::ray::*;
 
 pub struct PerspectiveCamera {

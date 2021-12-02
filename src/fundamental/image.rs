@@ -1,6 +1,6 @@
 use std::fs;
 use std::io::prelude::*;
-use crate::vector::*;
+use crate::fundamental::vector::*;
 
 pub struct Image {
     pixels: Vec<Vec<Vector>>,
