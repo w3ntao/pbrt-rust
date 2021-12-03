@@ -1,6 +1,6 @@
 use crate::fundamental::vector::*;
-use crate::ray::*;
-use crate::group::*;
+use crate::ray_tracing::ray::*;
+use crate::ray_tracing::group::*;
 
 pub struct RayCastingIntegrator {
     world: Group,

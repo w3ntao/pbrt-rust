@@ -1,8 +1,8 @@
 use crate::fundamental::point::*;
 use crate::fundamental::vector::*;
-use crate::ray::*;
-use crate::intersection::*;
-use crate::primitive::Primitive;
+use crate::ray_tracing::ray::*;
+use crate::ray_tracing::intersection::*;
+use crate::ray_tracing::primitive::Primitive;
 
 #[derive(Copy, Clone)]
 pub struct Triangle {

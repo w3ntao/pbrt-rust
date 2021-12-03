@@ -1,6 +1,6 @@
 use crate::Image;
-use crate::perspective_camera::*;
-use crate::ray_casting_integrator::*;
+use crate::ray_tracing::cameras::perspective_camera::*;
+use crate::ray_tracing::integrators::ray_casting::*;
 
 pub struct Renderer {
     camera: PerspectiveCamera,

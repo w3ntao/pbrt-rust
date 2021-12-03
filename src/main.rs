@@ -1,24 +1,17 @@
-mod ray;
-mod intersection;
-mod perspective_camera;
-mod ray_casting_integrator;
-mod group;
-mod renderer;
-mod solid;
-mod primitive;
 mod fundamental;
+mod ray_tracing;
 
-use crate::group::Group;
+use ray_tracing::group::Group;
 use fundamental::image::Image;
-use crate::perspective_camera::PerspectiveCamera;
-use crate::ray_casting_integrator::RayCastingIntegrator;
-use crate::renderer::Renderer;
-use solid::triangle::Triangle;
-use crate::solid::sphere::Sphere;
+use ray_tracing::cameras::perspective_camera::PerspectiveCamera;
+use ray_tracing::integrators::ray_casting::RayCastingIntegrator;
+use ray_tracing::renderer::Renderer;
+use ray_tracing::solids::triangle::Triangle;
+use ray_tracing::solids::sphere::Sphere;
 use fundamental::point::Point;
 use fundamental::vector::Vector;
-use crate::solid::axis_aligned_box::AxisAlignedBox;
-use crate::solid::quad::Quad;
+use ray_tracing::solids::axis_aligned_box::AxisAlignedBox;
+use ray_tracing::solids::quad::Quad;
 
 fn main() {
     let camera = PerspectiveCamera::new(
