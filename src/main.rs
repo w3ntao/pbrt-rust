@@ -3,7 +3,7 @@ mod ray_tracing;
 
 use ray_tracing::group::Group;
 use fundamental::image::Image;
-use ray_tracing::cameras::perspective_camera::PerspectiveCamera;
+use ray_tracing::cameras::perspective::PerspectiveCamera;
 use ray_tracing::integrators::ray_casting::RayCastingIntegrator;
 use ray_tracing::renderer::Renderer;
 use ray_tracing::solids::triangle::Triangle;
@@ -42,7 +42,7 @@ fn main() {
     let world = world;
 
     let integrator = RayCastingIntegrator::new(world);
-    let renderer = Renderer::new(camera, integrator);
+    let renderer = Renderer::new(&camera, integrator);
     let image = renderer.render(640, 480);
     image.write("out.ppm");
 }

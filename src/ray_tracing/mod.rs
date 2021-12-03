@@ -6,3 +6,4 @@ pub mod primitive;
 pub mod solids;
 pub mod integrators;
 pub mod cameras;
+pub mod camera;

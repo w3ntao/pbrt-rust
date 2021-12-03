@@ -1,6 +1,7 @@
 use crate::fundamental::point::*;
 use crate::fundamental::vector::*;
-use crate::ray_tracing::ray::*;
+use crate::ray_tracing::ray::Ray;
+use crate::ray_tracing::camera::Camera;
 
 pub struct PerspectiveCamera {
     center: Point,
@@ -29,8 +30,10 @@ impl PerspectiveCamera {
             y_pixel_multiplier: (_vertical_opening_angle / 2.0).tan(),
         };
     }
+}
 
-    pub fn get_primary_ray(&self, x: f32, y: f32) -> Ray {
+impl Camera for PerspectiveCamera {
+    fn get_primary_ray(&self, x: f32, y: f32) -> Ray {
         let x = x * self.x_pixel_multiplier;
         let y = y * self.y_pixel_multiplier;
 
