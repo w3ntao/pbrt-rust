@@ -1,6 +1,6 @@
 use crate::ray_tracing::ray::*;
 use crate::ray_tracing::intersection::*;
-use crate::ray_tracing::primitive::Primitive;
+use crate::ray_tracing::primitive_trait::Primitive;
 
 #[derive(Default)]
 pub struct Group {
