@@ -14,6 +14,7 @@ use ray_tracing::solids::triangle::Triangle;
 use ray_tracing::solids::sphere::Sphere;
 use ray_tracing::solids::axis_aligned_box::AxisAlignedBox;
 use ray_tracing::solids::quad::Quad;
+use crate::ray_tracing::world::World;
 
 fn main() {
     let camera = PerspectiveCamera::new(
@@ -49,8 +50,10 @@ fn main() {
 
     scene.add(&quad);
     scene.add(&aabox);
+    let scene = scene;
 
-    let integrator = RayCastingIntegrator::new(&scene);
+    let world = World::new(&scene);
+    let integrator = RayCastingIntegrator::new(&world);
     let renderer = Renderer::new(&camera, &integrator);
     let image = renderer.render(640, 480);
     image.write("out.ppm");

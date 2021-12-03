@@ -1,21 +1,21 @@
 use crate::fundamental::vector::*;
 use crate::ray_tracing::ray::Ray;
-use crate::ray_tracing::group::group_trait::GroupTrait;
 use crate::ray_tracing::integrator_trait::Integrator;
+use crate::ray_tracing::world::World;
 
 pub struct RayCastingIntegrator<'a> {
-    world: &'a (dyn GroupTrait<'a> + 'a),
+    world: &'a World<'a>,
 }
 
 impl<'a> RayCastingIntegrator<'a> {
-    pub fn new(_world: &'a (dyn GroupTrait<'a> + 'a)) -> Self {
+    pub fn new(_world: &'a World<'a>) -> Self {
         return Self { world: _world };
     }
 }
 
 impl<'a> Integrator for RayCastingIntegrator<'a> {
     fn get_radiance(&self, ray: &Ray) -> Vector {
-        let intersect = self.world.intersect(ray, f32::INFINITY);
+        let intersect = self.world.scene.intersect(ray, f32::INFINITY);
         if !intersect.intersected() {
             return Vector::zero();
         }
