@@ -1,14 +1,14 @@
 use crate::fundamental::vector::*;
 use crate::ray_tracing::ray::Ray;
-use crate::ray_tracing::group::Group;
+use crate::ray_tracing::group::group_trait::GroupTrait;
 use crate::ray_tracing::integrator_trait::Integrator;
 
 pub struct RayCastingIntegrator<'a> {
-    world: &'a Group<'a>,
+    world: &'a (dyn GroupTrait<'a> + 'a),
 }
 
 impl<'a> RayCastingIntegrator<'a> {
-    pub fn new(_world: &'a Group<'a>) -> Self {
+    pub fn new(_world: &'a (dyn GroupTrait<'a> + 'a)) -> Self {
         return Self { world: _world };
     }
 }

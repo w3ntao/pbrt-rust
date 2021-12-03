@@ -2,13 +2,13 @@ use crate::Image;
 use crate::ray_tracing::camera_trait::Camera;
 use crate::ray_tracing::integrator_trait::Integrator;
 
-pub struct Renderer<'life> {
-    camera: &'life (dyn Camera + 'life),
-    integrator: &'life (dyn Integrator + 'life),
+pub struct Renderer<'a> {
+    camera: &'a (dyn Camera + 'a),
+    integrator: &'a (dyn Integrator + 'a),
 }
 
-impl<'life> Renderer<'life> {
-    pub fn new(_camera: &'life (dyn Camera), _integrator: &'life (dyn Integrator)) -> Self {
+impl<'a> Renderer<'a> {
+    pub fn new(_camera: &'a (dyn Camera), _integrator: &'a (dyn Integrator)) -> Self {
         return Self {
             camera: _camera,
             integrator: _integrator,

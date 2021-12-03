@@ -5,7 +5,8 @@ use fundamental::image::Image;
 use fundamental::point::Point;
 use fundamental::vector::Vector;
 
-use ray_tracing::group::Group;
+use ray_tracing::group::group_trait::GroupTrait;
+use ray_tracing::group::simple_group::SimpleGroup;
 use ray_tracing::cameras::perspective::PerspectiveCamera;
 use ray_tracing::integrators::ray_casting::RayCastingIntegrator;
 use ray_tracing::renderer::Renderer;
@@ -38,7 +39,7 @@ fn main() {
     let quad = Quad::new(Point::new(1.0, -0.9, 4.5), Vector::new(-2.0, 0.0, 0.0), Vector::new(0.0, 0.1, -2.0));
     let aabox = AxisAlignedBox::new(Point::new(2.0, 1.5, -0.5), Point::new(3.0, 2.5, 2.5));
 
-    let mut scene = Group::new();
+    let mut scene = SimpleGroup::new();
     scene.add(&triangle_0);
     scene.add(&triangle_1);
 

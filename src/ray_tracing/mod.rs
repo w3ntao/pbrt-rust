@@ -1,6 +1,5 @@
 pub mod ray;
 pub mod intersection;
-pub mod group;
 pub mod renderer;
 pub mod primitive_trait;
 pub mod solids;
@@ -8,3 +7,4 @@ pub mod camera_trait;
 pub mod cameras;
 pub mod integrator_trait;
 pub mod integrators;
+pub mod group;
