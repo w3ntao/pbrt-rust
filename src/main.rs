@@ -42,7 +42,7 @@ fn main() {
     let world = world;
 
     let integrator = RayCastingIntegrator::new(world);
-    let renderer = Renderer::new(&camera, integrator);
+    let renderer = Renderer::new(&camera, &integrator);
     let image = renderer.render(640, 480);
     image.write("out.ppm");
 }

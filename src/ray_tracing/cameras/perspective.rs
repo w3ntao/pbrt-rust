@@ -1,7 +1,7 @@
 use crate::fundamental::point::*;
 use crate::fundamental::vector::*;
 use crate::ray_tracing::ray::Ray;
-use crate::ray_tracing::camera::Camera;
+use crate::ray_tracing::camera_trait::Camera;
 
 pub struct PerspectiveCamera {
     center: Point,
