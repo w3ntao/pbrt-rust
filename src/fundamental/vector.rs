@@ -1,5 +1,4 @@
 use std::ops;
-use std::ops::{Index, IndexMut};
 use crate::fundamental::point::*;
 
 #[derive(Copy, Clone)]
@@ -35,7 +34,7 @@ impl Vector {
     }
 }
 
-impl Index<usize> for Vector {
+impl ops::Index<usize> for Vector {
     type Output = f32;
     fn index(&self, index: usize) -> &f32 {
         return match index {
@@ -49,7 +48,7 @@ impl Index<usize> for Vector {
     }
 }
 
-impl IndexMut<usize> for Vector {
+impl ops::IndexMut<usize> for Vector {
     fn index_mut(&mut self, index: usize) -> &mut f32 {
         return match index {
             0 => &mut self.x,

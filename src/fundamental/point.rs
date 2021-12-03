@@ -1,4 +1,4 @@
-use std::ops::{Index, IndexMut};
+use std::ops;
 
 #[derive(Copy, Clone)]
 pub struct Point {
@@ -21,7 +21,7 @@ impl Point {
     }
 }
 
-impl Index<usize> for Point {
+impl ops::Index<usize> for Point {
     type Output = f32;
     fn index(&self, index: usize) -> &f32 {
         return match index {
@@ -35,7 +35,7 @@ impl Index<usize> for Point {
     }
 }
 
-impl IndexMut<usize> for Point {
+impl ops::IndexMut<usize> for Point {
     fn index_mut(&mut self, index: usize) -> &mut f32 {
         return match index {
             0 => &mut self.x,

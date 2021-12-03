@@ -1,9 +1,9 @@
 use std::fs;
 use std::io::prelude::*;
-use crate::fundamental::vector::*;
+use crate::fundamental::rgb_color::*;
 
 pub struct Image {
-    pixels: Vec<Vec<Vector>>,
+    pixels: Vec<Vec<RGBColor>>,
     pub width: usize,
     pub height: usize,
 }
@@ -13,11 +13,11 @@ impl Image {
         return Self {
             width: _width,
             height: _height,
-            pixels: vec![vec![Vector::zero(); _width]; _height],
+            pixels: vec![vec![RGBColor::black(); _width]; _height],
         };
     }
 
-    pub fn fill(&mut self, rgb_value: Vector, y: usize, x: usize) {
+    pub fn fill(&mut self, rgb_value: RGBColor, y: usize, x: usize) {
         self.pixels[y][x] = rgb_value;
     }
 
@@ -35,9 +35,9 @@ impl Image {
             for w in 0usize..self.width {
                 let pixel = self.pixels[h][w] * factor;
                 write!(file, "{} {} {}\n",
-                       pixel.x as i32,
-                       pixel.y as i32,
-                       pixel.z as i32)
+                       pixel.r as i32,
+                       pixel.g as i32,
+                       pixel.b as i32)
                     .expect(&format!("Failed to append to `{}`", ppm_file_name));
             }
         }

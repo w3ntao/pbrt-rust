@@ -1,3 +1,5 @@
+use std::ops;
+
 #[derive(Copy, Clone)]
 pub struct RGBColor {
     pub r: f32,
@@ -16,5 +18,23 @@ impl RGBColor {
 
     pub fn black() -> Self {
         return RGBColor::new(0.0, 0.0, 0.0);
+    }
+}
+
+impl ops::Mul<f32> for RGBColor {
+    type Output = RGBColor;
+    fn mul(self, rhs: f32) -> RGBColor {
+        return RGBColor {
+            r: self.r * rhs,
+            g: self.g * rhs,
+            b: self.b * rhs,
+        };
+    }
+}
+
+impl ops::Mul<RGBColor> for f32 {
+    type Output = RGBColor;
+    fn mul(self, rhs: RGBColor) -> RGBColor {
+        return rhs * self;
     }
 }

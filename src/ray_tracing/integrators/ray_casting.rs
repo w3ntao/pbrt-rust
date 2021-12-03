@@ -1,4 +1,5 @@
 use crate::fundamental::vector::*;
+use crate::fundamental::rgb_color::*;
 use crate::ray_tracing::ray::Ray;
 use crate::ray_tracing::integrator_trait::Integrator;
 use crate::ray_tracing::world::World;
@@ -14,14 +15,14 @@ impl<'a> RayCastingIntegrator<'a> {
 }
 
 impl<'a> Integrator for RayCastingIntegrator<'a> {
-    fn get_radiance(&self, ray: &Ray) -> Vector {
+    fn get_radiance(&self, ray: &Ray) -> RGBColor {
         let intersect = self.world.scene.intersect(ray, f32::INFINITY);
         if !intersect.intersected() {
-            return Vector::zero();
+            return RGBColor::black();
         }
 
         let normal = intersect.normal.normalize();
         let grey = 0.0_f32.max(dot(-ray.direction, normal));
-        return Vector::new(grey, grey, grey);
+        return RGBColor::new(grey, grey, grey);
     }
 }
