@@ -1,6 +1,6 @@
 use crate::fundamental::image::Image;
-use crate::ray_tracing::camera_trait::Camera;
-use crate::ray_tracing::integrator_trait::Integrator;
+use crate::ray_tracing::camera::Camera;
+use crate::ray_tracing::integrator::Integrator;
 
 pub struct Renderer<'a> {
     camera: &'a dyn Camera,

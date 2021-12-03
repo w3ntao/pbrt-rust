@@ -1,11 +1,12 @@
 pub mod ray;
 pub mod intersection;
 pub mod renderer;
-pub mod primitive_trait;
+pub mod primitive;
 pub mod primitives;
-pub mod camera_trait;
+pub mod camera;
 pub mod cameras;
-pub mod integrator_trait;
+pub mod integrator;
 pub mod integrators;
 pub mod groups;
 pub mod world;
+pub mod group;

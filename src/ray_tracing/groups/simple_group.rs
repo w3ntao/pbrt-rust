@@ -1,7 +1,7 @@
 use crate::ray_tracing::ray::*;
 use crate::ray_tracing::intersection::*;
-use crate::ray_tracing::primitive_trait::Primitive;
-use crate::ray_tracing::groups::group_trait::Group;
+use crate::ray_tracing::primitive::Primitive;
+use crate::ray_tracing::group::Group;
 
 #[derive(Default)]
 pub struct SimpleGroup<'a> {

@@ -1,6 +1,6 @@
 use crate::ray_tracing::ray::*;
 use crate::ray_tracing::intersection::*;
-use crate::ray_tracing::primitive_trait::Primitive;
+use crate::ray_tracing::primitive::Primitive;
 
 pub trait Group<'a> {
     fn add(&mut self, p: &'a dyn Primitive);

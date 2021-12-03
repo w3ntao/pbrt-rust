@@ -1,7 +1,7 @@
 use crate::fundamental::vector::*;
 use crate::fundamental::rgb_color::*;
 use crate::ray_tracing::ray::Ray;
-use crate::ray_tracing::integrator_trait::Integrator;
+use crate::ray_tracing::integrator::Integrator;
 use crate::ray_tracing::world::World;
 
 pub struct RayCastingIntegrator<'a> {
