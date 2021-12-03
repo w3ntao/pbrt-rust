@@ -3,15 +3,15 @@ use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::primitive_trait::Primitive;
 
 #[derive(Default)]
-pub struct Group {
-    primitives: Vec<Box<dyn Primitive>>,
+pub struct Group<'a> {
+    primitives: Vec<&'a (dyn Primitive + 'a)>,
 }
 
-impl Group {
+impl<'a> Group<'a> {
     pub fn new() -> Self { Default::default() }
 
-    pub fn add(&mut self, primitive: Box<dyn Primitive>) {
-        self.primitives.push(primitive);
+    pub fn add(&mut self, p: &'a (dyn Primitive + 'a)) {
+        self.primitives.push(p);
     }
 
     pub fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
