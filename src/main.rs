@@ -5,16 +5,18 @@ use fundamental::image::Image;
 use fundamental::point::Point;
 use fundamental::vector::Vector;
 
-use ray_tracing::group::group_trait::GroupTrait;
-use ray_tracing::group::simple_group::SimpleGroup;
-use ray_tracing::cameras::perspective::PerspectiveCamera;
-use ray_tracing::integrators::ray_casting::RayCastingIntegrator;
-use ray_tracing::renderer::Renderer;
 use ray_tracing::solids::triangle::Triangle;
 use ray_tracing::solids::sphere::Sphere;
 use ray_tracing::solids::axis_aligned_box::AxisAlignedBox;
 use ray_tracing::solids::quad::Quad;
-use crate::ray_tracing::world::World;
+
+use ray_tracing::group::group_trait::GroupTrait;
+use ray_tracing::group::simple_group::SimpleGroup;
+
+use ray_tracing::cameras::perspective::PerspectiveCamera;
+use ray_tracing::integrators::ray_casting::RayCastingIntegrator;
+use ray_tracing::renderer::Renderer;
+use ray_tracing::world::World;
 
 fn main() {
     let camera = PerspectiveCamera::new(
