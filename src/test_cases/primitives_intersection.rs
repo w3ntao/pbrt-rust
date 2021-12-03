@@ -6,8 +6,8 @@ use crate::ray_tracing::primitives::sphere::Sphere;
 use crate::ray_tracing::primitives::axis_aligned_box::AxisAlignedBox;
 use crate::ray_tracing::primitives::quad::Quad;
 
-use crate::ray_tracing::group::group_trait::GroupTrait;
-use crate::ray_tracing::group::simple_group::SimpleGroup;
+use crate::ray_tracing::groups::group_trait::Group;
+use crate::ray_tracing::groups::simple_group::SimpleGroup;
 
 use crate::ray_tracing::cameras::perspective::PerspectiveCamera;
 use crate::ray_tracing::integrators::ray_casting::RayCastingIntegrator;

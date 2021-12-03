@@ -1,7 +1,7 @@
 use crate::ray_tracing::ray::*;
 use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::primitive_trait::Primitive;
-use crate::ray_tracing::group::group_trait::GroupTrait;
+use crate::ray_tracing::groups::group_trait::Group;
 
 #[derive(Default)]
 pub struct SimpleGroup<'a> {
@@ -12,7 +12,7 @@ impl<'a> SimpleGroup<'a> {
     pub fn new() -> Self { Default::default() }
 }
 
-impl<'a> GroupTrait<'a> for SimpleGroup<'a> {
+impl<'a> Group<'a> for SimpleGroup<'a> {
     fn add(&mut self, p: &'a dyn Primitive) {
         self.primitives.push(p);
     }

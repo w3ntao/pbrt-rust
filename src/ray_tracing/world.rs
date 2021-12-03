@@ -1,11 +1,11 @@
-use crate::ray_tracing::group::group_trait::GroupTrait;
+use crate::ray_tracing::groups::group_trait::Group;
 
 pub struct World<'a> {
-    pub scene: &'a dyn GroupTrait<'a>,
+    pub scene: &'a dyn Group<'a>,
 }
 
 impl<'a> World<'a> {
-    pub fn new(_scene: &'a dyn GroupTrait<'a>) -> Self {
+    pub fn new(_scene: &'a dyn Group<'a>) -> Self {
         return Self {
             scene: _scene,
         };

@@ -7,5 +7,5 @@ pub mod camera_trait;
 pub mod cameras;
 pub mod integrator_trait;
 pub mod integrators;
-pub mod group;
+pub mod groups;
 pub mod world;
