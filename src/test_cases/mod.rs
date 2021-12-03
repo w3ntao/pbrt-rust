@@ -1,1 +1,1 @@
-pub mod solids_intersection;
+pub mod primitives_intersection;

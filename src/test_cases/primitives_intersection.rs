@@ -1,10 +1,10 @@
 use crate::fundamental::point::Point;
 use crate::fundamental::vector::Vector;
 
-use crate::ray_tracing::solids::triangle::Triangle;
-use crate::ray_tracing::solids::sphere::Sphere;
-use crate::ray_tracing::solids::axis_aligned_box::AxisAlignedBox;
-use crate::ray_tracing::solids::quad::Quad;
+use crate::ray_tracing::primitives::triangle::Triangle;
+use crate::ray_tracing::primitives::sphere::Sphere;
+use crate::ray_tracing::primitives::axis_aligned_box::AxisAlignedBox;
+use crate::ray_tracing::primitives::quad::Quad;
 
 use crate::ray_tracing::group::group_trait::GroupTrait;
 use crate::ray_tracing::group::simple_group::SimpleGroup;

@@ -2,8 +2,8 @@ mod fundamental;
 mod ray_tracing;
 mod test_cases;
 
-use crate::test_cases::solids_intersection;
+use crate::test_cases::primitives_intersection;
 
 fn main() {
-    solids_intersection::test();
+    primitives_intersection::test();
 }
