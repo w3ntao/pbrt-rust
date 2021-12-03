@@ -1,15 +1,16 @@
 mod fundamental;
 mod ray_tracing;
 
-use ray_tracing::group::Group;
 use fundamental::image::Image;
+use fundamental::point::Point;
+use fundamental::vector::Vector;
+
+use ray_tracing::group::Group;
 use ray_tracing::cameras::perspective::PerspectiveCamera;
 use ray_tracing::integrators::ray_casting::RayCastingIntegrator;
 use ray_tracing::renderer::Renderer;
 use ray_tracing::solids::triangle::Triangle;
 use ray_tracing::solids::sphere::Sphere;
-use fundamental::point::Point;
-use fundamental::vector::Vector;
 use ray_tracing::solids::axis_aligned_box::AxisAlignedBox;
 use ray_tracing::solids::quad::Quad;
 

@@ -15,16 +15,16 @@ impl Group {
     }
 
     pub fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
-        let mut intersect = Intersection::failure();
+        let mut closest_intersect = Intersection::failure();
         let mut closest_distance = previous_distance;
 
         for p in &self.primitives {
-            let temp = p.intersect(ray, closest_distance);
-            if temp.intersected() {
-                intersect = temp;
-                closest_distance = temp.distance;
+            let intersect = p.intersect(ray, closest_distance);
+            if intersect.intersected() {
+                closest_intersect = intersect;
+                closest_distance = intersect.distance;
             }
         }
-        return intersect;
+        return closest_intersect;
     }
 }
