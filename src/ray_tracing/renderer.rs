@@ -1,4 +1,4 @@
-use crate::Image;
+use crate::fundamental::image::Image;
 use crate::ray_tracing::camera_trait::Camera;
 use crate::ray_tracing::integrator_trait::Integrator;
 

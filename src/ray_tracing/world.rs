@@ -1,4 +1,4 @@
-use crate::GroupTrait;
+use crate::ray_tracing::group::group_trait::GroupTrait;
 
 pub struct World<'a> {
     pub scene: &'a dyn GroupTrait<'a>,
