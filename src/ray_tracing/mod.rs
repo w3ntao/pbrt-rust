@@ -10,3 +10,4 @@ pub mod integrators;
 pub mod groups;
 pub mod world;
 pub mod group;
+mod bounding_box;
