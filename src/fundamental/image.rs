@@ -1,5 +1,5 @@
 use std::fs;
-use std::io::prelude::*;
+use std::io::{BufWriter, Write};
 use crate::fundamental::rgb_color::*;
 
 pub struct Image {
@@ -23,22 +23,18 @@ impl Image {
 
     pub fn write(&self, ppm_file_name: &str) {
         let ppm_head = format!("P3\n{} {}\n255\n", self.width, self.height);
-        fs::write(ppm_file_name, ppm_head)
-            .expect(&format!("Failed to write to `{}`", ppm_file_name));
+        let mut buf_writer = BufWriter::new(fs::File::create(ppm_file_name).unwrap());
+        buf_writer.write(ppm_head.as_bytes()).unwrap();
 
-        let mut file = std::fs::OpenOptions::new()
-            .append(true)
-            .open(ppm_file_name)
-            .unwrap();
         let factor = 256 as f32 - 0.001;
         for h in 0usize..self.height {
             for w in 0usize..self.width {
                 let pixel = self.pixels[h][w] * factor;
-                write!(file, "{} {} {}\n",
-                       pixel.r as i32,
-                       pixel.g as i32,
-                       pixel.b as i32)
-                    .expect(&format!("Failed to append to `{}`", ppm_file_name));
+                let line = format!("{} {} {}\n",
+                                   pixel.r as i32,
+                                   pixel.g as i32,
+                                   pixel.b as i32);
+                buf_writer.write(line.as_bytes()).unwrap();
             }
         }
     }
