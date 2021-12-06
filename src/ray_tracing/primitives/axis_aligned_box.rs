@@ -1,5 +1,6 @@
 use crate::fundamental::point::*;
 use crate::fundamental::vector::*;
+use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::ray::*;
 use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::primitive::Primitive;
@@ -8,13 +9,15 @@ use crate::ray_tracing::primitive::Primitive;
 pub struct AxisAlignedBox {
     pub axis_min: Point,
     pub axis_max: Point,
+    bounds: BoundingBox,
 }
 
 impl AxisAlignedBox {
     pub fn new(corner_0: Point, corner_1: Point) -> Self {
         return Self {
-            axis_min: min_point(corner_0, corner_1),
-            axis_max: max_point(corner_0, corner_1),
+            axis_min: min_of(&[corner_0, corner_1]),
+            axis_max: max_of(&[corner_0, corner_1]),
+            bounds: BoundingBox::build(&[corner_0, corner_1]),
         };
     }
 }
@@ -56,5 +59,9 @@ impl Primitive for AxisAlignedBox {
         }
 
         return Intersection::new(t_min, ray, normal);
+    }
+
+    fn get_bounds(&self) -> BoundingBox {
+        return self.bounds;
     }
 }

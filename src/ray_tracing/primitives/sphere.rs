@@ -1,5 +1,6 @@
 use crate::fundamental::point::*;
 use crate::fundamental::vector::*;
+use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::ray::*;
 use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::primitive::Primitive;
@@ -8,13 +9,17 @@ use crate::ray_tracing::primitive::Primitive;
 pub struct Sphere {
     pub center: Point,
     pub radius: f32,
+    bounds: BoundingBox,
 }
 
 impl Sphere {
     pub fn new(_center: Point, _radius: f32) -> Self {
+        let min = _center + Point::new(-_radius, -_radius, -_radius);
+        let max = _center + Point::new(_radius, _radius, _radius);
         return Self {
             center: _center,
             radius: _radius,
+            bounds: BoundingBox::build(&[min, max]),
         };
     }
 }
@@ -50,5 +55,9 @@ impl Primitive for Sphere {
 
         let diff = (ray.get_point(t2) - self.center) / self.radius;
         return Intersection::new(t2, ray, diff);
+    }
+
+    fn get_bounds(&self) -> BoundingBox {
+        return self.bounds;
     }
 }

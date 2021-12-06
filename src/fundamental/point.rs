@@ -19,6 +19,30 @@ impl Point {
     pub fn zero() -> Self {
         return Point::new(0.0, 0.0, 0.0);
     }
+
+    pub fn nan() -> Self {
+        return Point::new(f32::NAN, f32::NAN, f32::NAN);
+    }
+
+    pub fn is_nan(&self) -> bool {
+        return self.x.is_nan() || self.y.is_nan() || self.z.is_nan();
+    }
+
+    fn min(&self, b: Point) -> Point {
+        return Point::new(
+            self.x.min(b.x),
+            self.y.min(b.y),
+            self.z.min(b.z),
+        );
+    }
+
+    fn max(&self, b: Point) -> Point {
+        return Point::new(
+            self.x.max(b.x),
+            self.y.max(b.y),
+            self.z.max(b.z),
+        );
+    }
 }
 
 impl ops::Index<usize> for Point {
@@ -48,18 +72,54 @@ impl ops::IndexMut<usize> for Point {
     }
 }
 
-pub fn max_point(a: Point, b: Point) -> Point {
-    return Point::new(
-        a.x.max(b.x),
-        a.y.max(b.y),
-        a.z.max(b.z),
-    );
+impl ops::Add<Point> for Point {
+    type Output = Point;
+    fn add(self, rhs: Point) -> Point {
+        return Point {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z,
+        };
+    }
 }
 
-pub fn min_point(a: Point, b: Point) -> Point {
-    return Point::new(
-        a.x.min(b.x),
-        a.y.min(b.y),
-        a.z.min(b.z),
-    );
+impl ops::Mul<f32> for Point {
+    type Output = Point;
+    fn mul(self, scalar: f32) -> Self::Output {
+        Point {
+            x: self.x * scalar,
+            y: self.y * scalar,
+            z: self.z * scalar,
+        }
+    }
 }
+
+
+impl ops::Mul<Point> for f32 {
+    type Output = Point;
+    fn mul(self, p: Point) -> Self::Output {
+        p * self
+    }
+}
+
+
+pub fn max_of(points: &[Point]) -> Point {
+    let mut _max = points[0];
+
+    for idx in 1..points.len() {
+        _max = _max.max(points[idx]);
+    }
+
+    return _max;
+}
+
+pub fn min_of(points: &[Point]) -> Point {
+    let mut _min = points[0];
+
+    for idx in 1..points.len() {
+        _min = _min.min(points[idx]);
+    }
+
+    return _min;
+}
+

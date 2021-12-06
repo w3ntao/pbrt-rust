@@ -8,6 +8,7 @@ use crate::ray_tracing::primitives::quad::Quad;
 
 use crate::ray_tracing::group::Group;
 use crate::ray_tracing::groups::simple_group::SimpleGroup;
+use crate::ray_tracing::groups::bvh::BVH;
 
 use crate::ray_tracing::cameras::perspective::PerspectiveCamera;
 use crate::ray_tracing::integrators::ray_casting::RayCastingIntegrator;
@@ -38,7 +39,7 @@ pub fn test() {
     let quad = Quad::new(Point::new(1.0, -0.9, 4.5), Vector::new(-2.0, 0.0, 0.0), Vector::new(0.0, 0.1, -2.0));
     let aabox = AxisAlignedBox::new(Point::new(2.0, 1.5, -0.5), Point::new(3.0, 2.5, 2.5));
 
-    let mut scene = SimpleGroup::new();
+    let mut scene = BVH::default();
     scene.add(&triangle_0);
     scene.add(&triangle_1);
 
@@ -48,12 +49,14 @@ pub fn test() {
 
     scene.add(&quad);
     scene.add(&aabox);
+    scene.build_index();
+
     let scene = scene;
 
     let world = World::new(&scene);
     let integrator = RayCastingIntegrator::new(&world);
     let renderer = Renderer::new(&camera, &integrator);
-    let image = renderer.render(640, 480);
+    let image = renderer.render(1920, 1440);
     image.write("out.ppm");
 
     return;

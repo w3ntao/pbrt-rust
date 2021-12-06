@@ -1,5 +1,6 @@
 use crate::fundamental::point::*;
 use crate::fundamental::vector::*;
+use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::ray::*;
 use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::primitive::Primitive;
@@ -10,6 +11,7 @@ pub struct Quad {
     pub span0: Vector,
     pub span1: Vector,
     pub normal: Vector,
+    bounds: BoundingBox,
 }
 
 impl Quad {
@@ -19,6 +21,7 @@ impl Quad {
             span0: _span0,
             span1: _span1,
             normal: cross(_span0, _span1).normalize(),
+            bounds: BoundingBox::build(&[v0, v0 + _span0, v0 + _span1, v0 + _span0 + _span1]),
         };
     }
 }
@@ -44,5 +47,9 @@ impl Primitive for Quad {
         }
 
         return Intersection::new(t, ray, ab.normalize());
+    }
+
+    fn get_bounds(&self) -> BoundingBox {
+        return self.bounds;
     }
 }

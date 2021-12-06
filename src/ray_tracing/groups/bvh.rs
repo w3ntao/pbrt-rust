@@ -1,29 +1,142 @@
+use crate::fundamental::point::*;
 use crate::ray_tracing::ray::*;
 use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::primitive::Primitive;
 use crate::ray_tracing::group::Group;
+use crate::ray_tracing::bounding_box::BoundingBox;
 
-#[derive(Default)]
-pub struct BVH<'a> {
+struct Node<'a> {
     primitives: Vec<&'a dyn Primitive>,
+    bounds: BoundingBox,
+    left: Option<Box<Node<'a>>>,
+    right: Option<Box<Node<'a>>>,
 }
 
-impl<'a> BVH<'a> {
-    pub fn new() -> Self { Default::default() }
+impl<'a> Primitive for Node<'a> {
+    fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
+        let (t1, t2) = self.bounds.intersect(ray);
+        if t1 > t2 || t1 > previous_distance {
+            return Intersection::failure();
+        }
+
+        if self.left.is_none() && self.right.is_none() {
+            let mut closest_intersect = Intersection::failure();
+            let mut closest_distance = previous_distance;
+
+            for p in &self.primitives {
+                let intersect = p.intersect(ray, closest_distance);
+                if intersect.intersected() {
+                    closest_intersect = intersect;
+                    closest_distance = intersect.distance;
+                }
+            }
+            return closest_intersect;
+        }
+
+        let left_intersect = self.left.as_ref().unwrap().intersect(ray, previous_distance);
+        let right_intersect = self.right.as_ref().unwrap().intersect(ray, left_intersect.distance);
+
+        return {
+            if left_intersect.distance < right_intersect.distance {
+                left_intersect
+            } else {
+                right_intersect
+            }
+        };
+    }
+
+    fn get_bounds(&self) -> BoundingBox {
+        return self.bounds;
+    }
+}
+
+impl<'a> Node<'a> {
+    fn new(_primitives: Vec<&'a dyn Primitive>) -> Self {
+        println!("building BVH with primitives {}", &_primitives.len());
+
+        let mut total_bounds = BoundingBox::empty();
+        for p in &_primitives {
+            total_bounds += p.get_bounds();
+        }
+        let total_bounds = total_bounds;
+
+        if _primitives.len() <= 3 {
+            return Self {
+                primitives: _primitives,
+                bounds: total_bounds,
+                left: None,
+                right: None,
+            };
+        }
+        
+        let mut axis = 0;
+        {
+            let centroids: Vec<Point> = (&_primitives).into_iter().map(
+                |p| p.get_bounds().get_centroid()).collect();
+            let extent = max_of(&centroids) - min_of(&centroids);
+            if extent[0] >= extent[1] && extent[0] >= extent[2] {
+                axis = 0;
+            } else if extent[1] >= extent[2] {
+                axis = 1;
+            } else {
+                axis = 2;
+            }
+        }
+
+        let mut sorted_primitives = _primitives.clone();
+        sorted_primitives.sort_by(|a, b|
+            a.get_bounds().get_centroid()[axis].partial_cmp(
+                &b.get_bounds().get_centroid()[axis]).unwrap());
+
+        let mid = sorted_primitives.len() / 2;
+        let left_nodes = &sorted_primitives[0..mid];
+        let right_nodes = &sorted_primitives[mid..sorted_primitives.len()];
+
+        return Self {
+            primitives: Vec::default(),
+            bounds: total_bounds,
+            left: Some(Box::new(Node::new(left_nodes.to_vec()))),
+            right: Some(Box::new(Node::new(right_nodes.to_vec()))),
+        };
+    }
+}
+
+pub struct BVH<'a> {
+    primitives: Vec<&'a dyn Primitive>,
+    bounds: BoundingBox,
+    root: Option<Box<Node<'a>>>,
+}
+
+impl Default for BVH<'_> {
+    fn default() -> Self {
+        BVH {
+            primitives: Vec::default(),
+            bounds: BoundingBox::empty(),
+            root: None,
+        }
+    }
 }
 
 impl<'a> Group<'a> for BVH<'a> {
     fn add(&mut self, p: &'a dyn Primitive) {
         self.primitives.push(p);
+        self.bounds += p.get_bounds();
+    }
+}
+
+impl<'a> Primitive for BVH<'a> {
+    fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
+        return self.root.as_ref().unwrap().intersect(ray, previous_distance);
     }
 
-    fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
-        return Intersection::failure();
+    fn get_bounds(&self) -> BoundingBox {
+        return self.bounds;
     }
 }
 
 impl<'a> BVH<'a> {
-    fn build_index(&mut self) {
-
+    pub fn build_index(&mut self) {
+        println!("Building BVH");
+        self.root = Some(Box::new(Node::new(self.primitives.clone())));
     }
 }
