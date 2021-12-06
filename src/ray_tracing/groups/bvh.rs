@@ -52,15 +52,13 @@ impl<'a> Primitive for Node<'a> {
 
 impl<'a> Node<'a> {
     fn new(_primitives: Vec<&'a dyn Primitive>) -> Self {
-        println!("building BVH with primitives {}", &_primitives.len());
-
         let mut total_bounds = BoundingBox::empty();
         for p in &_primitives {
             total_bounds += p.get_bounds();
         }
         let total_bounds = total_bounds;
 
-        if _primitives.len() <= 3 {
+        if _primitives.len() <= 20 {
             return Self {
                 primitives: _primitives,
                 bounds: total_bounds,

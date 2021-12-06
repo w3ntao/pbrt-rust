@@ -126,8 +126,11 @@ impl ops::Mul<Vector> for f32 {
 impl ops::Div<f32> for Vector {
     type Output = Vector;
     fn div(self, rhs: f32) -> Vector {
-        assert_ne!(rhs, 0.0);
-        return self * (1.0 / rhs);
+        return Vector {
+            x: self.x / rhs,
+            y: self.y / rhs,
+            z: self.z / rhs,
+        };
     }
 }
 
