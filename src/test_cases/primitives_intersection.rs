@@ -39,15 +39,15 @@ pub fn test() {
     let aabox = AxisAlignedBox::new(Point::new(2.0, 1.5, -0.5), Point::new(3.0, 2.5, 2.5));
 
     let mut scene = SimpleGroup::new();
-    scene.add(&triangle_0);
-    scene.add(&triangle_1);
+    scene.add(Box::new(triangle_0));
+    scene.add(Box::new(triangle_1));
 
-    scene.add(&sphere_0);
-    scene.add(&sphere_1);
-    scene.add(&sphere_2);
+    scene.add(Box::new(sphere_0));
+    scene.add(Box::new(sphere_1));
+    scene.add(Box::new(sphere_2));
 
-    scene.add(&quad);
-    scene.add(&aabox);
+    scene.add(Box::new(quad));
+    scene.add(Box::new(aabox));
     let scene = scene;
 
     let world = World::new(&scene);

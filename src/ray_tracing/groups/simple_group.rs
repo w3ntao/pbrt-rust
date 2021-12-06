@@ -5,21 +5,21 @@ use crate::ray_tracing::primitive::Primitive;
 use crate::ray_tracing::group::Group;
 
 #[derive(Default)]
-pub struct SimpleGroup<'a> {
-    primitives: Vec<&'a dyn Primitive>,
+pub struct SimpleGroup {
+    primitives: Vec<Box<dyn Primitive>>,
 }
 
-impl<'a> SimpleGroup<'a> {
+impl SimpleGroup {
     pub fn new() -> Self { Default::default() }
 }
 
-impl<'a> Group<'a> for SimpleGroup<'a> {
-    fn add(&mut self, p: &'a dyn Primitive) {
+impl SimpleGroup {
+    pub(crate) fn add(&mut self, p: Box<dyn Primitive>) {
         self.primitives.push(p);
     }
 }
 
-impl<'a> Primitive for SimpleGroup<'a> {
+impl Primitive for SimpleGroup {
         fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
         let mut closest_intersect = Intersection::failure();
         let mut closest_distance = previous_distance;

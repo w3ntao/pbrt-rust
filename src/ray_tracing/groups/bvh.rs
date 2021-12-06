@@ -1,3 +1,4 @@
+use std::rc::Rc;
 use crate::fundamental::point::*;
 use crate::ray_tracing::ray::*;
 use crate::ray_tracing::intersection::*;
@@ -5,14 +6,14 @@ use crate::ray_tracing::primitive::Primitive;
 use crate::ray_tracing::group::Group;
 use crate::ray_tracing::bounding_box::BoundingBox;
 
-struct Node<'a> {
-    primitives: Vec<&'a dyn Primitive>,
+struct Node {
+    primitives: Vec<Rc<dyn Primitive>>,
     bounds: BoundingBox,
-    left: Option<Box<Node<'a>>>,
-    right: Option<Box<Node<'a>>>,
+    left: Option<Box<Node>>,
+    right: Option<Box<Node>>,
 }
 
-impl<'a> Primitive for Node<'a> {
+impl Primitive for Node {
     fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
         let (t1, t2) = self.bounds.intersect(ray);
         if t1 > t2 || t1 > previous_distance {
@@ -50,8 +51,8 @@ impl<'a> Primitive for Node<'a> {
     }
 }
 
-impl<'a> Node<'a> {
-    fn new(_primitives: Vec<&'a dyn Primitive>) -> Self {
+impl Node {
+    fn new(_primitives: Vec<Rc<dyn Primitive>>) -> Self {
         let mut total_bounds = BoundingBox::empty();
         for p in &_primitives {
             total_bounds += p.get_bounds();
@@ -66,7 +67,7 @@ impl<'a> Node<'a> {
                 right: None,
             };
         }
-        
+
         let mut axis = 0;
         {
             let centroids: Vec<Point> = (&_primitives).into_iter().map(
@@ -81,7 +82,7 @@ impl<'a> Node<'a> {
             }
         }
 
-        let mut sorted_primitives = _primitives.clone();
+        let mut sorted_primitives = _primitives;
         sorted_primitives.sort_by(|a, b|
             a.get_bounds().get_centroid()[axis].partial_cmp(
                 &b.get_bounds().get_centroid()[axis]).unwrap());
@@ -99,13 +100,13 @@ impl<'a> Node<'a> {
     }
 }
 
-pub struct BVH<'a> {
-    primitives: Vec<&'a dyn Primitive>,
+pub struct BVH {
+    primitives: Vec<Rc<dyn Primitive>>,
     bounds: BoundingBox,
-    root: Option<Box<Node<'a>>>,
+    root: Option<Box<Node>>,
 }
 
-impl Default for BVH<'_> {
+impl Default for BVH {
     fn default() -> Self {
         BVH {
             primitives: Vec::default(),
@@ -115,14 +116,14 @@ impl Default for BVH<'_> {
     }
 }
 
-impl<'a> Group<'a> for BVH<'a> {
-    fn add(&mut self, p: &'a dyn Primitive) {
-        self.primitives.push(p);
+impl Group for BVH {
+    fn add(&mut self, p: Rc<dyn Primitive>) {
         self.bounds += p.get_bounds();
+        self.primitives.push(p);
     }
 }
 
-impl<'a> Primitive for BVH<'a> {
+impl Primitive for BVH {
     fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
         return self.root.as_ref().unwrap().intersect(ray, previous_distance);
     }
@@ -132,9 +133,12 @@ impl<'a> Primitive for BVH<'a> {
     }
 }
 
-impl<'a> BVH<'a> {
+impl BVH {
+    pub fn test_type(self, _primitives: Vec<Rc<dyn Primitive>>) {}
+
     pub fn build_index(&mut self) {
         println!("Building BVH");
         self.root = Some(Box::new(Node::new(self.primitives.clone())));
+        println!("BVH built");
     }
 }
