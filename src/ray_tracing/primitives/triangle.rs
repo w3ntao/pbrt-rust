@@ -44,7 +44,9 @@ impl Primitive for Triangle {
 
         let beta = dot(c, cross(ray.direction, self.span1)) / det;
         let gamma = dot(self.span0, cross(ray.direction, c)) / det;
-        if beta < 0.0 || gamma < 0.0 || beta + gamma > 1.0 {
+        let error_tolerance = 0.0001;
+        // to tolerate numerical error
+        if beta < -error_tolerance || gamma < -error_tolerance || beta + gamma > 1.0 + error_tolerance {
             // if the intersection is outside of the triangle
             return Intersection::failure();
         }
