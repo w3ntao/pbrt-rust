@@ -1,10 +1,9 @@
 use std::rc::Rc;
 use crate::fundamental::point::Point;
-use crate::ray_tracing::primitive::Primitive;
 use crate::ray_tracing::primitives::triangle::Triangle;
 
 pub fn obj_to_triangles(obj_file: &str) -> Vec<Rc<Triangle>> {
-    let (loaded_models, materials) =
+    let (loaded_models, _materials) =
         tobj::load_obj(
             &obj_file,
             &tobj::LoadOptions {

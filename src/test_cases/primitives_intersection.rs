@@ -1,3 +1,4 @@
+use std::rc::Rc;
 use crate::fundamental::point::Point;
 use crate::fundamental::vector::Vector;
 
@@ -6,7 +7,6 @@ use crate::ray_tracing::primitives::sphere::Sphere;
 use crate::ray_tracing::primitives::axis_aligned_box::AxisAlignedBox;
 use crate::ray_tracing::primitives::quad::Quad;
 
-use crate::ray_tracing::group::Group;
 use crate::ray_tracing::groups::simple_group::SimpleGroup;
 
 use crate::ray_tracing::cameras::perspective::PerspectiveCamera;
@@ -50,9 +50,9 @@ pub fn test() {
     scene.add(Box::new(aabox));
     let scene = scene;
 
-    let world = World::new(&scene);
-    let integrator = RayCastingIntegrator::new(&world);
-    let renderer = Renderer::new(&camera, &integrator);
+    let world = World::new(Rc::new(scene));
+    let integrator = RayCastingIntegrator::new(Rc::new(world));
+    let renderer = Renderer::new(Rc::new(camera), Rc::new(integrator));
     let image = renderer.render(640, 480);
     image.write("out.ppm");
 }

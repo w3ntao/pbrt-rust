@@ -1,14 +1,15 @@
+use std::rc::Rc;
 use crate::fundamental::image::Image;
 use crate::ray_tracing::camera::Camera;
 use crate::ray_tracing::integrator::Integrator;
 
-pub struct Renderer<'a> {
-    camera: &'a dyn Camera,
-    integrator: &'a dyn Integrator,
+pub struct Renderer {
+    camera: Rc<dyn Camera>,
+    integrator: Rc<dyn Integrator>,
 }
 
-impl<'a> Renderer<'a> {
-    pub fn new(_camera: &'a dyn Camera, _integrator: &'a dyn Integrator) -> Self {
+impl Renderer {
+    pub fn new(_camera: Rc<dyn Camera>, _integrator: Rc<dyn Integrator>) -> Self {
         return Self {
             camera: _camera,
             integrator: _integrator,
@@ -24,7 +25,7 @@ impl<'a> Renderer<'a> {
                 let ray = self.camera.get_primary_ray(
                     ndc_x + 1.0 / (image.width as f32),
                     ndc_y - 1.0 / (image.height as f32));
-                image.fill(self.integrator.get_radiance(&ray), y, x);
+                image.fill(self.integrator.get_radiance(Rc::new(ray)), y, x);
             }
         }
         return image;

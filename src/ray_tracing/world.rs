@@ -1,11 +1,12 @@
+use std::rc::Rc;
 use crate::ray_tracing::primitive::Primitive;
 
-pub struct World<'a> {
-    pub scene: &'a dyn Primitive,
+pub struct World {
+    pub scene: Rc<dyn Primitive>,
 }
 
-impl<'a> World<'a> {
-    pub fn new(_scene: &'a dyn Primitive) -> Self {
+impl World {
+    pub fn new(_scene: Rc<dyn Primitive>) -> Self {
         return Self {
             scene: _scene,
         };

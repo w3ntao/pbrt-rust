@@ -1,3 +1,4 @@
+use std::rc::Rc;
 use crate::fundamental::point::*;
 use crate::fundamental::vector::*;
 use crate::ray_tracing::bounding_box::BoundingBox;
@@ -23,7 +24,7 @@ impl AxisAlignedBox {
 }
 
 impl Primitive for AxisAlignedBox {
-    fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
+    fn intersect(&self, ray: Rc<Ray>, previous_distance: f32) -> Intersection {
         let mut t_min = 0.0;
         let mut t_max = previous_distance;
         let mut normal = Vector::zero();

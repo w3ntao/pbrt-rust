@@ -14,8 +14,8 @@ struct Node {
 }
 
 impl Primitive for Node {
-    fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
-        let (t1, t2) = self.bounds.intersect(ray);
+    fn intersect(&self, ray: Rc<Ray>, previous_distance: f32) -> Intersection {
+        let (t1, t2) = self.bounds.intersect(Rc::clone(&ray));
         if t1 > t2 || t1 > previous_distance {
             return Intersection::failure();
         }
@@ -25,17 +25,17 @@ impl Primitive for Node {
             let mut closest_distance = previous_distance;
 
             for p in &self.primitives {
-                let intersect = p.intersect(ray, closest_distance);
+                let intersect = p.intersect(Rc::clone(&ray), closest_distance);
                 if intersect.intersected() {
-                    closest_intersect = intersect;
                     closest_distance = intersect.distance;
+                    closest_intersect = intersect;
                 }
             }
             return closest_intersect;
         }
 
-        let left_intersect = self.left.as_ref().unwrap().intersect(ray, previous_distance);
-        let right_intersect = self.right.as_ref().unwrap().intersect(ray, left_intersect.distance);
+        let left_intersect = self.left.as_ref().unwrap().intersect(Rc::clone(&ray), previous_distance);
+        let right_intersect = self.right.as_ref().unwrap().intersect(Rc::clone(&ray), left_intersect.distance);
 
         return {
             if left_intersect.distance < right_intersect.distance {
@@ -68,19 +68,18 @@ impl Node {
             };
         }
 
-        let mut axis = 0;
-        {
-            let centroids: Vec<Point> = (&_primitives).into_iter().map(
-                |p| p.get_bounds().get_centroid()).collect();
-            let extent = max_of(&centroids) - min_of(&centroids);
+        let centroids: Vec<Point> = (&_primitives).into_iter().map(
+            |p| p.get_bounds().get_centroid()).collect();
+        let extent = max_of(&centroids) - min_of(&centroids);
+        let axis = {
             if extent[0] >= extent[1] && extent[0] >= extent[2] {
-                axis = 0;
+                0
             } else if extent[1] >= extent[2] {
-                axis = 1;
+                1
             } else {
-                axis = 2;
+                2
             }
-        }
+        };
 
         let mut sorted_primitives = _primitives;
         sorted_primitives.sort_by(|a, b|
@@ -124,7 +123,7 @@ impl Group for BVH {
 }
 
 impl Primitive for BVH {
-    fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
+    fn intersect(&self, ray: Rc<Ray>, previous_distance: f32) -> Intersection {
         return self.root.as_ref().unwrap().intersect(ray, previous_distance);
     }
 
@@ -134,8 +133,6 @@ impl Primitive for BVH {
 }
 
 impl BVH {
-    pub fn test_type(self, _primitives: Vec<Rc<dyn Primitive>>) {}
-
     pub fn build_index(&mut self) {
         println!("Building BVH");
         self.root = Some(Box::new(Node::new(self.primitives.clone())));

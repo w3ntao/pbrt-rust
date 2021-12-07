@@ -1,3 +1,4 @@
+use std::rc::Rc;
 use crate::fundamental::point::*;
 use crate::fundamental::vector::*;
 use crate::ray_tracing::bounding_box::BoundingBox;
@@ -25,7 +26,7 @@ impl Sphere {
 }
 
 impl Primitive for Sphere {
-    fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
+    fn intersect(&self, ray: Rc<Ray>, previous_distance: f32) -> Intersection {
         let oc = self.center - ray.origin;
         let dt = dot(oc, ray.direction);
         let discriminant = dt * dt + self.radius * self.radius - dot(oc, oc);

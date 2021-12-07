@@ -1,8 +1,8 @@
+use std::rc::Rc;
 use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::ray::*;
 use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::primitive::Primitive;
-use crate::ray_tracing::group::Group;
 
 #[derive(Default)]
 pub struct SimpleGroup {
@@ -20,15 +20,15 @@ impl SimpleGroup {
 }
 
 impl Primitive for SimpleGroup {
-        fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
+        fn intersect(&self, ray: Rc<Ray>, previous_distance: f32) -> Intersection {
         let mut closest_intersect = Intersection::failure();
         let mut closest_distance = previous_distance;
 
         for p in &self.primitives {
-            let intersect = p.intersect(ray, closest_distance);
+            let intersect = p.intersect(Rc::clone(&ray), closest_distance);
             if intersect.intersected() {
-                closest_intersect = intersect;
                 closest_distance = intersect.distance;
+                closest_intersect = intersect;
             }
         }
         return closest_intersect;
