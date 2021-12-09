@@ -43,7 +43,6 @@ impl Primitive for BVH {
 impl BVH {
     pub fn build_index(&mut self) {
         println!("Building BVH");
-        //let infos = Vec::<PrimitiveInfo>::new();
         let mut primitive_infos = vec![PrimitiveInfo::default(); self.primitives.len()];
         for idx in 0..self.primitives.len() {
             let bounds = self.primitives[idx].get_bounds();

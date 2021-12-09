@@ -7,7 +7,7 @@ use crate::ray_tracing::bounding_box::BoundingBox;
 
 #[derive(Copy, Clone)]
 pub struct PrimitiveInfo {
-    id: usize,
+    primitive_id: usize,
     bounds: BoundingBox,
     centroid: Point,
 }
@@ -15,7 +15,7 @@ pub struct PrimitiveInfo {
 impl Default for PrimitiveInfo {
     fn default() -> Self {
         Self {
-            id: usize::MAX,
+            primitive_id: usize::MAX,
             bounds: BoundingBox::empty(),
             centroid: Point::new(f32::NAN, f32::NAN, f32::NAN),
         }
@@ -23,9 +23,9 @@ impl Default for PrimitiveInfo {
 }
 
 impl PrimitiveInfo {
-    pub fn new(_id: usize, _bounds: BoundingBox, _centroid: Point) -> Self {
+    pub fn new(id: usize, _bounds: BoundingBox, _centroid: Point) -> Self {
         Self {
-            id: _id,
+            primitive_id: id,
             bounds: _bounds,
             centroid: _centroid,
         }
@@ -99,15 +99,15 @@ impl Node {
 
 impl Node {
     pub fn build_leaf(ordered_primitives: &mut Vec<Rc<dyn Primitive>>,
-                      primitive_info: Vec<PrimitiveInfo>,
-                      _primitives: &Vec<Rc<dyn Primitive>>) -> Self {
-        let mut total_bounds = BoundingBox::empty();
+                      infos: Vec<PrimitiveInfo>,
+                      primitives: &Vec<Rc<dyn Primitive>>) -> Self {
         let _start = ordered_primitives.len();
-        for info in primitive_info {
+        let _end = _start + infos.len();
+        let mut total_bounds = BoundingBox::empty();
+        for info in &infos {
+            ordered_primitives.push(primitives[info.primitive_id].clone());
             total_bounds += info.bounds;
-            ordered_primitives.push(_primitives[info.id].clone());
         }
-        let _end = ordered_primitives.len();
 
         Self {
             start: _start,
@@ -119,29 +119,43 @@ impl Node {
     }
 
     pub fn recursive_build(ordered_primitives: &mut Vec<Rc<dyn Primitive>>,
-                           primitive_infos: Vec<PrimitiveInfo>,
-                           _primitives: &Vec<Rc<dyn Primitive>>) -> Self {
-        if primitive_infos.len() < BUCKET_NUM {
-            return Node::build_leaf(ordered_primitives, primitive_infos, _primitives);
+                           infos: Vec<PrimitiveInfo>,
+                           primitives: &Vec<Rc<dyn Primitive>>) -> Self {
+        if infos.len() < BUCKET_NUM {
+            // stop dividing primitives into buckets
+            // when primitive number is too small
+            return Node::build_leaf(ordered_primitives, infos, primitives);
         }
 
         let mut total_bounds = BoundingBox::empty();
-        for info in &primitive_infos {
+        for info in &infos {
             total_bounds += info.bounds;
         }
         let total_bounds = total_bounds;
 
-        let centroids: Vec<Point> = (&primitive_infos).into_iter().map(
+        let centroids: Vec<Point> = (&infos).into_iter().map(
             |info| info.centroid).collect();
         let axis_min = min_of(&centroids);
         let axis_max = max_of(&centroids);
         let axis_extent = axis_max - axis_min;
+
+        let mut ignored_axis = [false; 3];
+        for axis_idx in 0..3 {
+            if axis_extent[axis_idx] < 0.5 * axis_extent[(axis_idx + 1) % 3] ||
+                axis_extent[axis_idx] < 0.5 * axis_extent[(axis_idx + 2) % 3] {
+                // ignore this axis when it's extent is
+                // comparably small compared with the other two
+                ignored_axis[axis_idx] = true;
+            }
+        }
+        let ignore_axis = ignored_axis;
 
         let mut min_cost = f32::INFINITY;
         let mut max_left_value = -f32::INFINITY;
         let mut split_axis = usize::MAX;
 
         for axis_idx in 0..3 {
+            if ignore_axis[axis_idx] { continue; }
             let bucket_width = axis_extent[axis_idx] / (BUCKET_NUM as f32);
 
             let mut bucket_list = Vec::with_capacity(BUCKET_NUM);
@@ -149,7 +163,7 @@ impl Node {
                 bucket_list.push(Bucket::empty());
             }
 
-            for info in &primitive_infos {
+            for info in &infos {
                 let bucket_idx_float = (info.centroid[axis_idx] - axis_min[axis_idx]) / bucket_width;
                 let bucket_idx = (bucket_idx_float as usize).max(0).min(BUCKET_NUM - 1);
 
@@ -190,14 +204,14 @@ impl Node {
             }
         }
 
-        let leaf_cost = primitive_infos.len() as f32;
+        let leaf_cost = infos.len() as f32;
         if leaf_cost <= min_cost {
-            return Node::build_leaf(ordered_primitives, primitive_infos, _primitives);
+            return Node::build_leaf(ordered_primitives, infos, primitives);
         }
 
         let mut left_infos = Vec::new();
         let mut right_infos = Vec::new();
-        for info in primitive_infos {
+        for info in infos {
             if info.centroid[split_axis] < max_left_value {
                 left_infos.push(info.clone());
             } else {
@@ -209,8 +223,8 @@ impl Node {
             start: usize::MAX,
             end: usize::MAX,
             bounds: total_bounds,
-            left: Some(Box::new(Node::recursive_build(ordered_primitives, left_infos, _primitives))),
-            right: Some(Box::new(Node::recursive_build(ordered_primitives, right_infos, _primitives))),
+            left: Some(Box::new(Node::recursive_build(ordered_primitives, left_infos, primitives))),
+            right: Some(Box::new(Node::recursive_build(ordered_primitives, right_infos, primitives))),
         };
     }
 }
