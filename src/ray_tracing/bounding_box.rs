@@ -41,6 +41,17 @@ impl BoundingBox {
         return 0.5 * self.min + 0.5 * self.max;
     }
 
+    pub fn get_area(&self) -> f32 {
+        if self.is_empty() {
+            return 0.0;
+        }
+        let x_extent = self.max.x - self.min.x;
+        let y_extent = self.max.y - self.min.y;
+        let z_extent = self.max.z - self.min.z;
+
+        return 2.0 * (x_extent * y_extent + x_extent * z_extent + y_extent * z_extent);
+    }
+
     pub fn intersect(&self, ray: Rc<Ray>) -> (f32, f32) {
         let no_intersection = (f32::INFINITY, -f32::INFINITY);
         if self.is_empty() {
