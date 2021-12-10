@@ -1,8 +1,8 @@
-use std::rc::Rc;
+use std::sync::Arc;
 use crate::fundamental::point::Point;
 use crate::ray_tracing::primitives::triangle::Triangle;
 
-pub fn obj_to_triangles(obj_file: &str) -> Vec<Rc<Triangle>> {
+pub fn obj_to_triangles(obj_file: &str) -> Vec<Arc<Triangle>> {
     let (loaded_models, _materials) =
         tobj::load_obj(
             &obj_file,
@@ -35,7 +35,7 @@ pub fn obj_to_triangles(obj_file: &str) -> Vec<Rc<Triangle>> {
         let p1_idx = mesh.indices[index + 1];
         let p2_idx = mesh.indices[index + 2];
 
-        triangles.push(Rc::new(Triangle::new(
+        triangles.push(Arc::new(Triangle::new(
             vertices[p0_idx as usize],
             vertices[p1_idx as usize],
             vertices[p2_idx as usize],

@@ -1,6 +1,6 @@
 use crate::fundamental::rgb_color::RGBColor;
 use crate::ray_tracing::ray::Ray;
 
-pub trait Integrator {
+pub trait Integrator: Send + Sync {
     fn get_radiance(&self, ray: &Ray) -> RGBColor;
 }

@@ -1,5 +1,4 @@
-use std::rc::Rc;
-use std::time::Instant;
+use std::sync::Arc;
 
 use crate::fundamental::point::Point;
 use crate::fundamental::vector::Vector;
@@ -28,9 +27,9 @@ pub fn test() {
         std::f32::consts::PI / 8.0,
         std::f32::consts::PI / 6.0);
 
-    let world = World::new(Rc::new(scene));
-    let integrator = RayCastingIntegrator::new(Rc::new(world));
-    let renderer = Renderer::new(Rc::new(camera), Rc::new(integrator));
+    let world = World::new(Arc::new(scene));
+    let integrator = RayCastingIntegrator::new(Arc::new(world));
+    let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator));
     let image = renderer.render(2000, 1500);
     image.write("dragon.ppm");
 }

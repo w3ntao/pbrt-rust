@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 use crate::fundamental::vector::*;
 use crate::fundamental::rgb_color::*;
 use crate::ray_tracing::ray::Ray;
@@ -6,11 +6,11 @@ use crate::ray_tracing::integrator::Integrator;
 use crate::ray_tracing::world::World;
 
 pub struct RayCastingIntegrator {
-    world: Rc<World>,
+    world: Arc<World>,
 }
 
 impl RayCastingIntegrator {
-    pub fn new(_world: Rc<World>) -> Self {
+    pub fn new(_world: Arc<World>) -> Self {
         return Self { world: _world };
     }
 }

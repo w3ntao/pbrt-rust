@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 use crate::fundamental::point::*;
 use crate::ray_tracing::ray::*;
 use crate::ray_tracing::intersection::*;
@@ -60,7 +60,7 @@ pub struct Node {
 }
 
 impl Node {
-    pub fn intersect(&self, ray: &Ray, previous_distance: f32, primitives: &Vec<Rc<dyn Primitive>>) -> Intersection {
+    pub fn intersect(&self, ray: &Ray, previous_distance: f32, primitives: &Vec<Arc<dyn Primitive>>) -> Intersection {
         let (t1, t2) = self.bounds.intersect(ray);
         if t1 > t2 || t1 > previous_distance {
             return Intersection::failure();
@@ -99,9 +99,9 @@ impl Node {
 }
 
 impl Node {
-    pub fn build_leaf(ordered_primitives: &mut Vec<Rc<dyn Primitive>>,
+    pub fn build_leaf(ordered_primitives: &mut Vec<Arc<dyn Primitive>>,
                       infos: Vec<PrimitiveInfo>,
-                      primitives: &Vec<Rc<dyn Primitive>>) -> Self {
+                      primitives: &Vec<Arc<dyn Primitive>>) -> Self {
         let _start = ordered_primitives.len();
         let _end = _start + infos.len();
         let mut total_bounds = BoundingBox::empty();
@@ -119,9 +119,9 @@ impl Node {
         }
     }
 
-    pub fn recursive_build(ordered_primitives: &mut Vec<Rc<dyn Primitive>>,
+    pub fn recursive_build(ordered_primitives: &mut Vec<Arc<dyn Primitive>>,
                            infos: Vec<PrimitiveInfo>,
-                           primitives: &Vec<Rc<dyn Primitive>>) -> Self {
+                           primitives: &Vec<Arc<dyn Primitive>>) -> Self {
         let mut total_bounds = BoundingBox::empty();
         for info in &infos {
             total_bounds += info.bounds;

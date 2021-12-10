@@ -37,10 +37,6 @@ impl BoundingBox {
         return self.min.is_nan() || self.max.is_nan();
     }
 
-    pub fn get_centroid(&self) -> Point {
-        return 0.5 * self.min + 0.5 * self.max;
-    }
-
     pub fn get_area(&self) -> f32 {
         if self.is_empty() {
             return 0.0;

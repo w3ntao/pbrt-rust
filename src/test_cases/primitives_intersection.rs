@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 use crate::fundamental::point::Point;
 use crate::fundamental::vector::Vector;
 
@@ -39,20 +39,20 @@ pub fn test() {
     let aabox = AxisAlignedBox::new(Point::new(2.0, 1.5, -0.5), Point::new(3.0, 2.5, 2.5));
 
     let mut scene = SimpleGroup::new();
-    scene.add(Box::new(triangle_0));
-    scene.add(Box::new(triangle_1));
+    scene.add(Arc::new(triangle_0));
+    scene.add(Arc::new(triangle_1));
 
-    scene.add(Box::new(sphere_0));
-    scene.add(Box::new(sphere_1));
-    scene.add(Box::new(sphere_2));
+    scene.add(Arc::new(sphere_0));
+    scene.add(Arc::new(sphere_1));
+    scene.add(Arc::new(sphere_2));
 
-    scene.add(Box::new(quad));
-    scene.add(Box::new(aabox));
+    scene.add(Arc::new(quad));
+    scene.add(Arc::new(aabox));
     let scene = scene;
 
-    let world = World::new(Rc::new(scene));
-    let integrator = RayCastingIntegrator::new(Rc::new(world));
-    let renderer = Renderer::new(Rc::new(camera), Rc::new(integrator));
+    let world = World::new(Arc::new(scene));
+    let integrator = RayCastingIntegrator::new(Arc::new(world));
+    let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator));
     let image = renderer.render(640, 480);
     image.write("out.ppm");
 }

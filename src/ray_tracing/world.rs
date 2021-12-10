@@ -1,12 +1,12 @@
-use std::rc::Rc;
+use std::sync::Arc;
 use crate::ray_tracing::primitive::Primitive;
 
 pub struct World {
-    pub scene: Rc<dyn Primitive>,
+    pub scene: Arc<dyn Primitive>,
 }
 
 impl World {
-    pub fn new(_scene: Rc<dyn Primitive>) -> Self {
+    pub fn new(_scene: Arc<dyn Primitive>) -> Self {
         return Self {
             scene: _scene,
         };

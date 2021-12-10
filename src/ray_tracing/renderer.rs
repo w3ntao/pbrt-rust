@@ -1,38 +1,110 @@
-use std::rc::Rc;
 use std::time::Instant;
+use std::sync::{Arc, Mutex};
+use std::thread;
+use std::thread::JoinHandle;
+
+extern crate num_cpus;
 
 use crate::fundamental::image::Image;
 use crate::ray_tracing::camera::Camera;
 use crate::ray_tracing::integrator::Integrator;
 
-pub struct Renderer {
-    camera: Rc<dyn Camera>,
-    integrator: Rc<dyn Integrator>,
+const BATCH_SIZE: usize = 128;
+
+#[derive(Clone)]
+struct Job {
+    pub x: usize,
+    pub y: usize,
 }
 
+pub struct Renderer {
+    camera: Arc<dyn Camera>,
+    integrator: Arc<dyn Integrator>,
+}
+
+unsafe impl Send for Renderer {}
+
 impl Renderer {
-    pub fn new(_camera: Rc<dyn Camera>, _integrator: Rc<dyn Integrator>) -> Self {
+    pub fn new(_camera: Arc<dyn Camera>, _integrator: Arc<dyn Integrator>) -> Self {
         return Self {
             camera: _camera,
             integrator: _integrator,
         };
     }
 
-    pub fn render(&self, width: usize, height: usize) -> Image {
+    fn single_thread_render(&self,
+                            image: &mut Arc<Mutex<Image>>,
+                            job_list: &mut Arc<Mutex<Vec<Vec<Job>>>>) {
+        let locked_image = image.lock().unwrap();
+        let width = locked_image.width;
+        let height = locked_image.height;
+        std::mem::drop(locked_image);
+
+        loop {
+            let mut locked_job = job_list.lock().unwrap();
+            let maybe_job = locked_job.pop();
+            std::mem::drop(locked_job);
+
+            match maybe_job {
+                Some(job_batch) => {
+                    for job in job_batch.iter() {
+                        let x = job.x;
+                        let y = job.y;
+                        let ndc_y = -2.0 * (y as f32) / (height as f32) + 1.0;
+                        let ndc_x = 2.0 * (x as f32) / (width as f32) - 1.0;
+
+                        let ray = self.camera.get_primary_ray(
+                            ndc_x + 1.0 / (width as f32),
+                            ndc_y - 1.0 / (height as f32));
+                        let color = self.integrator.get_radiance(&ray);
+
+                        let mut locked_image = image.lock().unwrap();
+                        locked_image.fill(color, y, x);
+                        std::mem::drop(locked_image);
+                    }
+                }
+                None => break,
+            };
+        }
+    }
+
+    pub fn render(self, width: usize, height: usize) -> Image {
         let start = Instant::now();
 
-        let mut image = Image::new(width, height);
-        for x in 0usize..image.width {
-            let ndc_x = 2.0 * (x as f32) / (image.width as f32) - 1.0;
-            for y in 0usize..image.height {
-                let ndc_y = -2.0 * (y as f32) / (image.height as f32) + 1.0;
-                let ray = self.camera.get_primary_ray(
-                    ndc_x + 1.0 / (image.width as f32),
-                    ndc_y - 1.0 / (image.height as f32));
-                image.fill(self.integrator.get_radiance(&ray), y, x);
+        let mut all_jobs: Vec<Job> = vec![];
+        all_jobs.reserve(width * height);
+        for _x in 0..width {
+            for _y in 0..height {
+                all_jobs.push(Job { x: _x, y: _y });
             }
         }
+
+        let mut job_list: Vec<Vec<Job>> = vec![];
+        for idx in (0..all_jobs.len()).step_by(BATCH_SIZE) {
+            let batch = &all_jobs[idx..(idx + BATCH_SIZE).min(all_jobs.len())];
+            job_list.push(batch.clone().to_vec());
+        }
+        let shared_job = Arc::new(Mutex::new(job_list));
+        let shared_image = Arc::new(Mutex::new(Image::new(width, height)));
+
+        let mut handles: Vec<JoinHandle<()>> = vec![];
+        let arc_self = Arc::new(self);
+        for _ in 0..num_cpus::get_physical() {
+            let mut image_ptr = Arc::clone(&shared_image);
+            let mut job_ptr = Arc::clone(&shared_job);
+
+            let forked_self = arc_self.clone();
+            let handle =
+                thread::spawn(move ||
+                    forked_self.single_thread_render(&mut image_ptr, &mut job_ptr)
+                );
+            handles.push(handle);
+        }
+        for handle in handles {
+            handle.join().unwrap();
+        }
+
         println!("Rendering took {:.2}[s]", start.elapsed().as_secs_f32());
-        return image;
+        return shared_image.lock().unwrap().clone();
     }
 }

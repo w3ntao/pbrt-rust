@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::ray::*;
 use crate::ray_tracing::intersection::*;
@@ -5,7 +6,7 @@ use crate::ray_tracing::primitive::Primitive;
 
 #[derive(Default)]
 pub struct SimpleGroup {
-    primitives: Vec<Box<dyn Primitive>>,
+    primitives: Vec<Arc<dyn Primitive>>,
 }
 
 impl SimpleGroup {
@@ -13,7 +14,7 @@ impl SimpleGroup {
 }
 
 impl SimpleGroup {
-    pub(crate) fn add(&mut self, p: Box<dyn Primitive>) {
+    pub(crate) fn add(&mut self, p: Arc<dyn Primitive>) {
         self.primitives.push(p);
     }
 }

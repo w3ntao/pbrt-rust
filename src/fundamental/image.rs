@@ -2,6 +2,7 @@ use std::fs;
 use std::io::{BufWriter, Write};
 use crate::fundamental::rgb_color::*;
 
+#[derive(Clone)]
 pub struct Image {
     pixels: Vec<Vec<RGBColor>>,
     pub width: usize,

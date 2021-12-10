@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 use std::time::Instant;
 
 use crate::ray_tracing::ray::*;
@@ -10,7 +10,7 @@ use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::groups::bvh_node::{Node, PrimitiveInfo};
 
 pub struct BVH {
-    primitives: Vec<Rc<dyn Primitive>>,
+    primitives: Vec<Arc<dyn Primitive>>,
     bounds: BoundingBox,
     root: Option<Box<Node>>,
 }
@@ -26,7 +26,7 @@ impl Default for BVH {
 }
 
 impl Group for BVH {
-    fn add(&mut self, p: Rc<dyn Primitive>) {
+    fn add(&mut self, p: Arc<dyn Primitive>) {
         self.bounds += p.get_bounds();
         self.primitives.push(p);
     }
@@ -52,7 +52,7 @@ impl BVH {
             primitive_infos[idx] = PrimitiveInfo::new(idx, bounds, centroid);
         }
 
-        let mut ordered_primitives = Vec::<Rc<dyn Primitive>>::new();
+        let mut ordered_primitives = Vec::<Arc<dyn Primitive>>::new();
         self.root = Some(Box::new(Node::recursive_build(&mut ordered_primitives,
                                                         primitive_infos,
                                                         &self.primitives)));
