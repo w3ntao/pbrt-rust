@@ -29,7 +29,7 @@ impl Renderer {
                 let ray = self.camera.get_primary_ray(
                     ndc_x + 1.0 / (image.width as f32),
                     ndc_y - 1.0 / (image.height as f32));
-                image.fill(self.integrator.get_radiance(Rc::new(ray)), y, x);
+                image.fill(self.integrator.get_radiance(&ray), y, x);
             }
         }
         println!("Rendering took {:.2}[s]", start.elapsed().as_secs_f32());

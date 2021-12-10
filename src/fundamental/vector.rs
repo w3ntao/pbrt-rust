@@ -21,16 +21,16 @@ impl Vector {
         return Vector::new(0.0, 0.0, 0.0);
     }
 
-    pub fn length_squared(self) -> f32 {
-        return dot(self, self);
+    pub fn length_squared(&self) -> f32 {
+        return dot(*self, *self);
     }
 
     pub fn length(&self) -> f32 {
         return self.length_squared().sqrt();
     }
 
-    pub fn normalize(self) -> Vector {
-        return self / self.length();
+    pub fn normalize(&self) -> Vector {
+        return *self / self.length();
     }
 }
 

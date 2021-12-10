@@ -1,4 +1,3 @@
-use std::rc::Rc;
 use crate::fundamental::point::*;
 use crate::fundamental::vector::*;
 use crate::ray_tracing::bounding_box::BoundingBox;
@@ -30,7 +29,7 @@ impl Triangle {
 }
 
 impl Primitive for Triangle {
-    fn intersect(&self, ray: Rc<Ray>, previous_distance: f32) -> Intersection {
+    fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
         let ab = cross(self.span0, self.span1);
         let det = -dot(ab, ray.direction);
         if det == 0.0 {

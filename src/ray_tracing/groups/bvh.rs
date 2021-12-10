@@ -33,7 +33,7 @@ impl Group for BVH {
 }
 
 impl Primitive for BVH {
-    fn intersect(&self, ray: Rc<Ray>, previous_distance: f32) -> Intersection {
+    fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
         return self.root.as_ref().unwrap().intersect(ray, previous_distance, &self.primitives);
     }
 

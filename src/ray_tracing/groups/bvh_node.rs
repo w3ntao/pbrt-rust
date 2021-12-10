@@ -60,8 +60,8 @@ pub struct Node {
 }
 
 impl Node {
-    pub fn intersect(&self, ray: Rc<Ray>, previous_distance: f32, primitives: &Vec<Rc<dyn Primitive>>) -> Intersection {
-        let (t1, t2) = self.bounds.intersect(Rc::clone(&ray));
+    pub fn intersect(&self, ray: &Ray, previous_distance: f32, primitives: &Vec<Rc<dyn Primitive>>) -> Intersection {
+        let (t1, t2) = self.bounds.intersect(ray);
         if t1 > t2 || t1 > previous_distance {
             return Intersection::failure();
         }
@@ -72,7 +72,7 @@ impl Node {
 
             for idx in self.start..self.end {
                 let p = &primitives[idx];
-                let intersect = p.intersect(Rc::clone(&ray), closest_distance);
+                let intersect = p.intersect(ray, closest_distance);
                 if intersect.intersected() {
                     closest_distance = intersect.distance;
                     closest_intersect = intersect;
@@ -85,8 +85,8 @@ impl Node {
         let left_node = self.left.as_ref().unwrap();
         let right_node = self.right.as_ref().unwrap();
 
-        let left_intersect = left_node.intersect(Rc::clone(&ray), previous_distance, primitives);
-        let right_intersect = right_node.intersect(Rc::clone(&ray), left_intersect.distance, primitives);
+        let left_intersect = left_node.intersect(ray, previous_distance, primitives);
+        let right_intersect = right_node.intersect(ray, left_intersect.distance, primitives);
 
         return {
             if left_intersect.distance < right_intersect.distance {

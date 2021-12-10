@@ -1,6 +1,6 @@
 use std::mem;
 use std::ops;
-use std::rc::Rc;
+
 use crate::fundamental::point::*;
 use crate::ray_tracing::ray::Ray;
 
@@ -52,7 +52,7 @@ impl BoundingBox {
         return 2.0 * (x_extent * y_extent + x_extent * z_extent + y_extent * z_extent);
     }
 
-    pub fn intersect(&self, ray: Rc<Ray>) -> (f32, f32) {
+    pub fn intersect(&self, ray: &Ray) -> (f32, f32) {
         let no_intersection = (f32::INFINITY, -f32::INFINITY);
         if self.is_empty() {
             return no_intersection;
