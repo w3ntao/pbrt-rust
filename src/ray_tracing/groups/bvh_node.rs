@@ -6,7 +6,7 @@ use crate::ray_tracing::primitive::Primitive;
 use crate::ray_tracing::bounding_box::BoundingBox;
 
 const BUCKET_NUM: usize = 12;
-const EPSILON: f32 = 1.0e-3;
+const EPSILON: f32 = 1.0e-6;
 
 #[derive(Copy, Clone)]
 pub struct PrimitiveInfo {
