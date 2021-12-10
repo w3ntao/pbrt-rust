@@ -1,4 +1,6 @@
 use std::rc::Rc;
+use std::time::Instant;
+
 use crate::ray_tracing::ray::*;
 use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::primitive::Primitive;
@@ -42,7 +44,7 @@ impl Primitive for BVH {
 
 impl BVH {
     pub fn build_index(&mut self) {
-        println!("Building BVH");
+        let start = Instant::now();
         let mut primitive_infos = vec![PrimitiveInfo::default(); self.primitives.len()];
         for idx in 0..self.primitives.len() {
             let bounds = self.primitives[idx].get_bounds();
@@ -55,6 +57,6 @@ impl BVH {
                                                         primitive_infos,
                                                         &self.primitives)));
         self.primitives = ordered_primitives;
-        println!("BVH built");
+        println!("BVH building took {:.2}[s]", start.elapsed().as_secs_f32());
     }
 }
