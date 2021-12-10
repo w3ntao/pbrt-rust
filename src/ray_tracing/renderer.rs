@@ -18,7 +18,7 @@ impl Renderer {
         };
     }
 
-    pub fn render(self, width: usize, height: usize) -> Image {
+    pub fn render(&self, width: usize, height: usize) -> Image {
         let start = Instant::now();
 
         let mut image = Image::new(width, height);

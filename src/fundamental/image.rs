@@ -29,11 +29,11 @@ impl Image {
         let factor = 256 as f32 - 0.001;
         for h in 0usize..self.height {
             for w in 0usize..self.width {
-                let pixel = self.pixels[h][w] * factor;
+                let pixel = &self.pixels[h][w];
                 let line = format!("{} {} {}\n",
-                                   pixel.r as i32,
-                                   pixel.g as i32,
-                                   pixel.b as i32);
+                                   (pixel.r * factor) as i32,
+                                   (pixel.g * factor) as i32,
+                                   (pixel.b * factor) as i32);
                 buf_writer.write(line.as_bytes()).unwrap();
             }
         }

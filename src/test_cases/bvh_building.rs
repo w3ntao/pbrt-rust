@@ -14,7 +14,6 @@ use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::world::World;
 
 pub fn test() {
-    let start = Instant::now();
     let triangles = obj_to_triangles("models/dragon.obj");
     let mut scene = BVH::default();
     for t in triangles {
@@ -34,5 +33,4 @@ pub fn test() {
     let renderer = Renderer::new(Rc::new(camera), Rc::new(integrator));
     let image = renderer.render(2000, 1500);
     image.write("dragon.ppm");
-    println!("In total took {:.2}[s]", start.elapsed().as_secs_f32());
 }
