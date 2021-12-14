@@ -3,6 +3,7 @@ use std::sync::Arc;
 use crate::fundamental::point::Point;
 use crate::fundamental::vector::Vector;
 use crate::fundamental::obj_loader::obj_to_triangles;
+use crate::fundamental::utility::get_file_name;
 
 use crate::ray_tracing::group::Group;
 use crate::ray_tracing::groups::bvh::BVH;
@@ -13,6 +14,8 @@ use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::world::World;
 
 pub fn test() {
+    let file_name = get_file_name(file!());
+    println!("TEST 1: {}", &file_name);
     let triangles = obj_to_triangles("models/dragon.obj");
     let mut scene = BVH::default();
     for t in triangles {
@@ -31,5 +34,6 @@ pub fn test() {
     let integrator = RayCastingIntegrator::new(Arc::new(world));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator));
     let image = renderer.render(2000, 1500);
-    image.write("dragon.ppm");
+    image.write(&format!("test_1_{}.ppm", file_name));
+    println!();
 }

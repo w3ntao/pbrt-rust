@@ -1,7 +1,11 @@
+use std::cmp::{min, max};
 use std::time::Instant;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::thread::JoinHandle;
+
+use rand::thread_rng;
+use rand::seq::SliceRandom;
 
 extern crate num_cpus;
 
@@ -9,7 +13,7 @@ use crate::fundamental::image::Image;
 use crate::ray_tracing::camera::Camera;
 use crate::ray_tracing::integrator::Integrator;
 
-const BATCH_SIZE: usize = 128;
+const MIN_BATCH_SIZE: usize = 128;
 
 #[derive(Clone)]
 struct Job {
@@ -78,10 +82,16 @@ impl Renderer {
                 all_jobs.push(Job { x: _x, y: _y });
             }
         }
+        all_jobs.shuffle(&mut thread_rng());
+        let all_jobs = all_jobs;
+
+        let batch_size = max(all_jobs.len() / num_cpus::get_physical() / 1000, MIN_BATCH_SIZE);
+        // Every core executes roughly 1000 batches of jobs.
+        // Also, number of jobs for each batch shouldn't be smaller than MIN_BATCH_SIZE
 
         let mut job_list: Vec<Vec<Job>> = vec![];
-        for idx in (0..all_jobs.len()).step_by(BATCH_SIZE) {
-            let batch = &all_jobs[idx..(idx + BATCH_SIZE).min(all_jobs.len())];
+        for idx in (0..all_jobs.len()).step_by(batch_size) {
+            let batch = &all_jobs[idx..min(idx + batch_size, all_jobs.len())];
             job_list.push(batch.clone().to_vec());
         }
         let shared_job = Arc::new(Mutex::new(job_list));

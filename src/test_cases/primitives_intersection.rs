@@ -1,6 +1,7 @@
 use std::sync::Arc;
 use crate::fundamental::point::Point;
 use crate::fundamental::vector::Vector;
+use crate::fundamental::utility::get_file_name;
 
 use crate::ray_tracing::primitives::triangle::Triangle;
 use crate::ray_tracing::primitives::sphere::Sphere;
@@ -15,6 +16,8 @@ use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::world::World;
 
 pub fn test() {
+    let file_name = get_file_name(file!());
+    println!("TEST 0: {}", &file_name);
     let camera = PerspectiveCamera::new(
         Point::new(0.0, 0.0, 10.0),
         Vector::new(0.0, 0.0, -1.0),
@@ -54,5 +57,7 @@ pub fn test() {
     let integrator = RayCastingIntegrator::new(Arc::new(world));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator));
     let image = renderer.render(640, 480);
-    image.write("out.ppm");
+
+    image.write(&format!("test_0_{}.ppm", file_name));
+    println!();
 }
