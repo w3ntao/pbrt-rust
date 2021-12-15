@@ -1,8 +1,10 @@
 use std::ops;
+use std::process::id;
 
 use crate::fundamental::point::Point;
 use crate::fundamental::vector::Vector;
 
+#[derive(Clone, Copy)]
 pub struct Float4 {
     pub x: f32,
     pub y: f32,
@@ -20,6 +22,15 @@ impl Float4 {
         }
     }
 
+    pub fn zero() -> Float4 {
+        Float4 {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+            w: 0.0,
+        }
+    }
+
     pub fn from_point(p: &Point) -> Float4 {
         Float4 {
             x: p.x,
@@ -29,7 +40,7 @@ impl Float4 {
         }
     }
 
-    pub fn from_vec3(v: &Vector) -> Float4 {
+    pub fn from_vector(v: &Vector) -> Float4 {
         Float4 {
             x: v.x,
             y: v.y,
@@ -156,5 +167,34 @@ impl ops::Neg for Float4 {
             z: -self.z,
             w: -self.w,
         };
+    }
+}
+
+pub fn dot(a: Float4, b: Float4) -> f32 {
+    let mut product = 0.0;
+    for idx in 0..4 {
+        product += a[idx] * b[idx];
+    }
+
+    return product;
+}
+
+impl Vector {
+    pub fn from_float4(f4: &Float4) -> Vector {
+        Vector {
+            x: f4.x,
+            y: f4.y,
+            z: f4.z,
+        }
+    }
+}
+
+impl Point {
+    pub fn from_float4(f4: &Float4) -> Point {
+        Point {
+            x: f4.x / f4.w,
+            y: f4.y / f4.w,
+            z: f4.z / f4.w,
+        }
     }
 }
