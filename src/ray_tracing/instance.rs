@@ -20,15 +20,15 @@ impl Primitive for Instance {
         let inverted_length = inverted_ray_direction.length();
         inverted_ray_direction = inverted_ray_direction / inverted_length;
 
-        let intersect = self.primitive.intersect((&Ray::new(inverted_transform.clone() * ray.origin, inverted_ray_direction)),
-                                                 previous_distance / inverted_length);
+        let intersect = self.primitive.intersect(
+            &Ray::new(inverted_transform.clone() * ray.origin, inverted_ray_direction),
+            previous_distance / inverted_length);
         if !intersect.intersected() {
             // failure
             return Intersection::failure();
         }
 
-        return Intersection::new(intersect.distance / inverted_length,
-                                 &ray,
+        return Intersection::new(intersect.distance / inverted_length, &ray,
                                  (inverted_transform.transpose() * intersect.normal).normalize());
     }
 
@@ -37,7 +37,7 @@ impl Primitive for Instance {
         let min = bounds.min;
         let max = bounds.max;
 
-        let points = [
+        let mut points = [
             min, max,
             Point::new(max.x, min.y, min.z),
             Point::new(min.x, max.y, min.z),
@@ -46,6 +46,10 @@ impl Primitive for Instance {
             Point::new(max.x, min.y, max.z),
             Point::new(max.x, max.y, min.z),
         ];
+
+        for idx in 0..points.len() {
+            points[idx] = self.transform.clone() * points[idx];
+        }
 
         return BoundingBox::build(&points);
     }
@@ -65,7 +69,7 @@ impl Instance {
 
     pub fn translate(&mut self, t: &Vector) {
         for idx in 0..3 {
-            self.transform[3][idx] += t[idx];
+            self.transform[idx][3] += t[idx];
         }
     }
 
@@ -81,7 +85,7 @@ impl Instance {
         }
     }
 
-    pub fn rotate(&mut self, axis: Vector, angle: f32) {
+    pub fn rotate(&mut self, axis: &Vector, angle: f32) {
         let cosine = f32::cos(angle);
         let sine = f32::sin(angle);
 
