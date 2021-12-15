@@ -26,8 +26,6 @@ pub struct Renderer {
     integrator: Arc<dyn Integrator>,
 }
 
-unsafe impl Send for Renderer {}
-
 impl Renderer {
     pub fn new(_camera: Arc<dyn Camera>, _integrator: Arc<dyn Integrator>) -> Self {
         return Self {

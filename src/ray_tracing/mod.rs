@@ -11,3 +11,4 @@ pub mod groups;
 pub mod world;
 pub mod group;
 mod bounding_box;
+pub mod instance;

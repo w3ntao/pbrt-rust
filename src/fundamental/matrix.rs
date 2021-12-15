@@ -4,6 +4,7 @@ use crate::fundamental::point::Point;
 use crate::fundamental::vector::Vector;
 use crate::fundamental::float4::*;
 
+#[derive(Clone)]
 pub struct Matrix {
     row: [Float4; 4],
 }
@@ -56,8 +57,8 @@ impl Matrix {
         result[3][0] = -m[1][0] * m[2][1] * m[3][2] + m[1][0] * m[2][2] * m[3][1] + m[2][0] * m[1][1] * m[3][2] -
             m[2][0] * m[1][2] * m[3][1] - m[3][0] * m[1][1] * m[2][2] + m[3][0] * m[1][2] * m[2][1];
 
-        let det = m[0][0] * result[0][0] + m[0][1] * result[1][0] + m[0][2] * result[2][0] + m[0][3] * result[3][0];
-        if det == 0.0 {
+        let determinant = m[0][0] * result[0][0] + m[0][1] * result[1][0] + m[0][2] * result[2][0] + m[0][3] * result[3][0];
+        if determinant == 0.0 {
             return Matrix::zero();
         }
 
@@ -86,7 +87,7 @@ impl Matrix {
         result[3][3] = m[0][0] * m[1][1] * m[2][2] - m[0][0] * m[1][2] * m[2][1] - m[1][0] * m[0][1] * m[2][2] +
             m[1][0] * m[0][2] * m[2][1] + m[2][0] * m[0][1] * m[1][2] - m[2][0] * m[0][2] * m[1][1];
 
-        result = result * (1.0 / det);
+        result = result / determinant;
         return result;
     }
 
@@ -163,6 +164,20 @@ impl ops::Mul<Point> for Matrix {
     type Output = Point;
     fn mul(self, p: Point) -> Point {
         return Point::from_float4(&(self * Float4::from_point(&p)));
+    }
+}
+
+impl ops::Div<f32> for Matrix {
+    type Output = Matrix;
+    fn div(self, divisor: f32) -> Matrix {
+        Matrix {
+            row: [
+                self.row[0] / divisor,
+                self.row[1] / divisor,
+                self.row[2] / divisor,
+                self.row[3] / divisor,
+            ],
+        }
     }
 }
 

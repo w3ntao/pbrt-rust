@@ -4,5 +4,5 @@ pub mod rgb_color;
 pub mod image;
 pub mod obj_loader;
 pub mod utility;
-mod float4;
-mod matrix;
+pub mod matrix;
+pub mod float4;

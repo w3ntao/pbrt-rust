@@ -148,12 +148,12 @@ impl ops::Div<Float4> for Float4 {
 
 impl ops::Div<f32> for Float4 {
     type Output = Float4;
-    fn div(self, scalar: f32) -> Float4 {
+    fn div(self, divisor: f32) -> Float4 {
         return Float4 {
-            x: self.x / scalar,
-            y: self.y / scalar,
-            z: self.z / scalar,
-            w: self.w / scalar,
+            x: self.x / divisor,
+            y: self.y / divisor,
+            z: self.z / divisor,
+            w: self.w / divisor,
         };
     }
 }
