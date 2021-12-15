@@ -24,22 +24,23 @@ pub fn test() {
     dragon_model.build_index();
     let dragon_model = Arc::new(dragon_model);
 
-    let num = 4.0;
-    let radius: f32 = 1.5;
-    let delta = std::f32::consts::PI / num;
+    let num = 4;
+    let radius: f32 = 1.2;
+    let delta = std::f32::consts::PI / (1.1 * (num-1) as f32);
 
     let mut scene = BVH::default();
-    for idx in 0..(num as i32 + 1) {
+    for idx in 0..num {
         let theta = (idx as f32) * delta;
         let mut dragon_var = Instance::new(dragon_model.clone());
         dragon_var.rotate(&Vector::new(0.0, 1.0, 0.0), theta);
+        dragon_var.scale_by_scalar(1.0 + (idx as f32) * 0.3);
         dragon_var.translate(&Vector::new(radius * f32::sin(theta), 0.0, radius * f32::cos(theta)));
         scene.add(Arc::new(dragon_var));
     }
     scene.build_index();
 
     let camera = PerspectiveCamera::new(
-        Point::new(-8.0, 6.0, 0.0),
+        Point::new(-7.0, 5.0, 0.0),
         Vector::new(1.0, -0.7, 0.0),
         Vector::new(0.0, 1.0, 0.0),
         std::f32::consts::PI / 8.0,
