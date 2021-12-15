@@ -86,15 +86,12 @@ impl Node {
         let right_node = self.right.as_ref().unwrap();
 
         let left_intersect = left_node.intersect(ray, previous_distance, primitives);
-        let right_intersect = right_node.intersect(ray, left_intersect.distance, primitives);
+        if !left_intersect.intersected() {
+            return right_node.intersect(ray, previous_distance, primitives);
+        }
 
-        return {
-            if left_intersect.distance < right_intersect.distance {
-                left_intersect
-            } else {
-                right_intersect
-            }
-        };
+        let right_intersect = right_node.intersect(ray, left_intersect.distance, primitives);
+        return if right_intersect.intersected() { right_intersect } else { left_intersect };
     }
 }
 
