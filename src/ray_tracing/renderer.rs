@@ -113,6 +113,14 @@ impl Renderer {
         }
 
         println!("Rendering took {:.2}[s]", start.elapsed().as_secs_f32());
-        return shared_image.lock().unwrap().clone();
+
+        match Arc::try_unwrap(shared_image) {
+            Ok(locked_image) => {
+                return locked_image.into_inner().unwrap();
+            }
+            Err(_) => {
+                panic!("Renderer: fail to return rendered image");
+            }
+        }
     }
 }
