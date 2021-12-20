@@ -31,8 +31,8 @@ impl Sphere {
 impl Primitive for Sphere {
     fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
         let oc = self.center - ray.origin;
-        let dt = dot(oc, ray.direction);
-        let discriminant = dt * dt + self.radius * self.radius - dot(oc, oc);
+        let dt = dot(&oc, &ray.direction);
+        let discriminant = dt * dt + self.radius * self.radius - dot(&oc, &oc);
 
         if discriminant < 0.0 {
             return Intersection::failure();
@@ -48,7 +48,7 @@ impl Primitive for Sphere {
 
         if t1 > 0.0 {
             let diff = (ray.get_point(t1) - self.center) / self.radius;
-            return Intersection::new(t1, ray, diff, Arc::new(NullMaterial {}));
+            return Intersection::new(t1, ray, diff, self.material.clone());
         }
 
         let t2 = dt + d_sqrt;
@@ -58,7 +58,7 @@ impl Primitive for Sphere {
         }
 
         let diff = (ray.get_point(t2) - self.center) / self.radius;
-        return Intersection::new(t2, ray, diff, Arc::new(NullMaterial {}));
+        return Intersection::new(t2, ray, diff, self.material.clone());
     }
 
     fn get_bounds(&self) -> BoundingBox {

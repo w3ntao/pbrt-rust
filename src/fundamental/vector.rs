@@ -22,7 +22,7 @@ impl Vector {
     }
 
     pub fn length_squared(&self) -> f32 {
-        return dot(*self, *self);
+        return dot(self, self);
     }
 
     pub fn length(&self) -> f32 {
@@ -150,7 +150,7 @@ impl ops::MulAssign<Vector> for Vector {
     }
 }
 
-pub fn dot(a: Vector, b: Vector) -> f32 {
+pub fn dot(a: &Vector, b: &Vector) -> f32 {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 

@@ -22,7 +22,6 @@ pub fn test() {
     println!("TEST 3: {}", &file_name);
     let ppm_name = format!("test_3_{}.ppm", file_name);
 
-    
     let material_ground = Lambertian { albedo: RGBColor::new(0.8, 0.8, 0.0) };
     let material_center = Lambertian { albedo: RGBColor::new(0.1, 0.2, 0.5) };
 
