@@ -24,16 +24,15 @@ pub fn test() {
     dragon_model.build_index();
     let dragon_model = Arc::new(dragon_model);
 
-    let num = 4;
-    let radius: f32 = 1.2;
-    let delta = std::f32::consts::PI / (1.1 * (num-1) as f32);
+    let num = 5;
+    let radius: f32 = 1.5;
+    let delta = std::f32::consts::PI / (num as f32 - 1.0);
 
     let mut scene = BVH::default();
     for idx in 0..num {
         let theta = (idx as f32) * delta;
         let mut dragon_var = Instance::new(dragon_model.clone());
         dragon_var.rotate(&Vector::new(0.0, 1.0, 0.0), theta);
-        dragon_var.scale_by_scalar(1.0 + (idx as f32) * 0.3);
         dragon_var.translate(&Vector::new(radius * f32::sin(theta), 0.0, radius * f32::cos(theta)));
         scene.add(Arc::new(dragon_var));
     }
