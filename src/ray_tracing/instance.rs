@@ -5,6 +5,7 @@ use crate::fundamental::matrix::*;
 use crate::fundamental::point::Point;
 use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::intersection::Intersection;
+use crate::ray_tracing::materials::null::NullMaterial;
 use crate::ray_tracing::primitive::Primitive;
 use crate::ray_tracing::ray::Ray;
 
@@ -29,7 +30,8 @@ impl Primitive for Instance {
         }
 
         return Intersection::new(intersect.distance / inverted_length, &ray,
-                                 (inverted_transform.transpose() * intersect.normal).normalize());
+                                 (inverted_transform.transpose() * intersect.normal).normalize(),
+                                 Arc::new(NullMaterial {}));
     }
 
     fn get_bounds(&self) -> BoundingBox {

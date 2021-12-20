@@ -1,25 +1,29 @@
+use std::sync::Arc;
 use crate::fundamental::point::*;
 use crate::fundamental::vector::*;
 use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::ray::*;
 use crate::ray_tracing::intersection::*;
+use crate::ray_tracing::material::Material;
+use crate::ray_tracing::materials::null::NullMaterial;
 use crate::ray_tracing::primitive::Primitive;
 
-#[derive(Copy, Clone)]
 pub struct Sphere {
     pub center: Point,
     pub radius: f32,
+    pub material: Arc<dyn Material>,
     bounds: BoundingBox,
 }
 
 impl Sphere {
-    pub fn new(_center: Point, _radius: f32) -> Self {
+    pub fn new(_center: Point, _radius: f32, _material: Arc<dyn Material>) -> Self {
         let min = _center + Point::new(-_radius, -_radius, -_radius);
         let max = _center + Point::new(_radius, _radius, _radius);
         return Self {
             center: _center,
             radius: _radius,
             bounds: BoundingBox::build(&[min, max]),
+            material: _material,
         };
     }
 }
@@ -44,7 +48,7 @@ impl Primitive for Sphere {
 
         if t1 > 0.0 {
             let diff = (ray.get_point(t1) - self.center) / self.radius;
-            return Intersection::new(t1, ray, diff);
+            return Intersection::new(t1, ray, diff, Arc::new(NullMaterial {}));
         }
 
         let t2 = dt + d_sqrt;
@@ -54,7 +58,7 @@ impl Primitive for Sphere {
         }
 
         let diff = (ray.get_point(t2) - self.center) / self.radius;
-        return Intersection::new(t2, ray, diff);
+        return Intersection::new(t2, ray, diff, Arc::new(NullMaterial {}));
     }
 
     fn get_bounds(&self) -> BoundingBox {

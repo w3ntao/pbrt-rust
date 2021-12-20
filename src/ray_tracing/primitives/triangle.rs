@@ -1,8 +1,10 @@
+use std::sync::Arc;
 use crate::fundamental::point::*;
 use crate::fundamental::vector::*;
 use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::ray::*;
 use crate::ray_tracing::intersection::*;
+use crate::ray_tracing::materials::null::NullMaterial;
 use crate::ray_tracing::primitive::Primitive;
 
 #[derive(Copy, Clone)]
@@ -52,7 +54,7 @@ impl Primitive for Triangle {
             return Intersection::failure();
         }
 
-        return Intersection::new(t, ray, self.normal);
+        return Intersection::new(t, ray, self.normal, Arc::new(NullMaterial {}));
     }
 
     fn get_bounds(&self) -> BoundingBox {

@@ -4,7 +4,7 @@ use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::material::Material;
 
 pub struct Lambertian {
-    albedo: RGBColor,
+    pub(crate) albedo: RGBColor,
 }
 
 impl Material for Lambertian {

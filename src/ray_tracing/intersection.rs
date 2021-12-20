@@ -1,8 +1,8 @@
 use std::sync::Arc;
 use crate::fundamental::point::*;
 use crate::fundamental::vector::*;
-use crate::ray_tracing::material::Material;
 use crate::ray_tracing::ray::*;
+use crate::ray_tracing::material::Material;
 use crate::ray_tracing::materials::null::*;
 
 #[derive(Clone)]
@@ -14,12 +14,12 @@ pub struct Intersection {
 }
 
 impl Intersection {
-    pub fn new(_distance: f32, _ray: &Ray, _normal: Vector) -> Self {
+    pub fn new(_distance: f32, _ray: &Ray, _normal: Vector, _material: Arc<dyn Material>) -> Self {
         return Self {
             distance: _distance,
             ray: _ray.clone(),
             normal: _normal,
-            material: Arc::new(NullMaterial {}),
+            material: _material,
         };
     }
 
