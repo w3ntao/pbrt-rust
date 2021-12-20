@@ -15,6 +15,13 @@ impl Ray {
         };
     }
 
+    pub fn dummy() -> Self {
+        Self {
+            origin: Point::zero(),
+            direction: Vector::zero(),
+        }
+    }
+
     pub fn get_point(&self, distance: f32) -> Point {
         return self.origin + distance * self.direction;
     }

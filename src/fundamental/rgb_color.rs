@@ -21,6 +21,17 @@ impl RGBColor {
     }
 }
 
+impl ops::Add<RGBColor> for RGBColor {
+    type Output = RGBColor;
+    fn add(self, rhs: RGBColor) -> RGBColor {
+        return RGBColor {
+            r: self.r + rhs.r,
+            g: self.g + rhs.g,
+            b: self.b + rhs.b,
+        };
+    }
+}
+
 impl ops::Mul<f32> for RGBColor {
     type Output = RGBColor;
     fn mul(self, rhs: f32) -> RGBColor {
@@ -36,5 +47,16 @@ impl ops::Mul<RGBColor> for f32 {
     type Output = RGBColor;
     fn mul(self, rhs: RGBColor) -> RGBColor {
         return rhs * self;
+    }
+}
+
+impl ops::Mul<RGBColor> for RGBColor {
+    type Output = RGBColor;
+    fn mul(self, rhs: RGBColor) -> RGBColor {
+        return RGBColor {
+            r: self.r * rhs.r,
+            g: self.g * rhs.g,
+            b: self.b * rhs.b,
+        };
     }
 }
