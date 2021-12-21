@@ -1,4 +1,6 @@
 use std::sync::Arc;
+use rand::thread_rng;
+use rand::Rng;
 use crate::fundamental::vector::*;
 use crate::fundamental::rgb_color::*;
 use crate::ray_tracing::ray::Ray;
@@ -23,13 +25,12 @@ impl MonteCarloPathTrace {
 
         let intersect = self.world.scene.intersect(ray, f32::INFINITY);
         if intersect.intersected() {
+            let mut scattered_ray = Ray::dummy();
             let mut attenuation = RGBColor::black();
-            let mut scatter_ray = Ray::dummy();
-
-            if intersect.material.scatter(&mut attenuation, &mut scatter_ray, &ray, &intersect) {
-                return attenuation * self.ray_color(&scatter_ray, depth - 1);
+            if intersect.material.scatter(&mut attenuation, &mut scattered_ray, &ray, &intersect) {
+                return attenuation * self.ray_color(&scattered_ray, depth - 1);
             }
-
+            // light got absorbed if `scatter()` return false
             return RGBColor::black();
         }
 
@@ -41,6 +42,6 @@ impl MonteCarloPathTrace {
 
 impl Integrator for MonteCarloPathTrace {
     fn get_radiance(&self, ray: &Ray) -> RGBColor {
-        return self.ray_color(ray, 20);
+        return self.ray_color(ray, 50);
     }
 }

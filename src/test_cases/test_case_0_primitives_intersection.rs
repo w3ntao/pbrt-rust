@@ -56,7 +56,7 @@ pub fn test() {
 
     let world = World::new(Arc::new(scene));
     let integrator = RayCastingIntegrator::new(Arc::new(world));
-    let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator));
+    let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), 1);
     let image = renderer.render(640, 480);
 
     image.write(&format!("test_0_{}.ppm", file_name));

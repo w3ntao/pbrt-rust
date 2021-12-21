@@ -5,11 +5,13 @@ use std::thread;
 use std::thread::JoinHandle;
 
 use rand::thread_rng;
+use rand::Rng;
 use rand::seq::SliceRandom;
 
 extern crate num_cpus;
 
 use crate::fundamental::image::Image;
+use crate::fundamental::rgb_color::RGBColor;
 use crate::ray_tracing::camera::Camera;
 use crate::ray_tracing::integrator::Integrator;
 
@@ -24,13 +26,15 @@ struct Job {
 pub struct Renderer {
     camera: Arc<dyn Camera>,
     integrator: Arc<dyn Integrator>,
+    samples: i32,
 }
 
 impl Renderer {
-    pub fn new(_camera: Arc<dyn Camera>, _integrator: Arc<dyn Integrator>) -> Self {
+    pub fn new(_camera: Arc<dyn Camera>, _integrator: Arc<dyn Integrator>, _samples: i32) -> Self {
         return Self {
             camera: _camera,
             integrator: _integrator,
+            samples: _samples,
         };
     }
 
@@ -41,6 +45,7 @@ impl Renderer {
         let width = locked_image.width;
         let height = locked_image.height;
         std::mem::drop(locked_image);
+        let mut rng = rand::thread_rng();
 
         loop {
             let mut locked_job = job_list.lock().unwrap();
@@ -55,14 +60,33 @@ impl Renderer {
                         let ndc_y = -2.0 * (y as f32) / (height as f32) + 1.0;
                         let ndc_x = 2.0 * (x as f32) / (width as f32) - 1.0;
 
-                        let ray = self.camera.get_primary_ray(
-                            ndc_x + 1.0 / (width as f32),
-                            ndc_y - 1.0 / (height as f32));
-                        let color = self.integrator.get_radiance(&ray);
+                        if self.samples == 1 {
+                            let ray = self.camera.get_primary_ray(
+                                ndc_x + 1.0 / (width as f32),
+                                ndc_y - 1.0 / (height as f32));
+                            let color = self.integrator.get_radiance(&ray);
+                            let mut locked_image = image.lock().unwrap();
+                            locked_image.fill(color, y, x);
+                            std::mem::drop(locked_image);
+                            continue;
+                        }
 
+                        let mut total = RGBColor::black();
+                        for _ in 0..self.samples {
+                            let random_0: f32 = rng.gen();
+                            let random_1: f32 = rng.gen();
+
+                            let ray = self.camera.get_primary_ray(
+                                ndc_x + 2.0 * random_0 / (width as f32),
+                                ndc_y - 2.0 * random_1 / (height as f32));
+                            total = total + self.integrator.get_radiance(&ray);
+                        }
+                        let color = total / (self.samples as f32);
+                        
                         let mut locked_image = image.lock().unwrap();
                         locked_image.fill(color, y, x);
                         std::mem::drop(locked_image);
+                        continue;
                     }
                 }
                 None => break,

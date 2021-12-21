@@ -22,11 +22,11 @@ pub fn test() {
     println!("TEST 3: {}", &file_name);
     let ppm_name = format!("test_3_{}.ppm", file_name);
 
-    let material_ground = Lambertian { albedo: RGBColor::new(0.8, 0.8, 0.0) };
-    let material_center = Lambertian { albedo: RGBColor::new(0.1, 0.2, 0.5) };
+    let material_center = Arc::new(Lambertian { albedo: RGBColor::new(0.1, 0.2, 0.5) });
+    let material_ground = Arc::new(Lambertian { albedo: RGBColor::new(0.8, 0.8, 0.0) });
 
-    let sphere_ground = Sphere::new(Point::new(0.0, -100.5, -1.0), 100.0, Arc::new(material_ground));
-    let sphere_center = Sphere::new(Point::new(0.0, 0.0, -1.0), 0.5, Arc::new(material_center));
+    let sphere_ground = Sphere::new(Point::new(0.0, -100.5, -1.0), 100.0, material_ground.clone());
+    let sphere_center = Sphere::new(Point::new(0.0, 0.0, -1.0), 0.5, material_center.clone());
 
     let mut scene = BVH::default();
     scene.add(Arc::new(sphere_ground));
@@ -42,8 +42,8 @@ pub fn test() {
 
     let world = World::new(Arc::new(scene));
     let integrator = MonteCarloPathTrace::new(Arc::new(world));
-    let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator));
-    let image = renderer.render(2000, 1500);
+    let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), 20);
+    let image = renderer.render(500, 375);
     image.write(&ppm_name);
     println!();
 }
