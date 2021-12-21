@@ -83,6 +83,17 @@ impl ops::Add<Vector> for Vector {
     }
 }
 
+impl ops::Sub<Vector> for Vector {
+    type Output = Vector;
+    fn sub(self, rhs: Vector) -> Vector {
+        return Vector {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+            z: self.z - rhs.z,
+        };
+    }
+}
+
 impl ops::Add<Vector> for Point {
     type Output = Point;
     fn add(self, rhs: Vector) -> Point {

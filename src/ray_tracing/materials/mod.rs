@@ -1,2 +1,4 @@
-pub mod lambertian;
 pub mod null;
+pub mod lambertian;
+pub mod metal;
+pub mod mirror;
