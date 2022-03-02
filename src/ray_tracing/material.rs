@@ -1,7 +1,7 @@
 use crate::fundamental::rgb_color::*;
-use crate::ray_tracing::ray::*;
 use crate::ray_tracing::intersection::*;
+use crate::ray_tracing::ray::*;
 
 pub trait Material: Send + Sync {
-    fn scatter(&self, attenuation: &mut RGBColor, scattered_ray: &mut Ray, incoming_ray: &Ray, intersect: &Intersection) -> bool;
+    fn scatter(&self, scattered_ray: &mut Ray, incoming_ray: &Ray, intersection: &Intersection) -> RGBColor;
 }

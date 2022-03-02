@@ -20,13 +20,11 @@ fn reflect(vec_in: &Vector, normal: &Vector) -> Vector {
 }
 
 impl Material for Mirror {
-    fn scatter(&self, attenuation: &mut RGBColor, scattered_ray: &mut Ray, incoming_ray: &Ray, intersection: &Intersection) -> bool {
-        *attenuation = RGBColor::new(1.0, 1.0, 1.0);
-        // TODO: I am implementing perfect glass for the time being
-        // TODO: that reflects everything
-
+    fn scatter(&self, scattered_ray: &mut Ray, incoming_ray: &Ray, intersection: &Intersection) -> RGBColor {
         scattered_ray.origin = intersection.ray.get_point(intersection.distance) + 0.001 * intersection.normal;
         scattered_ray.direction = reflect(&incoming_ray.direction, &intersection.normal);
-        return true;
+        return RGBColor::new(1.0, 1.0, 1.0);
+        // TODO: I am implementing perfect glass for the time being
+        // TODO: that reflects everything
     }
 }

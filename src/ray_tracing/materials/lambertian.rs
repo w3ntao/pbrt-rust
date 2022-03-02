@@ -42,12 +42,11 @@ fn random_vector_in_hemisphere(normal: &Vector) -> Vector {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, attenuation: &mut RGBColor, scattered_ray: &mut Ray, _: &Ray, intersect: &Intersection) -> bool {
-        let scattered_direction = random_vector_in_hemisphere(&intersect.normal);
+    fn scatter(&self, scattered_ray: &mut Ray, _: &Ray, intersection: &Intersection) -> RGBColor {
+        let scattered_direction = random_vector_in_hemisphere(&intersection.normal);
 
-        scattered_ray.origin = intersect.ray.get_point(intersect.distance) + 0.001 * intersect.normal;
+        scattered_ray.origin = intersection.ray.get_point(intersection.distance) + 0.001 * intersection.normal;
         scattered_ray.direction = scattered_direction;
-        *attenuation = self.albedo;
-        return true;
+        return self.albedo;
     }
 }

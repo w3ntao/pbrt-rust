@@ -9,6 +9,8 @@ use crate::ray_tracing::integrator::Integrator;
 use crate::ray_tracing::ray::Ray;
 use crate::ray_tracing::world::World;
 
+const EPSILON_BLACK: f32 = 1e-4;
+
 pub struct MonteCarloPathTrace {
     world: Arc<World>,
 }
@@ -28,12 +30,14 @@ impl MonteCarloPathTrace {
         let intersection = self.world.scene.intersect(ray, f32::INFINITY);
         if intersection.intersected() {
             let mut scattered_ray = Ray::dummy();
-            let mut attenuation = RGBColor::black();
-            if intersection.material.scatter(&mut attenuation, &mut scattered_ray, &ray, &intersection) {
-                return attenuation * self.trace(&scattered_ray, depth - 1);
+            let attenuation = intersection.material.scatter(&mut scattered_ray, &ray, &intersection);
+            if attenuation.r <= EPSILON_BLACK && attenuation.g <= EPSILON_BLACK && attenuation.b <= EPSILON_BLACK {
+                // the attenuation goes too low that it probably contribute nothing
+                // to the result so we stop here
+                // TODO: introduce Russian Roulette in the future to fix this bias
+                return attenuation;
             }
-            // light got absorbed if `scatter()` return false
-            return RGBColor::black();
+            return attenuation * self.trace(&scattered_ray, depth - 1);
         }
 
         // shoot into sky
