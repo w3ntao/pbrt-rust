@@ -1,11 +1,11 @@
-use rand_distr::{Distribution, Normal, NormalError};
 use rand::thread_rng;
+use rand_distr::{Distribution, Normal, NormalError};
 
 use crate::fundamental::rgb_color::*;
 use crate::fundamental::vector::*;
-use crate::ray_tracing::ray::*;
 use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::material::Material;
+use crate::ray_tracing::ray::*;
 
 pub struct Lambertian {
     pub albedo: RGBColor,
@@ -42,7 +42,7 @@ fn random_vector_in_hemisphere(normal: &Vector) -> Vector {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, attenuation: &mut RGBColor, scattered_ray: &mut Ray, incoming_ray: &Ray, intersect: &Intersection) -> bool {
+    fn scatter(&self, attenuation: &mut RGBColor, scattered_ray: &mut Ray, _: &Ray, intersect: &Intersection) -> bool {
         let scattered_direction = random_vector_in_hemisphere(&intersect.normal);
 
         scattered_ray.origin = intersect.ray.get_point(intersect.distance) + 0.001 * intersect.normal;

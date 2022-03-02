@@ -20,7 +20,7 @@ impl MonteCarloPathTrace {
 }
 
 impl MonteCarloPathTrace {
-    fn ray_color(&self, ray: &Ray, depth: i32) -> RGBColor {
+    fn trace(&self, ray: &Ray, depth: i32) -> RGBColor {
         if depth <= 0 {
             return RGBColor::black();
         }
@@ -30,12 +30,13 @@ impl MonteCarloPathTrace {
             let mut scattered_ray = Ray::dummy();
             let mut attenuation = RGBColor::black();
             if intersection.material.scatter(&mut attenuation, &mut scattered_ray, &ray, &intersection) {
-                return attenuation * self.ray_color(&scattered_ray, depth - 1);
+                return attenuation * self.trace(&scattered_ray, depth - 1);
             }
             // light got absorbed if `scatter()` return false
             return RGBColor::black();
         }
 
+        // shoot into sky
         let unit_direction = ray.direction.normalize();
         let t = 0.5 * (unit_direction.y + 1.0);
         return (1.0 - t) * RGBColor::new(1.0, 1.0, 1.0) + t * RGBColor::new(0.5, 0.7, 1.0);
@@ -44,6 +45,6 @@ impl MonteCarloPathTrace {
 
 impl Integrator for MonteCarloPathTrace {
     fn get_radiance(&self, ray: &Ray) -> RGBColor {
-        return self.ray_color(ray, 50);
+        return self.trace(ray, 50);
     }
 }
