@@ -1,10 +1,11 @@
 use std::fs;
 use std::io::{BufWriter, Write};
-use crate::fundamental::rgb_color::*;
+
+use crate::fundamental::color::*;
 
 #[derive(Clone)]
 pub struct Image {
-    pixels: Vec<Vec<RGBColor>>,
+    pixels: Vec<Vec<Color>>,
     pub width: usize,
     pub height: usize,
 }
@@ -14,11 +15,11 @@ impl Image {
         return Self {
             width: _width,
             height: _height,
-            pixels: vec![vec![RGBColor::black(); _width]; _height],
+            pixels: vec![vec![Color::black(); _width]; _height],
         };
     }
 
-    pub fn fill(&mut self, rgb_value: RGBColor, y: usize, x: usize) {
+    pub fn fill(&mut self, rgb_value: Color, y: usize, x: usize) {
         self.pixels[y][x] = rgb_value;
     }
 

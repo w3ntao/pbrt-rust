@@ -1,19 +1,19 @@
 use std::ops;
 
 use crate::fundamental::point::Point;
-use crate::fundamental::vector::Vector;
+use crate::fundamental::vector3::Vector3;
 
 #[derive(Clone, Copy)]
-pub struct Float4 {
+pub struct Vector4 {
     pub x: f32,
     pub y: f32,
     pub z: f32,
     pub w: f32,
 }
 
-impl Float4 {
-    pub fn new(_x: f32, _y: f32, _z: f32, _w: f32) -> Float4 {
-        Float4 {
+impl Vector4 {
+    pub fn new(_x: f32, _y: f32, _z: f32, _w: f32) -> Vector4 {
+        Vector4 {
             x: _x,
             y: _y,
             z: _z,
@@ -21,8 +21,8 @@ impl Float4 {
         }
     }
 
-    pub fn zero() -> Float4 {
-        Float4 {
+    pub fn zero() -> Vector4 {
+        Vector4 {
             x: 0.0,
             y: 0.0,
             z: 0.0,
@@ -30,8 +30,8 @@ impl Float4 {
         }
     }
 
-    pub fn from_point(p: &Point) -> Float4 {
-        Float4 {
+    pub fn from_point(p: &Point) -> Vector4 {
+        Vector4 {
             x: p.x,
             y: p.y,
             z: p.z,
@@ -39,8 +39,8 @@ impl Float4 {
         }
     }
 
-    pub fn from_vector(v: &Vector) -> Float4 {
-        Float4 {
+    pub fn from_vector(v: &Vector3) -> Vector4 {
+        Vector4 {
             x: v.x,
             y: v.y,
             z: v.z,
@@ -49,7 +49,7 @@ impl Float4 {
     }
 }
 
-impl ops::Index<usize> for Float4 {
+impl ops::Index<usize> for Vector4 {
     type Output = f32;
     fn index(&self, index: usize) -> &f32 {
         return match index {
@@ -64,7 +64,7 @@ impl ops::Index<usize> for Float4 {
     }
 }
 
-impl ops::IndexMut<usize> for Float4 {
+impl ops::IndexMut<usize> for Vector4 {
     fn index_mut(&mut self, index: usize) -> &mut f32 {
         return match index {
             0 => &mut self.x,
@@ -78,10 +78,10 @@ impl ops::IndexMut<usize> for Float4 {
     }
 }
 
-impl ops::Add<Float4> for Float4 {
-    type Output = Float4;
-    fn add(self, rhs: Float4) -> Float4 {
-        return Float4 {
+impl ops::Add<Vector4> for Vector4 {
+    type Output = Vector4;
+    fn add(self, rhs: Vector4) -> Vector4 {
+        return Vector4 {
             x: self.x + rhs.x,
             y: self.y + rhs.y,
             z: self.z + rhs.z,
@@ -90,10 +90,10 @@ impl ops::Add<Float4> for Float4 {
     }
 }
 
-impl ops::Sub<Float4> for Float4 {
-    type Output = Float4;
-    fn sub(self, rhs: Float4) -> Float4 {
-        return Float4 {
+impl ops::Sub<Vector4> for Vector4 {
+    type Output = Vector4;
+    fn sub(self, rhs: Vector4) -> Vector4 {
+        return Vector4 {
             x: self.x - rhs.x,
             y: self.y - rhs.y,
             z: self.z - rhs.z,
@@ -102,10 +102,10 @@ impl ops::Sub<Float4> for Float4 {
     }
 }
 
-impl ops::Mul<Float4> for Float4 {
-    type Output = Float4;
-    fn mul(self, rhs: Float4) -> Float4 {
-        return Float4 {
+impl ops::Mul<Vector4> for Vector4 {
+    type Output = Vector4;
+    fn mul(self, rhs: Vector4) -> Vector4 {
+        return Vector4 {
             x: self.x * rhs.x,
             y: self.y * rhs.y,
             z: self.z * rhs.z,
@@ -114,10 +114,10 @@ impl ops::Mul<Float4> for Float4 {
     }
 }
 
-impl ops::Mul<f32> for Float4 {
-    type Output = Float4;
-    fn mul(self, scalar: f32) -> Float4 {
-        return Float4 {
+impl ops::Mul<f32> for Vector4 {
+    type Output = Vector4;
+    fn mul(self, scalar: f32) -> Vector4 {
+        return Vector4 {
             x: self.x * scalar,
             y: self.y * scalar,
             z: self.z * scalar,
@@ -126,17 +126,17 @@ impl ops::Mul<f32> for Float4 {
     }
 }
 
-impl ops::Mul<Float4> for f32 {
-    type Output = Float4;
-    fn mul(self, f4: Float4) -> Float4 {
+impl ops::Mul<Vector4> for f32 {
+    type Output = Vector4;
+    fn mul(self, f4: Vector4) -> Vector4 {
         return f4 * self;
     }
 }
 
-impl ops::Div<Float4> for Float4 {
-    type Output = Float4;
-    fn div(self, rhs: Float4) -> Float4 {
-        return Float4 {
+impl ops::Div<Vector4> for Vector4 {
+    type Output = Vector4;
+    fn div(self, rhs: Vector4) -> Vector4 {
+        return Vector4 {
             x: self.x / rhs.x,
             y: self.y / rhs.y,
             z: self.z / rhs.z,
@@ -145,10 +145,10 @@ impl ops::Div<Float4> for Float4 {
     }
 }
 
-impl ops::Div<f32> for Float4 {
-    type Output = Float4;
-    fn div(self, divisor: f32) -> Float4 {
-        return Float4 {
+impl ops::Div<f32> for Vector4 {
+    type Output = Vector4;
+    fn div(self, divisor: f32) -> Vector4 {
+        return Vector4 {
             x: self.x / divisor,
             y: self.y / divisor,
             z: self.z / divisor,
@@ -157,10 +157,10 @@ impl ops::Div<f32> for Float4 {
     }
 }
 
-impl ops::Neg for Float4 {
-    type Output = Float4;
-    fn neg(self) -> Float4 {
-        return Float4 {
+impl ops::Neg for Vector4 {
+    type Output = Vector4;
+    fn neg(self) -> Vector4 {
+        return Vector4 {
             x: -self.x,
             y: -self.y,
             z: -self.z,
@@ -169,7 +169,7 @@ impl ops::Neg for Float4 {
     }
 }
 
-pub fn dot(a: Float4, b: Float4) -> f32 {
+pub fn dot(a: Vector4, b: Vector4) -> f32 {
     let mut product = 0.0;
     for idx in 0..4 {
         product += a[idx] * b[idx];
@@ -178,9 +178,9 @@ pub fn dot(a: Float4, b: Float4) -> f32 {
     return product;
 }
 
-impl Vector {
-    pub fn from_float4(f4: &Float4) -> Vector {
-        Vector {
+impl Vector3 {
+    pub fn from_float4(f4: &Vector4) -> Vector3 {
+        Vector3 {
             x: f4.x,
             y: f4.y,
             z: f4.z,
@@ -189,7 +189,7 @@ impl Vector {
 }
 
 impl Point {
-    pub fn from_float4(f4: &Float4) -> Point {
+    pub fn from_float4(f4: &Vector4) -> Point {
         Point {
             x: f4.x / f4.w,
             y: f4.y / f4.w,

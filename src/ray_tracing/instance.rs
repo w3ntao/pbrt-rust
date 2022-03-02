@@ -1,8 +1,9 @@
 use std::sync::Arc;
-use crate::fundamental::vector::Vector;
-use crate::fundamental::float4::Float4;
+
 use crate::fundamental::matrix::*;
 use crate::fundamental::point::Point;
+use crate::fundamental::vector3::Vector3;
+use crate::fundamental::vector4::Vector4;
 use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::intersection::Intersection;
 use crate::ray_tracing::materials::null::NullMaterial;
@@ -69,7 +70,7 @@ impl Instance {
         self.transform = Matrix::identity();
     }
 
-    pub fn translate(&mut self, t: &Vector) {
+    pub fn translate(&mut self, t: &Vector3) {
         for idx in 0..3 {
             self.transform[idx][3] += t[idx];
         }
@@ -81,13 +82,13 @@ impl Instance {
         }
     }
 
-    pub fn scale_by_vector(&mut self, scalar: Vector) {
+    pub fn scale_by_vector(&mut self, scalar: Vector3) {
         for idx in 0..3 {
             self.transform[idx][idx] *= scalar[idx];
         }
     }
 
-    pub fn rotate(&mut self, axis: &Vector, angle: f32) {
+    pub fn rotate(&mut self, axis: &Vector3, angle: f32) {
         let cosine = f32::cos(angle);
         let sine = f32::sin(angle);
 
@@ -97,22 +98,22 @@ impl Instance {
         let z = normalized_axis.z;
 
         let rotate_matrix = Matrix::new(
-            &Float4::new(
+            &Vector4::new(
                 x * x * (1.0 - cosine) + cosine,
                 x * y * (1.0 - cosine) - z * sine,
                 x * z * (1.0 - cosine) + y * sine,
                 0.0),
-            &Float4::new(
+            &Vector4::new(
                 x * y * (1.0 - cosine) + z * sine,
                 cosine + y * y * (1.0 - cosine),
                 y * z * (1.0 - cosine) - x * sine,
                 0.0),
-            &Float4::new(
+            &Vector4::new(
                 x * z * (1.0 - cosine) - y * sine,
                 y * z * (1.0 - cosine) + x * sine,
                 cosine + z * z * (1.0 - cosine),
                 0.0),
-            &Float4::new(0.0, 0.0, 0.0, 1.0));
+            &Vector4::new(0.0, 0.0, 0.0, 1.0));
 
         self.transform = product(&rotate_matrix, &self.transform);
     }

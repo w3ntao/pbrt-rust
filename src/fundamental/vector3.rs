@@ -1,14 +1,15 @@
 use std::ops;
+
 use crate::fundamental::point::*;
 
 #[derive(Copy, Clone)]
-pub struct Vector {
+pub struct Vector3 {
     pub x: f32,
     pub y: f32,
     pub z: f32,
 }
 
-impl Vector {
+impl Vector3 {
     pub fn new(_x: f32, _y: f32, _z: f32) -> Self {
         return Self {
             x: _x,
@@ -18,7 +19,7 @@ impl Vector {
     }
 
     pub fn zero() -> Self {
-        return Vector::new(0.0, 0.0, 0.0);
+        return Vector3::new(0.0, 0.0, 0.0);
     }
 
     pub fn length_squared(&self) -> f32 {
@@ -29,12 +30,12 @@ impl Vector {
         return self.length_squared().sqrt();
     }
 
-    pub fn normalize(&self) -> Vector {
+    pub fn normalize(&self) -> Vector3 {
         return *self / self.length();
     }
 }
 
-impl ops::Index<usize> for Vector {
+impl ops::Index<usize> for Vector3 {
     type Output = f32;
     fn index(&self, index: usize) -> &f32 {
         return match index {
@@ -48,7 +49,7 @@ impl ops::Index<usize> for Vector {
     }
 }
 
-impl ops::IndexMut<usize> for Vector {
+impl ops::IndexMut<usize> for Vector3 {
     fn index_mut(&mut self, index: usize) -> &mut f32 {
         return match index {
             0 => &mut self.x,
@@ -61,10 +62,10 @@ impl ops::IndexMut<usize> for Vector {
     }
 }
 
-impl ops::Neg for Vector {
-    type Output = Vector;
-    fn neg(self) -> Vector {
-        return Vector {
+impl ops::Neg for Vector3 {
+    type Output = Vector3;
+    fn neg(self) -> Vector3 {
+        return Vector3 {
             x: -self.x,
             y: -self.y,
             z: -self.z,
@@ -72,10 +73,10 @@ impl ops::Neg for Vector {
     }
 }
 
-impl ops::Add<Vector> for Vector {
-    type Output = Vector;
-    fn add(self, rhs: Vector) -> Vector {
-        return Vector {
+impl ops::Add<Vector3> for Vector3 {
+    type Output = Vector3;
+    fn add(self, rhs: Vector3) -> Vector3 {
+        return Vector3 {
             x: self.x + rhs.x,
             y: self.y + rhs.y,
             z: self.z + rhs.z,
@@ -83,10 +84,10 @@ impl ops::Add<Vector> for Vector {
     }
 }
 
-impl ops::Sub<Vector> for Vector {
-    type Output = Vector;
-    fn sub(self, rhs: Vector) -> Vector {
-        return Vector {
+impl ops::Sub<Vector3> for Vector3 {
+    type Output = Vector3;
+    fn sub(self, rhs: Vector3) -> Vector3 {
+        return Vector3 {
             x: self.x - rhs.x,
             y: self.y - rhs.y,
             z: self.z - rhs.z,
@@ -94,9 +95,9 @@ impl ops::Sub<Vector> for Vector {
     }
 }
 
-impl ops::Add<Vector> for Point {
+impl ops::Add<Vector3> for Point {
     type Output = Point;
-    fn add(self, rhs: Vector) -> Point {
+    fn add(self, rhs: Vector3) -> Point {
         return Point {
             x: self.x + rhs.x,
             y: self.y + rhs.y,
@@ -106,9 +107,9 @@ impl ops::Add<Vector> for Point {
 }
 
 impl ops::Sub<Point> for Point {
-    type Output = Vector;
-    fn sub(self, rhs: Point) -> Vector {
-        return Vector {
+    type Output = Vector3;
+    fn sub(self, rhs: Point) -> Vector3 {
+        return Vector3 {
             x: self.x - rhs.x,
             y: self.y - rhs.y,
             z: self.z - rhs.z,
@@ -116,10 +117,10 @@ impl ops::Sub<Point> for Point {
     }
 }
 
-impl ops::Mul<f32> for Vector {
-    type Output = Vector;
-    fn mul(self, rhs: f32) -> Vector {
-        return Vector {
+impl ops::Mul<f32> for Vector3 {
+    type Output = Vector3;
+    fn mul(self, rhs: f32) -> Vector3 {
+        return Vector3 {
             x: self.x * rhs,
             y: self.y * rhs,
             z: self.z * rhs,
@@ -127,17 +128,17 @@ impl ops::Mul<f32> for Vector {
     }
 }
 
-impl ops::Mul<Vector> for f32 {
-    type Output = Vector;
-    fn mul(self, rhs: Vector) -> Vector {
+impl ops::Mul<Vector3> for f32 {
+    type Output = Vector3;
+    fn mul(self, rhs: Vector3) -> Vector3 {
         return rhs * self;
     }
 }
 
-impl ops::Div<f32> for Vector {
-    type Output = Vector;
-    fn div(self, rhs: f32) -> Vector {
-        return Vector {
+impl ops::Div<f32> for Vector3 {
+    type Output = Vector3;
+    fn div(self, rhs: f32) -> Vector3 {
+        return Vector3 {
             x: self.x / rhs,
             y: self.y / rhs,
             z: self.z / rhs,
@@ -145,28 +146,28 @@ impl ops::Div<f32> for Vector {
     }
 }
 
-impl ops::AddAssign<Vector> for Vector {
-    fn add_assign(&mut self, rhs: Vector) {
+impl ops::AddAssign<Vector3> for Vector3 {
+    fn add_assign(&mut self, rhs: Vector3) {
         self.x += rhs.x;
         self.y += rhs.y;
         self.z += rhs.z;
     }
 }
 
-impl ops::MulAssign<Vector> for Vector {
-    fn mul_assign(&mut self, rhs: Vector) {
+impl ops::MulAssign<Vector3> for Vector3 {
+    fn mul_assign(&mut self, rhs: Vector3) {
         self.x *= rhs.x;
         self.y *= rhs.y;
         self.z *= rhs.z;
     }
 }
 
-pub fn dot(a: &Vector, b: &Vector) -> f32 {
+pub fn dot(a: &Vector3, b: &Vector3) -> f32 {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
-pub fn cross(a: Vector, b: Vector) -> Vector {
-    return Vector {
+pub fn cross(a: Vector3, b: Vector3) -> Vector3 {
+    return Vector3 {
         x: a.y * b.z - a.z * b.y,
         y: a.z * b.x - a.x * b.z,
         z: a.x * b.y - a.y * b.x,

@@ -1,23 +1,24 @@
 use std::sync::Arc;
+
 use crate::fundamental::point::*;
-use crate::fundamental::vector::*;
+use crate::fundamental::vector3::*;
 use crate::ray_tracing::bounding_box::BoundingBox;
-use crate::ray_tracing::ray::*;
 use crate::ray_tracing::intersection::*;
-use crate::ray_tracing::primitive::Primitive;
 use crate::ray_tracing::materials::null::NullMaterial;
+use crate::ray_tracing::primitive::Primitive;
+use crate::ray_tracing::ray::*;
 
 #[derive(Copy, Clone)]
 pub struct Quad {
     pub origin: Point,
-    pub span0: Vector,
-    pub span1: Vector,
-    pub normal: Vector,
+    pub span0: Vector3,
+    pub span1: Vector3,
+    pub normal: Vector3,
     bounds: BoundingBox,
 }
 
 impl Quad {
-    pub fn new(v0: Point, _span0: Vector, _span1: Vector) -> Self {
+    pub fn new(v0: Point, _span0: Vector3, _span1: Vector3) -> Self {
         return Self {
             origin: v0,
             span0: _span0,

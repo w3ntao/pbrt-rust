@@ -1,13 +1,13 @@
 use std::ops;
 
 #[derive(Copy, Clone)]
-pub struct RGBColor {
+pub struct Color {
     pub r: f32,
     pub g: f32,
     pub b: f32,
 }
 
-impl RGBColor {
+impl Color {
     pub fn new(_r: f32, _g: f32, _b: f32) -> Self {
         return Self {
             r: _r,
@@ -17,14 +17,14 @@ impl RGBColor {
     }
 
     pub fn black() -> Self {
-        return RGBColor::new(0.0, 0.0, 0.0);
+        return Color::new(0.0, 0.0, 0.0);
     }
 }
 
-impl ops::Add<RGBColor> for RGBColor {
-    type Output = RGBColor;
-    fn add(self, rhs: RGBColor) -> RGBColor {
-        return RGBColor {
+impl ops::Add<Color> for Color {
+    type Output = Color;
+    fn add(self, rhs: Color) -> Color {
+        return Color {
             r: self.r + rhs.r,
             g: self.g + rhs.g,
             b: self.b + rhs.b,
@@ -32,10 +32,10 @@ impl ops::Add<RGBColor> for RGBColor {
     }
 }
 
-impl ops::Mul<f32> for RGBColor {
-    type Output = RGBColor;
-    fn mul(self, factor: f32) -> RGBColor {
-        return RGBColor {
+impl ops::Mul<f32> for Color {
+    type Output = Color;
+    fn mul(self, factor: f32) -> Color {
+        return Color {
             r: self.r * factor,
             g: self.g * factor,
             b: self.b * factor,
@@ -43,17 +43,17 @@ impl ops::Mul<f32> for RGBColor {
     }
 }
 
-impl ops::Mul<RGBColor> for f32 {
-    type Output = RGBColor;
-    fn mul(self, rhs: RGBColor) -> RGBColor {
+impl ops::Mul<Color> for f32 {
+    type Output = Color;
+    fn mul(self, rhs: Color) -> Color {
         return rhs * self;
     }
 }
 
-impl ops::Mul<RGBColor> for RGBColor {
-    type Output = RGBColor;
-    fn mul(self, rhs: RGBColor) -> RGBColor {
-        return RGBColor {
+impl ops::Mul<Color> for Color {
+    type Output = Color;
+    fn mul(self, rhs: Color) -> Color {
+        return Color {
             r: self.r * rhs.r,
             g: self.g * rhs.g,
             b: self.b * rhs.b,
@@ -61,10 +61,10 @@ impl ops::Mul<RGBColor> for RGBColor {
     }
 }
 
-impl ops::Div<f32> for RGBColor {
-    type Output = RGBColor;
-    fn div(self, divisor: f32) -> RGBColor {
-        return RGBColor {
+impl ops::Div<f32> for Color {
+    type Output = Color;
+    fn div(self, divisor: f32) -> Color {
+        return Color {
             r: self.r / divisor,
             g: self.g / divisor,
             b: self.b / divisor,

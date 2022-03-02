@@ -1,14 +1,14 @@
 use crate::fundamental::point::*;
-use crate::fundamental::vector::*;
+use crate::fundamental::vector3::*;
 
 #[derive(Copy, Clone)]
 pub struct Ray {
     pub origin: Point,
-    pub direction: Vector,
+    pub direction: Vector3,
 }
 
 impl Ray {
-    pub fn new(_origin: Point, _direction: Vector) -> Self {
+    pub fn new(_origin: Point, _direction: Vector3) -> Self {
         return Self {
             origin: _origin,
             direction: _direction,
@@ -18,7 +18,7 @@ impl Ray {
     pub fn dummy() -> Self {
         Self {
             origin: Point::zero(),
-            direction: Vector::zero(),
+            direction: Vector3::zero(),
         }
     }
 

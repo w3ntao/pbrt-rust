@@ -1,11 +1,12 @@
 use std::sync::Arc;
+
 use crate::fundamental::point::*;
-use crate::fundamental::vector::*;
+use crate::fundamental::vector3::*;
 use crate::ray_tracing::bounding_box::BoundingBox;
-use crate::ray_tracing::ray::*;
 use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::materials::null::NullMaterial;
 use crate::ray_tracing::primitive::Primitive;
+use crate::ray_tracing::ray::*;
 
 #[derive(Copy, Clone)]
 pub struct AxisAlignedBox {
@@ -28,7 +29,7 @@ impl Primitive for AxisAlignedBox {
     fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
         let mut t_min = 0.0;
         let mut t_max = previous_distance;
-        let mut normal = Vector::zero();
+        let mut normal = Vector3::zero();
 
         for axis in 0..3 {
             if ray.direction[axis] == 0.0 {
@@ -42,14 +43,14 @@ impl Primitive for AxisAlignedBox {
                 if t0 > t1 {
                     if t_min < t1 {
                         t_min = t1;
-                        normal = Vector::new(0.0, 0.0, 0.0);
+                        normal = Vector3::new(0.0, 0.0, 0.0);
                         normal[axis] = 1.0;
                     }
                     t_max = t_max.min(t0);
                 } else {
                     if t_min < t0 {
                         t_min = t0;
-                        normal = Vector::new(0.0, 0.0, 0.0);
+                        normal = Vector3::new(0.0, 0.0, 0.0);
                         normal[axis] = -1.0;
                     }
                     t_max = t_max.min(t1);

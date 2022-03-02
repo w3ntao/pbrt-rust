@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use crate::fundamental::point::*;
-use crate::fundamental::vector::*;
+use crate::fundamental::vector3::*;
 use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::material::Material;

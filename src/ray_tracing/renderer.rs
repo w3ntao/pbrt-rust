@@ -1,19 +1,20 @@
-use std::cmp::{min, max};
-use std::time::Instant;
+extern crate num_cpus;
+
+use std::cmp::{max, min};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::thread::JoinHandle;
+use std::time::Instant;
 
-use rand::thread_rng;
 use rand::Rng;
 use rand::seq::SliceRandom;
-
-extern crate num_cpus;
+use rand::thread_rng;
 
 use crate::fundamental::image::Image;
-use crate::fundamental::rgb_color::RGBColor;
+use crate::fundamental::color::Color;
 use crate::ray_tracing::camera::Camera;
 use crate::ray_tracing::integrator::Integrator;
+
 
 const MIN_BATCH_SIZE: usize = 128;
 
@@ -71,7 +72,7 @@ impl Renderer {
                             continue;
                         }
 
-                        let mut total = RGBColor::black();
+                        let mut total = Color::black();
                         for _ in 0..self.samples {
                             let random_0: f32 = rng.gen();
                             let random_1: f32 = rng.gen();
@@ -82,7 +83,7 @@ impl Renderer {
                             total = total + self.integrator.get_radiance(&ray);
                         }
                         let color = total / (self.samples as f32);
-                        
+
                         let mut locked_image = image.lock().unwrap();
                         locked_image.fill(color, y, x);
                         std::mem::drop(locked_image);

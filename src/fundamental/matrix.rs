@@ -1,26 +1,26 @@
 use std::ops;
 
 use crate::fundamental::point::Point;
-use crate::fundamental::vector::Vector;
-use crate::fundamental::float4::*;
+use crate::fundamental::vector3::Vector3;
+use crate::fundamental::vector4::*;
 
 #[derive(Clone)]
 pub struct Matrix {
-    row: [Float4; 4],
+    row: [Vector4; 4],
 }
 
 impl Matrix {
-    pub fn new(r0: &Float4, r1: &Float4, r2: &Float4, r3: &Float4) -> Matrix {
+    pub fn new(r0: &Vector4, r1: &Vector4, r2: &Vector4, r3: &Vector4) -> Matrix {
         Matrix {
             row: [r0.clone(), r1.clone(), r2.clone(), r3.clone()],
         }
     }
 
     pub fn identity() -> Matrix {
-        let r0 = Float4::new(1.0, 0.0, 0.0, 0.0);
-        let r1 = Float4::new(0.0, 1.0, 0.0, 0.0);
-        let r2 = Float4::new(0.0, 0.0, 1.0, 0.0);
-        let r3 = Float4::new(0.0, 0.0, 0.0, 1.0);
+        let r0 = Vector4::new(1.0, 0.0, 0.0, 0.0);
+        let r1 = Vector4::new(0.0, 1.0, 0.0, 0.0);
+        let r2 = Vector4::new(0.0, 0.0, 1.0, 0.0);
+        let r3 = Vector4::new(0.0, 0.0, 0.0, 1.0);
         return Matrix {
             row: [r0, r1, r2, r3],
         };
@@ -28,15 +28,15 @@ impl Matrix {
 
     pub fn zero() -> Matrix {
         Matrix {
-            row: [Float4::zero(); 4]
+            row: [Vector4::zero(); 4]
         }
     }
 
-    pub fn column(&self, idx: usize) -> Float4 {
-        Float4::new(self.row[0][idx],
-                    self.row[1][idx],
-                    self.row[2][idx],
-                    self.row[3][idx])
+    pub fn column(&self, idx: usize) -> Vector4 {
+        Vector4::new(self.row[0][idx],
+                     self.row[1][idx],
+                     self.row[2][idx],
+                     self.row[3][idx])
     }
 
     pub fn transpose(&self) -> Matrix {
@@ -109,14 +109,14 @@ impl Matrix {
 }
 
 impl ops::Index<usize> for Matrix {
-    type Output = Float4;
-    fn index(&self, idx: usize) -> &Float4 {
+    type Output = Vector4;
+    fn index(&self, idx: usize) -> &Vector4 {
         &self.row[idx]
     }
 }
 
 impl ops::IndexMut<usize> for Matrix {
-    fn index_mut(&mut self, idx: usize) -> &mut Float4 {
+    fn index_mut(&mut self, idx: usize) -> &mut Vector4 {
         &mut self.row[idx]
     }
 }
@@ -142,10 +142,10 @@ impl ops::Mul<Matrix> for f32 {
     }
 }
 
-impl ops::Mul<Float4> for Matrix {
-    type Output = Float4;
-    fn mul(self, f4: Float4) -> Float4 {
-        let mut product = Float4::zero();
+impl ops::Mul<Vector4> for Matrix {
+    type Output = Vector4;
+    fn mul(self, f4: Vector4) -> Vector4 {
+        let mut product = Vector4::zero();
         for idx in 0..4 {
             product[idx] = dot(self.row[idx], f4);
         }
@@ -153,17 +153,17 @@ impl ops::Mul<Float4> for Matrix {
     }
 }
 
-impl ops::Mul<Vector> for Matrix {
-    type Output = Vector;
-    fn mul(self, v: Vector) -> Vector {
-        return Vector::from_float4(&(self * Float4::from_vector(&v)));
+impl ops::Mul<Vector3> for Matrix {
+    type Output = Vector3;
+    fn mul(self, v: Vector3) -> Vector3 {
+        return Vector3::from_float4(&(self * Vector4::from_vector(&v)));
     }
 }
 
 impl ops::Mul<Point> for Matrix {
     type Output = Point;
     fn mul(self, p: Point) -> Point {
-        return Point::from_float4(&(self * Float4::from_point(&p)));
+        return Point::from_float4(&(self * Vector4::from_point(&p)));
     }
 }
 
@@ -184,10 +184,10 @@ impl ops::Div<f32> for Matrix {
 pub fn product(a: &Matrix, b: &Matrix) -> Matrix {
     let mut result = Matrix::zero();
     for idx in 0..4 {
-        result[idx] = Float4::new(dot(a[idx], b.column(0)),
-                                  dot(a[idx], b.column(1)),
-                                  dot(a[idx], b.column(2)),
-                                  dot(a[idx], b.column(3)));
+        result[idx] = Vector4::new(dot(a[idx], b.column(0)),
+                                   dot(a[idx], b.column(1)),
+                                   dot(a[idx], b.column(2)),
+                                   dot(a[idx], b.column(3)));
     }
 
     return result;

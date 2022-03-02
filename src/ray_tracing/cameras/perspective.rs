@@ -1,20 +1,20 @@
 use crate::fundamental::point::*;
-use crate::fundamental::vector::*;
-use crate::ray_tracing::ray::Ray;
+use crate::fundamental::vector3::*;
 use crate::ray_tracing::camera::Camera;
+use crate::ray_tracing::ray::Ray;
 
 pub struct PerspectiveCamera {
     center: Point,
-    forward: Vector,
-    horizontal: Vector,
+    forward: Vector3,
+    horizontal: Vector3,
 
-    image_plane_vertical: Vector,
+    image_plane_vertical: Vector3,
     x_pixel_multiplier: f32,
     y_pixel_multiplier: f32,
 }
 
 impl PerspectiveCamera {
-    pub fn new(_center: Point, _forward: Vector, _up: Vector,
+    pub fn new(_center: Point, _forward: Vector3, _up: Vector3,
                _vertical_opening_angle: f32, _horizontal_opening_angle: f32) -> Self {
         let _forward = _forward.normalize();
         let _up = _up.normalize();

@@ -1,17 +1,17 @@
 use rand::thread_rng;
 use rand_distr::{Distribution, Normal, NormalError};
 
-use crate::fundamental::rgb_color::*;
-use crate::fundamental::vector::*;
+use crate::fundamental::color::*;
+use crate::fundamental::vector3::*;
 use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::material::Material;
 use crate::ray_tracing::ray::*;
 
 pub struct Lambertian {
-    pub albedo: RGBColor,
+    pub albedo: Color,
 }
 
-fn random_in_unit_sphere() -> Vector {
+fn random_in_unit_sphere() -> Vector3 {
     // TODO: this is inefficient
     let mut rng = thread_rng();
     let normal = Normal::new(-1.0, 1.0).unwrap();
@@ -25,11 +25,11 @@ fn random_in_unit_sphere() -> Vector {
         if acc > 1.0 || acc < 0.0001 {
             continue;
         }
-        return Vector::new(x, y, z);
+        return Vector3::new(x, y, z);
     }
 }
 
-fn random_vector_in_hemisphere(normal: &Vector) -> Vector {
+fn random_vector_in_hemisphere(normal: &Vector3) -> Vector3 {
     let random_vec = random_in_unit_sphere();
 
     return {
@@ -42,7 +42,7 @@ fn random_vector_in_hemisphere(normal: &Vector) -> Vector {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, scattered_ray: &mut Ray, _: &Ray, intersection: &Intersection) -> RGBColor {
+    fn scatter(&self, scattered_ray: &mut Ray, _: &Ray, intersection: &Intersection) -> Color {
         let scattered_direction = random_vector_in_hemisphere(&intersection.normal);
 
         scattered_ray.origin = intersection.ray.get_point(intersection.distance) + 0.001 * intersection.normal;

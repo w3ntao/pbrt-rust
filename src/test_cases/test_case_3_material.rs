@@ -1,10 +1,10 @@
 use std::sync::Arc;
 
+use crate::fundamental::color::Color;
 use crate::fundamental::obj_loader::obj_to_triangles;
 use crate::fundamental::point::Point;
-use crate::fundamental::rgb_color::RGBColor;
 use crate::fundamental::utility::get_file_name;
-use crate::fundamental::vector::Vector;
+use crate::fundamental::vector3::Vector3;
 use crate::ray_tracing::cameras::perspective::PerspectiveCamera;
 use crate::ray_tracing::group::Group;
 use crate::ray_tracing::groups::bvh::BVH;
@@ -22,9 +22,9 @@ pub fn test() {
     println!("TEST 3: {}", &file_name);
     let ppm_name = format!("test_3_{}.ppm", file_name);
 
-    let material_ground = Arc::new(Lambertian { albedo: RGBColor::new(0.8, 0.8, 0.0) });
-    let material_center = Arc::new(Lambertian { albedo: RGBColor::new(0.1, 0.2, 0.5) });
-    let metal = Arc::new(Metal { albedo: RGBColor::new(0.8, 0.6, 0.2), fuzz: 0.4 });
+    let material_ground = Arc::new(Lambertian { albedo: Color::new(0.8, 0.8, 0.0) });
+    let material_center = Arc::new(Lambertian { albedo: Color::new(0.1, 0.2, 0.5) });
+    let metal = Arc::new(Metal { albedo: Color::new(0.8, 0.6, 0.2), fuzz: 0.4 });
     let mirror = Arc::new(Mirror {});
 
     let sphere_ground = Sphere::new(Point::new(0.0, -100.5, -1.0), 100.0, material_ground.clone());
@@ -41,8 +41,8 @@ pub fn test() {
 
     let camera = PerspectiveCamera::new(
         Point::new(-2.0, 2.0, 1.0),
-        Vector::new(2.0, -2.0, -2.0),
-        Vector::new(0.0, 1.0, 0.0),
+        Vector3::new(2.0, -2.0, -2.0),
+        Vector3::new(0.0, 1.0, 0.0),
         std::f32::consts::PI / 8.0,
         std::f32::consts::PI / 6.0);
 

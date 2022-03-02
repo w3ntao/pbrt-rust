@@ -3,8 +3,8 @@ use std::sync::Arc;
 use rand::Rng;
 use rand::thread_rng;
 
-use crate::fundamental::rgb_color::*;
-use crate::fundamental::vector::*;
+use crate::fundamental::color::*;
+use crate::fundamental::vector3::*;
 use crate::ray_tracing::integrator::Integrator;
 use crate::ray_tracing::ray::Ray;
 use crate::ray_tracing::world::World;
@@ -22,9 +22,9 @@ impl MonteCarloPathTrace {
 }
 
 impl MonteCarloPathTrace {
-    fn trace(&self, ray: &Ray, depth: i32) -> RGBColor {
+    fn trace(&self, ray: &Ray, depth: i32) -> Color {
         if depth <= 0 {
-            return RGBColor::black();
+            return Color::black();
         }
 
         let intersection = self.world.scene.intersect(ray, f32::INFINITY);
@@ -43,12 +43,12 @@ impl MonteCarloPathTrace {
         // shoot into sky
         let unit_direction = ray.direction.normalize();
         let t = 0.5 * (unit_direction.y + 1.0);
-        return (1.0 - t) * RGBColor::new(1.0, 1.0, 1.0) + t * RGBColor::new(0.5, 0.7, 1.0);
+        return (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0);
     }
 }
 
 impl Integrator for MonteCarloPathTrace {
-    fn get_radiance(&self, ray: &Ray) -> RGBColor {
+    fn get_radiance(&self, ray: &Ray) -> Color {
         return self.trace(ray, 50);
     }
 }

@@ -1,8 +1,8 @@
-pub mod vector;
+pub mod vector3;
 pub mod point;
-pub mod rgb_color;
+pub mod color;
 pub mod image;
 pub mod obj_loader;
 pub mod utility;
 pub mod matrix;
-pub mod float4;
+pub mod vector4;
