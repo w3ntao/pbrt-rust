@@ -4,6 +4,7 @@ use rand::Rng;
 use rand::thread_rng;
 
 use crate::fundamental::color::*;
+use crate::fundamental::constants::INTERSECT_OFFSET;
 use crate::fundamental::vector3::*;
 use crate::ray_tracing::integrator::Integrator;
 use crate::ray_tracing::ray::Ray;
@@ -27,7 +28,10 @@ impl MonteCarloPathTrace {
             return Color::black();
         }
 
-        let intersection = self.world.scene.intersect(ray, 0.0, f32::INFINITY);
+        let intersection = self.world.scene.intersect(ray, INTERSECT_OFFSET, f32::INFINITY);
+        // with INTERSECT_OFFSET, we can avoid the situation when the ray
+        // re-hit the surface it just leave
+
         if intersection.intersected() {
             let mut scattered_ray = Ray::dummy();
             let attenuation = intersection.material.scatter(&mut scattered_ray, &ray, &intersection);

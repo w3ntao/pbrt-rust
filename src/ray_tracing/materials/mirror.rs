@@ -21,7 +21,7 @@ fn reflect(vec_in: Vector3, normal: Vector3) -> Vector3 {
 
 impl Material for Mirror {
     fn scatter(&self, scattered_ray: &mut Ray, incoming_ray: &Ray, intersection: &Intersection) -> Color {
-        scattered_ray.origin = intersection.ray.get_point(intersection.distance) + 0.001 * intersection.normal;
+        scattered_ray.origin = intersection.ray.get_point(intersection.distance);
         scattered_ray.direction = reflect(incoming_ray.direction, intersection.normal);
         return Color::new(1.0, 1.0, 1.0);
         // TODO: I am implementing perfect glass for the time being

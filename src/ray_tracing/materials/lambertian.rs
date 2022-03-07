@@ -45,7 +45,7 @@ impl Material for Lambertian {
     fn scatter(&self, scattered_ray: &mut Ray, _: &Ray, intersection: &Intersection) -> Color {
         let scattered_direction = random_vector_in_hemisphere(intersection.normal);
 
-        scattered_ray.origin = intersection.ray.get_point(intersection.distance) + 0.001 * intersection.normal;
+        scattered_ray.origin = intersection.ray.get_point(intersection.distance);
         scattered_ray.direction = scattered_direction;
         return self.albedo;
     }

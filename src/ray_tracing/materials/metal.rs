@@ -58,7 +58,7 @@ fn reflect(vec_in: Vector3, normal: Vector3) -> Vector3 {
 impl Material for Metal {
     fn scatter(&self, scattered_ray: &mut Ray, incoming_ray: &Ray, intersection: &Intersection) -> Color {
         let reflected = reflect(incoming_ray.direction.normalize(), intersection.normal);
-        scattered_ray.origin = intersection.ray.get_point(intersection.distance) + 0.001 * intersection.normal;
+        scattered_ray.origin = intersection.ray.get_point(intersection.distance);
         scattered_ray.direction = reflected + self.fuzz * random_in_unit_sphere();
 
         if dot(scattered_ray.direction, intersection.normal) <= 0.0 {
