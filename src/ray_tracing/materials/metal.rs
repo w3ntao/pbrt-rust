@@ -39,11 +39,11 @@ fn random_in_unit_sphere() -> Vector3 {
     }
 }
 
-fn random_vector_in_hemisphere(normal: &Vector3) -> Vector3 {
+fn random_vector_in_hemisphere(normal: Vector3) -> Vector3 {
     let random_vec = random_in_unit_sphere();
 
     return {
-        if dot(&random_vec, normal) < 0.0 {
+        if dot(random_vec, normal) < 0.0 {
             -random_vec
         } else {
             random_vec
@@ -51,17 +51,17 @@ fn random_vector_in_hemisphere(normal: &Vector3) -> Vector3 {
     };
 }
 
-fn reflect(vec_in: &Vector3, normal: &Vector3) -> Vector3 {
+fn reflect(vec_in: Vector3, normal: Vector3) -> Vector3 {
     return vec_in.clone() - 2.0 * dot(vec_in, normal) * normal.clone();
 }
 
 impl Material for Metal {
     fn scatter(&self, scattered_ray: &mut Ray, incoming_ray: &Ray, intersection: &Intersection) -> Color {
-        let reflected = reflect(&incoming_ray.direction.normalize(), &intersection.normal);
+        let reflected = reflect(incoming_ray.direction.normalize(), intersection.normal);
         scattered_ray.origin = intersection.ray.get_point(intersection.distance) + 0.001 * intersection.normal;
         scattered_ray.direction = reflected + self.fuzz * random_in_unit_sphere();
 
-        if dot(&scattered_ray.direction, &intersection.normal) <= 0.0 {
+        if dot(scattered_ray.direction, intersection.normal) <= 0.0 {
             return Color::black();
         }
 

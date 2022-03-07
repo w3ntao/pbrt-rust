@@ -29,11 +29,11 @@ fn random_in_unit_sphere() -> Vector3 {
     }
 }
 
-fn random_vector_in_hemisphere(normal: &Vector3) -> Vector3 {
+fn random_vector_in_hemisphere(normal: Vector3) -> Vector3 {
     let random_vec = random_in_unit_sphere();
 
     return {
-        if dot(&random_vec, normal) < 0.0 {
+        if dot(random_vec, normal) < 0.0 {
             -random_vec
         } else {
             random_vec
@@ -43,7 +43,7 @@ fn random_vector_in_hemisphere(normal: &Vector3) -> Vector3 {
 
 impl Material for Lambertian {
     fn scatter(&self, scattered_ray: &mut Ray, _: &Ray, intersection: &Intersection) -> Color {
-        let scattered_direction = random_vector_in_hemisphere(&intersection.normal);
+        let scattered_direction = random_vector_in_hemisphere(intersection.normal);
 
         scattered_ray.origin = intersection.ray.get_point(intersection.distance) + 0.001 * intersection.normal;
         scattered_ray.direction = scattered_direction;

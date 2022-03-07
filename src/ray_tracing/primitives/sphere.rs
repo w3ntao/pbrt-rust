@@ -32,8 +32,8 @@ impl Sphere {
 impl Primitive for Sphere {
     fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
         let oc = self.center - ray.origin;
-        let dt = dot(&oc, &ray.direction);
-        let discriminant = dt * dt + self.radius * self.radius - dot(&oc, &oc);
+        let dt = dot(oc, ray.direction);
+        let discriminant = dt * dt + self.radius * self.radius - dot(oc, oc);
 
         if discriminant < 0.0 {
             return Intersection::failure();
@@ -51,7 +51,7 @@ impl Primitive for Sphere {
             let normal = (ray.get_point(t1) - self.center) / self.radius;
 
             return {
-                if dot(&normal, &ray.direction) > 0.0 {
+                if dot(normal, ray.direction) > 0.0 {
                     Intersection::from_inside(t1, ray, normal,
                                               self.material.clone())
                 } else {
@@ -69,7 +69,7 @@ impl Primitive for Sphere {
 
         let normal = (ray.get_point(t2) - self.center) / self.radius;
         return {
-            if dot(&normal, &ray.direction) > 0.0 {
+            if dot(normal, ray.direction) > 0.0 {
                 Intersection::from_inside(t1, ray, normal,
                                           self.material.clone())
             } else {
