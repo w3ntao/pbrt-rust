@@ -1,5 +1,9 @@
 use std::ops;
 
+use rand::prelude::Distribution;
+use rand::thread_rng;
+use rand_distr::Normal;
+
 use crate::fundamental::point::*;
 
 #[derive(Copy, Clone)]
@@ -32,6 +36,10 @@ impl Vector3 {
 
     pub fn normalize(&self) -> Vector3 {
         return *self / self.length();
+    }
+
+    pub fn reflect(&self, normal: Vector3) -> Vector3 {
+        return *self - 2.0 * dot(*self, normal) * normal;
     }
 }
 
@@ -171,5 +179,35 @@ pub fn cross(a: Vector3, b: Vector3) -> Vector3 {
         x: a.y * b.z - a.z * b.y,
         y: a.z * b.x - a.x * b.z,
         z: a.x * b.y - a.y * b.x,
+    };
+}
+
+pub fn random_in_unit_sphere() -> Vector3 {
+    // TODO: this is inefficient
+    let mut rng = thread_rng();
+    let normal = Normal::new(-1.0, 1.0).unwrap();
+
+    loop {
+        let x = normal.sample(&mut rng);
+        let y = normal.sample(&mut rng);
+        let z = normal.sample(&mut rng);
+
+        let acc = x * x + y * y + z * z;
+        if acc > 1.0 || acc < 0.0001 {
+            continue;
+        }
+        return Vector3::new(x, y, z);
+    }
+}
+
+pub fn random_vector_in_hemisphere(normal: Vector3) -> Vector3 {
+    let random_vec = random_in_unit_sphere();
+
+    return {
+        if dot(random_vec, normal) < 0.0 {
+            -random_vec
+        } else {
+            random_vec
+        }
     };
 }
