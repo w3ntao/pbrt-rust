@@ -1,13 +1,12 @@
 use std::sync::Arc;
 use std::time::Instant;
 
-use crate::ray_tracing::ray::*;
+use crate::ray_tracing::bounding_box::BoundingBox;
+use crate::ray_tracing::group::Group;
+use crate::ray_tracing::groups::bvh_node::{Node, PrimitiveInfo};
 use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::primitive::Primitive;
-use crate::ray_tracing::group::Group;
-use crate::ray_tracing::bounding_box::BoundingBox;
-
-use crate::ray_tracing::groups::bvh_node::{Node, PrimitiveInfo};
+use crate::ray_tracing::ray::*;
 
 pub struct BVH {
     primitives: Vec<Arc<dyn Primitive>>,
@@ -33,8 +32,8 @@ impl Group for BVH {
 }
 
 impl Primitive for BVH {
-    fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
-        return self.root.as_ref().unwrap().intersect(ray, previous_distance, &self.primitives);
+    fn intersect(&self, ray: &Ray, t_max: f32) -> Intersection {
+        return self.root.as_ref().unwrap().intersect(ray, t_max, &self.primitives);
     }
 
     fn get_bounds(&self) -> BoundingBox {

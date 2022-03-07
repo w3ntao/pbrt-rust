@@ -30,7 +30,7 @@ impl Sphere {
 }
 
 impl Primitive for Sphere {
-    fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
+    fn intersect(&self, ray: &Ray, t_max: f32) -> Intersection {
         let oc = self.center - ray.origin;
         let dt = dot(oc, ray.direction);
         let discriminant = dt * dt + self.radius * self.radius - dot(oc, oc);
@@ -42,7 +42,7 @@ impl Primitive for Sphere {
         let d_sqrt = discriminant.sqrt();
         let t1 = dt - d_sqrt;
 
-        if t1 > previous_distance {
+        if t1 > t_max {
             // previous intersection was closer
             return Intersection::failure();
         }
@@ -62,7 +62,7 @@ impl Primitive for Sphere {
         }
 
         let t2 = dt + d_sqrt;
-        if t2 < 0.0 || t2 > previous_distance {
+        if t2 < 0.0 || t2 > t_max {
             // either the intersection is farther than the closest one, or behind
             return Intersection::failure();
         }

@@ -61,15 +61,15 @@ pub struct Node {
 }
 
 impl Node {
-    pub fn intersect(&self, ray: &Ray, previous_distance: f32, primitives: &Vec<Arc<dyn Primitive>>) -> Intersection {
+    pub fn intersect(&self, ray: &Ray, t_max: f32, primitives: &Vec<Arc<dyn Primitive>>) -> Intersection {
         let (t1, t2) = self.bounds.intersect(ray);
-        if t1 > t2 || t1 > previous_distance {
+        if t1 > t2 || t1 > t_max {
             return Intersection::failure();
         }
 
         if self.left.is_none() && self.right.is_none() {
             let mut closest_intersect = Intersection::failure();
-            let mut closest_distance = previous_distance;
+            let mut closest_distance = t_max;
 
             for idx in self.start..self.end {
                 let p = &primitives[idx];
@@ -86,9 +86,9 @@ impl Node {
         let left_node = self.left.as_ref().unwrap();
         let right_node = self.right.as_ref().unwrap();
 
-        let left_intersect = left_node.intersect(ray, previous_distance, primitives);
+        let left_intersect = left_node.intersect(ray, t_max, primitives);
         if !left_intersect.intersected() {
-            return right_node.intersect(ray, previous_distance, primitives);
+            return right_node.intersect(ray, t_max, primitives);
         }
 
         let right_intersect = right_node.intersect(ray, left_intersect.distance, primitives);

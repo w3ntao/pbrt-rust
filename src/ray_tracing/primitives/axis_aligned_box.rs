@@ -26,9 +26,9 @@ impl AxisAlignedBox {
 }
 
 impl Primitive for AxisAlignedBox {
-    fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
-        let mut t_min = 0.0;
-        let mut t_max = previous_distance;
+    fn intersect(&self, ray: &Ray, t_max: f32) -> Intersection {
+        let mut root_min = 0.0;
+        let mut root_max = t_max;
         let mut normal = Vector3::zero();
 
         for axis in 0..3 {
@@ -41,27 +41,27 @@ impl Primitive for AxisAlignedBox {
                 let t1 = (self.axis_max[axis] - ray.origin[axis]) / ray.direction[axis];
 
                 if t0 > t1 {
-                    if t_min < t1 {
-                        t_min = t1;
+                    if root_min < t1 {
+                        root_min = t1;
                         normal = Vector3::new(0.0, 0.0, 0.0);
                         normal[axis] = 1.0;
                     }
-                    t_max = t_max.min(t0);
+                    root_max = root_max.min(t0);
                 } else {
-                    if t_min < t0 {
-                        t_min = t0;
+                    if root_min < t0 {
+                        root_min = t0;
                         normal = Vector3::new(0.0, 0.0, 0.0);
                         normal[axis] = -1.0;
                     }
-                    t_max = t_max.min(t1);
+                    root_max = root_max.min(t1);
                 }
-                if t_max < t_min {
+                if root_max < root_min {
                     return Intersection::failure();
                 }
             }
         }
 
-        return Intersection::new(t_min, ray, normal, Arc::new(NullMaterial {}));
+        return Intersection::new(root_min, ray, normal, Arc::new(NullMaterial {}));
     }
 
     fn get_bounds(&self) -> BoundingBox {

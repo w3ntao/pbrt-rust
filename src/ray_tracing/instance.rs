@@ -16,7 +16,7 @@ pub struct Instance {
 }
 
 impl Primitive for Instance {
-    fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
+    fn intersect(&self, ray: &Ray, t_max: f32) -> Intersection {
         let inverted_transform = self.transform.invert();
         let mut inverted_ray_direction = inverted_transform.clone() * ray.direction;
         let inverted_length = inverted_ray_direction.length();
@@ -24,7 +24,7 @@ impl Primitive for Instance {
 
         let intersect = self.primitive.intersect(
             &Ray::new(inverted_transform.clone() * ray.origin, inverted_ray_direction),
-            previous_distance / inverted_length);
+            t_max / inverted_length);
         if !intersect.intersected() {
             // failure
             return Intersection::failure();

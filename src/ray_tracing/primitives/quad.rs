@@ -30,7 +30,7 @@ impl Quad {
 }
 
 impl Primitive for Quad {
-    fn intersect(&self, ray: &Ray, previous_distance: f32) -> Intersection {
+    fn intersect(&self, ray: &Ray, t_max: f32) -> Intersection {
         let ab = cross(self.span0, self.span1);
         let det = -dot(ab, ray.direction);
         if det == 0.0 {
@@ -40,7 +40,7 @@ impl Primitive for Quad {
         let c = ray.origin - self.origin;
         let det_t = dot(ab, c);
         let t = det_t / det;
-        if t < 0.0 || t > previous_distance {
+        if t < 0.0 || t > t_max {
             return Intersection::failure();
         }
         let beta = dot(c, cross(ray.direction, self.span1)) / det;
