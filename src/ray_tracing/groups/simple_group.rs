@@ -21,14 +21,14 @@ impl SimpleGroup {
 }
 
 impl Primitive for SimpleGroup {
-    fn intersect(&self, ray: &Ray, t_max: f32) -> Intersection {
+    fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
         let mut closest_intersect = Intersection::failure();
-        let mut closest_distance = t_max;
+        let mut closest_distance_so_far = t_max;
 
         for p in &self.primitives {
-            let intersect = p.intersect(ray, closest_distance);
+            let intersect = p.intersect(ray, t_min, closest_distance_so_far);
             if intersect.intersected() {
-                closest_distance = intersect.distance;
+                closest_distance_so_far = intersect.distance;
                 closest_intersect = intersect;
             }
         }

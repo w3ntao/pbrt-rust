@@ -27,7 +27,7 @@ impl MonteCarloPathTrace {
             return Color::black();
         }
 
-        let intersection = self.world.scene.intersect(ray, f32::INFINITY);
+        let intersection = self.world.scene.intersect(ray, 0.0, f32::INFINITY);
         if intersection.intersected() {
             let mut scattered_ray = Ray::dummy();
             let attenuation = intersection.material.scatter(&mut scattered_ray, &ray, &intersection);

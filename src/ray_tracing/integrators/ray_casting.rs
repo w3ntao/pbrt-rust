@@ -18,7 +18,7 @@ impl RayCastingIntegrator {
 
 impl Integrator for RayCastingIntegrator {
     fn get_radiance(&self, ray: &Ray) -> Color {
-        let intersect = self.world.scene.intersect(ray, f32::INFINITY);
+        let intersect = self.world.scene.intersect(ray, 0.0, f32::INFINITY);
         if !intersect.intersected() {
             return Color::black();
         }

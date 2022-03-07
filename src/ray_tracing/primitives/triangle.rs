@@ -32,7 +32,7 @@ impl Triangle {
 }
 
 impl Primitive for Triangle {
-    fn intersect(&self, ray: &Ray, t_max: f32) -> Intersection {
+    fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
         let ab = cross(self.span0, self.span1);
         let det = -dot(ab, ray.direction);
         if det == 0.0 {
@@ -41,7 +41,7 @@ impl Primitive for Triangle {
 
         let c = ray.origin - self.origin;
         let t = dot(ab, c) / det;
-        if t < 0.0 || t > t_max {
+        if t < t_min || t > t_max {
             return Intersection::failure();
         }
 

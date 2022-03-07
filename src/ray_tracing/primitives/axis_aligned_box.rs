@@ -26,8 +26,8 @@ impl AxisAlignedBox {
 }
 
 impl Primitive for AxisAlignedBox {
-    fn intersect(&self, ray: &Ray, t_max: f32) -> Intersection {
-        let mut root_min = 0.0;
+    fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
+        let mut root_min = t_min;
         let mut root_max = t_max;
         let mut normal = Vector3::zero();
 

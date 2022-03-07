@@ -32,8 +32,8 @@ impl Group for BVH {
 }
 
 impl Primitive for BVH {
-    fn intersect(&self, ray: &Ray, t_max: f32) -> Intersection {
-        return self.root.as_ref().unwrap().intersect(ray, t_max, &self.primitives);
+    fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
+        return self.root.as_ref().unwrap().intersect(ray, t_min, t_max, &self.primitives);
     }
 
     fn get_bounds(&self) -> BoundingBox {
