@@ -10,11 +10,10 @@ use rand::Rng;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 
-use crate::fundamental::image::Image;
 use crate::fundamental::color::Color;
+use crate::fundamental::image::Image;
 use crate::ray_tracing::camera::Camera;
 use crate::ray_tracing::integrator::Integrator;
-
 
 const MIN_BATCH_SIZE: usize = 128;
 
@@ -115,7 +114,7 @@ impl Renderer {
         let mut job_list: Vec<Vec<Job>> = vec![];
         for idx in (0..all_jobs.len()).step_by(batch_size) {
             let batch = &all_jobs[idx..min(idx + batch_size, all_jobs.len())];
-            job_list.push(batch.clone().to_vec());
+            job_list.push(batch.to_vec());
         }
         let shared_job = Arc::new(Mutex::new(job_list));
         let shared_image = Arc::new(Mutex::new(Image::new(width, height)));

@@ -30,7 +30,7 @@ impl Vector4 {
         }
     }
 
-    pub fn from_point(p: &Point) -> Vector4 {
+    pub fn from_point(p: Point) -> Vector4 {
         Vector4 {
             x: p.x,
             y: p.y,
@@ -39,7 +39,7 @@ impl Vector4 {
         }
     }
 
-    pub fn from_vector(v: &Vector3) -> Vector4 {
+    pub fn from_vector(v: Vector3) -> Vector4 {
         Vector4 {
             x: v.x,
             y: v.y,
@@ -179,7 +179,7 @@ pub fn dot(a: Vector4, b: Vector4) -> f32 {
 }
 
 impl Vector3 {
-    pub fn from_float4(f4: &Vector4) -> Vector3 {
+    pub fn from_float4(f4: Vector4) -> Vector3 {
         Vector3 {
             x: f4.x,
             y: f4.y,
@@ -189,7 +189,7 @@ impl Vector3 {
 }
 
 impl Point {
-    pub fn from_float4(f4: &Vector4) -> Point {
+    pub fn from_float4(f4: Vector4) -> Point {
         Point {
             x: f4.x / f4.w,
             y: f4.y / f4.w,

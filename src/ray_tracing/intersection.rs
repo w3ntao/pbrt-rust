@@ -19,7 +19,7 @@ impl Intersection {
     pub fn new(_distance: f32, _ray: &Ray, _normal: Vector3, _material: Arc<dyn Material>) -> Self {
         return Self {
             distance: _distance,
-            ray: _ray.clone(),
+            ray: *_ray,
             normal: _normal,
             material: _material,
             entering_material: true,
@@ -29,7 +29,7 @@ impl Intersection {
     pub fn from_inside(_distance: f32, _ray: &Ray, _normal: Vector3, _material: Arc<dyn Material>) -> Self {
         return Self {
             distance: _distance,
-            ray: _ray.clone(),
+            ray: *_ray,
             normal: _normal,
             material: _material,
             entering_material: false,

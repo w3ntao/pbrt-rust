@@ -31,8 +31,8 @@ pub fn test() {
     for idx in 0..num {
         let theta = (idx as f32) * delta;
         let mut dragon_var = Instance::new(dragon_model.clone());
-        dragon_var.rotate(&Vector3::new(0.0, 1.0, 0.0), theta);
-        dragon_var.translate(&Vector3::new(radius * f32::sin(theta), 0.0, radius * f32::cos(theta)));
+        dragon_var.rotate(Vector3::new(0.0, 1.0, 0.0), theta);
+        dragon_var.translate(Vector3::new(radius * f32::sin(theta), 0.0, radius * f32::cos(theta)));
         scene.add(Arc::new(dragon_var));
     }
     scene.build_index();

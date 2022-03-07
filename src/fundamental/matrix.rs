@@ -10,9 +10,9 @@ pub struct Matrix {
 }
 
 impl Matrix {
-    pub fn new(r0: &Vector4, r1: &Vector4, r2: &Vector4, r3: &Vector4) -> Matrix {
+    pub fn new(r0: Vector4, r1: Vector4, r2: Vector4, r3: Vector4) -> Matrix {
         Matrix {
-            row: [r0.clone(), r1.clone(), r2.clone(), r3.clone()],
+            row: [r0, r1, r2, r3],
         }
     }
 
@@ -40,7 +40,7 @@ impl Matrix {
     }
 
     pub fn transpose(&self) -> Matrix {
-        Matrix::new(&self.column(0), &self.column(1), &self.column(2), &self.column(3))
+        Matrix::new(self.column(0), self.column(1), self.column(2), self.column(3))
     }
 
     pub fn invert(&self) -> Matrix {
@@ -156,14 +156,14 @@ impl ops::Mul<Vector4> for Matrix {
 impl ops::Mul<Vector3> for Matrix {
     type Output = Vector3;
     fn mul(self, v: Vector3) -> Vector3 {
-        return Vector3::from_float4(&(self * Vector4::from_vector(&v)));
+        return Vector3::from_float4((self * Vector4::from_vector(v)));
     }
 }
 
 impl ops::Mul<Point> for Matrix {
     type Output = Point;
     fn mul(self, p: Point) -> Point {
-        return Point::from_float4(&(self * Vector4::from_point(&p)));
+        return Point::from_float4((self * Vector4::from_point(p)));
     }
 }
 

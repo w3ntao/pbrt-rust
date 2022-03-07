@@ -1,9 +1,10 @@
 use std::sync::Arc;
+
 use crate::fundamental::point::*;
-use crate::ray_tracing::ray::*;
+use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::primitive::Primitive;
-use crate::ray_tracing::bounding_box::BoundingBox;
+use crate::ray_tracing::ray::*;
 
 const BUCKET_NUM: usize = 12;
 const EPSILON: f32 = 1.0e-6;
@@ -158,10 +159,10 @@ impl Node {
             let mut right_bounds = BoundingBox::empty();
             for info in &infos {
                 if info.centroid[split_axis] < split_val {
-                    left_infos.push(info.clone());
+                    left_infos.push(*info);
                     left_bounds += info.bounds;
                 } else {
-                    right_infos.push(info.clone());
+                    right_infos.push(*info);
                     right_bounds += info.bounds;
                 }
             }
@@ -217,7 +218,7 @@ impl Node {
                 let bucket_idx = (bucket_idx_float as usize).max(0).min(BUCKET_NUM - 1);
 
                 bucket_list[bucket_idx].count += 1;
-                bucket_list[bucket_idx].primitive_infos.push(info.clone());
+                bucket_list[bucket_idx].primitive_infos.push(*info);
                 bucket_list[bucket_idx].bounds += info.bounds;
             }
 

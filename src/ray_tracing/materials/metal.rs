@@ -13,9 +13,9 @@ pub struct Metal {
 }
 
 impl Metal {
-    pub fn new(_albedo: &Color, _fuzz: f32) -> Metal {
+    pub fn new(_albedo: Color, _fuzz: f32) -> Metal {
         Metal {
-            albedo: _albedo.clone(),
+            albedo: _albedo,
             fuzz: _fuzz,
         }
     }
@@ -52,7 +52,7 @@ fn random_vector_in_hemisphere(normal: Vector3) -> Vector3 {
 }
 
 fn reflect(vec_in: Vector3, normal: Vector3) -> Vector3 {
-    return vec_in.clone() - 2.0 * dot(vec_in, normal) * normal.clone();
+    return vec_in - 2.0 * dot(vec_in, normal) * normal;
 }
 
 impl Material for Metal {
