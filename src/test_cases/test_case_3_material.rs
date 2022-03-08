@@ -10,9 +10,10 @@ use crate::ray_tracing::group::Group;
 use crate::ray_tracing::groups::bvh::BVH;
 use crate::ray_tracing::instance::*;
 use crate::ray_tracing::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
+use crate::ray_tracing::materials::glass::*;
 use crate::ray_tracing::materials::lambertian::*;
 use crate::ray_tracing::materials::metal::*;
-use crate::ray_tracing::materials::mirror::Mirror;
+use crate::ray_tracing::materials::mirror::*;
 use crate::ray_tracing::primitives::sphere::Sphere;
 use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::world::World;
@@ -22,14 +23,19 @@ pub fn test() {
     println!("TEST 3: {}", &file_name);
     let ppm_name = format!("test_3_{}.ppm", file_name);
 
+    const WIDTH: usize = 500;
+    const HEIGHT: usize = 375;
+    const SAMPLES: i32 = 100;
+
     let material_ground = Arc::new(Lambertian { albedo: Color::new(0.8, 0.8, 0.0) });
     let material_center = Arc::new(Lambertian { albedo: Color::new(0.1, 0.2, 0.5) });
     let metal = Arc::new(Metal { albedo: Color::new(0.8, 0.6, 0.2), fuzz: 0.4 });
     let mirror = Arc::new(Mirror {});
+    let glass = Arc::new(Glass::new());
 
     let sphere_ground = Sphere::new(Point::new(0.0, -100.5, -1.0), 100.0, material_ground.clone());
     let sphere_left = Sphere::new(Point::new(-1.0, 0.0, -1.0), 0.48, mirror.clone());
-    let sphere_center = Sphere::new(Point::new(0.0, 0.0, -1.0), 0.48, material_center.clone());
+    let sphere_center = Sphere::new(Point::new(0.0, 0.0, -1.0), 0.48, glass.clone());
     let sphere_right = Sphere::new(Point::new(1.0, 0.0, -1.0), 0.48, metal.clone());
 
     let mut scene = BVH::default();
@@ -48,8 +54,8 @@ pub fn test() {
 
     let world = World::new(Arc::new(scene));
     let integrator = MonteCarloPathTrace::new(Arc::new(world));
-    let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), 20);
-    let image = renderer.render(500, 375);
+    let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), SAMPLES);
+    let image = renderer.render(WIDTH, HEIGHT);
     image.write(&ppm_name);
     println!();
 }
