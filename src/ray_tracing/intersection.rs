@@ -20,7 +20,7 @@ impl Intersection {
         return Self {
             distance: _distance,
             ray: *_ray,
-            normal: _normal,
+            normal: _normal.normalize(),
             material: _material,
             entering_material: true,
         };
@@ -30,7 +30,7 @@ impl Intersection {
         return Self {
             distance: _distance,
             ray: *_ray,
-            normal: _normal,
+            normal: _normal.normalize(),
             material: _material,
             entering_material: false,
         };

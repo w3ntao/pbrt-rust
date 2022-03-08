@@ -28,15 +28,14 @@ pub fn test() {
     const SAMPLES: i32 = 100;
 
     let material_ground = Arc::new(Lambertian { albedo: Color::new(0.8, 0.8, 0.0) });
-    let material_center = Arc::new(Lambertian { albedo: Color::new(0.1, 0.2, 0.5) });
     let metal = Arc::new(Metal { albedo: Color::new(0.8, 0.6, 0.2), fuzz: 0.4 });
     let mirror = Arc::new(Mirror {});
     let glass = Arc::new(Glass::new());
 
     let sphere_ground = Sphere::new(Point::new(0.0, -100.5, -1.0), 100.0, material_ground.clone());
-    let sphere_left = Sphere::new(Point::new(-1.0, 0.0, -1.0), 0.48, mirror.clone());
-    let sphere_center = Sphere::new(Point::new(0.0, 0.0, -1.0), 0.48, glass.clone());
-    let sphere_right = Sphere::new(Point::new(1.0, 0.0, -1.0), 0.48, metal.clone());
+    let sphere_center = Sphere::new(Point::new(0.0, 0.0, -1.0), 0.5, glass.clone());
+    let sphere_left = Sphere::new(Point::new(-1.0, 0.0, -1.0), 0.5, mirror.clone());
+    let sphere_right = Sphere::new(Point::new(1.0, 0.0, -1.0), 0.5, metal.clone());
 
     let mut scene = BVH::default();
     scene.add(Arc::new(sphere_ground));
@@ -45,9 +44,18 @@ pub fn test() {
     scene.add(Arc::new(sphere_right));
     scene.build_index();
 
+    /*
     let camera = PerspectiveCamera::new(
         Point::new(-2.0, 2.0, 1.0),
         Vector3::new(2.0, -2.0, -2.0),
+        Vector3::new(0.0, 1.0, 0.0),
+        std::f32::consts::PI / 8.0,
+        std::f32::consts::PI / 6.0);
+    */
+
+    let camera = PerspectiveCamera::new(
+        Point::new(0.0, 0.0, 5.0),
+        Vector3::new(0.0, 0.0, -1.0),
         Vector3::new(0.0, 1.0, 0.0),
         std::f32::consts::PI / 8.0,
         std::f32::consts::PI / 6.0);
