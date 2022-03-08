@@ -1,8 +1,8 @@
 use std::ops;
 
+use rand::distributions::Uniform;
 use rand::prelude::Distribution;
 use rand::thread_rng;
-use rand_distr::Normal;
 
 use crate::fundamental::point::*;
 
@@ -189,12 +189,12 @@ pub fn cosine(a: Vector3, b: Vector3) -> f32 {
 pub fn random_in_unit_sphere() -> Vector3 {
     // TODO: this is inefficient
     let mut rng = thread_rng();
-    let normal = Normal::new(-1.0, 1.0).unwrap();
+    let uniform_distribution = Uniform::new(-1.0, 1.0);
 
     loop {
-        let x = normal.sample(&mut rng);
-        let y = normal.sample(&mut rng);
-        let z = normal.sample(&mut rng);
+        let x = uniform_distribution.sample(&mut rng);
+        let y = uniform_distribution.sample(&mut rng);
+        let z = uniform_distribution.sample(&mut rng);
 
         let acc = x * x + y * y + z * z;
         if acc > 1.0 || acc < 0.0001 {
