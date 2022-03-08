@@ -182,6 +182,10 @@ pub fn cross(a: Vector3, b: Vector3) -> Vector3 {
     };
 }
 
+pub fn cosine(a: Vector3, b: Vector3) -> f32 {
+    return dot(a.normalize(), b.normalize());
+}
+
 pub fn random_in_unit_sphere() -> Vector3 {
     // TODO: this is inefficient
     let mut rng = thread_rng();
