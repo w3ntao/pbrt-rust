@@ -20,21 +20,22 @@ use crate::ray_tracing::world::World;
 
 pub fn test() {
     let file_name = get_file_name(file!());
-    println!("TEST 3: {}", &file_name);
-    let ppm_name = format!("test_3_{}.ppm", file_name);
+    println!("TEST 4: {}", &file_name);
+    let ppm_name = format!("test_4_{}.ppm", file_name);
 
     const WIDTH: usize = 500;
     const HEIGHT: usize = 375;
-    const SAMPLES: i32 = 100;
+    const SAMPLES: i32 = 10;
 
     let material_ground = Arc::new(Lambertian { albedo: Color::new(0.8, 0.8, 0.0) });
+    let material_center = Arc::new(Lambertian { albedo: Color::new(0.1, 0.2, 0.5) });
     let metal = Arc::new(Metal { albedo: Color::new(0.8, 0.6, 0.2), fuzz: 0.4 });
     let mirror = Arc::new(Mirror {});
     let glass = Arc::new(Glass::new());
 
     let sphere_ground = Sphere::new(Point::new(0.0, -100.5, -1.0), 100.0, material_ground.clone());
-    let sphere_center = Sphere::new(Point::new(0.0, 0.0, -1.0), 0.5, glass.clone());
-    let sphere_left = Sphere::new(Point::new(-1.0, 0.0, -1.0), 0.5, mirror.clone());
+    let sphere_center = Sphere::new(Point::new(0.0, 0.0, -1.0), 0.5, material_center.clone());
+    let sphere_left = Sphere::new(Point::new(-1.0, 0.0, -1.0), 0.5, glass.clone());
     let sphere_right = Sphere::new(Point::new(1.0, 0.0, -1.0), 0.5, metal.clone());
 
     let mut scene = BVH::default();
@@ -44,18 +45,9 @@ pub fn test() {
     scene.add(Arc::new(sphere_right));
     scene.build_index();
 
-    /*
     let camera = PerspectiveCamera::new(
         Point::new(-2.0, 2.0, 1.0),
         Vector3::new(2.0, -2.0, -2.0),
-        Vector3::new(0.0, 1.0, 0.0),
-        std::f32::consts::PI / 8.0,
-        std::f32::consts::PI / 6.0);
-    */
-
-    let camera = PerspectiveCamera::new(
-        Point::new(0.0, 0.0, 5.0),
-        Vector3::new(0.0, 0.0, -1.0),
         Vector3::new(0.0, 1.0, 0.0),
         std::f32::consts::PI / 8.0,
         std::f32::consts::PI / 6.0);

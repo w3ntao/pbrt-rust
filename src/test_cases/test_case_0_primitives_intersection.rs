@@ -57,6 +57,6 @@ pub fn test() {
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), 1);
     let image = renderer.render(640, 480);
 
-    image.write(&format!("test_0_{}.ppm", file_name));
+    image.write(&format!("{}.ppm", file_name));
     println!();
 }

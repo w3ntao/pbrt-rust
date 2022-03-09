@@ -50,7 +50,7 @@ impl Material for Glass {
         let cosine_theta = cosine(-incoming_ray.direction, intersection.normal);
         let sine_theta = (1.0 - cosine_theta * cosine_theta).sqrt();
 
-        let cannot_refract = refraction_ratio * sine_theta >= 1.0;
+        let cannot_refract = refraction_ratio * sine_theta > 1.0;
 
         let direction = if cannot_refract || reflectance(cosine_theta, refraction_ratio) > random_zero_to_one() {
             incoming_ray.direction.reflect(intersection.normal)
