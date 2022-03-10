@@ -20,7 +20,7 @@ impl Metal {
 }
 
 impl Material for Metal {
-    fn scatter(&self, scattered_ray: &mut Ray, incoming_ray: &Ray, intersection: &Intersection) -> Color {
+    fn scatter(&self, incoming_ray: &Ray, intersection: &Intersection, scattered_ray: &mut Ray) -> Color {
         let reflected = incoming_ray.direction.reflect(intersection.normal);
         scattered_ray.origin = intersection.ray.get_point(intersection.distance);
         scattered_ray.direction = reflected + self.fuzz * random_in_unit_sphere();

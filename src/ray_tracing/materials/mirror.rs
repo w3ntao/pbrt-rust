@@ -16,7 +16,7 @@ impl Mirror {
 }
 
 impl Material for Mirror {
-    fn scatter(&self, scattered_ray: &mut Ray, incoming_ray: &Ray, intersection: &Intersection) -> Color {
+    fn scatter(&self, incoming_ray: &Ray, intersection: &Intersection, scattered_ray: &mut Ray) -> Color {
         scattered_ray.origin = intersection.ray.get_point(intersection.distance);
         scattered_ray.direction = incoming_ray.direction.reflect(intersection.normal);
         return Color::new(1.0, 1.0, 1.0);

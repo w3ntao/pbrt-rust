@@ -9,7 +9,7 @@ pub struct Lambertian {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, scattered_ray: &mut Ray, _: &Ray, intersection: &Intersection) -> Color {
+    fn scatter(&self, _: &Ray, intersection: &Intersection, scattered_ray: &mut Ray) -> Color {
         let scattered_direction = random_vector_in_hemisphere(intersection.normal);
 
         scattered_ray.origin = intersection.ray.get_point(intersection.distance);
