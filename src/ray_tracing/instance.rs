@@ -31,9 +31,9 @@ impl Primitive for Instance {
             return Intersection::failure();
         }
 
-        return Intersection::new(intersect.distance / inverted_length, &ray,
-                                 (inverted_transform.transpose() * intersect.normal).normalize(),
-                                 Arc::new(NullMaterial {}));
+        return Intersection::from_outside(intersect.distance / inverted_length, &ray,
+                                          (inverted_transform.transpose() * intersect.normal).normalize(),
+                                          Arc::new(NullMaterial {}));
     }
 
     fn get_bounds(&self) -> BoundingBox {

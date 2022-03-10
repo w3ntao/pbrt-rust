@@ -35,12 +35,6 @@ impl MonteCarloPathTrace {
         if intersection.intersected() {
             let mut scattered_ray = Ray::dummy();
             let attenuation = intersection.material.scatter(&mut scattered_ray, &ray, &intersection);
-            if attenuation.r <= EPSILON_BLACK && attenuation.g <= EPSILON_BLACK && attenuation.b <= EPSILON_BLACK {
-                // the attenuation goes too low that it probably contribute nothing
-                // to the result so we stop here
-                // TODO: introduce Russian Roulette in the future to fix this bias
-                return attenuation;
-            }
             return attenuation * self.trace(&scattered_ray, depth - 1);
         }
 

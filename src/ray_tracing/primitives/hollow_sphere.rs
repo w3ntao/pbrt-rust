@@ -1,0 +1,49 @@
+use std::env::current_exe;
+use std::sync::Arc;
+
+use crate::fundamental::constants::INTERSECT_OFFSET;
+use crate::fundamental::point::*;
+use crate::fundamental::vector3::*;
+use crate::ray_tracing::bounding_box::BoundingBox;
+use crate::ray_tracing::intersection::*;
+use crate::ray_tracing::material::Material;
+use crate::ray_tracing::primitive::Primitive;
+use crate::ray_tracing::primitives::sphere::*;
+use crate::ray_tracing::ray::*;
+
+pub struct HollowSphere {
+    pub external_sphere: Sphere,
+    pub internal_sphere: Sphere,
+}
+
+impl HollowSphere {
+    pub fn new(_center: Point, _radius: f32, thickness: f32, _material: Arc<dyn Material>) -> Self {
+        return Self {
+            external_sphere: Sphere::new(_center, _radius, _material.clone()),
+            internal_sphere: Sphere::new(_center, _radius - thickness, _material),
+        };
+    }
+}
+
+impl Primitive for HollowSphere {
+    fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
+        let external_intersection = self.external_sphere.intersect(ray, t_min, t_max);
+        if !external_intersection.intersected() || external_intersection.entering_material {
+            return external_intersection;
+        }
+
+        let mut internal_intersection = self.internal_sphere.intersect(ray, INTERSECT_OFFSET, external_intersection.distance);
+        if !internal_intersection.intersected() {
+            return external_intersection;
+        }
+
+        internal_intersection.entering_material = !internal_intersection.entering_material;
+        //internal_intersection.normal = -internal_intersection.normal;
+
+        return internal_intersection;
+    }
+
+    fn get_bounds(&self) -> BoundingBox {
+        return self.external_sphere.get_bounds();
+    }
+}

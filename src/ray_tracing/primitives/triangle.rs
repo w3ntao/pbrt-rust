@@ -55,7 +55,7 @@ impl Primitive for Triangle {
             return Intersection::failure();
         }
 
-        return Intersection::new(t, ray, self.normal, Arc::new(NullMaterial {}));
+        return Intersection::from_outside(t, ray, self.normal, Arc::new(NullMaterial {}));
     }
 
     fn get_bounds(&self) -> BoundingBox {

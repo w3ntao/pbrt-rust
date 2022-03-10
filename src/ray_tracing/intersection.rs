@@ -16,7 +16,7 @@ pub struct Intersection {
 }
 
 impl Intersection {
-    pub fn new(_distance: f32, _ray: &Ray, _normal: Vector3, _material: Arc<dyn Material>) -> Self {
+    pub fn from_outside(_distance: f32, _ray: &Ray, _normal: Vector3, _material: Arc<dyn Material>) -> Self {
         return Self {
             distance: _distance,
             ray: *_ray,

@@ -14,6 +14,7 @@ use crate::ray_tracing::materials::glass::*;
 use crate::ray_tracing::materials::lambertian::*;
 use crate::ray_tracing::materials::metal::*;
 use crate::ray_tracing::materials::mirror::*;
+use crate::ray_tracing::primitives::hollow_sphere::HollowSphere;
 use crate::ray_tracing::primitives::sphere::Sphere;
 use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::world::World;
@@ -23,9 +24,9 @@ pub fn test() {
     println!("TEST 4: {}", &file_name);
     let ppm_name = format!("test_4_{}.ppm", file_name);
 
-    const WIDTH: usize = 500;
-    const HEIGHT: usize = 375;
-    const SAMPLES: i32 = 10;
+    const WIDTH: usize = 1000;
+    const HEIGHT: usize = 750;
+    const SAMPLES: i32 = 100;
 
     let material_ground = Arc::new(Lambertian { albedo: Color::new(0.8, 0.8, 0.0) });
     let material_center = Arc::new(Lambertian { albedo: Color::new(0.1, 0.2, 0.5) });

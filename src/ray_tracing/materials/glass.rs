@@ -19,13 +19,11 @@ impl Glass {
     }
 }
 
-fn refract(ray_in: Vector3, normal: Vector3, etai_over_etat: f32) -> Vector3 {
-    let ray_in = ray_in.normalize();
-    let normal = normal.normalize();
-    let cost_theta = dot(-ray_in, normal);
-    let ray_out_perpendicular = etai_over_etat * (ray_in + cost_theta * normal);
-    let ray_out_parallel = -(1.0 - ray_out_perpendicular.length_squared()).abs().sqrt() * normal;
-    return ray_out_perpendicular + ray_out_parallel;
+fn refract(uv: Vector3, n: Vector3, etai_over_etat: f32) -> Vector3 {
+    let cos_theta = dot(-uv, n).min(1.0);
+    let r_out_perp = etai_over_etat * (uv + cos_theta * n);
+    let r_out_parallel = -(1.0 - r_out_perp.length_squared()).abs().sqrt() * n;
+    return r_out_perp + r_out_parallel;
 }
 
 fn reflectance(cosine: f32, index_of_refraction: f32) -> f32 {
@@ -47,16 +45,17 @@ impl Material for Glass {
             }
         };
 
-        let cosine_theta = cosine(-incoming_ray.direction, intersection.normal);
+        let normal = intersection.normal;
+
+        let cosine_theta = cosine(-incoming_ray.direction, normal);
         let sine_theta = (1.0 - cosine_theta * cosine_theta).sqrt();
 
         let cannot_refract = refraction_ratio * sine_theta > 1.0;
-
         let direction = if cannot_refract || reflectance(cosine_theta, refraction_ratio) > random_zero_to_one() {
-            incoming_ray.direction.reflect(intersection.normal)
+            incoming_ray.direction.reflect(normal)
         } else {
             refract(incoming_ray.direction,
-                    intersection.normal,
+                    normal,
                     refraction_ratio)
         };
 
