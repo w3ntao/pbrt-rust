@@ -38,7 +38,6 @@ impl Primitive for HollowSphere {
         }
 
         internal_intersection.entering_material = !internal_intersection.entering_material;
-        //internal_intersection.normal = -internal_intersection.normal;
 
         return internal_intersection;
     }

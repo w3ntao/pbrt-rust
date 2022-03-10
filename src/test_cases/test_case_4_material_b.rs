@@ -22,11 +22,11 @@ use crate::ray_tracing::world::World;
 pub fn test() {
     let file_name = get_file_name(file!());
     println!("TEST 4: {}", &file_name);
-    let ppm_name = format!("test_4_{}.ppm", file_name);
+    let ppm_name = format!("{}.ppm", file_name);
 
     const WIDTH: usize = 1000;
     const HEIGHT: usize = 750;
-    const SAMPLES: i32 = 100;
+    const SAMPLES: i32 = 10;
 
     let material_ground = Arc::new(Lambertian { albedo: Color::new(0.8, 0.8, 0.0) });
     let material_center = Arc::new(Lambertian { albedo: Color::new(0.1, 0.2, 0.5) });
@@ -36,7 +36,7 @@ pub fn test() {
 
     let sphere_ground = Sphere::new(Point::new(0.0, -100.5, -1.0), 100.0, material_ground.clone());
     let sphere_center = Sphere::new(Point::new(0.0, 0.0, -1.0), 0.5, material_center.clone());
-    let sphere_left = Sphere::new(Point::new(-1.0, 0.0, -1.0), 0.5, glass.clone());
+    let sphere_left = HollowSphere::new(Point::new(-1.0, 0.0, -1.0), 0.5, 0.05, glass.clone());
     let sphere_right = Sphere::new(Point::new(1.0, 0.0, -1.0), 0.5, metal.clone());
 
     let mut scene = BVH::default();
