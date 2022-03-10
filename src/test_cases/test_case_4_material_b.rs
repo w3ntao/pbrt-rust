@@ -34,10 +34,18 @@ pub fn test() {
     let mirror = Arc::new(Mirror {});
     let glass = Arc::new(Glass::new());
 
+    /*
     let sphere_ground = Sphere::new(Point::new(0.0, -100.5, -1.0), 100.0, material_ground.clone());
     let sphere_center = Sphere::new(Point::new(0.0, 0.0, -1.0), 0.5, material_center.clone());
     let sphere_left = HollowSphere::new(Point::new(-1.0, 0.0, -1.0), 0.5, 0.05, glass.clone());
     let sphere_right = Sphere::new(Point::new(1.0, 0.0, -1.0), 0.5, metal.clone());
+     */
+
+    let sphere_ground = Sphere::new(Point::new(0.0, -100.5, -1.0), 100.0);
+    let sphere_center = Sphere::new(Point::new(0.0, 0.0, -1.0), 0.5);
+    let sphere_left = HollowSphere::new(Point::new(-1.0, 0.0, -1.0), 0.5, 0.05);
+    let sphere_right = Sphere::new(Point::new(1.0, 0.0, -1.0), 0.5);
+
 
     let mut scene = BVH::default();
     scene.add(Arc::new(sphere_ground));

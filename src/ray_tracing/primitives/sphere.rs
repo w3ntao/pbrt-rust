@@ -17,14 +17,14 @@ pub struct Sphere {
 }
 
 impl Sphere {
-    pub fn new(_center: Point, _radius: f32, _material: Arc<dyn Material>) -> Self {
+    pub fn new(_center: Point, _radius: f32) -> Self {
         let min = _center + Point::new(-_radius, -_radius, -_radius);
         let max = _center + Point::new(_radius, _radius, _radius);
         return Self {
             center: _center,
             radius: _radius,
             bounds: BoundingBox::build(&[min, max]),
-            material: _material,
+            material: Arc::new(NullMaterial {}),
         };
     }
 }

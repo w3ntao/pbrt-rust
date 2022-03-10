@@ -17,10 +17,10 @@ pub struct HollowSphere {
 }
 
 impl HollowSphere {
-    pub fn new(_center: Point, _radius: f32, thickness: f32, _material: Arc<dyn Material>) -> Self {
+    pub fn new(_center: Point, _radius: f32, thickness: f32) -> Self {
         return Self {
-            external_sphere: Sphere::new(_center, _radius, _material.clone()),
-            internal_sphere: Sphere::new(_center, _radius - thickness, _material),
+            external_sphere: Sphere::new(_center, _radius),
+            internal_sphere: Sphere::new(_center, _radius - thickness),
         };
     }
 }

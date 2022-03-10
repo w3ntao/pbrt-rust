@@ -33,9 +33,9 @@ pub fn test() {
         Point::new(3.0, 2.0, -3.0),
         Point::new(-3.0, 2.0, -3.0));
 
-    let sphere_0 = Sphere::new(Point::new(-2.0, 1.7, 0.0), 2.0, Arc::new(NullMaterial {}));
-    let sphere_1 = Sphere::new(Point::new(1.0, -1.0, 1.0), 2.2, Arc::new(NullMaterial {}));
-    let sphere_2 = Sphere::new(Point::new(3.0, 0.8, -2.0), 2.0, Arc::new(NullMaterial {}));
+    let sphere_0 = Sphere::new(Point::new(-2.0, 1.7, 0.0), 2.0);
+    let sphere_1 = Sphere::new(Point::new(1.0, -1.0, 1.0), 2.2);
+    let sphere_2 = Sphere::new(Point::new(3.0, 0.8, -2.0), 2.0);
 
     let quad = Quad::new(Point::new(1.0, -0.9, 4.5), Vector3::new(-2.0, 0.0, 0.0), Vector3::new(0.0, 0.1, -2.0));
     let aabox = AxisAlignedBox::new(Point::new(2.0, 1.5, -0.5), Point::new(3.0, 2.5, 2.5));
