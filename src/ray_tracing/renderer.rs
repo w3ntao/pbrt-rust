@@ -47,6 +47,8 @@ impl Renderer {
         std::mem::drop(locked_image);
         let mut rng = rand::thread_rng();
 
+        let mut rendered_pixels: Vec<(usize, usize, Color)> = vec![];
+
         loop {
             let mut locked_job = job_list.lock().unwrap();
             let maybe_job = locked_job.pop();
@@ -65,33 +67,33 @@ impl Renderer {
                                 ndc_x + 1.0 / (width as f32),
                                 ndc_y - 1.0 / (height as f32));
                             let color = self.integrator.get_radiance(&ray);
-                            let mut locked_image = image.lock().unwrap();
-                            locked_image.fill(color, y, x);
-                            std::mem::drop(locked_image);
+                            rendered_pixels.push((y, x, color));
                             continue;
                         }
 
                         let mut total = Color::black();
                         for _ in 0..self.samples {
-                            let random_0: f32 = rng.gen();
-                            let random_1: f32 = rng.gen();
+                            let random_x: f32 = rng.gen();
+                            let random_y: f32 = rng.gen();
 
                             let ray = self.camera.get_primary_ray(
-                                ndc_x + 2.0 * random_0 / (width as f32),
-                                ndc_y - 2.0 * random_1 / (height as f32));
+                                ndc_x + 2.0 * random_x / (width as f32),
+                                ndc_y - 2.0 * random_y / (height as f32));
                             total = total + self.integrator.get_radiance(&ray);
                         }
                         let color = total / (self.samples as f32);
-
-                        let mut locked_image = image.lock().unwrap();
-                        locked_image.fill(color, y, x);
-                        std::mem::drop(locked_image);
-                        continue;
+                        rendered_pixels.push((y, x, color));
                     }
                 }
                 None => break,
             };
         }
+
+        let mut locked_image = image.lock().unwrap();
+        for (y, x, color) in rendered_pixels {
+            locked_image.fill(y, x, color);
+        }
+        std::mem::drop(locked_image);
     }
 
     pub fn render(self, width: usize, height: usize) -> Image {
@@ -107,8 +109,8 @@ impl Renderer {
         all_jobs.shuffle(&mut thread_rng());
         let all_jobs = all_jobs;
 
-        let batch_size = max(all_jobs.len() / num_cpus::get_physical() / 1000, MIN_BATCH_SIZE);
-        // Every core executes roughly 1000 batches of jobs.
+        let batch_size = max(all_jobs.len() / 1000, MIN_BATCH_SIZE);
+        // Divide the rendering job into 1000 slots
         // Also, number of jobs for each batch shouldn't be smaller than MIN_BATCH_SIZE
 
         let mut job_list: Vec<Vec<Job>> = vec![];

@@ -19,7 +19,7 @@ impl Image {
         };
     }
 
-    pub fn fill(&mut self, rgb_value: Color, y: usize, x: usize) {
+    pub fn fill(&mut self, y: usize, x: usize, rgb_value: Color) {
         self.pixels[y][x] = rgb_value;
     }
 
