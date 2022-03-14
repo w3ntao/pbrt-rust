@@ -33,9 +33,11 @@ impl PerspectiveCamera {
 }
 
 impl Camera for PerspectiveCamera {
-    fn get_primary_ray(&self, x: f32, y: f32) -> Ray {
-        let x = x * self.x_pixel_multiplier;
-        let y = y * self.y_pixel_multiplier;
+    fn get_primary_ray(&self, u: f32, v: f32) -> Ray {
+        // u, v are both in [-1, 1]
+
+        let x = u * self.x_pixel_multiplier;
+        let y = v * self.y_pixel_multiplier;
 
         let direction = self.forward + x * self.horizontal + y * self.image_plane_vertical;
 

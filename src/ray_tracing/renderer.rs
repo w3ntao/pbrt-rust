@@ -76,9 +76,11 @@ impl Renderer {
                             let random_x: f32 = rng.gen();
                             let random_y: f32 = rng.gen();
 
-                            let ray = self.camera.get_primary_ray(
-                                ndc_x + 2.0 * random_x / (width as f32),
-                                ndc_y - 2.0 * random_y / (height as f32));
+                            let u = ndc_x + 2.0 * random_x / (width as f32);
+                            let v = ndc_y - 2.0 * random_y / (height as f32);
+                            // u, v are both in [-1, 1]
+
+                            let ray = self.camera.get_primary_ray(u, v);
                             total = total + self.integrator.get_radiance(&ray);
                         }
                         let color = total / (self.samples as f32);

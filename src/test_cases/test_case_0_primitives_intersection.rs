@@ -16,7 +16,7 @@ use crate::ray_tracing::world::World;
 
 pub fn test() {
     let file_name = get_file_name(file!());
-    println!("TEST 0: {}", &file_name);
+    println!("TESTING: {}", &file_name);
     let camera = PerspectiveCamera::new(
         Point::new(0.0, 0.0, 10.0),
         Vector3::new(0.0, 0.0, -1.0),

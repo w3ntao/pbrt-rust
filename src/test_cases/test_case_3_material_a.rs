@@ -19,14 +19,13 @@ use crate::ray_tracing::primitives::sphere::Sphere;
 use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::world::World;
 
-pub fn test() {
+pub fn test(samples: i32) {
     let file_name = get_file_name(file!());
-    println!("TEST 3: {}", &file_name);
+    println!("TESTING: {}", &file_name);
     let ppm_name = format!("{}.ppm", file_name);
 
     const WIDTH: usize = 1000;
     const HEIGHT: usize = 750;
-    const SAMPLES: i32 = 10;
 
     let material_ground = Arc::new(Lambertian { albedo: Color::new(0.8, 0.8, 0.0) });
     let metal = Arc::new(Metal { albedo: Color::new(0.8, 0.6, 0.2), fuzz: 0.4 });
@@ -61,7 +60,7 @@ pub fn test() {
 
     let world = World::new(Arc::new(scene));
     let integrator = MonteCarloPathTrace::new(Arc::new(world));
-    let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), SAMPLES);
+    let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
     let image = renderer.render(WIDTH, HEIGHT);
     image.write(&ppm_name);
     println!();

@@ -13,7 +13,7 @@ use crate::ray_tracing::world::World;
 
 pub fn test() {
     let file_name = get_file_name(file!());
-    println!("TEST 1: {}", &file_name);
+    println!("TESTING: {}", &file_name);
     let triangles = obj_to_triangles("models/dragon.obj");
     let mut scene = BVH::default();
     for t in triangles {
