@@ -5,6 +5,7 @@ use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::group::Group;
 use crate::ray_tracing::groups::bvh_node::{Node, PrimitiveInfo};
 use crate::ray_tracing::intersection::*;
+use crate::ray_tracing::material::Material;
 use crate::ray_tracing::primitive::Primitive;
 use crate::ray_tracing::ray::*;
 
@@ -38,6 +39,10 @@ impl Primitive for BVH {
 
     fn get_bounds(&self) -> BoundingBox {
         return self.bounds;
+    }
+
+    fn set_material(&mut self, _: Arc<dyn Material>) {
+        panic!("You shouldn't invoke function `set_material)_` from simple_group")
     }
 }
 

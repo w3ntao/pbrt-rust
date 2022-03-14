@@ -6,13 +6,14 @@ use crate::fundamental::vector3::Vector3;
 use crate::fundamental::vector4::Vector4;
 use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::intersection::Intersection;
-use crate::ray_tracing::materials::null::NullMaterial;
+use crate::ray_tracing::material::{Material, NullMaterial, NullMaterialPredicate};
 use crate::ray_tracing::primitive::Primitive;
 use crate::ray_tracing::ray::Ray;
 
 pub struct Instance {
     pub primitive: Arc<dyn Primitive>,
     transform: Matrix,
+    material: Arc<dyn Material>,
 }
 
 impl Primitive for Instance {
@@ -22,18 +23,22 @@ impl Primitive for Instance {
         let inverted_length = inverted_ray_direction.length();
         inverted_ray_direction = inverted_ray_direction / inverted_length;
 
-        let intersect = self.primitive.intersect(
+        let mut intersection = self.primitive.intersect(
             &Ray::new(inverted_transform.clone() * ray.origin, inverted_ray_direction),
             t_min / inverted_length,
             t_max / inverted_length);
-        if !intersect.intersected() {
-            // failure
-            return Intersection::failure();
+        if !intersection.intersected() {
+            return intersection;
         }
 
-        return Intersection::from_outside(intersect.distance / inverted_length, &ray,
-                                          (inverted_transform.transpose() * intersect.normal).normalize(),
-                                          Arc::new(NullMaterial {}));
+        intersection.distance = intersection.distance / inverted_length;
+        intersection.normal = inverted_transform.transpose() * intersection.normal;
+
+        if !self.material.is_null() {
+            intersection.material = self.material.clone();
+        }
+
+        return intersection;
     }
 
     fn get_bounds(&self) -> BoundingBox {
@@ -57,6 +62,10 @@ impl Primitive for Instance {
 
         return BoundingBox::build(&points);
     }
+
+    fn set_material(&mut self, material: Arc<dyn Material>) {
+        self.material = material;
+    }
 }
 
 impl Instance {
@@ -64,6 +73,7 @@ impl Instance {
         Instance {
             primitive: _primitive,
             transform: Matrix::identity(),
+            material: Arc::new(NullMaterial {}),
         }
     }
 

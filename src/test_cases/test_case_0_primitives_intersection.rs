@@ -6,7 +6,7 @@ use crate::fundamental::vector3::Vector3;
 use crate::ray_tracing::cameras::perspective::PerspectiveCamera;
 use crate::ray_tracing::groups::simple_group::SimpleGroup;
 use crate::ray_tracing::integrators::ray_casting::RayCastingIntegrator;
-use crate::ray_tracing::materials::null::NullMaterial;
+use crate::ray_tracing::material::Material;
 use crate::ray_tracing::primitives::axis_aligned_box::AxisAlignedBox;
 use crate::ray_tracing::primitives::quad::Quad;
 use crate::ray_tracing::primitives::sphere::Sphere;

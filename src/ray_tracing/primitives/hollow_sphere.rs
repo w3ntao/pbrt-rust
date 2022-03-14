@@ -45,4 +45,9 @@ impl Primitive for HollowSphere {
     fn get_bounds(&self) -> BoundingBox {
         return self.external_sphere.get_bounds();
     }
+
+    fn set_material(&mut self, material: Arc<dyn Material>) {
+        self.external_sphere.set_material(material.clone());
+        self.internal_sphere.set_material(material);
+    }
 }

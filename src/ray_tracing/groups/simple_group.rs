@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::intersection::*;
+use crate::ray_tracing::material::Material;
 use crate::ray_tracing::primitive::Primitive;
 use crate::ray_tracing::ray::*;
 
@@ -37,5 +38,9 @@ impl Primitive for SimpleGroup {
 
     fn get_bounds(&self) -> BoundingBox {
         return BoundingBox::default();
+    }
+
+    fn set_material(&mut self, _: Arc<dyn Material>) {
+        panic!("You shouldn't invoke function `set_material)_` from simple_group")
     }
 }
