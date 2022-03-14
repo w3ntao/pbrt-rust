@@ -33,9 +33,10 @@ impl Image {
             for w in 0usize..self.width {
                 let pixel = &self.pixels[h][w];
                 let line = format!("{} {} {}\n",
-                                   (pixel.r * factor) as i32,
-                                   (pixel.g * factor) as i32,
-                                   (pixel.b * factor) as i32);
+                                   (pixel.r.sqrt() * factor) as i32,
+                                   (pixel.g.sqrt() * factor) as i32,
+                                   (pixel.b.sqrt() * factor) as i32);
+                // sqrt(): gamma correction
                 buf_writer.write(line.as_bytes()).unwrap();
             }
         }

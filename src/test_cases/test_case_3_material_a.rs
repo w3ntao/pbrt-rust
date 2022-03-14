@@ -26,7 +26,7 @@ pub fn test() {
 
     const WIDTH: usize = 1000;
     const HEIGHT: usize = 750;
-    const SAMPLES: i32 = 100;
+    const SAMPLES: i32 = 10;
 
     let material_ground = Arc::new(Lambertian { albedo: Color::new(0.8, 0.8, 0.0) });
     let metal = Arc::new(Metal { albedo: Color::new(0.8, 0.6, 0.2), fuzz: 0.4 });
@@ -51,7 +51,7 @@ pub fn test() {
     scene.add(Arc::new(sphere_center));
     scene.add(Arc::new(sphere_right));
     scene.build_index();
-    
+
     let camera = PerspectiveCamera::new(
         Point::new(0.0, 0.0, 5.0),
         Vector3::new(0.0, 0.0, -1.0),
