@@ -14,8 +14,8 @@ pub struct Glass {
 }
 
 impl Glass {
-    pub fn new() -> Glass {
-        Glass { index_of_refraction: 1.5 }
+    pub fn new(_index_of_refraction: f32) -> Glass {
+        Glass { index_of_refraction: _index_of_refraction }
     }
 }
 

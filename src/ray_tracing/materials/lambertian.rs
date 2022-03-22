@@ -5,7 +5,13 @@ use crate::ray_tracing::material::Material;
 use crate::ray_tracing::ray::*;
 
 pub struct Lambertian {
-    pub albedo: Color,
+    albedo: Color,
+}
+
+impl Lambertian {
+    pub fn new(_albedo: Color) -> Lambertian {
+        Lambertian { albedo: _albedo }
+    }
 }
 
 impl Material for Lambertian {

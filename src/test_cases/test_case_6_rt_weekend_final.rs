@@ -37,7 +37,7 @@ pub fn test(samples: i32) {
 
     let mut scene = BVH::default();
 
-    let material_ground = Arc::new(Lambertian { albedo: Color::new(0.5, 0.5, 0.5) });
+    let material_ground = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
 
     let mut sphere_ground = Sphere::new(Point::new(0.0, -1000.0, 0.0), 1000.0);
     sphere_ground.set_material(material_ground);
@@ -56,7 +56,7 @@ pub fn test(samples: i32) {
                     //diffuse
                     let albedo = random_color() * random_color();
                     let mut sphere = Sphere::new(center, 0.2);
-                    let material = Lambertian { albedo };
+                    let material = Lambertian::new(albedo);
                     sphere.set_material(Arc::new(material));
                     scene.add(Arc::new(sphere));
                 } else if choose_material < 0.7 {
@@ -69,7 +69,7 @@ pub fn test(samples: i32) {
                     scene.add(Arc::new(sphere));
                 } else {
                     //glass
-                    let glass = Glass::new();
+                    let glass = Glass::new(1.5);
                     let mut sphere = Sphere::new(center, 0.2);
                     sphere.set_material(Arc::new(glass));
                     scene.add(Arc::new(sphere));
@@ -78,13 +78,13 @@ pub fn test(samples: i32) {
         }
     }
 
-    let material0 = Lambertian { albedo: Color::new(0.4, 0.2, 0.1) };
+    let material0 = Lambertian::new(Color::new(0.4, 0.2, 0.1));
     let mut sphere0 = Sphere::new(Point::new(-4.0, 1.0, 0.0), 1.0);
     sphere0.set_material(Arc::new(material0));
     scene.add(Arc::new(sphere0));
 
     let sphere1_center = Point::new(0.0, 1.0, 0.0);
-    let material1 = Glass::new();
+    let material1 = Glass::new(1.5);
     let mut sphere1 = Sphere::new(sphere1_center, 1.0);
     sphere1.set_material(Arc::new(material1));
     scene.add(Arc::new(sphere1));
