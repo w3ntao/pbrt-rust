@@ -42,7 +42,7 @@ impl Primitive for BVH {
     }
 
     fn set_material(&mut self, _: Arc<dyn Material>) {
-        panic!("You shouldn't invoke function `set_material)_` from simple_group")
+        panic!("You shouldn't invoke function `set_material()` from BVH")
     }
 }
 

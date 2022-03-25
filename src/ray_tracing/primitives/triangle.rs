@@ -57,7 +57,10 @@ impl Primitive for Triangle {
             return Intersection::failure();
         }
 
-        return Intersection::from_outside(t, ray, self.normal, Arc::new(NullMaterial {}));
+        let cos = cosine(ray.direction, self.normal);
+        let normal = if cos < 0.0 { self.normal } else { -self.normal };
+
+        return Intersection::from_outside(t, ray, normal, self.material.clone());
     }
 
     fn get_bounds(&self) -> BoundingBox {

@@ -31,8 +31,9 @@ impl Primitive for Instance {
             return intersection;
         }
 
+        intersection.normal = (inverted_transform.transpose() * intersection.normal).normalize();
+        intersection.ray = *ray;
         intersection.distance = intersection.distance / inverted_length;
-        intersection.normal = inverted_transform.transpose() * intersection.normal;
 
         if !self.material.is_null() {
             intersection.material = self.material.clone();
@@ -49,11 +50,11 @@ impl Primitive for Instance {
         let mut points = [
             min, max,
             Point::new(max.x, min.y, min.z),
+            Point::new(max.x, min.y, max.z),
+            Point::new(max.x, max.y, min.z),
             Point::new(min.x, max.y, min.z),
             Point::new(min.x, min.y, max.z),
             Point::new(min.x, max.y, max.z),
-            Point::new(max.x, min.y, max.z),
-            Point::new(max.x, max.y, min.z),
         ];
 
         for idx in 0..points.len() {
