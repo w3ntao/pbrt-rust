@@ -127,6 +127,6 @@ impl Instance {
                 0.0),
             Vector4::new(0.0, 0.0, 0.0, 1.0));
 
-        self.transform = product(&rotate_matrix, &self.transform);
+        self.transform = rotate_matrix * self.transform.clone();
     }
 }

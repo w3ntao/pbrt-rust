@@ -181,14 +181,17 @@ impl ops::Div<f32> for Matrix {
     }
 }
 
-pub fn product(a: &Matrix, b: &Matrix) -> Matrix {
-    let mut result = Matrix::zero();
-    for idx in 0..4 {
-        result[idx] = Vector4::new(dot(a[idx], b.column(0)),
-                                   dot(a[idx], b.column(1)),
-                                   dot(a[idx], b.column(2)),
-                                   dot(a[idx], b.column(3)));
-    }
+impl ops::Mul<Matrix> for Matrix {
+    type Output = Matrix;
+    fn mul(self, rhs: Matrix) -> Matrix {
+        let mut result = Matrix::zero();
+        for idx in 0..4 {
+            result[idx] = Vector4::new(dot(self.row[idx], rhs.column(0)),
+                                       dot(self.row[idx], rhs.column(1)),
+                                       dot(self.row[idx], rhs.column(2)),
+                                       dot(self.row[idx], rhs.column(3)));
+        }
 
-    return result;
+        return result;
+    }
 }

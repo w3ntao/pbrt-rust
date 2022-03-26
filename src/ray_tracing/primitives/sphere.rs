@@ -50,7 +50,7 @@ impl Primitive for Sphere {
         }
         let root = root;
         let normal = (ray.get_point(root) - self.center) / self.radius;
-
+        
         return if dot(ray.direction, normal) < 0.0 {
             Intersection::from_outside(root, ray,
                                        normal, self.material.clone())
