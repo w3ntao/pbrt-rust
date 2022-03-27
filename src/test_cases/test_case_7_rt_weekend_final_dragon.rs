@@ -41,7 +41,7 @@ pub fn test(samples: i32) {
 
     let material_ground = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
 
-    let ground_radius = 10000.0;
+    let ground_radius = 2000.0;
     let mut sphere_ground = Sphere::new(Point::new(0.0, -ground_radius, 0.0), ground_radius);
     sphere_ground.set_material(material_ground);
     let ground = Arc::new(sphere_ground);
@@ -54,76 +54,74 @@ pub fn test(samples: i32) {
             let choose_material = random_zero_to_one();
             let center = Point::new(a + 0.9 * random_zero_to_one(), 0.2, b + 0.9 * random_zero_to_one());
 
-            if (center - Point::new(4.0, 0.2, 0.0)).length() > 0.9 {
-                let mut sphere = Sphere::new(center, 0.2);
-                if choose_material < 0.4 {
-                    //diffuse
-                    let albedo = random_color() * random_color();
-                    let material = Lambertian::new(albedo);
-                    sphere.set_material(Arc::new(material));
-                } else if choose_material < 0.7 {
-                    // metal
-                    let albedo = random_in_range(0.5, 1.0) * Color::new(1.0, 1.0, 1.0);
-                    let fuzz = random_in_range(0.0, 0.5);
-                    let metal = Metal::new(albedo, fuzz);
-                    sphere.set_material(Arc::new(metal));
-                } else {
-                    //glass
-                    let glass = Glass::new(1.5);
-                    sphere.set_material(Arc::new(glass));
+            let mut too_close = false;
+            for point in [Point::new(-4.0, 0.2, 0.0), Point::new(0.0, 0.2, 0.0), Point::new(4.0, 0.2, 0.0)] {
+                if (center - point).length() <= 1.2 {
+                    too_close = true;
+                    break;
                 }
-                //scene.add(Arc::new(sphere));
             }
+
+            if too_close {
+                continue;
+            }
+
+            let mut sphere = Sphere::new(center, 0.2);
+            if choose_material < 0.4 {
+                //diffuse
+                let albedo = random_color() * random_color();
+                let material = Lambertian::new(albedo);
+                sphere.set_material(Arc::new(material));
+            } else if choose_material < 0.7 {
+                // metal
+                let albedo = random_in_range(0.5, 1.0) * Color::new(1.0, 1.0, 1.0);
+                let fuzz = random_in_range(0.0, 0.5);
+                let metal = Metal::new(albedo, fuzz);
+                sphere.set_material(Arc::new(metal));
+            } else {
+                //glass
+                let glass = Glass::new(1.5);
+                sphere.set_material(Arc::new(glass));
+            }
+            scene.add(Arc::new(sphere));
         }
     }
 
+
+    let lambertian = Arc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
     let glass = Arc::new(Glass::new(1.5));
     let metal = Arc::new(Metal { albedo: Color::new(0.7, 0.6, 0.5), fuzz: 0.0 });
 
-    //let triangles = obj_to_triangles("models/lucy_winged_victory.obj");
     let triangles = obj_to_triangles("models/dragon.obj");
-    let mut lucy_bvh = BVH::default();
+    let mut dragon_bvh = BVH::default();
     for t in triangles {
-        lucy_bvh.add(t);
+        dragon_bvh.add(t);
     }
-    lucy_bvh.build_index();
-    let lucy_bvh_arc = Arc::new(lucy_bvh);
+    dragon_bvh.build_index();
 
-    let scale = 4.0;
+    let mut scaled_dragon = Instance::new(Arc::new(dragon_bvh));
+    scaled_dragon.rotate(Vector3::new(0.0, 1.0, 0.0), std::f32::consts::PI);
+    scaled_dragon.translate(Vector3::new(0.0, 0.7, 0.0));
+    scaled_dragon.scale_by_scalar(2.5);
+    let dragon_instance = Arc::new(scaled_dragon);
 
-    let mut lucy_instance_0 = Instance::new(lucy_bvh_arc.clone());
-    lucy_instance_0.set_material(metal.clone());
-    lucy_instance_0.scale_by_scalar(scale);
-    //lucy_instance_0.translate(Vector3::new(-4.0, 0.0, 0.0));
-    //lucy_instance_0.translate(Vector3::new(0.0, -1.0, 0.0));
-    //scene.add(Arc::new(lucy_instance_0));
+    let mut dragon_instance_0 = Instance::new(dragon_instance.clone());
+    dragon_instance_0.set_material(lambertian.clone());
+    dragon_instance_0.translate(Vector3::new(-4.0, 0.0, 0.0));
+    scene.add(Arc::new(dragon_instance_0));
 
-    let mut lucy_instance_1 = Instance::new(lucy_bvh_arc.clone());
-    lucy_instance_1.set_material(metal.clone());
-    lucy_instance_1.scale_by_scalar(scale);
-    lucy_instance_1.translate(Vector3::new(0.0, 0.0, 0.0));
-    //scene.add(Arc::new(lucy_instance_1));
+    let mut dragon_instance_1 = Instance::new(dragon_instance.clone());
+    dragon_instance_1.set_material(glass.clone());
+    dragon_instance_1.translate(Vector3::new(0.0, 0.0, 0.0));
+    scene.add(Arc::new(dragon_instance_1));
 
-    let mut lucy_instance_2 = Instance::new(lucy_bvh_arc.clone());
-    lucy_instance_2.set_material(metal.clone());
-    lucy_instance_2.scale_by_scalar(scale);
-    lucy_instance_2.translate(Vector3::new(4.0, 0.0, 0.0));
-    //scene.add(Arc::new(lucy_instance_2));
+    let mut dragon_instance_2 = Instance::new(dragon_instance.clone());
+    dragon_instance_2.set_material(metal.clone());
+    dragon_instance_2.translate(Vector3::new(4.0, 0.0, 0.0));
+    scene.add(Arc::new(dragon_instance_2));
 
-    let material0 = Lambertian::new(Color::new(0.4, 0.2, 0.1));
-    let mut sphere0 = Sphere::new(Point::new(-4.0, 1.0, 0.0), 1.0);
-    sphere0.set_material(Arc::new(material0));
-    //scene.add(Arc::new(sphere0));
-
-    let sphere1_center = Point::new(0.0, 1.0, 0.0);
-    let mut sphere1 = Sphere::new(sphere1_center, 1.0);
-    sphere1.set_material(glass.clone());
-    //scene.add(Arc::new(sphere1));
-
-    let sphere2_center = Point::new(4.0, 1.0, 0.0);
-    let mut sphere2 = Sphere::new(sphere2_center, 1.0);
-    sphere2.set_material(metal.clone());
-    //scene.add(Arc::new(sphere2));
+    let close_dragon_center = Point::new(4.0, 1.0, 0.0);
+    let middle_dragon_center = Point::new(0.0, 1.0, 0.0);
 
     scene.build_index();
 
@@ -131,12 +129,14 @@ pub fn test(samples: i32) {
     let look_at = Point::new(0.0, 0.0, 0.0);
     let direction = look_at - camera_center;
 
-    let camera = PerspectiveCamera::new(
+    let camera = DepthOfField::new(
         camera_center,
         direction,
         Vector3::new(0.0, 1.0, 0.0),
         std::f32::consts::PI / 8.0,
-        std::f32::consts::PI / 6.0);
+        std::f32::consts::PI / 6.0,
+        0.15, (camera_center - middle_dragon_center).length(),
+    );
 
     let world = World::new(Arc::new(scene));
     let integrator = MonteCarloPathTrace::new(Arc::new(world));

@@ -12,6 +12,6 @@ fn main() {
     //test_case_3_material_a::test(100);
     //test_case_4_material_b::test(100);
     //test_case_5_depth_of_field::test(100);
-    test_case_6_rt_weekend_final::test(20);
-    //test_case_7_rt_weekend_final::test(200);
+    //test_case_6_rt_weekend_final::test(100);
+    test_case_7_rt_weekend_final_dragon::test(10);
 }
