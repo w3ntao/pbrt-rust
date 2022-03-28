@@ -6,8 +6,8 @@ use crate::ray_tracing::material::Material;
 use crate::ray_tracing::ray::*;
 
 pub struct Metal {
-    pub albedo: Color,
-    pub fuzz: f32,
+    albedo: Color,
+    fuzz: f32,
 }
 
 impl Metal {

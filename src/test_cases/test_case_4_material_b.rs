@@ -30,7 +30,7 @@ pub fn test(samples: i32) {
 
     let material_ground = Arc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
     let material_center = Arc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
-    let metal = Arc::new(Metal { albedo: Color::new(0.8, 0.6, 0.2), fuzz: 0.4 });
+    let metal = Arc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.4));
     let glass = Arc::new(Glass::new(1.5));
 
     let mut sphere_ground = Sphere::new(Point::new(0.0, -100.5, -1.0), 100.0);

@@ -90,7 +90,7 @@ pub fn test(samples: i32) {
 
     let lambertian = Arc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
     let glass = Arc::new(Glass::new(1.5));
-    let metal = Arc::new(Metal { albedo: Color::new(0.7, 0.6, 0.5), fuzz: 0.0 });
+    let metal = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
 
     let triangles = obj_to_triangles("models/dragon.obj");
     let mut dragon_bvh = BVH::default();
