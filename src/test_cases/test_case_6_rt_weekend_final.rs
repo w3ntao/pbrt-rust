@@ -28,7 +28,7 @@ fn random_color() -> Color {
     return Color::new(random_zero_to_one(), random_zero_to_one(), random_zero_to_one());
 }
 
-pub fn test(samples: i32) {
+pub fn test(samples: usize) {
     let file_name = get_file_name(file!());
     println!("TESTING: {}", &file_name);
     let ppm_name = format!("{}.ppm", file_name);

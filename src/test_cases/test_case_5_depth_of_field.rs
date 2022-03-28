@@ -21,7 +21,7 @@ use crate::ray_tracing::primitives::sphere::Sphere;
 use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::world::World;
 
-pub fn test(samples: i32) {
+pub fn test(samples: usize) {
     let file_name = get_file_name(file!());
     println!("TESTING: {}", &file_name);
     let ppm_name = format!("{}.ppm", file_name);
@@ -32,7 +32,6 @@ pub fn test(samples: i32) {
     let material_ground = Arc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
     let material_center = Arc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
     let metal = Arc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.4));
-    let mirror = Arc::new(Mirror {});
     let glass = Arc::new(Glass::new(1.5));
 
     let mut sphere_ground = Sphere::new(Point::new(0.0, -100.5, -1.0), 100.0);
