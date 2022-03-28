@@ -15,14 +15,6 @@ use crate::fundamental::image::Image;
 use crate::ray_tracing::camera::Camera;
 use crate::ray_tracing::integrator::Integrator;
 
-const MIN_BATCH_SIZE: usize = 128;
-
-#[derive(Clone)]
-struct Job {
-    pub x: usize,
-    pub y: usize,
-}
-
 pub struct Renderer {
     camera: Arc<dyn Camera>,
     integrator: Arc<dyn Integrator>,
@@ -40,7 +32,7 @@ impl Renderer {
 
     fn single_thread_render(&self,
                             image: &mut Arc<Mutex<Image>>,
-                            job_list: &mut Arc<Mutex<Vec<Vec<Job>>>>) {
+                            shared_job_list: &mut Arc<Mutex<Vec<usize>>>) {
         let locked_image = image.lock().unwrap();
         let width = locked_image.width;
         let height = locked_image.height;
@@ -50,15 +42,13 @@ impl Renderer {
         let mut rendered_pixels: Vec<(usize, usize, Color)> = vec![];
 
         loop {
-            let mut locked_job = job_list.lock().unwrap();
-            let maybe_job = locked_job.pop();
+            let mut locked_job = shared_job_list.lock().unwrap();
+            let maybe_x = locked_job.pop();
             std::mem::drop(locked_job);
 
-            match maybe_job {
-                Some(job_batch) => {
-                    for job in job_batch.iter() {
-                        let x = job.x;
-                        let y = job.y;
+            match maybe_x {
+                Some(x) => {
+                    for y in 0..height {
                         let ndc_y = -2.0 * (y as f32) / (height as f32) + 1.0;
                         let ndc_x = 2.0 * (x as f32) / (width as f32) - 1.0;
 
@@ -101,33 +91,15 @@ impl Renderer {
     pub fn render(self, width: usize, height: usize) -> Image {
         let start = Instant::now();
 
-        let mut all_jobs: Vec<Job> = vec![];
-        all_jobs.reserve(width * height);
-        for _x in 0..width {
-            for _y in 0..height {
-                all_jobs.push(Job { x: _x, y: _y });
-            }
-        }
-        all_jobs.shuffle(&mut thread_rng());
-        let all_jobs = all_jobs;
-
-        let batch_size = max(all_jobs.len() / 1000, MIN_BATCH_SIZE);
-        // Divide the rendering job into 1000 slots
-        // Also, number of jobs for each batch shouldn't be smaller than MIN_BATCH_SIZE
-
-        let mut job_list: Vec<Vec<Job>> = vec![];
-        for idx in (0..all_jobs.len()).step_by(batch_size) {
-            let batch = &all_jobs[idx..min(idx + batch_size, all_jobs.len())];
-            job_list.push(batch.to_vec());
-        }
-        let shared_job = Arc::new(Mutex::new(job_list));
+        let job_list: Vec<usize> = (0..width).collect();
+        let shared_job_list = Arc::new(Mutex::new(job_list));
         let shared_image = Arc::new(Mutex::new(Image::new(width, height)));
 
         let mut handles: Vec<JoinHandle<()>> = vec![];
         let arc_self = Arc::new(self);
         for _ in 0..num_cpus::get_physical() {
             let mut image_ptr = Arc::clone(&shared_image);
-            let mut job_ptr = Arc::clone(&shared_job);
+            let mut job_ptr = Arc::clone(&shared_job_list);
 
             let forked_self = arc_self.clone();
             let handle =
