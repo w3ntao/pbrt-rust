@@ -1,8 +1,9 @@
 extern crate num_cpus;
 
+use std::{io, thread, time};
 use std::cmp::{max, min};
+use std::io::Write;
 use std::sync::{Arc, Mutex};
-use std::thread;
 use std::thread::JoinHandle;
 use std::time::Instant;
 
@@ -21,6 +22,28 @@ pub struct Renderer {
     samples: usize,
 }
 
+fn print_time(seconds: i32) {
+    print!("\rtime left: ");
+    if seconds > 3600 {
+        let hour = seconds / 3600;
+        print!("{}[h]", hour);
+        let minute = (seconds - hour * 3600) / 60;
+        if minute > 0 {
+            print!("{}[m]", minute);
+        }
+        io::stdout().flush();
+        return;
+    }
+    let minute = (seconds) / 60;
+    if minute > 0 {
+        print!("{}[m]", minute);
+    }
+    let seconds = seconds - minute * 60;
+    print!("{}[s]", seconds);
+
+    io::stdout().flush();
+}
+
 impl Renderer {
     pub fn new(_camera: Arc<dyn Camera>, _integrator: Arc<dyn Integrator>, _samples: usize) -> Self {
         return Self {
@@ -28,6 +51,38 @@ impl Renderer {
             integrator: _integrator,
             samples: _samples,
         };
+    }
+
+    fn time_estimator(&self,
+                      shared_job_list: &mut Arc<Mutex<Vec<usize>>>,
+                      total_job: usize,
+                      core: usize,
+    ) {
+        let start = Instant::now();
+        let one_second = time::Duration::from_secs(1);
+
+        let mut last_length = total_job;
+        print!("time left: estimating...");
+        io::stdout().flush();
+        loop {
+            thread::sleep(one_second);
+            let mut locked_job = shared_job_list.lock().unwrap();
+            let length = locked_job.len();
+            std::mem::drop(locked_job);
+
+            if length == 0 {
+                break;
+            }
+            let finished_job = total_job - core - length;
+            if length == last_length || finished_job == 0 {
+                continue;
+            }
+            last_length = length;
+            let unit_job_time = start.elapsed().as_secs_f32() / (finished_job as f32);
+            print_time((unit_job_time * ((length + core) as f32)) as i32);
+        }
+
+        println!("\nRendering took {:.2}[s]", start.elapsed().as_secs_f32());
     }
 
     fn single_thread_render(&self,
@@ -40,7 +95,6 @@ impl Renderer {
         let mut rng = rand::thread_rng();
 
         let mut rendered_pixels: Vec<(usize, usize, Color)> = vec![];
-
         loop {
             let mut locked_job = shared_job_list.lock().unwrap();
             let maybe_x = locked_job.pop();
@@ -80,15 +134,16 @@ impl Renderer {
     }
 
     pub fn render(self, width: usize, height: usize) -> Image {
-        let start = Instant::now();
+        let mut job_list: Vec<usize> = (0..width).collect();
+        job_list.shuffle(&mut thread_rng());
 
-        let job_list: Vec<usize> = (0..width).collect();
         let shared_job_list = Arc::new(Mutex::new(job_list));
         let shared_image = Arc::new(Mutex::new(Image::new(width, height)));
 
         let mut handles: Vec<JoinHandle<()>> = vec![];
         let arc_self = Arc::new(self);
-        for _ in 0..num_cpus::get_physical() {
+        let cpu_num = num_cpus::get_physical();
+        for _ in 0..cpu_num {
             let mut image_ptr = Arc::clone(&shared_image);
             let mut job_ptr = Arc::clone(&shared_job_list);
 
@@ -99,11 +154,15 @@ impl Renderer {
                 );
             handles.push(handle);
         }
+        let forked_self = arc_self.clone();
+        let mut job_ptr = Arc::clone(&shared_job_list);
+        let handle_time_estimator =
+            thread::spawn(move || forked_self.time_estimator(&mut job_ptr, width, cpu_num));
+        handles.push(handle_time_estimator);
+
         for handle in handles {
             handle.join().unwrap();
         }
-
-        println!("Rendering took {:.2}[s]", start.elapsed().as_secs_f32());
 
         match Arc::try_unwrap(shared_image) {
             Ok(locked_image) => {
