@@ -52,15 +52,6 @@ impl Renderer {
                         let ndc_y = -2.0 * (y as f32) / (height as f32) + 1.0;
                         let ndc_x = 2.0 * (x as f32) / (width as f32) - 1.0;
 
-                        if self.samples == 1 {
-                            let ray = self.camera.get_primary_ray(
-                                ndc_x + 1.0 / (width as f32),
-                                ndc_y - 1.0 / (height as f32));
-                            let color = self.integrator.get_radiance(&ray);
-                            rendered_pixels.push((y, x, color));
-                            continue;
-                        }
-
                         let mut total = Color::black();
                         for _ in 0..self.samples {
                             let random_x: f32 = rng.gen();
