@@ -19,7 +19,7 @@ use crate::ray_tracing::primitives::sphere::Sphere;
 use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::world::World;
 
-pub fn test(samples: usize) {
+pub fn test(samples: u32) {
     let file_name = get_file_name(file!());
     println!("TESTING: {}", &file_name);
     let ppm_name = format!("{}.ppm", file_name);

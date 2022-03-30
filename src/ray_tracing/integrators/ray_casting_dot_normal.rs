@@ -6,17 +6,17 @@ use crate::ray_tracing::integrator::Integrator;
 use crate::ray_tracing::ray::Ray;
 use crate::ray_tracing::world::World;
 
-pub struct RayCastingIntegrator {
+pub struct RayCastingDotNormal {
     world: Arc<World>,
 }
 
-impl RayCastingIntegrator {
+impl RayCastingDotNormal {
     pub fn new(_world: Arc<World>) -> Self {
         return Self { world: _world };
     }
 }
 
-impl Integrator for RayCastingIntegrator {
+impl Integrator for RayCastingDotNormal {
     fn get_radiance(&self, ray: &Ray) -> Color {
         let intersect = self.world.scene.intersect(ray, 0.0, f32::INFINITY);
         if !intersect.intersected() {

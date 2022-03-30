@@ -3,7 +3,7 @@ use crate::fundamental::vector3::*;
 use crate::ray_tracing::camera::Camera;
 use crate::ray_tracing::ray::Ray;
 
-pub struct PerspectiveCamera {
+pub struct Perspective {
     center: Point,
     forward: Vector3,
     horizontal: Vector3,
@@ -13,7 +13,7 @@ pub struct PerspectiveCamera {
     y_pixel_multiplier: f32,
 }
 
-impl PerspectiveCamera {
+impl Perspective {
     pub fn new(_center: Point, _forward: Vector3, _up: Vector3,
                _vertical_opening_angle: f32, _horizontal_opening_angle: f32) -> Self {
         let _forward = _forward.normalize();
@@ -32,7 +32,7 @@ impl PerspectiveCamera {
     }
 }
 
-impl Camera for PerspectiveCamera {
+impl Camera for Perspective {
     fn get_primary_ray(&self, u: f32, v: f32) -> Ray {
         // u, v are both in [-1, 1]
 

@@ -17,7 +17,7 @@ impl MonteCarloPathTrace {
 }
 
 impl MonteCarloPathTrace {
-    fn trace(&self, ray: &Ray, depth: i32) -> Color {
+    fn trace(&self, ray: &Ray, depth: u32) -> Color {
         if depth <= 0 {
             return Color::black();
         }

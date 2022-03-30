@@ -3,9 +3,9 @@ use std::sync::Arc;
 use crate::fundamental::point::Point;
 use crate::fundamental::utility::get_file_name;
 use crate::fundamental::vector3::Vector3;
-use crate::ray_tracing::cameras::perspective::PerspectiveCamera;
+use crate::ray_tracing::cameras::perspective::Perspective;
 use crate::ray_tracing::groups::simple_group::SimpleGroup;
-use crate::ray_tracing::integrators::ray_casting::RayCastingIntegrator;
+use crate::ray_tracing::integrators::ray_casting_dot_normal::RayCastingDotNormal;
 use crate::ray_tracing::primitives::axis_aligned_box::AxisAlignedBox;
 use crate::ray_tracing::primitives::quad::Quad;
 use crate::ray_tracing::primitives::sphere::Sphere;
@@ -16,7 +16,7 @@ use crate::ray_tracing::world::World;
 pub fn test() {
     let file_name = get_file_name(file!());
     println!("TESTING: {}", &file_name);
-    let camera = PerspectiveCamera::new(
+    let camera = Perspective::new(
         Point::new(0.0, 0.0, 10.0),
         Vector3::new(0.0, 0.0, -1.0),
         Vector3::new(0.0, 1.0, 0.0),
@@ -52,7 +52,7 @@ pub fn test() {
     let scene = scene;
 
     let world = World::new(Arc::new(scene));
-    let integrator = RayCastingIntegrator::new(Arc::new(world));
+    let integrator = RayCastingDotNormal::new(Arc::new(world));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), 1);
     let image = renderer.render(1600, 1200);
 

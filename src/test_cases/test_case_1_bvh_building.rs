@@ -4,10 +4,10 @@ use crate::fundamental::obj_loader::obj_to_triangles;
 use crate::fundamental::point::Point;
 use crate::fundamental::utility::get_file_name;
 use crate::fundamental::vector3::Vector3;
-use crate::ray_tracing::cameras::perspective::PerspectiveCamera;
+use crate::ray_tracing::cameras::perspective::Perspective;
 use crate::ray_tracing::group::Group;
 use crate::ray_tracing::groups::bvh::BVH;
-use crate::ray_tracing::integrators::ray_casting::RayCastingIntegrator;
+use crate::ray_tracing::integrators::ray_casting_dot_normal::RayCastingDotNormal;
 use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::world::World;
 
@@ -21,7 +21,7 @@ pub fn test() {
     }
     scene.build_index();
 
-    let camera = PerspectiveCamera::new(
+    let camera = Perspective::new(
         Point::new(-2.2, 0.0, 0.0),
         Vector3::new(1.0, 0.0, 0.0),
         Vector3::new(0.0, 1.0, 0.0),
@@ -29,7 +29,7 @@ pub fn test() {
         std::f32::consts::PI / 6.0);
 
     let world = World::new(Arc::new(scene));
-    let integrator = RayCastingIntegrator::new(Arc::new(world));
+    let integrator = RayCastingDotNormal::new(Arc::new(world));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), 1);
     let image = renderer.render(2000, 1500);
     image.write(&format!("{}.ppm", file_name));

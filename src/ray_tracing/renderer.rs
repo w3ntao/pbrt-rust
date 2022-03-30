@@ -18,7 +18,7 @@ use crate::ray_tracing::integrator::Integrator;
 pub struct Renderer {
     camera: Arc<dyn Camera>,
     integrator: Arc<dyn Integrator>,
-    samples: usize,
+    samples: u32,
 }
 
 fn print_time(seconds: i32) {
@@ -44,7 +44,7 @@ fn print_time(seconds: i32) {
 }
 
 impl Renderer {
-    pub fn new(_camera: Arc<dyn Camera>, _integrator: Arc<dyn Integrator>, _samples: usize) -> Self {
+    pub fn new(_camera: Arc<dyn Camera>, _integrator: Arc<dyn Integrator>, _samples: u32) -> Self {
         return Self {
             camera: _camera,
             integrator: _integrator,
