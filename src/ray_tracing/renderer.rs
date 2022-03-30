@@ -73,7 +73,7 @@ impl Renderer {
                 break;
             }
             let finished_job = total_job - core - length;
-            if length == last_length || finished_job == 0 {
+            if length == last_length || finished_job <= 0 {
                 continue;
             }
             last_length = length;
