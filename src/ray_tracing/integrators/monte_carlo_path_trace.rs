@@ -1,16 +1,10 @@
 use std::sync::Arc;
 
-use rand::Rng;
-use rand::thread_rng;
-
 use crate::fundamental::color::*;
 use crate::fundamental::constants::INTERSECT_OFFSET;
-use crate::fundamental::vector3::*;
 use crate::ray_tracing::integrator::Integrator;
 use crate::ray_tracing::ray::Ray;
 use crate::ray_tracing::world::World;
-
-const EPSILON_BLACK: f32 = 1e-4;
 
 pub struct MonteCarloPathTrace {
     world: Arc<World>,

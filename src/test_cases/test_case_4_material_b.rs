@@ -1,19 +1,16 @@
 use std::sync::Arc;
 
 use crate::fundamental::color::Color;
-use crate::fundamental::obj_loader::obj_to_triangles;
 use crate::fundamental::point::Point;
 use crate::fundamental::utility::get_file_name;
 use crate::fundamental::vector3::Vector3;
 use crate::ray_tracing::cameras::perspective::PerspectiveCamera;
 use crate::ray_tracing::group::Group;
 use crate::ray_tracing::groups::bvh::BVH;
-use crate::ray_tracing::instance::*;
 use crate::ray_tracing::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
 use crate::ray_tracing::materials::glass::*;
 use crate::ray_tracing::materials::lambertian::*;
 use crate::ray_tracing::materials::metal::*;
-use crate::ray_tracing::materials::mirror::*;
 use crate::ray_tracing::primitive::Primitive;
 use crate::ray_tracing::primitives::hollow_sphere::HollowSphere;
 use crate::ray_tracing::primitives::sphere::Sphere;

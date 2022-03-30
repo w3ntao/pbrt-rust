@@ -1,7 +1,6 @@
 use std::sync::Arc;
 
 use crate::fundamental::color::*;
-use crate::fundamental::vector3::*;
 use crate::ray_tracing::integrator::Integrator;
 use crate::ray_tracing::ray::Ray;
 use crate::ray_tracing::world::World;
@@ -25,8 +24,5 @@ impl Integrator for RayCastingNormal {
 
         let normal = intersect.normal.normalize();
         return Color::new(normal.x, normal.y, normal.z);
-
-        let grey = 0.0_f32.max(dot(-ray.direction, normal));
-        return Color::new(grey, grey, grey);
     }
 }

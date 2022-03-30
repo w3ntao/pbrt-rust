@@ -1,9 +1,7 @@
-use std::env::current_exe;
 use std::sync::Arc;
 
 use crate::fundamental::constants::INTERSECT_OFFSET;
 use crate::fundamental::point::*;
-use crate::fundamental::vector3::*;
 use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::material::Material;

@@ -1,7 +1,6 @@
 extern crate num_cpus;
 
 use std::{io, thread, time};
-use std::cmp::{max, min};
 use std::io::Write;
 use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
@@ -31,7 +30,7 @@ fn print_time(seconds: i32) {
         if minute > 0 {
             print!("{}[m]", minute);
         }
-        io::stdout().flush();
+        let _ = io::stdout().flush();
         return;
     }
     let minute = (seconds) / 60;
@@ -41,7 +40,7 @@ fn print_time(seconds: i32) {
     let seconds = seconds - minute * 60;
     print!("{}[s]", seconds);
 
-    io::stdout().flush();
+    let _ = io::stdout().flush();
 }
 
 impl Renderer {
@@ -63,10 +62,10 @@ impl Renderer {
 
         let mut last_length = total_job;
         print!("time left: estimating...");
-        io::stdout().flush();
+        let _ = io::stdout().flush();
         loop {
             thread::sleep(one_second);
-            let mut locked_job = shared_job_list.lock().unwrap();
+            let locked_job = shared_job_list.lock().unwrap();
             let length = locked_job.len();
             std::mem::drop(locked_job);
 

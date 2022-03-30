@@ -1,33 +1,23 @@
 use std::sync::Arc;
 
-use rand::random;
-
 use crate::fundamental::color::Color;
 use crate::fundamental::obj_loader::obj_to_triangles;
 use crate::fundamental::point::Point;
 use crate::fundamental::utility::{get_file_name, random_in_range, random_zero_to_one};
+use crate::fundamental::utility::random_color;
 use crate::fundamental::vector3::Vector3;
 use crate::ray_tracing::cameras::depth_of_field::DepthOfField;
-use crate::ray_tracing::cameras::perspective::PerspectiveCamera;
 use crate::ray_tracing::group::Group;
 use crate::ray_tracing::groups::bvh::BVH;
 use crate::ray_tracing::instance::*;
 use crate::ray_tracing::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
-use crate::ray_tracing::integrators::ray_casting::RayCastingIntegrator;
 use crate::ray_tracing::materials::glass::*;
 use crate::ray_tracing::materials::lambertian::*;
 use crate::ray_tracing::materials::metal::*;
-use crate::ray_tracing::materials::mirror::*;
 use crate::ray_tracing::primitive::Primitive;
-use crate::ray_tracing::primitives::hollow_sphere::HollowSphere;
 use crate::ray_tracing::primitives::sphere::Sphere;
-use crate::ray_tracing::ray::Ray;
 use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::world::World;
-
-fn random_color() -> Color {
-    return Color::new(random_zero_to_one(), random_zero_to_one(), random_zero_to_one());
-}
 
 pub fn test(samples: usize) {
     let file_name = get_file_name(file!());
@@ -120,7 +110,6 @@ pub fn test(samples: usize) {
     dragon_instance_2.translate(Vector3::new(4.0, 0.0, 0.0));
     scene.add(Arc::new(dragon_instance_2));
 
-    let close_dragon_center = Point::new(4.0, 1.0, 0.0);
     let middle_dragon_center = Point::new(0.0, 1.0, 0.0);
 
     scene.build_index();

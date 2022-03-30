@@ -1,5 +1,3 @@
-use rand::{random, thread_rng};
-//use rand_distr::{Distribution, Normal, NormalError};
 use rand_distr::num_traits::Pow;
 
 use crate::fundamental::color::*;

@@ -1,8 +1,4 @@
-use rand::thread_rng;
-use rand_distr::{Distribution, Normal, NormalError};
-
 use crate::fundamental::color::*;
-use crate::fundamental::vector3::*;
 use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::material::Material;
 use crate::ray_tracing::ray::*;
