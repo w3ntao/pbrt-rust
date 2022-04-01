@@ -8,27 +8,27 @@ use crate::ray_tracing::ray::*;
 #[derive(Clone)]
 pub struct Intersection {
     pub distance: f32,
-    pub ray: Ray,
+    pub hit_point: Point,
     pub normal: Vector3,
     pub material: Arc<dyn Material>,
     pub entering_material: bool,
 }
 
 impl Intersection {
-    pub fn from_outside(_distance: f32, _ray: &Ray, _normal: Vector3, _material: Arc<dyn Material>) -> Self {
+    pub fn from_outside(_distance: f32, _hit_point: Point, _normal: Vector3, _material: Arc<dyn Material>) -> Self {
         return Self {
             distance: _distance,
-            ray: *_ray,
+            hit_point: _hit_point,
             normal: _normal.normalize(),
             material: _material,
             entering_material: true,
         };
     }
 
-    pub fn from_inside(_distance: f32, _ray: &Ray, _normal: Vector3, _material: Arc<dyn Material>) -> Self {
+    pub fn from_inside(_distance: f32, _hit_point: Point, _normal: Vector3, _material: Arc<dyn Material>) -> Self {
         return Self {
             distance: _distance,
-            ray: *_ray,
+            hit_point: _hit_point,
             normal: _normal.normalize(),
             material: _material,
             entering_material: false,
@@ -37,8 +37,8 @@ impl Intersection {
 
     pub fn failure() -> Self {
         return Self {
-            ray: Ray::new(Point::zero(), Vector3::zero()),
             distance: f32::INFINITY,
+            hit_point: Point::zero(),
             normal: Vector3::zero(),
             material: Arc::new(NullMaterial {}),
             entering_material: true,

@@ -50,12 +50,12 @@ impl Primitive for Sphere {
         }
         let root = root;
         let normal = (ray.get_point(root) - self.center) / self.radius;
-        
+
         return if dot(ray.direction, normal) < 0.0 {
-            Intersection::from_outside(root, ray,
+            Intersection::from_outside(root, ray.get_point(root),
                                        normal, self.material.clone())
         } else {
-            Intersection::from_inside(root, ray,
+            Intersection::from_inside(root, ray.get_point(root),
                                       -normal, self.material.clone())
         };
     }

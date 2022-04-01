@@ -62,7 +62,7 @@ impl Primitive for AxisAlignedBox {
             }
         }
 
-        return Intersection::from_outside(root_min, ray, normal, Arc::new(NullMaterial {}));
+        return Intersection::from_outside(root_min, ray.get_point(root_min), normal, Arc::new(NullMaterial {}));
     }
 
     fn get_bounds(&self) -> BoundingBox {

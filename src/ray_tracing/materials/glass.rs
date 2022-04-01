@@ -57,7 +57,7 @@ impl Material for Glass {
                     refraction_ratio)
         };
 
-        scattered_ray.origin = intersection.ray.get_point(intersection.distance);
+        scattered_ray.origin = intersection.hit_point;
         scattered_ray.direction = direction;
         return Color::new(1.0, 1.0, 1.0);
     }

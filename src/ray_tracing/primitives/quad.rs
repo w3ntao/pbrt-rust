@@ -50,7 +50,7 @@ impl Primitive for Quad {
             return Intersection::failure();
         }
 
-        return Intersection::from_outside(t, ray, ab.normalize(), Arc::new(NullMaterial {}));
+        return Intersection::from_outside(t, ray.get_point(t), ab.normalize(), Arc::new(NullMaterial {}));
     }
 
     fn get_bounds(&self) -> BoundingBox {
