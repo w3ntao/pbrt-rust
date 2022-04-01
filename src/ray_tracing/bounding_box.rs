@@ -19,8 +19,8 @@ impl Default for BoundingBox {
 impl BoundingBox {
     pub fn empty() -> Self {
         return BoundingBox {
-            min: Point::nan(),
-            max: Point::nan(),
+            min: Point::invalid(),
+            max: Point::invalid(),
         };
     }
 
@@ -34,7 +34,7 @@ impl BoundingBox {
     }
 
     pub fn is_empty(&self) -> bool {
-        return self.min.is_nan() || self.max.is_nan();
+        return !self.min.is_valid() || !self.max.is_valid();
     }
 
     pub fn get_area(&self) -> f32 {

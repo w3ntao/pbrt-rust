@@ -22,9 +22,9 @@ impl Vector3 {
             z: _z,
         };
     }
-
-    pub fn zero() -> Self {
-        return Vector3::new(0.0, 0.0, 0.0);
+    
+    pub fn invalid() -> Self {
+        return Vector3::new(f32::NAN, f32::NAN, f32::NAN);
     }
 
     pub fn length_squared(&self) -> f32 {

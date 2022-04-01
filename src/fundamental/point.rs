@@ -16,16 +16,12 @@ impl Point {
         };
     }
 
-    pub fn zero() -> Self {
-        return Point::new(0.0, 0.0, 0.0);
-    }
-
-    pub fn nan() -> Self {
+    pub fn invalid() -> Self {
         return Point::new(f32::NAN, f32::NAN, f32::NAN);
     }
 
-    pub fn is_nan(&self) -> bool {
-        return self.x.is_nan() || self.y.is_nan() || self.z.is_nan();
+    pub fn is_valid(&self) -> bool {
+        return !self.x.is_nan() && !self.y.is_nan() && !self.z.is_nan();
     }
 
     fn min(&self, b: Point) -> Point {

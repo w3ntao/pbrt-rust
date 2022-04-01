@@ -38,8 +38,8 @@ impl Intersection {
     pub fn failure() -> Self {
         return Self {
             distance: f32::INFINITY,
-            hit_point: Point::zero(),
-            normal: Vector3::zero(),
+            hit_point: Point::invalid(),
+            normal: Vector3::invalid(),
             material: Arc::new(NullMaterial {}),
             entering_material: true,
         };

@@ -30,7 +30,7 @@ impl Primitive for AxisAlignedBox {
     fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
         let mut root_min = t_min;
         let mut root_max = t_max;
-        let mut normal = Vector3::zero();
+        let mut normal = Vector3::invalid();
 
         for axis in 0..3 {
             if ray.direction[axis] == 0.0 {

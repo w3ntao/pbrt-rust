@@ -17,8 +17,8 @@ impl Ray {
 
     pub fn dummy() -> Self {
         Self {
-            origin: Point::zero(),
-            direction: Vector3::zero(),
+            origin: Point::invalid(),
+            direction: Vector3::invalid(),
         }
     }
 
