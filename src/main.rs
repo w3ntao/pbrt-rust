@@ -13,5 +13,6 @@ fn main() {
     //test_case_4_material_b::test(1);
     //test_case_5_depth_of_field::test(1);
     //test_case_6_rt_weekend_final::test(1);
-    test_case_7_rt_weekend_final_dragon::test(1);
+    //test_case_7_rt_weekend_final_dragon::test(1);
+    test_case_8_texture::test(1);
 }

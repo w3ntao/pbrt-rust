@@ -1,6 +1,10 @@
 use std::sync::Arc;
 
+use rand_distr::num_traits::Pow;
+use rand_distr::num_traits::real::Real;
+
 use crate::fundamental::point::*;
+use crate::fundamental::utility::to_point;
 use crate::fundamental::vector3::*;
 use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::intersection::*;
@@ -28,6 +32,20 @@ impl Sphere {
     }
 }
 
+fn get_sphere_uv(p: Point) -> (f32, f32) {
+    // p: a given point on the sphere of radius one, centered at the origin.
+    // u: returned value [0,1] of angle around the Y axis from X=-1.
+    // v: returned value [0,1] of angle from Y=-1 to Y=+1.
+    //     <1 0 0> yields <0.50 0.50>       <-1  0  0> yields <0.00 0.50>
+    //     <0 1 0> yields <0.50 1.00>       < 0 -1  0> yields <0.50 0.00>
+    //     <0 0 1> yields <0.25 0.50>       < 0  0 -1> yields <0.75 0.50>
+
+    let theta = (-p.y).acos();
+    let phi = (-p.z / p.x).atan() + std::f32::consts::PI;
+
+    return (phi / (2.0 * std::f32::consts::PI), theta / std::f32::consts::PI);
+}
+
 impl Primitive for Sphere {
     fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
         let oc = ray.origin - self.center;
@@ -50,14 +68,21 @@ impl Primitive for Sphere {
         }
         let root = root;
         let normal = (ray.get_point(root) - self.center) / self.radius;
+        let hit_point = ray.get_point(root);
 
-        return if dot(ray.direction, normal) < 0.0 {
-            Intersection::from_outside(root, ray.get_point(root),
+        let mut intersection = if dot(ray.direction, normal) < 0.0 {
+            Intersection::from_outside(root, hit_point,
                                        normal, self.material.clone())
         } else {
-            Intersection::from_inside(root, ray.get_point(root),
+            Intersection::from_inside(root, hit_point,
                                       -normal, self.material.clone())
         };
+
+        let (u, v) = get_sphere_uv(to_point((hit_point - self.center).normalize()));
+        intersection.u = u;
+        intersection.v = v;
+        
+        return intersection;
     }
 
     fn get_bounds(&self) -> BoundingBox {

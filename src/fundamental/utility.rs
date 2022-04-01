@@ -5,6 +5,8 @@ use rand::thread_rng;
 use rand_distr::Distribution;
 
 use crate::fundamental::color::Color;
+use crate::fundamental::point::Point;
+use crate::fundamental::vector3::Vector3;
 
 pub fn get_file_name(full_path: &str) -> String {
     let file_name_with_postfix = Path::new(full_path).file_name().and_then(|s| s.to_str()).unwrap();
@@ -25,4 +27,12 @@ pub fn random_zero_to_one() -> f32 {
 
 pub fn random_color() -> Color {
     return Color::new(random_zero_to_one(), random_zero_to_one(), random_zero_to_one());
+}
+
+pub fn to_vector3(p: Point) -> Vector3 {
+    return Vector3::new(p.x, p.y, p.z);
+}
+
+pub fn to_point(v: Vector3) -> Point {
+    return Point::new(v.x, v.y, v.z);
 }

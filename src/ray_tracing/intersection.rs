@@ -1,5 +1,7 @@
 use std::sync::Arc;
 
+use rand_distr::num_traits::Float;
+
 use crate::fundamental::point::*;
 use crate::fundamental::vector3::*;
 use crate::ray_tracing::material::{Material, NullMaterial};
@@ -12,6 +14,9 @@ pub struct Intersection {
     pub normal: Vector3,
     pub material: Arc<dyn Material>,
     pub entering_material: bool,
+    pub u: f32,
+    pub v: f32,
+    // uv coordinate is for texture
 }
 
 impl Intersection {
@@ -22,6 +27,8 @@ impl Intersection {
             normal: _normal.normalize(),
             material: _material,
             entering_material: true,
+            u: f32::nan(),
+            v: f32::nan(),
         };
     }
 
@@ -32,6 +39,8 @@ impl Intersection {
             normal: _normal.normalize(),
             material: _material,
             entering_material: false,
+            u: f32::nan(),
+            v: f32::nan(),
         };
     }
 
@@ -42,6 +51,8 @@ impl Intersection {
             normal: Vector3::invalid(),
             material: Arc::new(NullMaterial {}),
             entering_material: true,
+            u: f32::nan(),
+            v: f32::nan(),
         };
     }
 

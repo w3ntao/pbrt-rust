@@ -14,3 +14,5 @@ mod bounding_box;
 pub mod instance;
 pub mod materials;
 pub mod material;
+pub mod texture;
+pub mod textures;
