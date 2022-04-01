@@ -22,25 +22,21 @@ pub struct Renderer {
 }
 
 fn print_time(seconds: i32) {
-    print!("\rtime left: ");
     if seconds > 3600 {
         let hour = seconds / 3600;
-        print!("{}[h]", hour);
+        print!("{}h ", hour);
         let minute = (seconds - hour * 3600) / 60;
         if minute > 0 {
-            print!("{}[m]", minute);
+            print!("{}m ", minute);
         }
-        let _ = io::stdout().flush();
         return;
     }
     let minute = (seconds) / 60;
     if minute > 0 {
-        print!("{}[m]", minute);
+        print!("{}m ", minute);
     }
     let seconds = seconds - minute * 60;
-    print!("{}[s]", seconds);
-
-    let _ = io::stdout().flush();
+    print!("{}s", seconds);
 }
 
 impl Renderer {
@@ -78,10 +74,14 @@ impl Renderer {
             }
             last_length = length;
             let unit_job_time = start.elapsed().as_secs_f32() / (finished_job as f32);
+            print!("\rtime left: ");
             print_time((unit_job_time * ((length + core) as f32)) as i32);
+            let _ = io::stdout().flush();
         }
 
-        println!("\nRendering took {:.2}[s]", start.elapsed().as_secs_f32());
+        print!("\nRendering took ");
+        print_time(start.elapsed().as_secs_f32() as i32);
+        println!();
     }
 
     fn single_thread_render(&self,

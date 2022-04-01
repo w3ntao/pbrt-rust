@@ -61,6 +61,6 @@ impl BVH {
                                                         primitive_infos,
                                                         &self.primitives)));
         self.primitives = ordered_primitives;
-        println!("BVH building took {:.2}[s]", start.elapsed().as_secs_f32());
+        println!("BVH building took {:.2}s", start.elapsed().as_secs_f32());
     }
 }
