@@ -15,6 +15,7 @@ use crate::ray_tracing::materials::mirror::*;
 use crate::ray_tracing::primitive::Primitive;
 use crate::ray_tracing::primitives::sphere::Sphere;
 use crate::ray_tracing::renderer::Renderer;
+use crate::ray_tracing::textures::solid_color::SolidColor;
 use crate::ray_tracing::world::World;
 
 pub fn test(samples: u32) {
@@ -25,7 +26,7 @@ pub fn test(samples: u32) {
     const WIDTH: usize = 1000;
     const HEIGHT: usize = 750;
 
-    let material_ground = Arc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
+    let material_ground = Arc::new(Lambertian::new(Arc::new(SolidColor::new(Color::new(0.8, 0.8, 0.0)))));
     let metal = Arc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.4));
     let mirror = Arc::new(Mirror::new());
     let glass = Arc::new(Glass::new(1.5));

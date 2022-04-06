@@ -16,6 +16,7 @@ use crate::ray_tracing::primitives::hollow_sphere::HollowSphere;
 use crate::ray_tracing::primitives::sphere::Sphere;
 use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::world::World;
+use crate::test_case_4_material_b::scene_three_spheres;
 
 pub fn test(samples: u32) {
     let file_name = get_file_name(file!());
@@ -25,33 +26,8 @@ pub fn test(samples: u32) {
     const WIDTH: usize = 1000;
     const HEIGHT: usize = 750;
 
-    let material_ground = Arc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
-    let material_center = Arc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
-    let metal = Arc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.4));
-    let glass = Arc::new(Glass::new(1.5));
-
-    let mut sphere_ground = Sphere::new(Point::new(0.0, -100.5, -1.0), 100.0);
-    sphere_ground.set_material(material_ground);
-
-    let focus_point = Point::new(0.0, 0.0, -1.0);
-    let radius = 0.5;
-    let mut sphere_center = Sphere::new(focus_point.clone(), radius);
-    sphere_center.set_material(material_center);
-
-    let mut sphere_left = HollowSphere::new(Point::new(-1.0, 0.0, -1.0), radius, 0.05);
-    sphere_left.set_material(glass);
-
-    let mut sphere_right = Sphere::new(Point::new(1.0, 0.0, -1.0), radius);
-    sphere_right.set_material(metal);
-
-    let mut scene = BVH::default();
-    scene.add(Arc::new(sphere_ground));
-    scene.add(Arc::new(sphere_left));
-    scene.add(Arc::new(sphere_center));
-    scene.add(Arc::new(sphere_right));
-    scene.build_index();
-
     let camera_center = Point::new(-3.0, 3.0, 2.0);
+    let focus_point = Point::new(0.0, 0.0, -1.0);
 
     let camera = DepthOfField::new(
         camera_center,
@@ -61,7 +37,7 @@ pub fn test(samples: u32) {
         std::f32::consts::PI / 6.0,
         0.4, (focus_point - camera_center).length());
 
-    let world = World::new(Arc::new(scene));
+    let world = World::new(Arc::new(scene_three_spheres()));
     let integrator = MonteCarloPathTrace::new(Arc::new(world));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
     let image = renderer.render(WIDTH, HEIGHT);

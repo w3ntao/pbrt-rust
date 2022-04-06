@@ -15,6 +15,7 @@ use crate::ray_tracing::materials::metal::*;
 use crate::ray_tracing::primitive::Primitive;
 use crate::ray_tracing::primitives::sphere::Sphere;
 use crate::ray_tracing::renderer::Renderer;
+use crate::ray_tracing::textures::solid_color::SolidColor;
 use crate::ray_tracing::world::World;
 
 pub fn test(samples: u32) {
@@ -27,7 +28,8 @@ pub fn test(samples: u32) {
 
     let mut scene = BVH::default();
 
-    let material_ground = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
+    let solid_color_ground = Arc::new(SolidColor::new(Color::new(0.5, 0.5, 0.5)));
+    let material_ground = Arc::new(Lambertian::new(solid_color_ground.clone()));
 
     let ground_radius = 2000.0;
     let mut sphere_ground = Sphere::new(Point::new(0.0, -ground_radius, 0.0), ground_radius);
@@ -46,7 +48,8 @@ pub fn test(samples: u32) {
                 if choose_material < 0.4 {
                     //diffuse
                     let albedo = random_color() * random_color();
-                    let material = Lambertian::new(albedo);
+                    let texture = Arc::new(SolidColor::new(albedo));
+                    let material = Lambertian::new(texture.clone());
                     sphere.set_material(Arc::new(material));
                 } else if choose_material < 0.7 {
                     // metal
@@ -64,7 +67,8 @@ pub fn test(samples: u32) {
         }
     }
 
-    let lambertian = Arc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
+    let texture_lambertian = Arc::new(SolidColor::new(Color::new(0.4, 0.2, 0.1)));
+    let lambertian = Arc::new(Lambertian::new(texture_lambertian.clone()));
     let glass = Arc::new(Glass::new(1.5));
     let metal = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
 

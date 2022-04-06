@@ -33,7 +33,7 @@ pub fn test(samples: u32) {
     let solid_white = Arc::new(SolidColor::new(Color::new(0.9, 0.9, 0.9)));
 
     let checker = Arc::new(CheckerTexture::new(solid_green.clone(), solid_white.clone()));
-    let material_ground = Arc::new(Lambertian::new_with_texture(checker.clone()));
+    let material_ground = Arc::new(Lambertian::new(checker.clone()));
 
     let ground_radius = 1000.0;
     let mut sphere_ground = Sphere::new(Point::new(0.0, -ground_radius, 0.0), ground_radius);
@@ -51,9 +51,12 @@ pub fn test(samples: u32) {
                 let mut sphere = Sphere::new(center, 0.2);
                 if choose_material < 0.4 {
                     //diffuse
+
                     let albedo = random_color() * random_color();
-                    let material = Lambertian::new(albedo);
-                    sphere.set_material(Arc::new(material));
+                    let texture_albedo = Arc::new(SolidColor::new(albedo));
+                    let material = Arc::new(Lambertian::new(texture_albedo.clone()));
+
+                    sphere.set_material(material);
                 } else if choose_material < 0.7 {
                     // metal
                     let albedo = random_in_range(0.5, 1.0) * Color::new(1.0, 1.0, 1.0);
@@ -70,7 +73,9 @@ pub fn test(samples: u32) {
         }
     }
 
-    let lambertian = Arc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
+    let texture_lambertian = Arc::new(SolidColor::new(Color::new(0.4, 0.2, 0.1)));
+    let lambertian = Arc::new(Lambertian::new(texture_lambertian.clone()));
+
     let glass = Arc::new(Glass::new(1.5));
     let metal = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
 

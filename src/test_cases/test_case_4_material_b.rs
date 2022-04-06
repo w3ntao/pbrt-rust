@@ -15,18 +15,15 @@ use crate::ray_tracing::primitive::Primitive;
 use crate::ray_tracing::primitives::hollow_sphere::HollowSphere;
 use crate::ray_tracing::primitives::sphere::Sphere;
 use crate::ray_tracing::renderer::Renderer;
+use crate::ray_tracing::textures::solid_color::SolidColor;
 use crate::ray_tracing::world::World;
 
-pub fn test(samples: u32) {
-    let file_name = get_file_name(file!());
-    println!("TESTING: {}", &file_name);
-    let ppm_name = format!("{}.ppm", file_name);
+pub fn scene_three_spheres() -> BVH {
+    let solid_color_ground = Arc::new(SolidColor::new(Color::new(0.8, 0.8, 0.0)));
+    let solid_color_center = Arc::new(SolidColor::new(Color::new(0.1, 0.2, 0.5)));
 
-    const WIDTH: usize = 1000;
-    const HEIGHT: usize = 750;
-
-    let material_ground = Arc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
-    let material_center = Arc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
+    let material_ground = Arc::new(Lambertian::new(solid_color_ground.clone()));
+    let material_center = Arc::new(Lambertian::new(solid_color_center.clone()));
     let metal = Arc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.4));
     let glass = Arc::new(Glass::new(1.5));
 
@@ -49,14 +46,25 @@ pub fn test(samples: u32) {
     scene.add(Arc::new(sphere_right));
     scene.build_index();
 
+    return scene;
+}
+
+pub fn test(samples: u32) {
+    let file_name = get_file_name(file!());
+    println!("TESTING: {}", &file_name);
+    let ppm_name = format!("{}.ppm", file_name);
+
+    const WIDTH: usize = 1000;
+    const HEIGHT: usize = 750;
+
     let camera = Perspective::new(
         Point::new(-3.0, 3.0, 2.0),
         Vector3::new(2.0, -2.0, -2.0),
         Vector3::new(0.0, 1.0, 0.0),
         std::f32::consts::PI / 8.0,
         std::f32::consts::PI / 6.0);
-
-    let world = World::new(Arc::new(scene));
+    
+    let world = World::new(Arc::new(scene_three_spheres()));
     let integrator = MonteCarloPathTrace::new(Arc::new(world));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
     let image = renderer.render(WIDTH, HEIGHT);
