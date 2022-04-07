@@ -18,6 +18,7 @@ use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::textures::checker_texture::CheckerTexture;
 use crate::ray_tracing::textures::solid_color::*;
 use crate::ray_tracing::world::World;
+use crate::test_case_6_rt_weekend_final::many_random_spheres;
 
 pub fn test(samples: u32) {
     let file_name = get_file_name(file!());
@@ -27,7 +28,7 @@ pub fn test(samples: u32) {
     const WIDTH: usize = 1000;
     const HEIGHT: usize = 750;
 
-    let mut scene = BVH::default();
+    let mut scene = many_random_spheres();
 
     let solid_green = Arc::new(SolidColor::new(Color::new(0.2, 0.3, 0.1)));
     let solid_white = Arc::new(SolidColor::new(Color::new(0.9, 0.9, 0.9)));
@@ -39,39 +40,6 @@ pub fn test(samples: u32) {
     let mut sphere_ground = Sphere::new(Point::new(0.0, -ground_radius, 0.0), ground_radius);
     sphere_ground.set_material(material_ground);
     scene.add(Arc::new(sphere_ground));
-
-    for a in -11..11 {
-        let a = a as f32;
-        for b in -11..11 {
-            let b = b as f32;
-            let choose_material = random_zero_to_one();
-            let center = Point::new(a + 0.9 * random_zero_to_one(), 0.2, b + 0.9 * random_zero_to_one());
-
-            if (center - Point::new(4.0, 0.2, 0.0)).length() > 0.9 {
-                let mut sphere = Sphere::new(center, 0.2);
-                if choose_material < 0.4 {
-                    //diffuse
-
-                    let albedo = random_color() * random_color();
-                    let texture_albedo = Arc::new(SolidColor::new(albedo));
-                    let material = Arc::new(Lambertian::new(texture_albedo.clone()));
-
-                    sphere.set_material(material);
-                } else if choose_material < 0.7 {
-                    // metal
-                    let albedo = random_in_range(0.5, 1.0) * Color::new(1.0, 1.0, 1.0);
-                    let fuzz = random_in_range(0.0, 0.5);
-                    let metal = Metal::new(albedo, fuzz);
-                    sphere.set_material(Arc::new(metal));
-                } else {
-                    //glass
-                    let glass = Glass::new(1.5);
-                    sphere.set_material(Arc::new(glass));
-                }
-                scene.add(Arc::new(sphere));
-            }
-        }
-    }
 
     let texture_lambertian = Arc::new(SolidColor::new(Color::new(0.4, 0.2, 0.1)));
     let lambertian = Arc::new(Lambertian::new(texture_lambertian.clone()));

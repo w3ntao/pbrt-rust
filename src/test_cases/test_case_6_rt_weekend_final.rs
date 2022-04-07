@@ -18,6 +18,52 @@ use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::textures::solid_color::SolidColor;
 use crate::ray_tracing::world::World;
 
+pub fn many_random_spheres() -> BVH {
+    let mut scene = BVH::default();
+    for a in -11..11 {
+        let a = a as f32;
+        for b in -11..11 {
+            let b = b as f32;
+            let choose_material = random_zero_to_one();
+            let center = Point::new(a + 0.9 * random_zero_to_one(), 0.2, b + 0.9 * random_zero_to_one());
+
+            let mut too_close = false;
+            for point in [Point::new(-4.0, 0.2, 0.0), Point::new(0.0, 0.2, 0.0), Point::new(4.0, 0.2, 0.0)] {
+                if (center - point).length() <= 1.2 {
+                    too_close = true;
+                    break;
+                }
+            }
+
+            if too_close {
+                continue;
+            }
+
+            let mut sphere = Sphere::new(center, 0.2);
+            if choose_material < 0.4 {
+                //diffuse
+                let albedo = random_color() * random_color();
+                let texture = Arc::new(SolidColor::new(albedo));
+                let material = Lambertian::new(texture.clone());
+                sphere.set_material(Arc::new(material));
+            } else if choose_material < 0.7 {
+                // metal
+                let albedo = random_in_range(0.5, 1.0) * Color::new(1.0, 1.0, 1.0);
+                let fuzz = random_in_range(0.0, 0.5);
+                let metal = Metal::new(albedo, fuzz);
+                sphere.set_material(Arc::new(metal));
+            } else {
+                //glass
+                let glass = Glass::new(1.5);
+                sphere.set_material(Arc::new(glass));
+            }
+            scene.add(Arc::new(sphere));
+        }
+    }
+
+    return scene;
+}
+
 pub fn test(samples: u32) {
     let file_name = get_file_name(file!());
     println!("TESTING: {}", &file_name);
@@ -26,46 +72,15 @@ pub fn test(samples: u32) {
     const WIDTH: usize = 1000;
     const HEIGHT: usize = 750;
 
-    let mut scene = BVH::default();
-
+    let mut scene = many_random_spheres();
     let solid_color_ground = Arc::new(SolidColor::new(Color::new(0.5, 0.5, 0.5)));
     let material_ground = Arc::new(Lambertian::new(solid_color_ground.clone()));
 
     let ground_radius = 2000.0;
     let mut sphere_ground = Sphere::new(Point::new(0.0, -ground_radius, 0.0), ground_radius);
     sphere_ground.set_material(material_ground);
-    scene.add(Arc::new(sphere_ground));
-
-    for a in -11..11 {
-        let a = a as f32;
-        for b in -11..11 {
-            let b = b as f32;
-            let choose_material = random_zero_to_one();
-            let center = Point::new(a + 0.9 * random_zero_to_one(), 0.2, b + 0.9 * random_zero_to_one());
-
-            if (center - Point::new(4.0, 0.2, 0.0)).length() > 0.9 {
-                let mut sphere = Sphere::new(center, 0.2);
-                if choose_material < 0.4 {
-                    //diffuse
-                    let albedo = random_color() * random_color();
-                    let texture = Arc::new(SolidColor::new(albedo));
-                    let material = Lambertian::new(texture.clone());
-                    sphere.set_material(Arc::new(material));
-                } else if choose_material < 0.7 {
-                    // metal
-                    let albedo = random_in_range(0.5, 1.0) * Color::new(1.0, 1.0, 1.0);
-                    let fuzz = random_in_range(0.0, 0.5);
-                    let metal = Metal::new(albedo, fuzz);
-                    sphere.set_material(Arc::new(metal));
-                } else {
-                    //glass
-                    let glass = Glass::new(1.5);
-                    sphere.set_material(Arc::new(glass));
-                }
-                scene.add(Arc::new(sphere));
-            }
-        }
-    }
+    let ground = Arc::new(sphere_ground);
+    scene.add(ground.clone());
 
     let texture_lambertian = Arc::new(SolidColor::new(Color::new(0.4, 0.2, 0.1)));
     let lambertian = Arc::new(Lambertian::new(texture_lambertian.clone()));

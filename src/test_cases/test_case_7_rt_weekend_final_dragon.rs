@@ -19,6 +19,7 @@ use crate::ray_tracing::primitives::sphere::Sphere;
 use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::textures::solid_color::SolidColor;
 use crate::ray_tracing::world::World;
+use crate::test_case_6_rt_weekend_final::many_random_spheres;
 
 pub fn test(samples: u32) {
     let file_name = get_file_name(file!());
@@ -28,8 +29,7 @@ pub fn test(samples: u32) {
     const WIDTH: usize = 1000;
     const HEIGHT: usize = 750;
 
-    let mut scene = BVH::default();
-
+    let mut scene = many_random_spheres();
     let solid_color_ground = Arc::new(SolidColor::new(Color::new(0.5, 0.5, 0.5)));
     let material_ground = Arc::new(Lambertian::new(solid_color_ground.clone()));
 
@@ -38,57 +38,14 @@ pub fn test(samples: u32) {
     sphere_ground.set_material(material_ground);
     let ground = Arc::new(sphere_ground);
     scene.add(ground.clone());
-
-    for a in -11..11 {
-        let a = a as f32;
-        for b in -11..11 {
-            let b = b as f32;
-            let choose_material = random_zero_to_one();
-            let center = Point::new(a + 0.9 * random_zero_to_one(), 0.2, b + 0.9 * random_zero_to_one());
-
-            let mut too_close = false;
-            for point in [Point::new(-4.0, 0.2, 0.0), Point::new(0.0, 0.2, 0.0), Point::new(4.0, 0.2, 0.0)] {
-                if (center - point).length() <= 1.2 {
-                    too_close = true;
-                    break;
-                }
-            }
-
-            if too_close {
-                continue;
-            }
-
-            let mut sphere = Sphere::new(center, 0.2);
-            if choose_material < 0.4 {
-                //diffuse
-                let albedo = random_color() * random_color();
-                let texture = Arc::new(SolidColor::new(albedo));
-                let material = Lambertian::new(texture.clone());
-                sphere.set_material(Arc::new(material));
-            } else if choose_material < 0.7 {
-                // metal
-                let albedo = random_in_range(0.5, 1.0) * Color::new(1.0, 1.0, 1.0);
-                let fuzz = random_in_range(0.0, 0.5);
-                let metal = Metal::new(albedo, fuzz);
-                sphere.set_material(Arc::new(metal));
-            } else {
-                //glass
-                let glass = Glass::new(1.5);
-                sphere.set_material(Arc::new(glass));
-            }
-            scene.add(Arc::new(sphere));
-        }
-    }
-
-
+    
     let texture_lambertian = Arc::new(SolidColor::new(Color::new(0.4, 0.2, 0.1)));
     let lambertian = Arc::new(Lambertian::new(texture_lambertian.clone()));
     let glass = Arc::new(Glass::new(1.5));
     let metal = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
 
-    let triangles = obj_to_triangles("models/dragon.obj");
     let mut dragon_bvh = BVH::default();
-    for t in triangles {
+    for t in obj_to_triangles("models/dragon.obj") {
         dragon_bvh.add(t);
     }
     dragon_bvh.build_index();
