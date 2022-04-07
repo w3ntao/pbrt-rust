@@ -38,7 +38,7 @@ pub fn test(samples: u32) {
     sphere_ground.set_material(material_ground);
     let ground = Arc::new(sphere_ground);
     scene.add(ground.clone());
-    
+
     let texture_lambertian = Arc::new(SolidColor::new(Color::new(0.4, 0.2, 0.1)));
     let lambertian = Arc::new(Lambertian::new(texture_lambertian.clone()));
     let glass = Arc::new(Glass::new(1.5));

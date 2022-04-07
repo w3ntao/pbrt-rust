@@ -13,6 +13,7 @@ pub struct BVH {
     primitives: Vec<Arc<dyn Primitive>>,
     bounds: BoundingBox,
     root: Option<Box<Node>>,
+    index_built: bool,
 }
 
 impl Default for BVH {
@@ -21,6 +22,7 @@ impl Default for BVH {
             primitives: Vec::default(),
             bounds: BoundingBox::empty(),
             root: None,
+            index_built: false,
         }
     }
 }
@@ -29,11 +31,16 @@ impl Group for BVH {
     fn add(&mut self, p: Arc<dyn Primitive>) {
         self.bounds += p.get_bounds();
         self.primitives.push(p);
+        self.index_built = false;
     }
 }
 
 impl Primitive for BVH {
     fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
+        if !self.index_built {
+            panic!("BVH: You should invoke function `build_index()` before intersect with it")
+        }
+
         return self.root.as_ref().unwrap().intersect(ray, t_min, t_max, &self.primitives);
     }
 
@@ -62,5 +69,6 @@ impl BVH {
                                                         &self.primitives)));
         self.primitives = ordered_primitives;
         println!("BVH building took {:.2}s", start.elapsed().as_secs_f32());
+        self.index_built = true;
     }
 }
