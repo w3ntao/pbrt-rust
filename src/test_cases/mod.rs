@@ -7,3 +7,4 @@ pub mod test_case_5_depth_of_field;
 pub mod test_case_6_rt_weekend_final;
 pub mod test_case_7_rt_weekend_final_dragon;
 pub mod test_case_8_texture;
+pub mod test_case_9_perlin_texture;
