@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use crate::fundamental::color::Color;
 use crate::fundamental::point::Point;
 use crate::ray_tracing::texture::Texture;

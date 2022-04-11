@@ -1,9 +1,7 @@
 use rand::Rng;
 
-use crate::fundamental::color::Color;
 use crate::fundamental::point::Point;
 use crate::fundamental::utility::random_zero_to_one;
-use crate::ray_tracing::texture::Texture;
 
 const POINT_COUNT: usize = 256;
 

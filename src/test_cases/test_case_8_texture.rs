@@ -2,12 +2,10 @@ use std::sync::Arc;
 
 use crate::fundamental::color::Color;
 use crate::fundamental::point::Point;
-use crate::fundamental::utility::{get_file_name, random_in_range, random_zero_to_one};
-use crate::fundamental::utility::random_color;
+use crate::fundamental::utility::get_file_name;
 use crate::fundamental::vector3::Vector3;
 use crate::ray_tracing::cameras::depth_of_field::DepthOfField;
 use crate::ray_tracing::group::Group;
-use crate::ray_tracing::groups::bvh::BVH;
 use crate::ray_tracing::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
 use crate::ray_tracing::materials::glass::*;
 use crate::ray_tracing::materials::lambertian::*;

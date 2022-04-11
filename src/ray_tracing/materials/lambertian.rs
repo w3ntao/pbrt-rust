@@ -1,13 +1,11 @@
 use std::sync::Arc;
 
 use crate::fundamental::color::*;
-use crate::fundamental::point::Point;
 use crate::fundamental::vector3::*;
 use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::material::Material;
 use crate::ray_tracing::ray::*;
 use crate::ray_tracing::texture::Texture;
-use crate::ray_tracing::textures::solid_color::SolidColor;
 
 pub struct Lambertian {
     albedo: Arc<dyn Texture>,

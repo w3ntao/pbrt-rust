@@ -1,8 +1,5 @@
 use std::sync::Arc;
 
-use rand_distr::num_traits::Pow;
-use rand_distr::num_traits::real::Real;
-
 use crate::fundamental::point::*;
 use crate::fundamental::utility::to_point;
 use crate::fundamental::vector3::*;
@@ -81,7 +78,7 @@ impl Primitive for Sphere {
         let (u, v) = get_sphere_uv(to_point((hit_point - self.center).normalize()));
         intersection.u = u;
         intersection.v = v;
-        
+
         return intersection;
     }
 

@@ -5,7 +5,6 @@ use rand_distr::num_traits::Float;
 use crate::fundamental::point::*;
 use crate::fundamental::vector3::*;
 use crate::ray_tracing::material::{Material, NullMaterial};
-use crate::ray_tracing::ray::*;
 
 #[derive(Clone)]
 pub struct Intersection {
