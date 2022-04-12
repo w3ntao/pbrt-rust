@@ -15,6 +15,6 @@ fn main() {
     //test_case_5_depth_of_field::test(samples);
     //test_case_6_rt_weekend_final::test(samples);
     //test_case_7_rt_weekend_final_dragon::test(samples);
-    //test_case_8_texture::test(samples);
+    //test_case_8_checker_texture::test(samples);
     test_case_9_perlin_texture::test(samples);
 }

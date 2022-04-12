@@ -24,7 +24,7 @@ pub fn test(samples: u32) {
 
     let mut scene = BVH::default();
 
-    let perlin_texture = Arc::new(NoiseTexture::new());
+    let perlin_texture = Arc::new(NoiseTexture::new(4.0));
 
     let lambertian_perlin = Arc::new(Lambertian::new(perlin_texture.clone()));
 

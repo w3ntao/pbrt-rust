@@ -1,15 +1,61 @@
-use rand::Rng;
+use rand::{random, Rng};
 
 use crate::fundamental::point::Point;
-use crate::fundamental::utility::random_zero_to_one;
+use crate::fundamental::utility::{random_in_range, random_zero_to_one};
+use crate::fundamental::vector3::{dot, Vector3};
 
 const POINT_COUNT: usize = 256;
 
 pub struct Perlin {
-    random_float: [f32; POINT_COUNT],
+    random_vector: [Vector3; POINT_COUNT],
     permuted_x: [i32; POINT_COUNT],
     permuted_y: [i32; POINT_COUNT],
     permuted_z: [i32; POINT_COUNT],
+}
+
+impl Perlin {
+    pub fn new() -> Perlin {
+        let mut _random_vector = [Vector3::invalid(); POINT_COUNT];
+        for idx in 0..POINT_COUNT {
+            _random_vector[idx] = Vector3::new(
+                random_in_range(-1.0, 1.0),
+                random_in_range(-1.0, 1.0),
+                random_in_range(-1.0, 1.0)).normalize();
+        }
+
+        return Perlin {
+            random_vector: _random_vector,
+            permuted_x: generate_perlin_perm(),
+            permuted_y: generate_perlin_perm(),
+            permuted_z: generate_perlin_perm(),
+        };
+    }
+
+    pub fn noise(&self, p: Point) -> f32 {
+        let u = p.x - p.x.floor();
+        let v = p.y - p.y.floor();
+        let w = p.z - p.z.floor();
+
+        let i = p.x.floor() as i32;
+        let j = p.y.floor() as i32;
+        let k = p.z.floor() as i32;
+
+        let mut c = [[[Vector3::invalid(); 2]; 2]; 2];
+        for di in 0..2 {
+            for dj in 0..2 {
+                for dk in 0..2 {
+                    let index
+                        = self.permuted_x[((i + di) & 255) as usize] ^
+                        self.permuted_y[((j + dj) & 255) as usize] ^
+                        self.permuted_z[((k + dk) & 255) as usize];
+
+                    c[di as usize][dj as usize][dk as usize] = self.random_vector[index as usize];
+                }
+            }
+        }
+
+        return perlin_interpolate(c, u, v, w);
+    }
 }
 
 fn permute(array: &mut [i32]) {
@@ -33,63 +79,28 @@ fn generate_perlin_perm() -> [i32; POINT_COUNT] {
     return array;
 }
 
-fn trilinear_interpolate(c: [[[f32; 2]; 2]; 2], u: f32, v: f32, w: f32) -> f32 {
+fn perlin_interpolate(c: [[[Vector3; 2]; 2]; 2], u: f32, v: f32, w: f32) -> f32 {
+    let uu = u * u * (3.0 - 2.0 * u);
+    let vv = v * v * (3.0 - 2.0 * v);
+    let ww = w * w * (3.0 - 2.0 * w);
+
     let mut accumulate = 0.0;
     for i in 0..2 {
         for j in 0..2 {
             for k in 0..2 {
-                let value_c = c[i][j][k];
                 let i = i as f32;
                 let j = j as f32;
                 let k = k as f32;
+                let weight = Vector3::new(u - i, v - j, w - k);
 
-                accumulate +=
-                    (i * u + (1.0 - i) * (1.0 - u)) *
-                        (j * v + (1.0 - j) * (1.0 - v)) *
-                        (k * w + (1.0 - k) * (1.0 - w)) * value_c;
+                accumulate
+                    += (i * uu + (1.0 - i) * (1.0 - uu))
+                    * (j * vv + (1.0 - j) * (1.0 - vv))
+                    * (k * ww + (1.0 - k) * (1.0 - ww))
+                    * dot(c[i as usize][j as usize][k as usize], weight);
             }
         }
     }
 
     return accumulate;
-}
-
-impl Perlin {
-    pub fn new() -> Perlin {
-        let mut initialized_random_float: [f32; POINT_COUNT] = [0.0; POINT_COUNT];
-        for idx in 0..POINT_COUNT {
-            initialized_random_float[idx] = random_zero_to_one();
-        }
-
-        return Perlin {
-            random_float: initialized_random_float,
-            permuted_x: generate_perlin_perm(),
-            permuted_y: generate_perlin_perm(),
-            permuted_z: generate_perlin_perm(),
-        };
-    }
-
-    pub fn noise(&self, p: Point) -> f32 {
-        let u = p.x - p.x.floor();
-        let v = p.y - p.y.floor();
-        let w = p.z - p.z.floor();
-
-        let i = p.x.floor() as i32;
-        let j = p.y.floor() as i32;
-        let k = p.z.floor() as i32;
-
-        let mut c = [[[0.0; 2]; 2]; 2];
-        for di in 0..2 {
-            for dj in 0..2 {
-                for dk in 0..2 {
-                    let index =
-                        self.permuted_x[((i + di) & 255) as usize] ^ self.permuted_x[((j + dj) & 255) as usize] ^ self.permuted_x[((k + dk) & 255) as usize];
-
-                    c[di as usize][dj as usize][dk as usize] = self.random_float[index as usize];
-                }
-            }
-        }
-
-        return trilinear_interpolate(c, u, v, w);
-    }
 }
