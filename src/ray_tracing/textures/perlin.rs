@@ -56,6 +56,20 @@ impl Perlin {
 
         return perlin_interpolate(c, u, v, w);
     }
+
+    pub fn turbulence(&self, point: Point, depth: i32) -> f32 {
+        let mut accumulate = 0.0;
+        let mut amplitude = 1.0;
+        let mut weight = 1.0;
+
+        for _ in 0..depth {
+            accumulate += weight * self.noise(point * amplitude);
+            amplitude *= 2.0;
+            weight *= 0.5;
+        }
+
+        return accumulate.abs();
+    }
 }
 
 fn permute(array: &mut [i32]) {
