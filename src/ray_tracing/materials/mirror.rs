@@ -1,4 +1,5 @@
 use crate::fundamental::color::*;
+use crate::fundamental::point::Point;
 use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::material::Material;
 use crate::ray_tracing::ray::*;
@@ -18,5 +19,9 @@ impl Material for Mirror {
         return Color::new(1.0, 1.0, 1.0);
         // TODO: I am implementing perfect glass for the time being
         // TODO: that reflects everything
+    }
+
+    fn emit(&self, _: f32, _: f32, _: Point) -> Color {
+        return Color::black();
     }
 }

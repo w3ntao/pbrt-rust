@@ -1,4 +1,5 @@
 use crate::fundamental::color::*;
+use crate::fundamental::point::Point;
 use crate::fundamental::vector3::*;
 use crate::fundamental::vector3::random_in_unit_sphere;
 use crate::ray_tracing::intersection::*;
@@ -30,5 +31,9 @@ impl Material for Metal {
         }
 
         return self.albedo;
+    }
+
+    fn emit(&self, _: f32, _: f32, _: Point) -> Color {
+        return Color::black();
     }
 }

@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use crate::fundamental::color::*;
+use crate::fundamental::point::Point;
 use crate::fundamental::vector3::*;
 use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::material::Material;
@@ -24,5 +25,9 @@ impl Material for Lambertian {
         scattered_ray.origin = intersection.hit_point;
         scattered_ray.direction = scattered_direction;
         return self.albedo.get_color(intersection.u, intersection.v, intersection.hit_point);
+    }
+
+    fn emit(&self, _: f32, _: f32, _: Point) -> Color {
+        return Color::black();
     }
 }

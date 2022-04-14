@@ -1,6 +1,7 @@
 use rand_distr::num_traits::Pow;
 
 use crate::fundamental::color::*;
+use crate::fundamental::point::Point;
 use crate::fundamental::utility::random_zero_to_one;
 use crate::fundamental::vector3::*;
 use crate::ray_tracing::intersection::*;
@@ -60,5 +61,9 @@ impl Material for Glass {
         scattered_ray.origin = intersection.hit_point;
         scattered_ray.direction = direction;
         return Color::new(1.0, 1.0, 1.0);
+    }
+
+    fn emit(&self, _: f32, _: f32, _: Point) -> Color {
+        return Color::black();
     }
 }
