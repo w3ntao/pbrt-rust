@@ -18,7 +18,7 @@ impl Material for NullMaterial {
     fn scatter(&self, _: &Ray, _: &Intersection, _: &mut Ray) -> Color {
         panic!("You should never invoke `scatter()` from NullMaterial");
     }
-    fn emit(&self, u: f32, v: f32, point: Point) -> Color {
+    fn emit(&self, _: f32, _: f32, _: Point) -> Color {
         panic!("You should never invoke `emit()` from NullMaterial");
     }
 }

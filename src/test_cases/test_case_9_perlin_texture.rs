@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use crate::fundamental::color::Color;
 use crate::fundamental::point::Point;
 use crate::fundamental::utility::get_file_name;
 use crate::fundamental::vector3::Vector3;
@@ -52,7 +53,7 @@ pub fn test(samples: u32) {
         0.002, (camera_center - sphere_center).length());
 
     let world = World::new(Arc::new(scene));
-    let integrator = MonteCarloPathTrace::new(Arc::new(world));
+    let integrator = MonteCarloPathTrace::new(Arc::new(world), Color::new(0.7, 0.8, 1.0));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
     let image = renderer.render(WIDTH, HEIGHT);
     image.write(&ppm_name);

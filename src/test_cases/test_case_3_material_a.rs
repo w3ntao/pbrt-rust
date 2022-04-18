@@ -58,7 +58,7 @@ pub fn test(samples: u32) {
         std::f32::consts::PI / 6.0);
 
     let world = World::new(Arc::new(scene));
-    let integrator = MonteCarloPathTrace::new(Arc::new(world));
+    let integrator = MonteCarloPathTrace::new(Arc::new(world), Color::new(0.7, 0.8, 1.0));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
     let image = renderer.render(WIDTH, HEIGHT);
     image.write(&ppm_name);

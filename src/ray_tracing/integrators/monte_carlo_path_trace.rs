@@ -8,11 +8,15 @@ use crate::ray_tracing::world::World;
 
 pub struct MonteCarloPathTrace {
     world: Arc<World>,
+    background: Color,
 }
 
 impl MonteCarloPathTrace {
-    pub fn new(_world: Arc<World>) -> Self {
-        return Self { world: _world };
+    pub fn new(_world: Arc<World>, _background: Color) -> Self {
+        return Self {
+            world: _world,
+            background: _background,
+        };
     }
 }
 
@@ -26,16 +30,15 @@ impl MonteCarloPathTrace {
         // with INTERSECT_OFFSET, we can avoid the situation when the ray
         // re-hit the surface it just leave
 
-        if intersection.intersected() {
-            let mut scattered_ray = Ray::dummy();
-            let attenuation = intersection.material.scatter(&ray, &intersection, &mut scattered_ray);
-            return attenuation * self.trace(&scattered_ray, depth - 1);
+        if !intersection.intersected() {
+            return self.background;
         }
 
-        // shoot into sky
-        let unit_direction = ray.direction.normalize();
-        let t = 0.5 * (unit_direction.y + 1.0);
-        return (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0);
+        let emission = intersection.material.emit(intersection.u, intersection.v, intersection.hit_point);
+
+        let mut scattered_ray = Ray::dummy();
+        let attenuation = intersection.material.scatter(&ray, &intersection, &mut scattered_ray);
+        return emission + attenuation * self.trace(&scattered_ray, depth - 1);
     }
 }
 
