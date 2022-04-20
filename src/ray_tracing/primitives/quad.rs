@@ -50,7 +50,9 @@ impl Primitive for Quad {
             return Intersection::failure();
         }
 
-        return Intersection::from_outside(t, ray.get_point(t), ab.normalize(), self.material.clone());
+        let cos = cosine(ray.direction, self.normal);
+        let normal = if cos < 0.0 { self.normal } else { -self.normal };
+        return Intersection::from_outside(t, ray.get_point(t), normal, self.material.clone());
     }
 
     fn get_bounds(&self) -> BoundingBox {
