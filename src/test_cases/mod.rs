@@ -9,3 +9,4 @@ pub mod test_case_7_rt_weekend_final_dragon;
 pub mod test_case_8_checker_texture;
 pub mod test_case_9_perlin_texture;
 pub mod test_case_10_lighting;
+pub mod test_case_11_cornell_box;
