@@ -5,7 +5,7 @@ use rand::prelude::Distribution;
 use rand::thread_rng;
 
 use crate::fundamental::point::*;
-use crate::fundamental::utility::random_zero_to_one;
+use crate::fundamental::utility::*;
 
 #[derive(Copy, Clone)]
 pub struct Vector3 {
@@ -22,7 +22,7 @@ impl Vector3 {
             z: _z,
         };
     }
-    
+
     pub fn invalid() -> Self {
         return Vector3::new(f32::NAN, f32::NAN, f32::NAN);
     }
@@ -219,7 +219,7 @@ pub fn random_vector_in_hemisphere(normal: Vector3) -> Vector3 {
 
 pub fn random_vector_in_disk() -> (f32, f32) {
     let r = random_zero_to_one().sqrt();
-    let theta = random_zero_to_one() * 2.0 * std::f32::consts::PI;
+    let theta = random_zero_to_one() * 2.0 * PI;
 
     return (r * theta.sin(), r * theta.cos());
 }

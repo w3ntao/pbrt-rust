@@ -1,9 +1,7 @@
 use std::sync::Arc;
 
 use crate::fundamental::obj_loader::obj_to_triangles;
-use crate::fundamental::point::Point;
-use crate::fundamental::utility::get_file_name;
-use crate::fundamental::vector3::Vector3;
+use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::perspective::Perspective;
 use crate::ray_tracing::group::Group;
 use crate::ray_tracing::groups::bvh::BVH;
@@ -25,7 +23,7 @@ pub fn test() {
 
     let num = 5;
     let radius: f32 = 1.5;
-    let delta = std::f32::consts::PI / (num as f32 - 1.0);
+    let delta = PI / (num as f32 - 1.0);
 
     let mut scene = BVH::default();
     for idx in 0..num {
@@ -41,8 +39,8 @@ pub fn test() {
         Point::new(-7.0, 5.0, 0.0),
         Vector3::new(1.0, -0.7, 0.0),
         Vector3::new(0.0, 1.0, 0.0),
-        std::f32::consts::PI / 8.0,
-        std::f32::consts::PI / 6.0);
+        PI / 8.0,
+        PI / 6.0);
 
     let world = World::new(Arc::new(scene));
     let integrator = RayCastingDotNormal::new(Arc::new(world));

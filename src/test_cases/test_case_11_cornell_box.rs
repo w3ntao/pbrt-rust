@@ -1,9 +1,6 @@
 use std::sync::Arc;
 
-use crate::fundamental::color::Color;
-use crate::fundamental::point::Point;
-use crate::fundamental::utility::get_file_name;
-use crate::fundamental::vector3::Vector3;
+use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::depth_of_field::DepthOfField;
 use crate::ray_tracing::group::Group;
 use crate::ray_tracing::groups::bvh::BVH;
@@ -79,7 +76,7 @@ pub fn test(samples: u32) {
         Point::new(0.0, 0.0, 0.0),
         Point::new(165.0, 330.0, 165.0));
     let mut box_a = Instance::new(Arc::new(box_a));
-    box_a.rotate(Vector3::new(0.0, 1.0, 0.0), std::f32::consts::PI / 12.0);
+    box_a.rotate(Vector3::new(0.0, 1.0, 0.0), PI / 12.0);
     box_a.translate(Vector3::new(265.0, 0.0, 295.0));
     box_a.set_material(lambertian_white.clone());
     let box_a = Arc::new(box_a);
@@ -89,7 +86,7 @@ pub fn test(samples: u32) {
         Point::new(0.0, 0.0, 0.0),
         Point::new(165.0, 165.0, 165.0));
     let mut box_b = Instance::new(Arc::new(box_b));
-    box_b.rotate(Vector3::new(0.0, 1.0, 0.0), -std::f32::consts::PI / 10.0);
+    box_b.rotate(Vector3::new(0.0, 1.0, 0.0), -PI / 10.0);
     box_b.translate(Vector3::new(130.0, 0.0, 65.0));
     box_b.set_material(lambertian_white.clone());
     let box_b = Arc::new(box_b);
@@ -110,8 +107,8 @@ pub fn test(samples: u32) {
         camera_center,
         direction,
         Vector3::new(0.0, 1.0, 0.0),
-        std::f32::consts::PI / 4.0,
-        std::f32::consts::PI / 4.0,
+        PI / 4.0,
+        PI / 4.0,
         0.000001, (look_at - camera_center).length());
 
     let world = World::new(Arc::new(scene));

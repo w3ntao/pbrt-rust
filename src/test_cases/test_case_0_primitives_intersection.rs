@@ -1,8 +1,6 @@
 use std::sync::Arc;
 
-use crate::fundamental::point::Point;
-use crate::fundamental::utility::get_file_name;
-use crate::fundamental::vector3::Vector3;
+use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::perspective::Perspective;
 use crate::ray_tracing::groups::simple_group::SimpleGroup;
 use crate::ray_tracing::integrators::ray_casting_dot_normal::RayCastingDotNormal;
@@ -20,8 +18,8 @@ pub fn test() {
         Point::new(0.0, 0.0, 10.0),
         Vector3::new(0.0, 0.0, -1.0),
         Vector3::new(0.0, 1.0, 0.0),
-        std::f32::consts::PI / 4.0,
-        std::f32::consts::PI / 3.0);
+        PI / 4.0,
+        PI / 3.0);
 
     let triangle_0 = Triangle::new(
         Point::new(-2.0, 3.7, 0.0),

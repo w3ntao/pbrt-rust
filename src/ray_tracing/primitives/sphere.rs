@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use crate::fundamental::point::*;
-use crate::fundamental::utility::to_point;
+use crate::fundamental::utility::*;
 use crate::fundamental::vector3::*;
 use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::intersection::*;
@@ -38,9 +38,9 @@ fn get_sphere_uv(p: Point) -> (f32, f32) {
     //     <0 0 1> yields <0.25 0.50>       < 0  0 -1> yields <0.75 0.50>
 
     let theta = (-p.y).acos();
-    let phi = (-p.z / p.x).atan() + std::f32::consts::PI;
+    let phi = (-p.z / p.x).atan() + PI;
 
-    return (phi / (2.0 * std::f32::consts::PI), theta / std::f32::consts::PI);
+    return (phi / (2.0 * PI), theta / PI);
 }
 
 impl Primitive for Sphere {

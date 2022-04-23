@@ -1,9 +1,6 @@
 use std::sync::Arc;
 
-use crate::fundamental::color::Color;
-use crate::fundamental::point::Point;
-use crate::fundamental::utility::get_file_name;
-use crate::fundamental::vector3::Vector3;
+use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::perspective::Perspective;
 use crate::ray_tracing::group::Group;
 use crate::ray_tracing::groups::bvh::BVH;
@@ -61,8 +58,8 @@ pub fn test(samples: u32) {
         Point::new(-3.0, 3.0, 2.0),
         Vector3::new(2.0, -2.0, -2.0),
         Vector3::new(0.0, 1.0, 0.0),
-        std::f32::consts::PI / 8.0,
-        std::f32::consts::PI / 6.0);
+        PI / 8.0,
+        PI / 6.0);
 
     let world = World::new(Arc::new(scene_three_spheres()));
     let integrator = MonteCarloPathTrace::new(Arc::new(world), Color::new(0.7, 0.8, 1.0));

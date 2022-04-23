@@ -1,10 +1,7 @@
 use std::sync::Arc;
 
-use crate::fundamental::color::Color;
 use crate::fundamental::obj_loader::obj_to_triangles;
-use crate::fundamental::point::Point;
-use crate::fundamental::utility::get_file_name;
-use crate::fundamental::vector3::Vector3;
+use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::depth_of_field::DepthOfField;
 use crate::ray_tracing::group::Group;
 use crate::ray_tracing::groups::bvh::BVH;
@@ -50,7 +47,7 @@ pub fn test(samples: u32) {
     dragon_bvh.build_index();
 
     let mut scaled_dragon = Instance::new(Arc::new(dragon_bvh));
-    scaled_dragon.rotate(Vector3::new(0.0, 1.0, 0.0), std::f32::consts::PI);
+    scaled_dragon.rotate(Vector3::new(0.0, 1.0, 0.0), PI);
     scaled_dragon.translate(Vector3::new(0.0, 0.7, 0.0));
     scaled_dragon.scale_by_scalar(2.5);
     let dragon_instance = Arc::new(scaled_dragon);
@@ -82,8 +79,8 @@ pub fn test(samples: u32) {
         camera_center,
         direction,
         Vector3::new(0.0, 1.0, 0.0),
-        std::f32::consts::PI / 8.0,
-        std::f32::consts::PI / 6.0,
+        PI / 8.0,
+        PI / 6.0,
         0.15, (camera_center - middle_dragon_center).length(),
     );
 

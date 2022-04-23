@@ -1,12 +1,13 @@
+pub use std::f32::consts::PI;
 use std::path::Path;
 
 use rand::distributions::Uniform;
 use rand::thread_rng;
 use rand_distr::Distribution;
 
-use crate::fundamental::color::Color;
-use crate::fundamental::point::Point;
-use crate::fundamental::vector3::Vector3;
+pub use crate::fundamental::color::Color;
+pub use crate::fundamental::point::Point;
+pub use crate::fundamental::vector3::Vector3;
 
 pub fn get_file_name(full_path: &str) -> String {
     let file_name_with_postfix = Path::new(full_path).file_name().and_then(|s| s.to_str()).unwrap();

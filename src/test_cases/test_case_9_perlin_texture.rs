@@ -1,9 +1,6 @@
 use std::sync::Arc;
 
-use crate::fundamental::color::Color;
-use crate::fundamental::point::Point;
-use crate::fundamental::utility::get_file_name;
-use crate::fundamental::vector3::Vector3;
+use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::depth_of_field::DepthOfField;
 use crate::ray_tracing::group::Group;
 use crate::ray_tracing::groups::bvh::BVH;
@@ -48,8 +45,8 @@ pub fn test(samples: u32) {
         camera_center,
         direction,
         Vector3::new(0.0, 1.0, 0.0),
-        std::f32::consts::PI / 8.0,
-        std::f32::consts::PI / 6.0,
+        PI / 8.0,
+        PI / 6.0,
         0.002, (camera_center - sphere_center).length());
 
     let world = World::new(Arc::new(scene));
