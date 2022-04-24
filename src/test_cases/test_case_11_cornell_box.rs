@@ -25,17 +25,10 @@ pub fn test(samples: u32) {
     println!("TESTING: {}", &file_name);
     let ppm_name = format!("{}.ppm", file_name);
 
-    const WIDTH: usize = 600;
-    const HEIGHT: usize = 600;
+    const WIDTH: usize = 1200;
+    const HEIGHT: usize = 1200;
 
     let mut scene = BVH::default();
-
-    /*
-    let diffuse_light = DiffuseLight::new(Arc::new(SolidColor::new(Color::new(4.0, 4.0, 4.0))));
-    let mut quad_light = Quad::new(Point::new(3.0, 1.0, -2.0), Vector3::new(2.0, 0.0, 0.0), Vector3::new(0.0, 2.0, 0.0));
-    quad_light.set_material(Arc::new(diffuse_light));
-    scene.add(Arc::new(quad_light));
-    */
 
     let solid_color_red = Arc::new(SolidColor::new(Color::new(0.65, 0.05, 0.05)));
     let solid_color_green = Arc::new(SolidColor::new(Color::new(0.12, 0.45, 0.15)));
@@ -71,26 +64,25 @@ pub fn test(samples: u32) {
     let wall_up = Arc::new(wall_up);
     scene.add(wall_up.clone());
 
-
-    let mut box_a = AxisAlignedBox::new(
+    let mut box_big = AxisAlignedBox::new(
         Point::new(0.0, 0.0, 0.0),
         Point::new(165.0, 330.0, 165.0));
-    let mut box_a = Instance::new(Arc::new(box_a));
-    box_a.rotate(Vector3::new(0.0, 1.0, 0.0), PI / 12.0);
-    box_a.translate(Vector3::new(265.0, 0.0, 295.0));
-    box_a.set_material(lambertian_white.clone());
-    let box_a = Arc::new(box_a);
-    scene.add(box_a.clone());
+    let mut box_big = Instance::new(Arc::new(box_big));
+    box_big.rotate(Vector3::new(0.0, 1.0, 0.0), PI / 12.0);
+    box_big.translate(Vector3::new(265.0, 0.0, 295.0));
+    box_big.set_material(lambertian_white.clone());
+    let box_big = Arc::new(box_big);
+    scene.add(box_big.clone());
 
-    let mut box_b = AxisAlignedBox::new(
+    let mut box_small = AxisAlignedBox::new(
         Point::new(0.0, 0.0, 0.0),
         Point::new(165.0, 165.0, 165.0));
-    let mut box_b = Instance::new(Arc::new(box_b));
-    box_b.rotate(Vector3::new(0.0, 1.0, 0.0), -PI / 10.0);
-    box_b.translate(Vector3::new(130.0, 0.0, 65.0));
-    box_b.set_material(lambertian_white.clone());
-    let box_b = Arc::new(box_b);
-    scene.add(box_b.clone());
+    let mut box_small = Instance::new(Arc::new(box_small));
+    box_small.rotate(Vector3::new(0.0, 1.0, 0.0), -PI / 10.0);
+    box_small.translate(Vector3::new(130.0, 0.0, 65.0));
+    box_small.set_material(lambertian_white.clone());
+    let box_small = Arc::new(box_small);
+    scene.add(box_small.clone());
 
     let diffuse_light = DiffuseLight::new(Arc::new(SolidColor::new(Color::new(15.0, 15.0, 15.0))));
     let mut quad_light = Quad::new(Point::new(213.0, length - 1.0, 227.0), Vector3::new(130.0, 0.0, 0.0), Vector3::new(0.0, 0.0, 105.0));
