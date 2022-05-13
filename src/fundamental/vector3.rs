@@ -205,18 +205,6 @@ pub fn random_in_unit_sphere() -> Vector3 {
     }
 }
 
-pub fn random_vector_in_hemisphere(normal: Vector3) -> Vector3 {
-    let random_vec = random_in_unit_sphere();
-
-    return {
-        if dot(random_vec, normal) < 0.0 {
-            -random_vec
-        } else {
-            random_vec
-        }
-    };
-}
-
 pub fn random_vector_in_disk() -> (f32, f32) {
     let r = random_zero_to_one().sqrt();
     let theta = random_zero_to_one() * 2.0 * PI;
