@@ -27,12 +27,8 @@ impl Material for Lambertian {
     fn scatter(&self, _: &Ray, intersection: &Intersection) -> (Ray, Color) {
         //https://www.pbr-book.org/3ed-2018/Monte_Carlo_Integration/2D_Sampling_with_Multidimensional_Transformations#UniformlySamplingaHemisphere
 
-        let mut random_direction = random_in_unit_sphere();
-        if dot(random_direction, intersection.normal) <= 0.0 {
-            random_direction = -random_direction;
-        }
-
-        let scattered_ray = Ray::new(intersection.hit_point, random_direction);
+        let random_direction = random_in_unit_sphere();
+        let scattered_ray = Ray::new(intersection.hit_point, (intersection.normal.normalize() + random_direction).normalize());
 
         return (scattered_ray, self.albedo.get_color(intersection.u, intersection.v, intersection.hit_point));
     }
