@@ -40,12 +40,7 @@ impl MonteCarloPathTrace {
             return emission;
         }
 
-        let mut scattered_ray = Ray::dummy();
-        let attenuation = intersection.material.scatter(&ray, &intersection, &mut scattered_ray);
-
-        if attenuation.r <= 0.0 && attenuation.g <= 0.0 && attenuation.b <= 0.0 {
-            return attenuation;
-        }
+        let (scattered_ray, attenuation) = intersection.material.scatter(&ray, &intersection);
 
         return attenuation * self.trace(&scattered_ray, depth - 1);
     }

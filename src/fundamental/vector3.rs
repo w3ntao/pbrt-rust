@@ -188,21 +188,14 @@ pub fn cosine(a: Vector3, b: Vector3) -> f32 {
 }
 
 pub fn random_in_unit_sphere() -> Vector3 {
-    // TODO: this is inefficient
-    let mut rng = thread_rng();
-    let uniform_distribution = Uniform::new(-1.0, 1.0);
+    let phi = random_in_range(0.0, 2.0 * PI);
+    let sin_phi = phi.sin();
+    let cos_phi = phi.cos();
 
-    loop {
-        let x = uniform_distribution.sample(&mut rng);
-        let y = uniform_distribution.sample(&mut rng);
-        let z = uniform_distribution.sample(&mut rng);
+    let cos_theta = random_in_range(-1.0, 1.0);
+    let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
 
-        let acc = x * x + y * y + z * z;
-        if acc > 1.0 || acc < 0.0001 {
-            continue;
-        }
-        return Vector3::new(x, y, z);
-    }
+    return Vector3::new(sin_phi * sin_theta, cos_phi * sin_theta, cos_theta);
 }
 
 pub fn random_vector_in_disk() -> (f32, f32) {

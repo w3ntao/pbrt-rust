@@ -23,10 +23,10 @@ use crate::ray_tracing::world::World;
 pub fn test(samples: u32) {
     let file_name = get_file_name(file!());
     println!("TESTING: {}", &file_name);
-    let ppm_name = format!("{}.ppm", file_name);
+    let ppm_name = format!("{}_{}.ppm", file_name, samples);
 
-    const WIDTH: usize = 1200;
-    const HEIGHT: usize = 1200;
+    const WIDTH: usize = 600;
+    const HEIGHT: usize = 600;
 
     let mut scene = BVH::default();
 
