@@ -13,7 +13,7 @@ impl Mirror {
 }
 
 impl Material for Mirror {
-    fn scatter(&self, incoming_ray: &Ray, intersection: &Intersection) -> (Ray, Color) {
+    fn scatter(&self, incoming_ray: Ray, intersection: &Intersection) -> (Ray, Color) {
         let scattered_ray = Ray::new(intersection.hit_point, incoming_ray.direction.reflect(intersection.normal));
 
         return (scattered_ray, Color::new(1.0, 1.0, 1.0));

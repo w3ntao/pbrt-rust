@@ -115,7 +115,7 @@ impl Renderer {
                             // u, v are both in [-1, 1]
 
                             let ray = self.camera.get_primary_ray(u, v);
-                            total = total + self.integrator.get_radiance(&ray);
+                            total = total + self.integrator.get_radiance(ray);
                         }
                         let color = total / (self.samples as f32);
                         rendered_pixels.push((y, x, color));

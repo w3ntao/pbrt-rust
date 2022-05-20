@@ -20,7 +20,7 @@ impl DiffuseLight {
 }
 
 impl Material for DiffuseLight {
-    fn scatter(&self, _: &Ray, _: &Intersection) -> (Ray, Color) {
+    fn scatter(&self, _: Ray, _: &Intersection) -> (Ray, Color) {
         return (Ray::dummy(), Color::black());
     }
 

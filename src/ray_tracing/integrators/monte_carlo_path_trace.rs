@@ -21,12 +21,12 @@ impl MonteCarloPathTrace {
 }
 
 impl MonteCarloPathTrace {
-    fn trace(&self, ray: &Ray, depth: u32) -> Color {
+    fn trace(&self, ray: Ray, depth: u32) -> Color {
         if depth <= 0 {
             return Color::black();
         }
 
-        let intersection = self.world.scene.intersect(ray, INTERSECT_OFFSET, f32::INFINITY);
+        let intersection = self.world.scene.intersect(&ray, INTERSECT_OFFSET, f32::INFINITY);
         // with INTERSECT_OFFSET, we can avoid the situation when the ray
         // re-hit the surface it just leave
 
@@ -40,14 +40,14 @@ impl MonteCarloPathTrace {
             return emission;
         }
 
-        let (scattered_ray, attenuation) = intersection.material.scatter(&ray, &intersection);
+        let (scattered_ray, attenuation) = intersection.material.scatter(ray, &intersection);
 
-        return attenuation * self.trace(&scattered_ray, depth - 1);
+        return attenuation * self.trace(scattered_ray, depth - 1);
     }
 }
 
 impl Integrator for MonteCarloPathTrace {
-    fn get_radiance(&self, ray: &Ray) -> Color {
+    fn get_radiance(&self, ray: Ray) -> Color {
         return self.trace(ray, 50);
     }
 }

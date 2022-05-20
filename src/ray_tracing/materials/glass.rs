@@ -34,7 +34,7 @@ fn reflectance(cosine: f32, index_of_refraction: f32) -> f32 {
 }
 
 impl Material for Glass {
-    fn scatter(&self, incoming_ray: &Ray, intersection: &Intersection) -> (Ray, Color) {
+    fn scatter(&self, incoming_ray: Ray, intersection: &Intersection) -> (Ray, Color) {
         let refraction_ratio = {
             if intersection.entering_material {
                 1.0 / self.index_of_refraction

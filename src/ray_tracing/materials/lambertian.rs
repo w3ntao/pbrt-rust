@@ -24,7 +24,7 @@ impl Lambertian {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, _: &Ray, intersection: &Intersection) -> (Ray, Color) {
+    fn scatter(&self, _: Ray, intersection: &Intersection) -> (Ray, Color) {
         //https://www.pbr-book.org/3ed-2018/Monte_Carlo_Integration/2D_Sampling_with_Multidimensional_Transformations#UniformlySamplingaHemisphere
 
         let random_direction = random_in_unit_sphere();

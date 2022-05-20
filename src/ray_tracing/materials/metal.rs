@@ -21,7 +21,7 @@ impl Metal {
 }
 
 impl Material for Metal {
-    fn scatter(&self, incoming_ray: &Ray, intersection: &Intersection) -> (Ray, Color) {
+    fn scatter(&self, incoming_ray: Ray, intersection: &Intersection) -> (Ray, Color) {
         let reflected = incoming_ray.direction.reflect(intersection.normal);
 
         let scattered_ray = Ray::new(intersection.hit_point, reflected + self.fuzz * random_in_unit_sphere());
