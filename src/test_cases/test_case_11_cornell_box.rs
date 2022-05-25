@@ -22,7 +22,7 @@ use crate::ray_tracing::world::World;
 
 pub fn test(samples: u32) {
     let file_name = get_file_name(file!());
-    println!("TESTING: {}", &file_name);
+    println!("TESTING: {} for {} sampling", &file_name, samples);
     let ppm_name = format!("{}_{}.ppm", file_name, samples);
 
     const WIDTH: usize = 600;

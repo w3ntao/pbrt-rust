@@ -71,3 +71,19 @@ impl ops::Div<f32> for Color {
         };
     }
 }
+
+impl ops::AddAssign<Color> for Color {
+    fn add_assign(&mut self, rhs: Color) {
+        self.r += rhs.r;
+        self.g += rhs.g;
+        self.b += rhs.b;
+    }
+}
+
+impl ops::MulAssign<Color> for Color {
+    fn mul_assign(&mut self, rhs: Color) {
+        self.r *= rhs.r;
+        self.g *= rhs.g;
+        self.b *= rhs.b;
+    }
+}

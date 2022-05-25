@@ -43,7 +43,7 @@ impl MonteCarloPathTrace {
             let (scattered_ray, attenuation) = intersection.material.scatter(ray, &intersection);
 
             ray = scattered_ray;
-            total_attenuation = total_attenuation * attenuation;
+            total_attenuation *= attenuation;
         }
         return Color::black();
     }
