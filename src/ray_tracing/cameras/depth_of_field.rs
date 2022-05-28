@@ -44,15 +44,6 @@ impl Camera for DepthOfField {
     fn get_primary_ray(&self, u: f32, v: f32) -> Ray {
         // u, v are both in [-1, 1]
 
-        /*
-        let x = u * self.x_pixel_multiplier;
-        let y = v * self.y_pixel_multiplier;
-
-        let direction = self.forward + x * self.horizontal + y * self.vertical;
-
-        return Ray::new(self.center, direction.normalize());
-        */
-
         let x = u * self.x_pixel_multiplier;
         let y = v * self.y_pixel_multiplier;
 
@@ -65,5 +56,9 @@ impl Camera for DepthOfField {
         let origin = self.center + self.horizontal * rd_x + self.vertical * rd_y;
 
         return Ray::new(origin, (target - origin).normalize());
+    }
+
+    fn get_stratified_rays(&self, num_samples: u32, min_u: f32, max_u: f32, min_v: f32, max_v: f32) -> Vec<Ray> {
+        panic!("get_stratified_ray() is not implemented for DepthOfField");
     }
 }

@@ -106,6 +106,8 @@ impl Renderer {
                         let ndc_x = 2.0 * (x as f32) / (width as f32) - 1.0;
 
                         let mut total = Color::black();
+
+                        /*
                         for _ in 0..self.samples {
                             let random_x: f32 = rng.gen();
                             let random_y: f32 = rng.gen();
@@ -117,6 +119,15 @@ impl Renderer {
                             let ray = self.camera.get_primary_ray(u, v);
                             total += self.integrator.get_radiance(ray);
                         }
+                        */
+
+                        for ray in self.camera.get_stratified_rays(
+                            self.samples,
+                            ndc_x, ndc_x + 2.0 / (width as f32),
+                            ndc_y - 2.0 / (height as f32), ndc_y) {
+                            total += self.integrator.get_radiance(ray);
+                        }
+
                         let color = total / (self.samples as f32);
                         rendered_pixels.push((y, x, color));
                     }

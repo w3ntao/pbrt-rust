@@ -184,7 +184,7 @@ pub fn cross(a: Vector3, b: Vector3) -> Vector3 {
 }
 
 pub fn cosine(a: Vector3, b: Vector3) -> f32 {
-    return dot(a.normalize(), b.normalize());
+    return dot(a, b) / (a.length() * b.length());
 }
 
 pub fn random_in_unit_sphere() -> Vector3 {

@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use crate::fundamental::utility::*;
-use crate::ray_tracing::cameras::depth_of_field::DepthOfField;
+use crate::ray_tracing::cameras::perspective::Perspective;
 use crate::ray_tracing::group::Group;
 use crate::ray_tracing::groups::bvh::BVH;
 use crate::ray_tracing::instance::Instance;
@@ -22,8 +22,13 @@ use crate::ray_tracing::world::World;
 
 pub fn test(samples: u32) {
     let file_name = get_file_name(file!());
-    println!("TESTING: {} for {} sampling", &file_name, samples);
-    let ppm_name = format!("{}_{}.ppm", file_name, samples);
+
+    println!("TESTING: {} for {} sampling (stratify)", &file_name, samples);
+    let ppm_name = format!("{}_{}_stratify.ppm", file_name, samples);
+
+    let samples_per_dimension = (samples as f32).sqrt() as u32;
+    let samples = samples_per_dimension * samples_per_dimension;
+    println!("actual samples: {}", samples);
 
     const WIDTH: usize = 600;
     const HEIGHT: usize = 600;
@@ -95,13 +100,12 @@ pub fn test(samples: u32) {
     let look_at = Point::new(278.0, 278.0, 0.0);
     let direction = look_at - camera_center;
 
-    let camera = DepthOfField::new(
+    let camera = Perspective::new(
         camera_center,
         direction,
         Vector3::new(0.0, 1.0, 0.0),
         PI / 4.0,
-        PI / 4.0,
-        0.000001, (look_at - camera_center).length());
+        PI / 4.0);
 
     let world = World::new(Arc::new(scene));
     let integrator = MonteCarloPathTrace::new(Arc::new(world), Color::black());
