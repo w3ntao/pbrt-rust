@@ -29,8 +29,10 @@ impl Vector4 {
             w: 0.0,
         }
     }
+}
 
-    pub fn from_point(p: Point) -> Vector4 {
+impl From<Point> for Vector4 {
+    fn from(p: Point) -> Self {
         Vector4 {
             x: p.x,
             y: p.y,
@@ -38,12 +40,14 @@ impl Vector4 {
             w: 1.0,
         }
     }
+}
 
-    pub fn from_vector(v: Vector3) -> Vector4 {
+impl From<Vector3> for Vector4 {
+    fn from(v3: Vector3) -> Self {
         Vector4 {
-            x: v.x,
-            y: v.y,
-            z: v.z,
+            x: v3.x,
+            y: v3.y,
+            z: v3.z,
             w: 0.0,
         }
     }
@@ -178,22 +182,22 @@ pub fn dot(a: Vector4, b: Vector4) -> f32 {
     return product;
 }
 
-impl Vector3 {
-    pub fn from_float4(f4: Vector4) -> Vector3 {
+impl From<Vector4> for Vector3 {
+    fn from(v4: Vector4) -> Self {
         Vector3 {
-            x: f4.x,
-            y: f4.y,
-            z: f4.z,
+            x: v4.x,
+            y: v4.y,
+            z: v4.z,
         }
     }
 }
 
-impl Point {
-    pub fn from_float4(f4: Vector4) -> Point {
+impl From<Vector4> for Point {
+    fn from(v4: Vector4) -> Self {
         Point {
-            x: f4.x / f4.w,
-            y: f4.y / f4.w,
-            z: f4.z / f4.w,
+            x: v4.x / v4.w,
+            y: v4.y / v4.w,
+            z: v4.z / v4.w,
         }
     }
 }

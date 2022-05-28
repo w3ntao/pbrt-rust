@@ -156,14 +156,14 @@ impl ops::Mul<Vector4> for Matrix {
 impl ops::Mul<Vector3> for Matrix {
     type Output = Vector3;
     fn mul(self, v: Vector3) -> Vector3 {
-        return Vector3::from_float4(self * Vector4::from_vector(v));
+        return Vector3::from(self * Vector4::from(v));
     }
 }
 
 impl ops::Mul<Point> for Matrix {
     type Output = Point;
     fn mul(self, p: Point) -> Point {
-        return Point::from_float4(self * Vector4::from_point(p));
+        return Point::from(self * Vector4::from(p));
     }
 }
 
