@@ -50,8 +50,7 @@ impl Primitive for Quad {
             return Intersection::failure();
         }
 
-        let cos = cosine(ray.direction, self.normal);
-        let normal = if cos < 0.0 { self.normal } else { -self.normal };
+        let normal = if dot(ray.direction, self.normal) < 0.0 { self.normal } else { -self.normal };
         return Intersection::from_outside(t, ray.get_point(t), normal, self.material.clone());
     }
 

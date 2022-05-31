@@ -3,6 +3,7 @@ use std::sync::Arc;
 use rand::random;
 
 use crate::fundamental::color::*;
+use crate::fundamental::orthonormal_basis::OrthonormalBasis;
 use crate::fundamental::point::Point;
 use crate::fundamental::utility::*;
 use crate::fundamental::vector3::*;
@@ -23,12 +24,25 @@ impl Lambertian {
     }
 }
 
+fn random_cosine_direction() -> Vector3 {
+    let sin2_theta = random_zero_to_one();
+    let cos2_theta = 1.0 - sin2_theta;
+
+    let phi = random_in_range(0.0, 2.0 * PI);
+    let sin_phi = phi.sin();
+    let cos_phi = phi.cos();
+
+    let sin_theta = sin2_theta.sqrt();
+
+    return Vector3::new(sin_phi * sin_theta, cos_phi * sin_theta, cos2_theta.sqrt());
+}
+
 impl Material for Lambertian {
     fn scatter(&self, _: Ray, intersection: &Intersection) -> (Ray, Color) {
-        //https://www.pbr-book.org/3ed-2018/Monte_Carlo_Integration/2D_Sampling_with_Multidimensional_Transformations#UniformlySamplingaHemisphere
+        let uvw = OrthonormalBasis::build_from_w(intersection.normal);
+        let random_direction = uvw.local(random_cosine_direction());
 
-        let random_direction = random_in_unit_sphere();
-        let scattered_ray = Ray::new(intersection.hit_point, (intersection.normal.normalize() + random_direction).normalize());
+        let scattered_ray = Ray::new(intersection.hit_point, random_direction.normalize());
 
         return (scattered_ray, self.albedo.get_color(intersection.u, intersection.v, intersection.hit_point));
     }

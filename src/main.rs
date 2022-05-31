@@ -19,7 +19,7 @@ fn main() {
     //test_case_9_perlin_texture::test(samples);
     //test_case_10_lighting::test(samples);
 
-    for samples in [100, 200, 500] {
+    for samples in [500, 1000, 2000] {
         test_case_11_cornell_box::test(samples);
     }
 }
