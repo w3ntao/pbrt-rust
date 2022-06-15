@@ -21,16 +21,13 @@ impl Metal {
 }
 
 impl Material for Metal {
-    fn scatter(&self, incoming_ray: Ray, intersection: &Intersection) -> (Ray, Color) {
+    fn scatter(&self, incoming_ray: Ray, intersection: &Intersection) -> (bool, Ray, Color) {
         let reflected = incoming_ray.direction.reflect(intersection.normal);
 
         let scattered_ray = Ray::new(intersection.hit_point, reflected + self.fuzz * random_in_unit_sphere());
 
-        if dot(scattered_ray.direction, intersection.normal) <= 0.0 {
-            return (scattered_ray, Color::black());
-        }
-
-        return (scattered_ray, self.albedo);
+        return (dot(scattered_ray.direction, intersection.normal) > 0.0, scattered_ray, self.albedo);
+        // for those light go beneath the surface, consider them not scattered
     }
 
     fn emit(&self, _: f32, _: f32, _: Point) -> Color {

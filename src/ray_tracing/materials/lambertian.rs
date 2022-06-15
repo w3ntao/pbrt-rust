@@ -38,13 +38,13 @@ fn random_cosine_direction() -> Vector3 {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, _: Ray, intersection: &Intersection) -> (Ray, Color) {
+    fn scatter(&self, _: Ray, intersection: &Intersection) -> (bool, Ray, Color) {
         let uvw = OrthonormalBasis::build_from_w(intersection.normal);
         let random_direction = uvw.local(random_cosine_direction());
 
         let scattered_ray = Ray::new(intersection.hit_point, random_direction.normalize());
 
-        return (scattered_ray, self.albedo.get_color(intersection.u, intersection.v, intersection.hit_point));
+        return (true, scattered_ray, self.albedo.get_color(intersection.u, intersection.v, intersection.hit_point));
     }
 
     fn emit(&self, _: f32, _: f32, _: Point) -> Color {

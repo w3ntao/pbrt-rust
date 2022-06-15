@@ -23,7 +23,7 @@ impl MonteCarloPathTrace {
 impl MonteCarloPathTrace {
     fn trace(&self, ray: Ray, depth: u32) -> Color {
         let mut ray = ray;
-        let mut total_attenuation = Color::new(1.0, 1.0, 1.0);
+        let mut accumulated_attenuation = Color::new(1.0, 1.0, 1.0);
 
         for _ in 0..depth {
             let intersection = self.world.scene.intersect(&ray, INTERSECT_OFFSET, f32::INFINITY);
@@ -31,19 +31,19 @@ impl MonteCarloPathTrace {
             // re-hit the surface it just leave
 
             if !intersection.intersected() {
-                return total_attenuation * self.background;
+                return accumulated_attenuation * self.background;
             }
 
             let emission = intersection.material.emit(intersection.u, intersection.v, intersection.hit_point);
 
-            if emission.r > 0.0 || emission.g > 0.0 || emission.b > 0.0 {
-                return total_attenuation * emission;
+            let (scattered, scattered_ray, attenuation) = intersection.material.scatter(ray, &intersection);
+
+            if !scattered {
+                return accumulated_attenuation * emission;
             }
 
-            let (scattered_ray, attenuation) = intersection.material.scatter(ray, &intersection);
-
             ray = scattered_ray;
-            total_attenuation *= attenuation;
+            accumulated_attenuation = (emission + accumulated_attenuation) * attenuation;
         }
         return Color::black();
     }
