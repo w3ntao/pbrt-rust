@@ -22,30 +22,27 @@ impl MonteCarloPathTrace {
 
 impl MonteCarloPathTrace {
     fn trace(&self, ray: Ray, depth: u32) -> Color {
-        let mut ray = ray;
-        let mut accumulated_attenuation = Color::new(1.0, 1.0, 1.0);
-
-        for _ in 0..depth {
-            let intersection = self.world.scene.intersect(&ray, INTERSECT_OFFSET, f32::INFINITY);
-            // with INTERSECT_OFFSET, we can avoid the situation when the ray
-            // re-hit the surface it just leave
-
-            if !intersection.intersected() {
-                return accumulated_attenuation * self.background;
-            }
-
-            let emission = intersection.material.emit(intersection.u, intersection.v, intersection.hit_point);
-
-            let (scattered, scattered_ray, attenuation) = intersection.material.scatter(ray, &intersection);
-
-            if !scattered {
-                return accumulated_attenuation * emission;
-            }
-
-            ray = scattered_ray;
-            accumulated_attenuation = (emission + accumulated_attenuation) * attenuation;
+        if depth == 0 {
+            return Color::black();
         }
-        return Color::black();
+
+        let intersection = self.world.scene.intersect(&ray, INTERSECT_OFFSET, f32::INFINITY);
+        // with INTERSECT_OFFSET, we can avoid the situation when the ray
+        // re-hit the surface it just leave
+
+        if !intersection.intersected() {
+            return self.background;
+        }
+
+        let emission = intersection.material.emit(intersection.u, intersection.v, intersection.hit_point);
+
+        let (scattered, scattered_ray, attenuation) = intersection.material.scatter(ray, &intersection);
+
+        if !scattered {
+            return emission;
+        }
+
+        return emission + attenuation * self.trace(scattered_ray, depth - 1);
     }
 }
 
