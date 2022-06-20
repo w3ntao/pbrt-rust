@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use crate::fundamental::point::*;
+use crate::fundamental::utility::random_zero_to_one;
 use crate::fundamental::vector3::*;
 use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::intersection::*;
@@ -63,6 +64,8 @@ impl Primitive for Quad {
     }
 
     fn sample(&self) -> Point {
-        panic!("sample() is not implemented for Quad");
+        let alpha = random_zero_to_one();
+        let beta = random_zero_to_one();
+        return self.origin + alpha * self.span0 + beta * self.span1;
     }
 }
