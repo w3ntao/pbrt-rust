@@ -1,17 +1,42 @@
 use std::sync::Arc;
 
+use crate::ray_tracing::group::Group;
+use crate::ray_tracing::groups::bvh::BVH;
+use crate::ray_tracing::intersection::Intersection;
 use crate::ray_tracing::primitive::Primitive;
+use crate::ray_tracing::ray::Ray;
 
 pub struct World {
-    pub scene: Arc<dyn Primitive>,
-    pub lights: Vec<Arc<dyn Primitive>>,
+    lights: Vec<Arc<dyn Primitive>>,
+    scene: BVH,
 }
 
-impl World {
-    pub fn new(_scene: Arc<dyn Primitive>) -> Self {
+impl Default for World {
+    fn default() -> Self {
         return Self {
-            scene: _scene,
             lights: vec![],
+            scene: BVH::default(),
         };
+    }
+}
+
+
+impl World {
+    pub fn add(&mut self, object: Arc<dyn Primitive>) {
+        self.scene.add(object.clone());
+    }
+
+    pub fn add_light(&mut self, light: Arc<dyn Primitive>) {
+        self.lights.push(light.clone());
+        self.scene.add(light.clone());
+    }
+
+
+    pub fn build_index(&mut self) {
+        self.scene.build_index();
+    }
+
+    pub fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
+        return self.scene.intersect(ray, t_min, t_max);
     }
 }

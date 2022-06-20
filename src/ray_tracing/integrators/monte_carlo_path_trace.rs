@@ -26,7 +26,7 @@ impl MonteCarloPathTrace {
             return Color::black();
         }
 
-        let intersection = self.world.scene.intersect(&ray, INTERSECT_OFFSET, f32::INFINITY);
+        let intersection = self.world.intersect(&ray, INTERSECT_OFFSET, f32::INFINITY);
         // with INTERSECT_OFFSET, we can avoid the situation when the ray
         // re-hit the surface it just leave
 

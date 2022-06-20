@@ -26,8 +26,7 @@ pub fn test(samples: u32) {
         PI / 6.0,
         0.4, (focus_point - camera_center).length());
 
-    let world = World::new(Arc::new(scene_three_spheres()));
-    let integrator = MonteCarloPathTrace::new(Arc::new(world), Color::new(0.7, 0.8, 1.0));
+    let integrator = MonteCarloPathTrace::new(Arc::new(scene_three_spheres()), Color::new(0.7, 0.8, 1.0));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
     let image = renderer.render(WIDTH, HEIGHT);
     image.write(&ppm_name);

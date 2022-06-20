@@ -25,15 +25,15 @@ pub fn test() {
     let radius: f32 = 1.5;
     let delta = PI / (num as f32 - 1.0);
 
-    let mut scene = BVH::default();
+    let mut world = World::default();
     for idx in 0..num {
         let theta = (idx as f32) * delta;
         let mut dragon_var = Instance::new(dragon_model.clone());
         dragon_var.rotate(Vector3::new(0.0, 1.0, 0.0), theta);
         dragon_var.translate(Vector3::new(radius * f32::sin(theta), 0.0, radius * f32::cos(theta)));
-        scene.add(Arc::new(dragon_var));
+        world.add(Arc::new(dragon_var));
     }
-    scene.build_index();
+    world.build_index();
 
     let camera = Perspective::new(
         Point::new(-7.0, 5.0, 0.0),
@@ -42,7 +42,6 @@ pub fn test() {
         PI / 8.0,
         PI / 6.0);
 
-    let world = World::new(Arc::new(scene));
     let integrator = RayCastingDotNormal::new(Arc::new(world));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), 1);
     let image = renderer.render(2000, 1500);

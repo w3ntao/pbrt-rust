@@ -35,21 +35,20 @@ pub fn test() {
     let sphere_2 = Sphere::new(Point::new(3.0, 0.8, -2.0), 2.0);
 
     let quad = Quad::new(Point::new(1.0, -0.9, 4.5), Vector3::new(-2.0, 0.0, 0.0), Vector3::new(0.0, 0.1, -2.0));
-    let aabox = AxisAlignedBox::new(Point::new(2.0, 1.5, -0.5), Point::new(3.0, 2.5, 2.5));
+    let aabb_box = AxisAlignedBox::new(Point::new(2.0, 1.5, -0.5), Point::new(3.0, 2.5, 2.5));
 
-    let mut scene = SimpleGroup::new();
-    scene.add(Arc::new(triangle_0));
-    scene.add(Arc::new(triangle_1));
+    let mut world = World::default();
+    world.add(Arc::new(triangle_0));
+    world.add(Arc::new(triangle_1));
 
-    scene.add(Arc::new(sphere_0));
-    scene.add(Arc::new(sphere_1));
-    scene.add(Arc::new(sphere_2));
+    world.add(Arc::new(sphere_0));
+    world.add(Arc::new(sphere_1));
+    world.add(Arc::new(sphere_2));
 
-    scene.add(Arc::new(quad));
-    scene.add(Arc::new(aabox));
-    let scene = scene;
+    world.add(Arc::new(quad));
+    world.add(Arc::new(aabb_box));
+    world.build_index();
 
-    let world = World::new(Arc::new(scene));
     let integrator = RayCastingDotNormal::new(Arc::new(world));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), 1);
     let image = renderer.render(1600, 1200);

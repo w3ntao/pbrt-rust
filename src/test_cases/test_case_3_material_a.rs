@@ -40,12 +40,12 @@ pub fn test(samples: u32) {
     let mut sphere_right = Sphere::new(Point::new(1.0, 0.0, -1.0), 0.5);
     sphere_right.set_material(metal);
 
-    let mut scene = BVH::default();
-    scene.add(Arc::new(sphere_ground));
-    scene.add(Arc::new(sphere_left));
-    scene.add(Arc::new(sphere_center));
-    scene.add(Arc::new(sphere_right));
-    scene.build_index();
+    let mut world = World::default();
+    world.add(Arc::new(sphere_ground));
+    world.add(Arc::new(sphere_left));
+    world.add(Arc::new(sphere_center));
+    world.add(Arc::new(sphere_right));
+    world.build_index();
 
     let camera = Perspective::new(
         Point::new(0.0, 0.0, 5.0),
@@ -54,7 +54,6 @@ pub fn test(samples: u32) {
         PI / 8.0,
         PI / 6.0);
 
-    let world = World::new(Arc::new(scene));
     let integrator = MonteCarloPathTrace::new(Arc::new(world), Color::new(0.7, 0.8, 1.0));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
     let image = renderer.render(WIDTH, HEIGHT);

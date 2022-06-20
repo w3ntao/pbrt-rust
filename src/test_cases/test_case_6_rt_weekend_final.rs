@@ -14,8 +14,8 @@ use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::textures::solid_color::SolidColor;
 use crate::ray_tracing::world::World;
 
-pub fn many_random_spheres() -> BVH {
-    let mut scene = BVH::default();
+pub fn many_random_spheres() -> World {
+    let mut scene = World::default();
     for a in -11..11 {
         let a = a as f32;
         for b in -11..11 {
@@ -110,8 +110,7 @@ pub fn test(samples: u32) {
         PI / 6.0,
         0.2, (camera_center - center_sphere_close).length());
 
-    let world = World::new(Arc::new(scene));
-    let integrator = MonteCarloPathTrace::new(Arc::new(world), Color::new(0.7, 0.8, 1.0));
+    let integrator = MonteCarloPathTrace::new(Arc::new(scene), Color::new(0.7, 0.8, 1.0));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
     let image = renderer.render(WIDTH, HEIGHT);
     image.write(&ppm_name);

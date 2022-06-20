@@ -25,7 +25,7 @@ pub fn test(samples: u32) {
     const WIDTH: usize = 1000;
     const HEIGHT: usize = 750;
 
-    let mut scene = BVH::default();
+    let mut scene = World::default();
 
     let perlin_texture = Arc::new(NoiseTexture::new(4.0));
     let lambertian_perlin = Arc::new(Lambertian::new(perlin_texture.clone()));
@@ -58,8 +58,7 @@ pub fn test(samples: u32) {
         PI / 6.0,
         0.000002, (look_at - camera_center).length());
 
-    let world = World::new(Arc::new(scene));
-    let integrator = MonteCarloPathTrace::new(Arc::new(world), Color::new(0.0, 0.0, 0.0));
+    let integrator = MonteCarloPathTrace::new(Arc::new(scene), Color::new(0.0, 0.0, 0.0));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
     let image = renderer.render(WIDTH, HEIGHT);
     image.write(&ppm_name);
