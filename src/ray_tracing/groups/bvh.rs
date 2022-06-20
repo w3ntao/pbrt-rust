@@ -1,6 +1,7 @@
 use std::sync::Arc;
 use std::time::Instant;
 
+use crate::fundamental::point::Point;
 use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::group::Group;
 use crate::ray_tracing::groups::bvh_node::{Node, PrimitiveInfo};
@@ -50,6 +51,10 @@ impl Primitive for BVH {
 
     fn set_material(&mut self, _: Arc<dyn Material>) {
         panic!("You shouldn't invoke function `set_material()` from BVH")
+    }
+
+    fn sample(&self) -> Point {
+        panic!("sample() is not implemented for BVH");
     }
 }
 

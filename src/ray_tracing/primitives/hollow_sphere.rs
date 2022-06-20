@@ -48,4 +48,8 @@ impl Primitive for HollowSphere {
         self.external_sphere.set_material(material.clone());
         self.internal_sphere.set_material(material);
     }
+
+    fn sample(&self) -> Point {
+        panic!("sample() is not implemented for HollowSphere");
+    }
 }

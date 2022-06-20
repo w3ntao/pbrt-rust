@@ -67,6 +67,10 @@ impl Primitive for Instance {
     fn set_material(&mut self, material: Arc<dyn Material>) {
         self.material = material;
     }
+
+    fn sample(&self) -> Point {
+        panic!("sample() is not implemented for Instance");
+    }
 }
 
 impl Instance {

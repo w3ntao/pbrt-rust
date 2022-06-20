@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use crate::fundamental::point::Point;
 use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::material::Material;
@@ -42,5 +43,9 @@ impl Primitive for SimpleGroup {
 
     fn set_material(&mut self, _: Arc<dyn Material>) {
         panic!("You shouldn't invoke function `set_material)_` from simple_group")
+    }
+
+    fn sample(&self) -> Point {
+        panic!("sample() is not implemented for SimpleGroup");
     }
 }
