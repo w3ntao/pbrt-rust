@@ -20,21 +20,8 @@ use crate::ray_tracing::textures::noise_texture::NoiseTexture;
 use crate::ray_tracing::textures::solid_color::SolidColor;
 use crate::ray_tracing::world::World;
 
-pub fn test(samples: u32) {
-    let file_name = get_file_name(file!());
-
-    println!("TESTING: {} for {} sampling (stratify)", &file_name, samples);
-    let ppm_name = format!("{}_{}_stratify.ppm", file_name, samples);
-
-    let samples_per_dimension = (samples as f32).sqrt() as u32;
-    let samples = samples_per_dimension * samples_per_dimension;
-    println!("actual samples: {}", samples);
-
-    const WIDTH: usize = 600;
-    const HEIGHT: usize = 600;
-
+pub fn cornel_box() -> World {
     let mut world = World::default();
-    //let mut scene = BVH::default();
 
     let solid_color_red = Arc::new(SolidColor::new(Color::new(0.65, 0.05, 0.05)));
     let solid_color_green = Arc::new(SolidColor::new(Color::new(0.12, 0.45, 0.15)));
@@ -97,6 +84,22 @@ pub fn test(samples: u32) {
     world.add(quad_light);
     world.build_index();
 
+    return world;
+}
+
+pub fn test(samples: u32) {
+    let file_name = get_file_name(file!());
+
+    println!("TESTING: {} for {} sampling (stratify)", &file_name, samples);
+    let ppm_name = format!("{}_{}_stratify.ppm", file_name, samples);
+
+    let samples_per_dimension = (samples as f32).sqrt() as u32;
+    let samples = samples_per_dimension * samples_per_dimension;
+    println!("actual samples: {}", samples);
+
+    const WIDTH: usize = 600;
+    const HEIGHT: usize = 600;
+
     let camera_center = Point::new(278.0, 278.0, -800.0);
     let look_at = Point::new(278.0, 278.0, 0.0);
     let direction = look_at - camera_center;
@@ -107,8 +110,8 @@ pub fn test(samples: u32) {
         Vector3::new(0.0, 1.0, 0.0),
         PI / 4.0,
         PI / 4.0);
-    
-    let integrator = MonteCarloPathTrace::new(Arc::new(world), Color::black());
+
+    let integrator = MonteCarloPathTrace::new(Arc::new(cornel_box()), Color::black());
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
     let image = renderer.render(WIDTH, HEIGHT);
     image.write(&ppm_name);
