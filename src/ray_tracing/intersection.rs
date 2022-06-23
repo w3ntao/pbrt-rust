@@ -16,10 +16,11 @@ pub struct Intersection {
     pub u: f32,
     pub v: f32,
     // uv coordinate is for texture
+    pub object_id: u128,
 }
 
 impl Intersection {
-    pub fn from_outside(_distance: f32, _hit_point: Point, _normal: Vector3, _material: Arc<dyn Material>) -> Self {
+    pub fn from_outside(_distance: f32, _hit_point: Point, _normal: Vector3, _material: Arc<dyn Material>, id: u128) -> Self {
         return Self {
             distance: _distance,
             hit_point: _hit_point,
@@ -28,6 +29,7 @@ impl Intersection {
             entering_material: true,
             u: f32::nan(),
             v: f32::nan(),
+            object_id: id,
         };
     }
 
@@ -40,6 +42,7 @@ impl Intersection {
             entering_material: false,
             u: f32::nan(),
             v: f32::nan(),
+            object_id: 0,
         };
     }
 
@@ -52,6 +55,7 @@ impl Intersection {
             entering_material: true,
             u: f32::nan(),
             v: f32::nan(),
+            object_id: 0,
         };
     }
 

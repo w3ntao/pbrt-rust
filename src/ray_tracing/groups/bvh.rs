@@ -2,6 +2,7 @@ use std::sync::Arc;
 use std::time::Instant;
 
 use crate::fundamental::point::Point;
+use crate::fundamental::vector3::Vector3;
 use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::group::Group;
 use crate::ray_tracing::groups::bvh_node::{Node, PrimitiveInfo};
@@ -53,8 +54,16 @@ impl Primitive for BVH {
         panic!("You shouldn't invoke function `set_material()` from BVH")
     }
 
-    fn sample(&self) -> Point {
+    fn sample(&self) -> (Point, Vector3) {
         panic!("sample() is not implemented for BVH");
+    }
+
+    fn get_id(&self) -> u128 {
+        panic!("get_id() is not implemented for BVH");
+    }
+
+    fn get_area(&self) -> f32 {
+        panic!("get_area() is not implemented for BVH");
     }
 }
 

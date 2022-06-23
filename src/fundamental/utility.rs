@@ -1,8 +1,8 @@
 pub use std::f32::consts::PI;
 use std::path::Path;
 
+use rand::{Rng, thread_rng};
 use rand::distributions::Uniform;
-use rand::thread_rng;
 use rand_distr::Distribution;
 
 pub use crate::fundamental::color::Color;
@@ -14,6 +14,11 @@ pub fn get_file_name(full_path: &str) -> String {
     let file_name = &file_name_with_postfix[0..(&file_name_with_postfix).len() - 3];
 
     return file_name.to_string();
+}
+
+pub fn random_u128() -> u128 {
+    let mut rng = rand::thread_rng();
+    return rng.gen::<u128>();
 }
 
 pub fn random_in_range(low: f32, high: f32) -> f32 {

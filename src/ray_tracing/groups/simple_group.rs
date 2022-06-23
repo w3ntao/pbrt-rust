@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use crate::fundamental::point::Point;
+use crate::fundamental::vector3::Vector3;
 use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::material::Material;
@@ -45,7 +46,15 @@ impl Primitive for SimpleGroup {
         panic!("You shouldn't invoke function `set_material)_` from simple_group")
     }
 
-    fn sample(&self) -> Point {
+    fn sample(&self) -> (Point, Vector3) {
         panic!("sample() is not implemented for SimpleGroup");
+    }
+
+    fn get_id(&self) -> u128 {
+        panic!("get_id() is not implemented for SimpleGroup");
+    }
+
+    fn get_area(&self) -> f32 {
+        panic!("get_area() is not implemented for SimpleGroup");
     }
 }

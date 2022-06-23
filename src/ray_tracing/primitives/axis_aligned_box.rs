@@ -1,6 +1,9 @@
 use std::sync::Arc;
 
+use rand::random;
+
 use crate::fundamental::point::*;
+use crate::fundamental::utility::random_u128;
 use crate::fundamental::vector3::*;
 use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::intersection::*;
@@ -11,6 +14,7 @@ use crate::ray_tracing::ray::*;
 pub struct AxisAlignedBox {
     pub axis_min: Point,
     pub axis_max: Point,
+    pub id: u128,
     bounds: BoundingBox,
     material: Arc<dyn Material>,
 }
@@ -20,6 +24,7 @@ impl AxisAlignedBox {
         return Self {
             axis_min: min_of(&[corner_0, corner_1]),
             axis_max: max_of(&[corner_0, corner_1]),
+            id: random_u128(),
             bounds: BoundingBox::build(&[corner_0, corner_1]),
             material: Arc::new(NullMaterial {}),
         };
@@ -62,7 +67,7 @@ impl Primitive for AxisAlignedBox {
             }
         }
 
-        return Intersection::from_outside(root_min, ray.get_point(root_min), normal, self.material.clone());
+        return Intersection::from_outside(root_min, ray.get_point(root_min), normal, self.material.clone(), self.get_id());
     }
 
     fn get_bounds(&self) -> BoundingBox {
@@ -73,7 +78,15 @@ impl Primitive for AxisAlignedBox {
         self.material = material;
     }
 
-    fn sample(&self) -> Point {
+    fn sample(&self) -> (Point, Vector3) {
         panic!("sample() is not implemented for AxisAlignedBox");
+    }
+
+    fn get_id(&self) -> u128 {
+        return self.id;
+    }
+
+    fn get_area(&self) -> f32 {
+        panic!("get_area() is not implemented for AxisAlignedBox");
     }
 }

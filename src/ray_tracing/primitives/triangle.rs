@@ -60,7 +60,7 @@ impl Primitive for Triangle {
         let cos = cosine(ray.direction, self.normal);
         let normal = if cos < 0.0 { self.normal } else { -self.normal };
 
-        return Intersection::from_outside(t, ray.get_point(t), normal, self.material.clone());
+        return Intersection::from_outside(t, ray.get_point(t), normal, self.material.clone(), self.get_id());
     }
 
     fn get_bounds(&self) -> BoundingBox {
@@ -71,7 +71,15 @@ impl Primitive for Triangle {
         self.material = material;
     }
 
-    fn sample(&self) -> Point {
+    fn sample(&self) -> (Point, Vector3) {
         panic!("sample() is not implemented for Triangle");
+    }
+
+    fn get_id(&self) -> u128 {
+        panic!("get_id() is not implemented for Triangle");
+    }
+
+    fn get_area(&self) -> f32 {
+        panic!("get_area() is not implemented for Triangle");
     }
 }

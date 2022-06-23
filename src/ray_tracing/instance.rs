@@ -68,8 +68,16 @@ impl Primitive for Instance {
         self.material = material;
     }
 
-    fn sample(&self) -> Point {
+    fn sample(&self) -> (Point, Vector3) {
         panic!("sample() is not implemented for Instance");
+    }
+
+    fn get_id(&self) -> u128 {
+        panic!("get_id() is not implemented for Instance");
+    }
+
+    fn get_area(&self) -> f32 {
+        panic!("get_area() is not implemented for Instance");
     }
 }
 

@@ -69,7 +69,7 @@ impl Primitive for Sphere {
 
         let mut intersection = if dot(ray.direction, normal) < 0.0 {
             Intersection::from_outside(root, hit_point,
-                                       normal, self.material.clone())
+                                       normal, self.material.clone(), self.get_id())
         } else {
             Intersection::from_inside(root, hit_point,
                                       -normal, self.material.clone())
@@ -90,7 +90,15 @@ impl Primitive for Sphere {
         self.material = material;
     }
 
-    fn sample(&self) -> Point {
+    fn sample(&self) -> (Point, Vector3) {
         panic!("sample() is not implemented for Sphere");
+    }
+
+    fn get_id(&self) -> u128 {
+        panic!("get_id() is not implemented for Sphere");
+    }
+
+    fn get_area(&self) -> f32 {
+        panic!("get_area() is not implemented for Sphere");
     }
 }

@@ -10,3 +10,4 @@ pub mod test_case_8_checker_texture;
 pub mod test_case_9_perlin_texture;
 pub mod test_case_10_lighting;
 pub mod test_case_11_cornell_box;
+pub mod test_case_12_cornell_box_next_event_estimation;
