@@ -6,7 +6,7 @@ use crate::fundamental::vector3::Vector3;
 use crate::fundamental::vector4::Vector4;
 use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::intersection::Intersection;
-use crate::ray_tracing::material::{Material, NullMaterial, NullMaterialPredicate};
+use crate::ray_tracing::material::*;
 use crate::ray_tracing::primitive::Primitive;
 use crate::ray_tracing::ray::Ray;
 
