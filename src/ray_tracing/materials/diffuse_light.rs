@@ -1,7 +1,6 @@
 use std::sync::Arc;
 
 use crate::fundamental::color::Color;
-use crate::fundamental::point::Point;
 use crate::ray_tracing::intersection::Intersection;
 use crate::ray_tracing::material::Material;
 use crate::ray_tracing::ray::Ray;

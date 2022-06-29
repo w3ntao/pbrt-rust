@@ -6,7 +6,6 @@ use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
 use std::time::Instant;
 
-use rand::Rng;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 
@@ -91,7 +90,6 @@ impl Renderer {
         let width = locked_image.width;
         let height = locked_image.height;
         std::mem::drop(locked_image);
-        let mut rng = rand::thread_rng();
 
         let mut rendered_pixels: Vec<(usize, usize, Color)> = vec![];
         loop {
@@ -104,22 +102,7 @@ impl Renderer {
                     for y in 0..height {
                         let ndc_y = -2.0 * (y as f32) / (height as f32) + 1.0;
                         let ndc_x = 2.0 * (x as f32) / (width as f32) - 1.0;
-
                         let mut total = Color::black();
-
-                        /*
-                        for _ in 0..self.samples {
-                            let random_x: f32 = rng.gen();
-                            let random_y: f32 = rng.gen();
-
-                            let u = ndc_x + 2.0 * random_x / (width as f32);
-                            let v = ndc_y - 2.0 * random_y / (height as f32);
-                            // u, v are both in [-1, 1]
-
-                            let ray = self.camera.get_primary_ray(u, v);
-                            total += self.integrator.get_radiance(ray);
-                        }
-                        */
 
                         for ray in self.camera.get_stratified_rays(
                             self.samples,

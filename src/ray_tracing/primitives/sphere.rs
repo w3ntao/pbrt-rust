@@ -75,7 +75,7 @@ impl Primitive for Sphere {
                                       -normal, self.material.clone())
         };
 
-        let (u, v) = get_sphere_uv(to_point((hit_point - self.center).normalize()));
+        let (u, v) = get_sphere_uv((hit_point - self.center).normalize().to_point());
         intersection.u = u;
         intersection.v = v;
 

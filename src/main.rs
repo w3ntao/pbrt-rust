@@ -5,7 +5,7 @@ mod ray_tracing;
 mod test_cases;
 
 fn main() {
-    let mut samples = 5;
+    //let samples = 5;
     println!();
     //test_case_0_primitives_intersection::test();
     //test_case_1_bvh_building::test();
@@ -19,7 +19,7 @@ fn main() {
     //test_case_9_perlin_texture::test(samples);
     //test_case_10_lighting::test(samples);
 
-    for samples in [10, 100, 200] {
+    for samples in [10, 100] {
         //test_case_11_cornell_box::test(samples);
         test_case_12_cornell_box_next_event_estimation::test(samples);
     }

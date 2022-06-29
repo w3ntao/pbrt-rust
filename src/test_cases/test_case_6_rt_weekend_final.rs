@@ -2,8 +2,6 @@ use std::sync::Arc;
 
 use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::depth_of_field::DepthOfField;
-use crate::ray_tracing::group::Group;
-use crate::ray_tracing::groups::bvh::BVH;
 use crate::ray_tracing::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
 use crate::ray_tracing::materials::glass::*;
 use crate::ray_tracing::materials::lambertian::*;
@@ -60,6 +58,7 @@ pub fn many_random_spheres() -> World {
     return scene;
 }
 
+#[allow(dead_code)]
 pub fn test(samples: u32) {
     let file_name = get_file_name(file!());
     println!("TESTING: {}", &file_name);

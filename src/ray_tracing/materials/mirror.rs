@@ -1,5 +1,4 @@
 use crate::fundamental::color::*;
-use crate::fundamental::point::Point;
 use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::material::Material;
 use crate::ray_tracing::ray::*;

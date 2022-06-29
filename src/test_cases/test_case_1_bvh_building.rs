@@ -3,12 +3,11 @@ use std::sync::Arc;
 use crate::fundamental::obj_loader::obj_to_triangles;
 use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::perspective::Perspective;
-use crate::ray_tracing::group::Group;
-use crate::ray_tracing::groups::bvh::BVH;
 use crate::ray_tracing::integrators::ray_casting_dot_normal::RayCastingDotNormal;
 use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::world::World;
 
+#[allow(dead_code)]
 pub fn test() {
     let file_name = get_file_name(file!());
     println!("TESTING: {}", &file_name);

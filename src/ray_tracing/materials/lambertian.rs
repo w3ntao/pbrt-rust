@@ -1,10 +1,7 @@
 use std::sync::Arc;
 
-use rand::random;
-
 use crate::fundamental::color::*;
 use crate::fundamental::orthonormal_basis::OrthonormalBasis;
-use crate::fundamental::point::Point;
 use crate::fundamental::utility::*;
 use crate::fundamental::vector3::*;
 use crate::ray_tracing::intersection::*;

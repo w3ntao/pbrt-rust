@@ -10,6 +10,7 @@ use crate::ray_tracing::integrators::ray_casting_dot_normal::RayCastingDotNormal
 use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::world::World;
 
+#[allow(dead_code)]
 pub fn test() {
     let file_name = get_file_name(file!());
     println!("TESTING: {}", &file_name);

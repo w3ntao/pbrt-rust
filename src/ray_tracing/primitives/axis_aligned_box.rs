@@ -1,7 +1,5 @@
 use std::sync::Arc;
 
-use rand::random;
-
 use crate::fundamental::point::*;
 use crate::fundamental::utility::random_u128;
 use crate::fundamental::vector3::*;

@@ -2,7 +2,6 @@ use std::sync::Arc;
 
 use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::depth_of_field::DepthOfField;
-use crate::ray_tracing::group::Group;
 use crate::ray_tracing::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
 use crate::ray_tracing::materials::glass::*;
 use crate::ray_tracing::materials::lambertian::*;
@@ -12,9 +11,9 @@ use crate::ray_tracing::primitives::sphere::Sphere;
 use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::textures::checker_texture::CheckerTexture;
 use crate::ray_tracing::textures::solid_color::*;
-use crate::ray_tracing::world::World;
 use crate::test_case_6_rt_weekend_final::many_random_spheres;
 
+#[allow(dead_code)]
 pub fn test(samples: u32) {
     let file_name = get_file_name(file!());
     println!("TESTING: {}", &file_name);

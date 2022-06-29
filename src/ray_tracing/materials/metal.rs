@@ -1,5 +1,4 @@
 use crate::fundamental::color::*;
-use crate::fundamental::point::Point;
 use crate::fundamental::vector3::*;
 use crate::fundamental::vector3::random_in_unit_sphere;
 use crate::ray_tracing::intersection::*;

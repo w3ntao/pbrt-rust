@@ -35,10 +35,8 @@ pub fn random_color() -> Color {
     return Color::new(random_zero_to_one(), random_zero_to_one(), random_zero_to_one());
 }
 
-pub fn to_vector3(p: Point) -> Vector3 {
-    return Vector3::new(p.x, p.y, p.z);
-}
-
-pub fn to_point(v: Vector3) -> Point {
-    return Point::new(v.x, v.y, v.z);
+impl Vector3 {
+    pub fn to_point(&self) -> Point {
+        return Point::new(self.x, self.y, self.z);
+    } 
 }

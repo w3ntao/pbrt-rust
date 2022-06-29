@@ -1,7 +1,6 @@
 use rand_distr::num_traits::Pow;
 
 use crate::fundamental::color::*;
-use crate::fundamental::point::Point;
 use crate::fundamental::utility::random_zero_to_one;
 use crate::fundamental::vector3::*;
 use crate::ray_tracing::intersection::*;

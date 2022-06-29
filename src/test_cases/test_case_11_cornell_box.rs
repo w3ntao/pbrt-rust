@@ -2,24 +2,18 @@ use std::sync::Arc;
 
 use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::perspective::Perspective;
-use crate::ray_tracing::group::Group;
-use crate::ray_tracing::groups::bvh::BVH;
 use crate::ray_tracing::instance::Instance;
 use crate::ray_tracing::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
-use crate::ray_tracing::integrators::ray_casting_dot_normal;
-use crate::ray_tracing::integrators::ray_casting_dot_normal::RayCastingDotNormal;
-use crate::ray_tracing::integrators::ray_casting_normal::RayCastingNormal;
 use crate::ray_tracing::materials::diffuse_light::DiffuseLight;
 use crate::ray_tracing::materials::lambertian::*;
 use crate::ray_tracing::primitive::Primitive;
 use crate::ray_tracing::primitives::axis_aligned_box::AxisAlignedBox;
 use crate::ray_tracing::primitives::quad::Quad;
-use crate::ray_tracing::primitives::sphere::Sphere;
 use crate::ray_tracing::renderer::Renderer;
-use crate::ray_tracing::textures::noise_texture::NoiseTexture;
 use crate::ray_tracing::textures::solid_color::SolidColor;
 use crate::ray_tracing::world::World;
 
+#[allow(dead_code)]
 pub fn cornel_box() -> World {
     let mut world = World::default();
 
@@ -57,7 +51,7 @@ pub fn cornel_box() -> World {
     let wall_up = Arc::new(wall_up);
     world.add(wall_up.clone());
 
-    let mut box_big = AxisAlignedBox::new(
+    let box_big = AxisAlignedBox::new(
         Point::new(0.0, 0.0, 0.0),
         Point::new(165.0, 330.0, 165.0));
     let mut box_big = Instance::new(Arc::new(box_big));
@@ -67,7 +61,7 @@ pub fn cornel_box() -> World {
     let box_big = Arc::new(box_big);
     world.add(box_big.clone());
 
-    let mut box_small = AxisAlignedBox::new(
+    let box_small = AxisAlignedBox::new(
         Point::new(0.0, 0.0, 0.0),
         Point::new(165.0, 165.0, 165.0));
     let mut box_small = Instance::new(Arc::new(box_small));
@@ -88,6 +82,7 @@ pub fn cornel_box() -> World {
     return world;
 }
 
+#[allow(dead_code)]
 pub fn test(samples: u32) {
     let file_name = get_file_name(file!());
 

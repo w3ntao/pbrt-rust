@@ -10,6 +10,7 @@ pub struct RayCastingNormal {
 }
 
 impl RayCastingNormal {
+    #[allow(dead_code)]
     pub fn new(_world: Arc<World>) -> Self {
         return Self { world: _world };
     }

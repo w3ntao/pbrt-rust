@@ -1,7 +1,5 @@
 use std::sync::Arc;
 
-use rand_distr::num_traits::pow;
-
 use crate::fundamental::color::*;
 use crate::fundamental::constants::INTERSECT_OFFSET;
 use crate::fundamental::utility::*;
@@ -12,14 +10,12 @@ use crate::ray_tracing::world::World;
 
 pub struct NextEventEstimation {
     world: Arc<World>,
-    background: Color,
 }
 
 impl NextEventEstimation {
-    pub fn new(_world: Arc<World>, _background: Color) -> Self {
+    pub fn new(_world: Arc<World>) -> Self {
         return Self {
             world: _world,
-            background: _background,
         };
     }
 }
@@ -42,7 +38,7 @@ impl NextEventEstimation {
 
         let emission = intersection.material.emit(&intersection);
 
-        let (scattered, scattered_ray, attenuation) = intersection.material.scatter(ray, &intersection);
+        let (scattered, _, attenuation) = intersection.material.scatter(ray, &intersection);
 
         if !scattered {
             return emission;

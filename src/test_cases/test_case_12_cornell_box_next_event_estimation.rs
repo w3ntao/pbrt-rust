@@ -2,21 +2,11 @@ use std::sync::Arc;
 
 use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::perspective::Perspective;
-use crate::ray_tracing::group::Group;
-use crate::ray_tracing::instance::Instance;
 use crate::ray_tracing::integrators::next_event_estimation::NextEventEstimation;
-use crate::ray_tracing::materials::diffuse_light::DiffuseLight;
-use crate::ray_tracing::materials::lambertian::*;
-use crate::ray_tracing::primitive::Primitive;
-use crate::ray_tracing::primitives::axis_aligned_box::AxisAlignedBox;
-use crate::ray_tracing::primitives::quad::Quad;
-use crate::ray_tracing::primitives::sphere::Sphere;
 use crate::ray_tracing::renderer::Renderer;
-use crate::ray_tracing::textures::noise_texture::NoiseTexture;
-use crate::ray_tracing::textures::solid_color::SolidColor;
-use crate::ray_tracing::world::World;
 use crate::test_case_11_cornell_box::cornel_box;
 
+#[allow(dead_code)]
 pub fn test(samples: u32) {
     let file_name = get_file_name(file!());
 
@@ -41,7 +31,7 @@ pub fn test(samples: u32) {
         PI / 4.0,
         PI / 4.0);
 
-    let integrator = NextEventEstimation::new(Arc::new(cornel_box()), Color::black());
+    let integrator = NextEventEstimation::new(Arc::new(cornel_box()));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
     let image = renderer.render(WIDTH, HEIGHT);
     image.write(&ppm_name);

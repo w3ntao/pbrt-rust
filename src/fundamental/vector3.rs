@@ -1,9 +1,5 @@
 use std::ops;
 
-use rand::distributions::Uniform;
-use rand::prelude::Distribution;
-use rand::thread_rng;
-
 use crate::fundamental::point::*;
 use crate::fundamental::utility::*;
 

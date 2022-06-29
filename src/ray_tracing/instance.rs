@@ -90,6 +90,7 @@ impl Instance {
         }
     }
 
+    #[allow(dead_code)]
     pub fn reset(&mut self) {
         self.transform = Matrix::identity();
     }
@@ -106,6 +107,7 @@ impl Instance {
         }
     }
 
+    #[allow(dead_code)]
     pub fn scale_by_vector(&mut self, scalar: Vector3) {
         for idx in 0..3 {
             self.transform[idx][idx] *= scalar[idx];
