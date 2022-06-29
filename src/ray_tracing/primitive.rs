@@ -9,14 +9,20 @@ use crate::ray_tracing::ray::*;
 
 pub trait Primitive: Send + Sync {
     fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection;
-    
-    fn get_bounds(&self) -> BoundingBox;
-    
-    fn set_material(&mut self, material: Arc<dyn Material>);
-    
-    fn sample(&self) -> (Point, Vector3);
-    
-    fn get_id(&self) -> u128;
 
-    fn get_area(&self) -> f32;
+    fn get_bounds(&self) -> BoundingBox;
+
+    fn set_material(&mut self, material: Arc<dyn Material>);
+
+    fn sample(&self) -> (Point, Vector3) {
+        panic!("sample() not implemented for this Primitive");
+    }
+
+    fn get_id(&self) -> u128 {
+        panic!("get_id() not implemented for this Primitive");
+    }
+
+    fn get_area(&self) -> f32 {
+        panic!("get_area() not implemented for this Primitive");
+    }
 }

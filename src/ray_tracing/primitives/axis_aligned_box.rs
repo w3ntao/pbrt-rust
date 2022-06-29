@@ -76,15 +76,7 @@ impl Primitive for AxisAlignedBox {
         self.material = material;
     }
 
-    fn sample(&self) -> (Point, Vector3) {
-        panic!("sample() is not implemented for AxisAlignedBox");
-    }
-
     fn get_id(&self) -> u128 {
         return self.id;
-    }
-
-    fn get_area(&self) -> f32 {
-        panic!("get_area() is not implemented for AxisAlignedBox");
     }
 }

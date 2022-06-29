@@ -2,7 +2,6 @@ use std::sync::Arc;
 
 use crate::fundamental::constants::INTERSECT_OFFSET;
 use crate::fundamental::point::*;
-use crate::fundamental::vector3::Vector3;
 use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::material::Material;
@@ -48,17 +47,5 @@ impl Primitive for HollowSphere {
     fn set_material(&mut self, material: Arc<dyn Material>) {
         self.external_sphere.set_material(material.clone());
         self.internal_sphere.set_material(material);
-    }
-
-    fn sample(&self) -> (Point, Vector3) {
-        panic!("sample() is not implemented for HollowSphere");
-    }
-
-    fn get_id(&self) -> u128 {
-        panic!("get_id() is not implemented for HollowSphere");
-    }
-
-    fn get_area(&self) -> f32 {
-        panic!("get_area() is not implemented for HollowSphere");
     }
 }
