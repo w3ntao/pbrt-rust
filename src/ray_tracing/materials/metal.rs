@@ -30,7 +30,7 @@ impl Material for Metal {
         // for those light go beneath the surface, consider them not scattered
     }
 
-    fn emit(&self, _: f32, _: f32, _: Point) -> Color {
+    fn emit(&self, _: &Intersection) -> Color {
         return Color::black();
     }
 }

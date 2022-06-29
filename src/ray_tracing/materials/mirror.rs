@@ -21,7 +21,7 @@ impl Material for Mirror {
         // TODO: that reflects everything
     }
 
-    fn emit(&self, _: f32, _: f32, _: Point) -> Color {
+    fn emit(&self, _: &Intersection) -> Color {
         return Color::black();
     }
 }

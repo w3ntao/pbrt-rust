@@ -6,6 +6,7 @@ use crate::ray_tracing::intersection::Intersection;
 use crate::ray_tracing::material::Material;
 use crate::ray_tracing::ray::Ray;
 use crate::ray_tracing::texture::Texture;
+use crate::ray_tracing::material::Illumination;
 
 pub struct DiffuseLight {
     emission: Arc<dyn Texture>,
@@ -24,7 +25,13 @@ impl Material for DiffuseLight {
         return (false, Ray::dummy(), Color::black());
     }
 
-    fn emit(&self, u: f32, v: f32, point: Point) -> Color {
-        return self.emission.get_color(u, v, point);
+    fn emit(&self, intersection: &Intersection) -> Color {
+        return self.emission.get_color(intersection.u, intersection.v, intersection.hit_point);
+    }
+}
+
+impl Illumination for DiffuseLight {
+    fn illuminate(&self, intersection: &Intersection) -> Color {
+        return self.emission.get_color(intersection.u, intersection.v, intersection.hit_point);
     }
 }

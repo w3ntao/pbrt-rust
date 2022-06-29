@@ -26,6 +26,8 @@ impl NextEventEstimation {
 
 impl NextEventEstimation {
     fn trace(&self, ray: Ray, depth: u32) -> Color {
+        //TODO: currently works for direct illumination only
+
         if depth == 0 {
             return Color::black();
         }
@@ -38,7 +40,7 @@ impl NextEventEstimation {
             return Color::black();
         }
 
-        let emission = intersection.material.emit(intersection.u, intersection.v, intersection.hit_point);
+        let emission = intersection.material.emit(&intersection);
 
         let (scattered, scattered_ray, attenuation) = intersection.material.scatter(ray, &intersection);
 
@@ -71,7 +73,7 @@ impl NextEventEstimation {
 
         let pdf = shadow_intersection.distance * shadow_intersection.distance / (light_cosine * light_area);
 
-        let direct_lighting = shadow_intersection.material.emit(shadow_intersection.u, shadow_intersection.v, shadow_intersection.hit_point);
+        let direct_lighting = shadow_intersection.material.emit(&shadow_intersection);
 
         return attenuation * direct_lighting * scattering_pdf / pdf;
     }

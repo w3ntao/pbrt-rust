@@ -62,7 +62,7 @@ impl Material for Glass {
         return (true, scattered_ray, Color::new(1.0, 1.0, 1.0));
     }
 
-    fn emit(&self, _: f32, _: f32, _: Point) -> Color {
+    fn emit(&self, _: &Intersection) -> Color {
         return Color::black();
     }
 }

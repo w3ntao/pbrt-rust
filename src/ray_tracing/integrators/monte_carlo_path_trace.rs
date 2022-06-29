@@ -34,7 +34,7 @@ impl MonteCarloPathTrace {
             return self.background;
         }
 
-        let emission = intersection.material.emit(intersection.u, intersection.v, intersection.hit_point);
+        let emission = intersection.material.emit(&intersection);
 
         let (scattered, scattered_ray, attenuation) = intersection.material.scatter(ray, &intersection);
 
