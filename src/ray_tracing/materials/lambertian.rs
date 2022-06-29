@@ -43,4 +43,10 @@ impl Material for Lambertian {
 
         return (true, scattered_ray, self.albedo.get_color(intersection.u, intersection.v, intersection.hit_point));
     }
+
+    fn scattering_pdf(&self, _: Vector3, normal: Vector3, scattered_direction: Vector3) -> f32 {
+        let val_cosine = cosine(normal, scattered_direction);
+
+        return if val_cosine <= 0.0 { 0.0 } else { val_cosine / PI };
+    }
 }

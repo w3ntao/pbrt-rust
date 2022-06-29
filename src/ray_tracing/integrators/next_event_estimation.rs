@@ -2,7 +2,6 @@ use std::sync::Arc;
 
 use crate::fundamental::color::*;
 use crate::fundamental::constants::INTERSECT_OFFSET;
-use crate::fundamental::utility::*;
 use crate::fundamental::vector3::cosine;
 use crate::ray_tracing::integrator::Integrator;
 use crate::ray_tracing::ray::Ray;
@@ -54,24 +53,23 @@ impl NextEventEstimation {
             return Color::black();
         }
 
-        let light_cosine   = cosine(-towards_light, light_normal).abs();
+        let light_cosine = cosine(-towards_light, light_normal).abs();
         if light_cosine <= 0.0 {
             return Color::black();
         }
 
-        let surface_cosine = cosine(towards_light, intersection.normal);
-        if surface_cosine <= 0.0 {
+        let scattering_pdf = intersection.material.scattering_pdf(ray.direction, intersection.normal, towards_light);
+
+        if scattering_pdf <= 0.0 {
             return Color::black();
         }
 
-        //TODO: move scattering_pdf into Material
-        let scattering_pdf = surface_cosine / PI;
+        let sample_pdf = shadow_intersection.distance * shadow_intersection.distance / (light_cosine * light_area);
 
-        let pdf = shadow_intersection.distance * shadow_intersection.distance / (light_cosine * light_area);
-
-        let direct_lighting = shadow_intersection.material.emit(&shadow_intersection);
-
-        return attenuation * direct_lighting * scattering_pdf / pdf;
+        return attenuation
+            * shadow_intersection.material.emit(&shadow_intersection)
+            * scattering_pdf
+            / sample_pdf;
     }
 }
 
