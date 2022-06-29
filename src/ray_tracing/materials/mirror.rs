@@ -19,8 +19,4 @@ impl Material for Mirror {
         // TODO: I am implementing perfect glass for the time being
         // TODO: that reflects everything
     }
-
-    fn emit(&self, _: &Intersection) -> Color {
-        return Color::black();
-    }
 }

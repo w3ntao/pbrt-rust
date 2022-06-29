@@ -60,8 +60,4 @@ impl Material for Glass {
         let scattered_ray = Ray::new(intersection.hit_point, direction);
         return (true, scattered_ray, Color::new(1.0, 1.0, 1.0));
     }
-
-    fn emit(&self, _: &Intersection) -> Color {
-        return Color::black();
-    }
 }

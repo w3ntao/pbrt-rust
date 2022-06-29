@@ -43,8 +43,4 @@ impl Material for Lambertian {
 
         return (true, scattered_ray, self.albedo.get_color(intersection.u, intersection.v, intersection.hit_point));
     }
-
-    fn emit(&self, _: &Intersection) -> Color {
-        return Color::black();
-    }
 }
