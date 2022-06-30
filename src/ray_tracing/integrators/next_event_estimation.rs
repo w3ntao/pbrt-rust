@@ -38,7 +38,6 @@ impl NextEventEstimation {
         let emission = intersection.material.emit(&intersection);
 
         let (scattered, _, attenuation) = intersection.material.scatter(ray, &intersection);
-
         if !scattered {
             return emission;
         }
@@ -53,13 +52,13 @@ impl NextEventEstimation {
             return Color::black();
         }
 
-        let light_cosine = cosine(-towards_light, light_normal).abs();
+        // with light_cosine, the light emits unidirectionally 
+        let light_cosine = cosine(-towards_light, light_normal);
         if light_cosine <= 0.0 {
             return Color::black();
         }
 
         let scattering_pdf = intersection.material.scattering_pdf(ray.direction, intersection.normal, towards_light);
-
         if scattering_pdf <= 0.0 {
             return Color::black();
         }

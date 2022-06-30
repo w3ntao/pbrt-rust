@@ -73,8 +73,8 @@ pub fn cornel_box() -> World {
 
     let diffuse_light = DiffuseLight::new(Arc::new(SolidColor::new(Color::new(15.0, 15.0, 15.0))));
     let mut quad_light = Quad::new(Point::new(213.0, length - 1.0, 227.0), Vector3::new(130.0, 0.0, 0.0), Vector3::new(0.0, 0.0, 105.0));
-    quad_light.set_material(Arc::new(diffuse_light));
-    quad_light.normal = -quad_light.normal;
+    quad_light.set_material(Arc::new(diffuse_light));    
+
     let quad_light = Arc::new(quad_light);
     world.add_light(quad_light);
     world.build_index();
