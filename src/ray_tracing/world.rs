@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use rand::Rng;
 
 use crate::fundamental::point::Point;
 use crate::fundamental::utility::Vector3;
@@ -41,8 +42,7 @@ impl World {
     }
 
     pub fn sample_light(&self) -> (u128, Point, Vector3, f32) {
-        // TODO: randomly pick a light
-        let idx = 0;
+        let idx = rand::thread_rng().gen_range(0..self.lights.len());
         let (point, normal) = self.lights[idx].sample();
 
         return (self.lights[idx].get_id(), point, normal, self.lights[idx].get_area());
