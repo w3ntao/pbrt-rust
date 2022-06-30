@@ -14,7 +14,7 @@ use crate::ray_tracing::textures::solid_color::SolidColor;
 use crate::ray_tracing::world::World;
 
 #[allow(dead_code)]
-pub fn cornel_box() -> World {
+pub fn cornell_box() -> World {
     let mut world = World::default();
 
     let solid_color_red = Arc::new(SolidColor::new(Color::new(0.65, 0.05, 0.05)));
@@ -73,7 +73,7 @@ pub fn cornel_box() -> World {
 
     let diffuse_light = DiffuseLight::new(Arc::new(SolidColor::new(Color::new(15.0, 15.0, 15.0))));
     let mut quad_light = Quad::new(Point::new(213.0, length - 1.0, 227.0), Vector3::new(130.0, 0.0, 0.0), Vector3::new(0.0, 0.0, 105.0));
-    quad_light.set_material(Arc::new(diffuse_light));    
+    quad_light.set_material(Arc::new(diffuse_light));
 
     let quad_light = Arc::new(quad_light);
     world.add_light(quad_light);
@@ -107,7 +107,7 @@ pub fn test(samples: u32) {
         PI / 4.0,
         PI / 4.0);
 
-    let integrator = MonteCarloPathTrace::new(Arc::new(cornel_box()), Color::black());
+    let integrator = MonteCarloPathTrace::new(Arc::new(cornell_box()), Color::black());
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
     let image = renderer.render(WIDTH, HEIGHT);
     image.write(&ppm_name);

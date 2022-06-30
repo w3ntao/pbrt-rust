@@ -19,9 +19,17 @@ fn main() {
     //test_case_9_perlin_texture::test(samples);
     //test_case_10_lighting::test(samples);
 
-    //test_case_11_cornell_box::test(10);
+    /*
+    for samples in [1500, 2000] {
+        test_case_11_cornell_box::test(samples);
+    }
+    */
 
-    for samples in [10, 100] {
-        test_case_12_cornell_box_next_event_estimation::test(samples);
+    for samples in [10, 20] {
+        test_case_12_cornell_box_sample_light::test(samples);
+    }
+
+    for samples in [10, 20] {
+        test_case_13_cornell_box_next_event_estimation::test(samples);
     }
 }
