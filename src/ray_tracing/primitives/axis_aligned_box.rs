@@ -31,13 +31,14 @@ impl AxisAlignedBox {
 
 impl Primitive for AxisAlignedBox {
     fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
-        let mut root_min = t_min;
-        let mut root_max = t_max;
+        let mut root_in = -f32::INFINITY;
+        let mut root_out = f32::INFINITY;
         let mut normal = Vector3::invalid();
 
         for axis in 0..3 {
             if ray.direction[axis] == 0.0 {
-                if self.axis_min[axis] > ray.origin[axis] || self.axis_max[axis] < ray.origin[axis] {
+                if self.axis_min[axis] > ray.origin[axis] || self.axis_max[axis] < ray.origin[axis]
+                {
                     return Intersection::failure();
                 }
             } else {
@@ -45,27 +46,37 @@ impl Primitive for AxisAlignedBox {
                 let t1 = (self.axis_max[axis] - ray.origin[axis]) / ray.direction[axis];
 
                 if t0 > t1 {
-                    if root_min < t1 {
-                        root_min = t1;
+                    if root_in < t1 {
+                        root_in = t1;
                         normal = Vector3::new(0.0, 0.0, 0.0);
                         normal[axis] = 1.0;
                     }
-                    root_max = root_max.min(t0);
+                    root_out = root_out.min(t0);
                 } else {
-                    if root_min < t0 {
-                        root_min = t0;
+                    if root_in < t0 {
+                        root_in = t0;
                         normal = Vector3::new(0.0, 0.0, 0.0);
                         normal[axis] = -1.0;
                     }
-                    root_max = root_max.min(t1);
+                    root_out = root_out.min(t1);
                 }
-                if root_max < root_min {
+                if root_out < root_in {
                     return Intersection::failure();
                 }
             }
         }
 
-        return Intersection::from_outside(root_min, ray.get_point(root_min), normal, self.material.clone(), self.get_id());
+        if root_in < t_min || root_in > t_max {
+            return Intersection::failure();
+        }
+
+        return Intersection::from_outside(
+            root_in,
+            ray.get_point(root_in),
+            normal,
+            self.material.clone(),
+            self.get_id(),
+        );
     }
 
     fn get_bounds(&self) -> BoundingBox {
