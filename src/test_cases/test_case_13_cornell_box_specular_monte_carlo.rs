@@ -1,75 +1,10 @@
 use std::sync::Arc;
 
+use crate::cornell_box::cornell_box_specular;
 use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::perspective::Perspective;
 use crate::ray_tracing::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
-use crate::ray_tracing::materials::diffuse_light::DiffuseLight;
-use crate::ray_tracing::materials::glass::Glass;
-use crate::ray_tracing::materials::lambertian::*;
-use crate::ray_tracing::primitive::Primitive;
-use crate::ray_tracing::primitives::quad::Quad;
-use crate::ray_tracing::primitives::sphere::Sphere;
 use crate::ray_tracing::renderer::Renderer;
-use crate::ray_tracing::textures::solid_color::SolidColor;
-use crate::ray_tracing::world::World;
-
-#[allow(dead_code)]
-pub fn cornell_box_specular() -> World {
-    let mut world = World::default();
-
-    let solid_color_red = Arc::new(SolidColor::new(Color::new(0.65, 0.05, 0.05)));
-    let solid_color_green = Arc::new(SolidColor::new(Color::new(0.12, 0.45, 0.15)));
-    let solid_color_white = Arc::new(SolidColor::new(Color::new(0.73, 0.73, 0.73)));
-
-    let lambertian_red = Arc::new(Lambertian::new(solid_color_red.clone()));
-    let lambertian_green = Arc::new(Lambertian::new(solid_color_green.clone()));
-    let lambertian_white = Arc::new(Lambertian::new(solid_color_white.clone()));
-    let glass = Arc::new(Glass::new(1.5));
-
-    let length = 555.0;
-    let mut wall_left = Quad::new(Point::new(length, 0.0, 0.0), Vector3::new(0.0, length, 0.0), Vector3::new(0.0, 0.0, length));
-    wall_left.set_material(lambertian_green.clone());
-    let wall_left = Arc::new(wall_left);
-    world.add(wall_left.clone());
-
-    let mut wall_right = Quad::new(Point::new(0.0, 0.0, 0.0), Vector3::new(0.0, length, 0.0), Vector3::new(0.0, 0.0, length));
-    wall_right.set_material(lambertian_red.clone());
-    let wall_right = Arc::new(wall_right);
-    world.add(wall_right.clone());
-
-    let mut wall_back = Quad::new(Point::new(0.0, 0.0, length), Vector3::new(0.0, length, 0.0), Vector3::new(length, 0.0, 0.0));
-    wall_back.set_material(lambertian_white.clone());
-    let wall_back = Arc::new(wall_back);
-    world.add(wall_back.clone());
-
-    let mut wall_bottom = Quad::new(Point::new(0.0, 0.0, 0.0), Vector3::new(length, 0.0, 0.0), Vector3::new(0.0, 0.0, length));
-    wall_bottom.set_material(lambertian_white.clone());
-    let wall_bottom = Arc::new(wall_bottom);
-    world.add(wall_bottom.clone());
-
-    let mut wall_up = Quad::new(Point::new(0.0, length, 0.0), Vector3::new(length, 0.0, 0.0), Vector3::new(0.0, 0.0, length));
-    wall_up.set_material(lambertian_white.clone());
-    let wall_up = Arc::new(wall_up);
-    world.add(wall_up.clone());
-
-    let radius = 120.0;
-    let mut sphere = Sphere::new(
-        Point::new(190.0, radius, 190.0),
-        radius);
-    sphere.set_material(glass.clone());
-    world.add(Arc::new(sphere));
-
-    let diffuse_light = DiffuseLight::new(Arc::new(SolidColor::new(Color::new(15.0, 15.0, 15.0))));
-    let mut quad_light = Quad::new(Point::new(213.0, length - 1.0, 227.0), Vector3::new(130.0, 0.0, 0.0), Vector3::new(0.0, 0.0, 105.0));
-    quad_light.set_material(Arc::new(diffuse_light));
-
-    let quad_light = Arc::new(quad_light);
-    world.add_light(quad_light);
-    world.build_index();
-
-    return world;
-}
-
 
 #[allow(dead_code)]
 pub fn test(samples: u32) {

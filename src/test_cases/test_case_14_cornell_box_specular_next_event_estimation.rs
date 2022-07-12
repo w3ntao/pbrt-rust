@@ -1,10 +1,10 @@
 use std::sync::Arc;
 
+use crate::cornell_box::cornell_box_specular;
 use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::perspective::Perspective;
 use crate::ray_tracing::integrators::next_event_estimation::NextEventEstimation;
 use crate::ray_tracing::renderer::Renderer;
-use crate::test_case_13_cornell_box_specular_monte_carlo::cornell_box_specular;
 
 #[allow(dead_code)]
 pub fn test(samples: u32) {
