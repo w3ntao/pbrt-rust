@@ -22,6 +22,9 @@ fn main() {
     //test_case_12_cornell_box_sample_light::test(samples);
     //test_case_13_cornell_box_next_event_estimation::test(samples);
 
+    test_case_15_cornell_box_specular_dragon_next_event_estimation::test(1);
+
+    return;
 
     for samples in [50] {
         test_case_12_cornell_box_next_event_estimation::test(samples);

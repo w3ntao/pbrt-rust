@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use crate::fundamental::point::*;
+use crate::fundamental::utility::random_u128;
 use crate::fundamental::vector3::*;
 use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::intersection::*;
@@ -16,6 +17,7 @@ pub struct Triangle {
     pub normal: Vector3,
     bounds: BoundingBox,
     material: Arc<dyn Material>,
+    id: u128,
 }
 
 impl Triangle {
@@ -29,6 +31,7 @@ impl Triangle {
             normal: cross(_span0, _span1).normalize(),
             bounds: BoundingBox::build(&[v0, v1, v2]),
             material: Arc::new(NullMaterial {}),
+            id: random_u128(),
         };
     }
 }
@@ -69,5 +72,9 @@ impl Primitive for Triangle {
 
     fn set_material(&mut self, material: Arc<dyn Material>) {
         self.material = material;
+    }
+
+    fn get_id(&self) -> u128 {
+        return self.id;
     }
 }

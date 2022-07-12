@@ -9,8 +9,10 @@ pub mod test_case_7_rt_weekend_final_dragon;
 pub mod test_case_8_checker_texture;
 pub mod test_case_9_perlin_texture;
 pub mod test_case_10_lighting;
+
+pub mod cornell_box;
 pub mod test_case_11_cornell_box;
 pub mod test_case_12_cornell_box_next_event_estimation;
 pub mod test_case_13_cornell_box_specular_monte_carlo;
 pub mod test_case_14_cornell_box_specular_next_event_estimation;
-pub mod cornell_box;
+pub mod test_case_15_cornell_box_specular_dragon_next_event_estimation;
