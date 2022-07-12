@@ -9,17 +9,21 @@ use crate::ray_tracing::world::World;
 
 pub struct NextEventEstimation {
     world: Arc<World>,
+    max_depth: u32,
 }
 
 impl NextEventEstimation {
     pub fn new(_world: Arc<World>) -> Self {
-        return Self { world: _world };
+        return Self {
+            world: _world,
+            max_depth: 50,
+        };
     }
 }
 
 impl NextEventEstimation {
-    fn trace(&self, ray: Ray, depth: u32, max_depth: u32) -> Color {
-        if depth == max_depth {
+    fn trace(&self, ray: Ray, last_hit_specular: bool, depth: u32) -> Color {
+        if depth == self.max_depth {
             return Color::black();
         }
 
@@ -37,11 +41,15 @@ impl NextEventEstimation {
             intersection.material.scatter(ray, &intersection);
         if !scattered {
             // to avoid double sampling on light
-            return if depth == 0 { emission } else { Color::black() };
+            return if depth == 0 || last_hit_specular { emission } else { Color::black() };
+        }
+
+        if intersection.material.is_specular() {
+            return self.trace(scattered_ray, true, depth + 1) * attenuation;
         }
 
         // for scattering: cos(theta) / PI cancel out for scattering_pdf and sample_pdf
-        let indirect_illumination = self.trace(scattered_ray, depth + 1, max_depth) * attenuation;
+        let indirect_illumination = self.trace(scattered_ray, false, depth + 1) * attenuation;
 
         let (light_id, light_point, light_normal, light_area) = self.world.sample_light();
         let towards_light = light_point - intersection.hit_point;
@@ -75,10 +83,10 @@ impl NextEventEstimation {
         let direct_illumination = shadow_intersection.material.emit(&shadow_intersection)
             * attenuation
             * intersection.material.scattering_pdf(
-                ray.direction,
-                intersection.normal,
-                towards_light,
-            )
+            ray.direction,
+            intersection.normal,
+            towards_light,
+        )
             / sample_light_pdf;
 
         return emission + direct_illumination + indirect_illumination;
@@ -87,6 +95,6 @@ impl NextEventEstimation {
 
 impl Integrator for NextEventEstimation {
     fn get_radiance(&self, ray: Ray) -> Color {
-        return self.trace(ray, 0, 50);
+        return self.trace(ray, false, 0);
     }
 }

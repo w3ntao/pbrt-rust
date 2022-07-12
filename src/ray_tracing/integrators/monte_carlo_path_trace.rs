@@ -9,6 +9,7 @@ use crate::ray_tracing::world::World;
 pub struct MonteCarloPathTrace {
     world: Arc<World>,
     background: Color,
+    max_depth: u32,
 }
 
 impl MonteCarloPathTrace {
@@ -16,13 +17,14 @@ impl MonteCarloPathTrace {
         return Self {
             world: _world,
             background: _background,
+            max_depth: 50,
         };
     }
 }
 
 impl MonteCarloPathTrace {
-    fn trace(&self, ray: Ray, depth: u32, max_depth: u32) -> Color {
-        if depth == max_depth {
+    fn trace(&self, ray: Ray, depth: u32) -> Color {
+        if depth == self.max_depth {
             return Color::black();
         }
 
@@ -42,12 +44,12 @@ impl MonteCarloPathTrace {
             return emission;
         }
 
-        return emission + attenuation * self.trace(scattered_ray, depth + 1, max_depth);
+        return emission + attenuation * self.trace(scattered_ray, depth + 1);
     }
 }
 
 impl Integrator for MonteCarloPathTrace {
     fn get_radiance(&self, ray: Ray) -> Color {
-        return self.trace(ray, 0, 50);
+        return self.trace(ray, 0);
     }
 }
