@@ -1,8 +1,4 @@
 pub mod test_case_0_primitives_intersection;
-pub mod test_case_10_lighting;
-pub mod test_case_11_cornell_box;
-pub mod test_case_12_cornell_box_sample_light;
-pub mod test_case_13_cornell_box_next_event_estimation;
 pub mod test_case_1_bvh_building;
 pub mod test_case_2_multiple_instances;
 pub mod test_case_3_material_a;
@@ -12,3 +8,8 @@ pub mod test_case_6_rt_weekend_final;
 pub mod test_case_7_rt_weekend_final_dragon;
 pub mod test_case_8_checker_texture;
 pub mod test_case_9_perlin_texture;
+pub mod test_case_10_lighting;
+pub mod test_case_11_cornell_box;
+pub mod test_case_12_cornell_box_sample_light;
+pub mod test_case_13_cornell_box_next_event_estimation;
+pub mod test_case_14_cornell_box_specular;
