@@ -20,10 +20,15 @@ fn main() {
     //test_case_10_lighting::test(samples);
     //test_case_11_cornell_box::test(samples);
     //test_case_12_cornell_box_sample_light::test(samples);
+    //test_case_13_cornell_box_next_event_estimation::test(samples);
 
+    for samples in [10, 50] {
+        test_case_15_cornell_box_specular_next_event_estimation::test(samples);
+    }
 
-    for samples in [100, 200, 1000, 2000] {
-        test_case_14_cornell_box_specular::test(samples);
-        //test_case_13_cornell_box_next_event_estimation::test(samples);
+    return;
+
+    for samples in [200, 1000] {
+        test_case_14_cornell_box_specular_monte_carlo::test(samples);
     }
 }

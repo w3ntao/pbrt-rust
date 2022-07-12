@@ -16,6 +16,8 @@ pub trait Material: Send + Sync {
         return false;
     }
 
+    fn is_specular(&self) -> bool { return false; }
+
     fn scattering_pdf(&self, _incoming_direction: Vector3, _normal: Vector3, _scattered_direction: Vector3) -> f32 {
         panic!("scattering_pdf() not implemented for this Material");
     }

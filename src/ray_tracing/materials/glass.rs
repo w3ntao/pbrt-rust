@@ -60,4 +60,6 @@ impl Material for Glass {
         let scattered_ray = Ray::new(intersection.hit_point, direction);
         return (true, scattered_ray, Color::new(1.0, 1.0, 1.0));
     }
+
+    fn is_specular(&self) -> bool { return true; }
 }

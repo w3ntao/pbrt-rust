@@ -19,4 +19,6 @@ impl Material for Mirror {
         // TODO: I am implementing perfect glass for the time being
         // TODO: that reflects everything
     }
+
+    fn is_specular(&self) -> bool { return true; }
 }

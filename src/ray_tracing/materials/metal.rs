@@ -28,4 +28,6 @@ impl Material for Metal {
         return (dot(scattered_ray.direction, intersection.normal) > 0.0, scattered_ray, self.albedo);
         // for those light go beneath the surface, consider them not scattered
     }
+
+    fn is_specular(&self) -> bool { return true; }
 }
