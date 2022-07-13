@@ -102,15 +102,10 @@ impl Instance {
     }
 
     pub fn scale_by_scalar(&mut self, scalar: f32) {
-        for idx in 0..3 {
-            self.transform[idx][idx] *= scalar;
-        }
-    }
-
-    #[allow(dead_code)]
-    pub fn scale_by_vector(&mut self, scalar: Vector3) {
-        for idx in 0..3 {
-            self.transform[idx][idx] *= scalar[idx];
+        for row in 0..3 {
+            for col in 0..3 {
+                self.transform[row][col] *= scalar;
+            }
         }
     }
 
