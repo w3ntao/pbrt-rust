@@ -5,7 +5,7 @@ mod ray_tracing;
 mod test_cases;
 
 fn main() {
-    //let samples = 5;
+    let samples = 5;
     println!();
     //test_case_0_primitives_intersection::test();
     //test_case_1_bvh_building::test();
@@ -18,20 +18,9 @@ fn main() {
     //test_case_8_checker_texture::test(samples);
     //test_case_9_perlin_texture::test(samples);
     //test_case_10_lighting::test(samples);
-    //test_case_11_cornell_box::test(samples);
-    //test_case_12_cornell_box_sample_light::test(samples);
-    //test_case_13_cornell_box_next_event_estimation::test(samples);
-
-    test_case_15_cornell_box_specular_dragon_next_event_estimation::test(1);
-
-    return;
-
-    for samples in [50] {
-        test_case_12_cornell_box_next_event_estimation::test(samples);
-        test_case_14_cornell_box_specular_next_event_estimation::test(samples);
-    }
-
-    for samples in [100, 200] {
-        test_case_13_cornell_box_specular_monte_carlo::test(samples);
-    }
+    test_case_11_cornell_box_monte_carlo::test(samples);
+    test_case_12_cornell_box_next_event_estimation::test(samples);
+    test_case_13_cornell_box_specular_monte_carlo::test(samples);
+    test_case_14_cornell_box_specular_next_event_estimation::test(samples);
+    test_case_15_cornell_box_metal_dragon_next_event_estimation::test(5);
 }
