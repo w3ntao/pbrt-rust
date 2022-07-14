@@ -4,7 +4,6 @@ use crate::cornell_box::*;
 use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::perspective::Perspective;
 use crate::ray_tracing::integrators::next_event_estimation::NextEventEstimation;
-use crate::ray_tracing::integrators::ray_casting_dot_normal::RayCastingDotNormal;
 use crate::ray_tracing::renderer::Renderer;
 
 #[allow(dead_code)]
@@ -18,8 +17,8 @@ pub fn test(samples: u32) {
     let samples = samples_per_dimension * samples_per_dimension;
     println!("actual samples: {}", samples);
 
-    const WIDTH: usize = 600;
-    const HEIGHT: usize = 600;
+    const WIDTH: usize = 1600;
+    const HEIGHT: usize = 1600;
 
     let camera_center = Point::new(278.0, 278.0, -800.0);
     let look_at = Point::new(278.0, 278.0, 0.0);
@@ -32,7 +31,7 @@ pub fn test(samples: u32) {
         PI / 4.0,
         PI / 4.0);
 
-    let integrator = NextEventEstimation::new(Arc::new(cornell_box_specular_dragon()));
+    let integrator = NextEventEstimation::new(Arc::new(cornell_box_metal_dragon()));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
     let image = renderer.render(WIDTH, HEIGHT);
     image.write(&ppm_name);
