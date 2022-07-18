@@ -4,7 +4,7 @@ use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::depth_of_field::DepthOfField;
 use crate::ray_tracing::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
 use crate::ray_tracing::renderer::Renderer;
-use crate::test_case_4_material_b::scene_three_spheres;
+use crate::test_case_05_material_b::scene_three_spheres;
 
 #[allow(dead_code)]
 pub fn test(samples: u32) {

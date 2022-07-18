@@ -11,7 +11,7 @@ use crate::ray_tracing::primitives::sphere::Sphere;
 use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::textures::checker_texture::CheckerTexture;
 use crate::ray_tracing::textures::solid_color::*;
-use crate::test_case_6_rt_weekend_final::many_random_spheres;
+use crate::test_case_07_rt_weekend_final::many_random_spheres;
 
 #[allow(dead_code)]
 pub fn test(samples: u32) {
