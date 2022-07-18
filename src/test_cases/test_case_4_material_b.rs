@@ -50,19 +50,21 @@ pub fn test(samples: u32) {
     println!("TESTING: {}", &file_name);
     let ppm_name = format!("{}.ppm", file_name);
 
-    const WIDTH: usize = 1000;
-    const HEIGHT: usize = 750;
+    let width = 1000;
+    let height = 750;
 
     let camera = Perspective::new(
         Point::new(-3.0, 3.0, 2.0),
         Vector3::new(2.0, -2.0, -2.0),
         Vector3::new(0.0, 1.0, 0.0),
-        PI / 8.0,
-        PI / 6.0);
+        PI / 6.0,
+        (height as f32) / (width as f32),
+    );
 
-    let integrator = MonteCarloPathTrace::new(Arc::new(scene_three_spheres()), Color::new(0.7, 0.8, 1.0));
+    let integrator =
+        MonteCarloPathTrace::new(Arc::new(scene_three_spheres()), Color::new(0.7, 0.8, 1.0));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
-    let image = renderer.render(WIDTH, HEIGHT);
+    let image = renderer.render(width, height);
     image.write(&ppm_name);
     println!();
 }

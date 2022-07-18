@@ -1,5 +1,7 @@
 use std::sync::Arc;
 
+use rand_distr::num_traits::ToPrimitive;
+
 use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::perspective::Perspective;
 use crate::ray_tracing::integrators::next_event_estimation::NextEventEstimation;
@@ -18,8 +20,8 @@ pub fn test(samples: u32) {
     let samples = samples_per_dimension * samples_per_dimension;
     println!("actual samples: {}", samples);
 
-    const WIDTH: usize = 600;
-    const HEIGHT: usize = 600;
+    let width = 600;
+    let height = 600;
 
     let camera_center = Point::new(50.0, 52.0, 295.6);
     //let look_at = Point::new(278.0, 278.0, 0.0);
@@ -30,11 +32,12 @@ pub fn test(samples: u32) {
         direction,
         Vector3::new(0.0, 1.0, 0.0),
         PI / 4.0,
-        PI / 4.0);
+        (height as f32) / (width as f32),
+    );
 
     let integrator = RayCastingDotNormal::new(Arc::new(smallpt()));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
-    let image = renderer.render(WIDTH, HEIGHT);
+    let image = renderer.render(width, height);
     image.write(&ppm_name);
     println!();
 }

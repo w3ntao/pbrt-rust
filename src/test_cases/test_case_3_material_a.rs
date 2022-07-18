@@ -19,10 +19,9 @@ pub fn test(samples: u32) {
     println!("TESTING: {}", &file_name);
     let ppm_name = format!("{}.ppm", file_name);
 
-    const WIDTH: usize = 1000;
-    const HEIGHT: usize = 750;
-
-    let material_ground = Arc::new(Lambertian::new(Arc::new(SolidColor::new(Color::new(0.8, 0.8, 0.0)))));
+    let material_ground = Arc::new(Lambertian::new(Arc::new(SolidColor::new(Color::new(
+        0.8, 0.8, 0.0,
+    )))));
     let metal = Arc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.4));
     let mirror = Arc::new(Mirror::new());
     let glass = Arc::new(Glass::new(1.5));
@@ -46,16 +45,19 @@ pub fn test(samples: u32) {
     world.add(Arc::new(sphere_right));
     world.build_index();
 
+    let width = 1000;
+    let height = 750;
     let camera = Perspective::new(
         Point::new(0.0, 0.0, 5.0),
         Vector3::new(0.0, 0.0, -1.0),
         Vector3::new(0.0, 1.0, 0.0),
-        PI / 8.0,
-        PI / 6.0);
+        PI / 6.0,
+        (height as f32) / (width as f32),
+    );
 
     let integrator = MonteCarloPathTrace::new(Arc::new(world), Color::new(0.7, 0.8, 1.0));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
-    let image = renderer.render(WIDTH, HEIGHT);
+    let image = renderer.render(width, height);
     image.write(&ppm_name);
     println!();
 }

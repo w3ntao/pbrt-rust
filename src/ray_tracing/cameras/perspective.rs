@@ -17,11 +17,12 @@ pub struct Perspective {
 }
 
 impl Perspective {
-    pub fn new(_center: Point, _forward: Vector3, _up: Vector3,
-               _vertical_opening_angle: f32, _horizontal_opening_angle: f32) -> Self {
+    pub fn new(_center: Point, _forward: Vector3, _up: Vector3, _horizontal_opening_angle: f32, height_to_width_ratio: f32) -> Self {
         let _forward = _forward.normalize();
         let _up = _up.normalize();
         let _horizontal = cross(_forward, _up).normalize();
+
+        let _x_pixel_multiplier = (_horizontal_opening_angle / 2.0).tan();
 
         return Self {
             center: _center,
@@ -29,8 +30,8 @@ impl Perspective {
             horizontal: _horizontal,
             image_plane_vertical: cross(_horizontal, _forward),
 
-            x_pixel_multiplier: (_horizontal_opening_angle / 2.0).tan(),
-            y_pixel_multiplier: (_vertical_opening_angle / 2.0).tan(),
+            x_pixel_multiplier: _x_pixel_multiplier,
+            y_pixel_multiplier: _x_pixel_multiplier * height_to_width_ratio,
         };
     }
 }
