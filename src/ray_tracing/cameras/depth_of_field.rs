@@ -1,5 +1,5 @@
-use rand::{Rng, thread_rng};
 use rand::distributions::Uniform;
+use rand::{thread_rng, Rng};
 
 use crate::fundamental::point::*;
 use crate::fundamental::vector3::*;
@@ -21,12 +21,19 @@ pub struct DepthOfField {
 }
 
 impl DepthOfField {
-    pub fn new(_center: Point, _forward: Vector3, _up: Vector3,
-               _vertical_opening_angle: f32, _horizontal_opening_angle: f32,
-               _aperture: f32, _focus_distance: f32) -> Self {
+    pub fn new(
+        _center: Point,
+        _forward: Vector3,
+        _up: Vector3,
+        _horizontal_opening_angle: f32,
+        height_to_width_ratio: f32,
+        _aperture: f32,
+        _focus_distance: f32,
+    ) -> Self {
         let _forward = _forward.normalize();
         let _up = _up.normalize();
         let _horizontal = cross(_forward, _up).normalize();
+        let _x_pixel_multiplier = (_horizontal_opening_angle / 2.0).tan();
 
         return Self {
             center: _center,
@@ -34,8 +41,8 @@ impl DepthOfField {
             horizontal: _horizontal,
             vertical: cross(_horizontal, _forward),
 
-            x_pixel_multiplier: (_horizontal_opening_angle / 2.0).tan(),
-            y_pixel_multiplier: (_vertical_opening_angle / 2.0).tan(),
+            x_pixel_multiplier: _x_pixel_multiplier,
+            y_pixel_multiplier: _x_pixel_multiplier * height_to_width_ratio,
 
             aperture: _aperture,
             focus_distance: _focus_distance,
@@ -61,7 +68,14 @@ impl Camera for DepthOfField {
         return Ray::new(origin, (target - origin).normalize());
     }
 
-    fn get_stratified_rays(&self, num_samples: u32, min_u: f32, max_u: f32, min_v: f32, max_v: f32) -> Vec<Ray> {
+    fn get_stratified_rays(
+        &self,
+        num_samples: u32,
+        min_u: f32,
+        max_u: f32,
+        min_v: f32,
+        max_v: f32,
+    ) -> Vec<Ray> {
         // TODO: stratified aperture sampling
         let mut generator_u = thread_rng();
         let mut generator_v = thread_rng();
@@ -75,13 +89,11 @@ impl Camera for DepthOfField {
 
         for u_idx in 0..samples_per_dimension {
             let u_idx = u_idx as f32;
-            let range_u =
-                Uniform::new(min_u + u_unit * u_idx, min_u + u_unit * (u_idx + 1.0));
+            let range_u = Uniform::new(min_u + u_unit * u_idx, min_u + u_unit * (u_idx + 1.0));
 
             for v_idx in 0..samples_per_dimension {
                 let v_idx = v_idx as f32;
-                let range_v =
-                    Uniform::new(min_v + v_unit * v_idx, min_v + v_unit * (v_idx + 1.0));
+                let range_v = Uniform::new(min_v + v_unit * v_idx, min_v + v_unit * (v_idx + 1.0));
 
                 let u = generator_u.sample(range_u);
                 let v = generator_v.sample(range_v);

@@ -19,10 +19,18 @@ pub fn many_random_spheres() -> World {
         for b in -11..11 {
             let b = b as f32;
             let choose_material = random_zero_to_one();
-            let center = Point::new(a + 0.9 * random_zero_to_one(), 0.2, b + 0.9 * random_zero_to_one());
+            let center = Point::new(
+                a + 0.9 * random_zero_to_one(),
+                0.2,
+                b + 0.9 * random_zero_to_one(),
+            );
 
             let mut too_close = false;
-            for point in [Point::new(-4.0, 0.2, 0.0), Point::new(0.0, 0.2, 0.0), Point::new(4.0, 0.2, 0.0)] {
+            for point in [
+                Point::new(-4.0, 0.2, 0.0),
+                Point::new(0.0, 0.2, 0.0),
+                Point::new(4.0, 0.2, 0.0),
+            ] {
                 if (center - point).length() <= 1.2 {
                     too_close = true;
                     break;
@@ -64,9 +72,6 @@ pub fn test(samples: u32) {
     println!("TESTING: {}", &file_name);
     let ppm_name = format!("{}.ppm", file_name);
 
-    const WIDTH: usize = 1000;
-    const HEIGHT: usize = 750;
-
     let mut scene = many_random_spheres();
     let solid_color_ground = Arc::new(SolidColor::new(Color::new(0.5, 0.5, 0.5)));
     let material_ground = Arc::new(Lambertian::new(solid_color_ground.clone()));
@@ -101,17 +106,22 @@ pub fn test(samples: u32) {
     let look_at = Point::new(0.0, 0.0, 0.0);
     let direction = look_at - camera_center;
 
+    let width = 1000;
+    let height = 750;
+
     let camera = DepthOfField::new(
         camera_center,
         direction,
         Vector3::new(0.0, 1.0, 0.0),
-        PI / 8.0,
         PI / 6.0,
-        0.2, (camera_center - center_sphere_close).length());
+        (height as f32) / (width as f32),
+        0.2,
+        (camera_center - center_sphere_close).length(),
+    );
 
     let integrator = MonteCarloPathTrace::new(Arc::new(scene), Color::new(0.7, 0.8, 1.0));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
-    let image = renderer.render(WIDTH, HEIGHT);
+    let image = renderer.render(width, height);
     image.write(&ppm_name);
     println!();
 }

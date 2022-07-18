@@ -16,9 +16,6 @@ pub fn test(samples: u32) {
     println!("TESTING: {}", &file_name);
     let ppm_name = format!("{}.ppm", file_name);
 
-    const WIDTH: usize = 1000;
-    const HEIGHT: usize = 750;
-
     let mut scene = World::default();
 
     let perlin_texture = Arc::new(NoiseTexture::new(4.0));
@@ -40,17 +37,22 @@ pub fn test(samples: u32) {
     let look_at = Point::new(0.0, 0.0, 0.0);
     let direction = look_at - camera_center;
 
+    let width = 1000;
+    let height = 750;
+
     let camera = DepthOfField::new(
         camera_center,
         direction,
         Vector3::new(0.0, 1.0, 0.0),
-        PI / 8.0,
         PI / 6.0,
-        0.002, (camera_center - sphere_center).length());
+        (height as f32) / (width as f32),
+        0.002,
+        (camera_center - sphere_center).length(),
+    );
 
     let integrator = MonteCarloPathTrace::new(Arc::new(scene), Color::new(0.7, 0.8, 1.0));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
-    let image = renderer.render(WIDTH, HEIGHT);
+    let image = renderer.render(width, height);
     image.write(&ppm_name);
     println!();
 }

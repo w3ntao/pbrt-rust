@@ -19,15 +19,15 @@ pub fn test(samples: u32) {
     println!("TESTING: {}", &file_name);
     let ppm_name = format!("{}.ppm", file_name);
 
-    const WIDTH: usize = 1000;
-    const HEIGHT: usize = 750;
-
     let mut scene = many_random_spheres();
 
     let solid_green = Arc::new(SolidColor::new(Color::new(0.2, 0.3, 0.1)));
     let solid_white = Arc::new(SolidColor::new(Color::new(0.9, 0.9, 0.9)));
 
-    let checker = Arc::new(CheckerTexture::new(solid_green.clone(), solid_white.clone()));
+    let checker = Arc::new(CheckerTexture::new(
+        solid_green.clone(),
+        solid_white.clone(),
+    ));
     let material_ground = Arc::new(Lambertian::new(checker.clone()));
 
     let ground_radius = 1000.0;
@@ -60,17 +60,22 @@ pub fn test(samples: u32) {
     let look_at = Point::new(0.0, 0.0, 0.0);
     let direction = look_at - camera_center;
 
+    let width = 1000;
+    let height = 750;
+
     let camera = DepthOfField::new(
         camera_center,
         direction,
         Vector3::new(0.0, 1.0, 0.0),
-        PI / 8.0,
         PI / 6.0,
-        0.2, (camera_center - center_sphere_close).length());
+        (height as f32) / (width as f32),
+        0.2,
+        (camera_center - center_sphere_close).length(),
+    );
 
     let integrator = MonteCarloPathTrace::new(Arc::new(scene), Color::new(0.7, 0.8, 1.0));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
-    let image = renderer.render(WIDTH, HEIGHT);
+    let image = renderer.render(width, height);
     image.write(&ppm_name);
     println!();
 }
