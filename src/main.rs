@@ -34,7 +34,10 @@ fn main() {
     test_case_08_rt_weekend_final_dragon::test(samples);
     */
 
-    let samples = 200;
-    test_case_12_cornell_box_monte_carlo::test(samples);
-    test_case_14_cornell_box_specular_monte_carlo::test(samples);
+    let mut samples = 40;
+    test_case_13_cornell_box_next_event_estimation::test(samples);
+    test_case_17_smallpt::test(samples);
+
+    samples = 10;
+    test_case_16_cornell_box_metal_dragon_next_event_estimation::test(samples);
 }

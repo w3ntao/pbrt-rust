@@ -4,6 +4,7 @@ use crate::fundamental::color::*;
 use crate::fundamental::constants::INTERSECT_OFFSET;
 use crate::fundamental::vector3::{cosine, dot};
 use crate::ray_tracing::integrator::Integrator;
+use crate::ray_tracing::intersection::Intersection;
 use crate::ray_tracing::ray::Ray;
 use crate::ray_tracing::world::World;
 
@@ -22,6 +23,45 @@ impl NextEventEstimation {
 }
 
 impl NextEventEstimation {
+    fn get_direct_illumination(&self, intersection: &Intersection, ray: &Ray) -> Color {
+        let (light_id, light_point, light_normal, light_area) = self.world.sample_light();
+        let towards_light = light_point - intersection.hit_point;
+        let distance_squared = towards_light.length_squared();
+        let towards_light = towards_light.normalize();
+
+        // sampled light at the back side of object normal
+        if dot(towards_light, intersection.normal) <= 0.0 {
+            return Color::black();
+        }
+
+        let shadow_ray = Ray::new(intersection.hit_point, towards_light);
+
+        // with light_cosine, the light emits uni-directionally
+        let light_cosine = cosine(-towards_light, light_normal);
+        if light_cosine <= 0.0 {
+            return Color::black();
+        }
+
+        let shadow_intersection =
+            self.world
+                .intersect(&shadow_ray, INTERSECT_OFFSET, f32::INFINITY);
+
+        // couldn't reach the sampled light
+        if !shadow_intersection.intersected() || shadow_intersection.object_id != light_id {
+            return Color::black();
+        }
+
+        let sample_light_pdf = distance_squared / (light_cosine * light_area);
+
+        return shadow_intersection.material.emit(&shadow_intersection)
+            * intersection.material.scattering_pdf(
+                ray.direction,
+                intersection.normal,
+                towards_light,
+            )
+            / sample_light_pdf;
+    }
+
     fn trace(&self, ray: Ray, last_hit_specular: bool, depth: u32) -> Color {
         if depth == self.max_depth {
             return Color::black();
@@ -41,55 +81,24 @@ impl NextEventEstimation {
             intersection.material.scatter(ray, &intersection);
         if !scattered {
             // to avoid double sampling on light
-            return if depth == 0 || last_hit_specular { emission } else { Color::black() };
+            return if depth == 0 || last_hit_specular {
+                emission
+            } else {
+                Color::black()
+            };
         }
 
-        if intersection.material.is_specular() {
-            return self.trace(scattered_ray, true, depth + 1) * attenuation;
-        }
-
+        let last_hit_specular = intersection.material.is_specular();
         // for scattering: cos(theta) / PI cancel out for scattering_pdf and sample_pdf
-        let indirect_illumination = self.trace(scattered_ray, false, depth + 1) * attenuation;
+        let indirect_illumination = self.trace(scattered_ray, last_hit_specular, depth + 1);
 
-        let (light_id, light_point, light_normal, light_area) = self.world.sample_light();
-        let towards_light = light_point - intersection.hit_point;
-        let distance_squared = towards_light.length_squared();
-        let towards_light = towards_light.normalize();
-
-        // sampled light at the back side of object normal
-        if dot(towards_light, intersection.normal) <= 0.0 {
-            return emission + indirect_illumination;
+        if last_hit_specular {
+            return emission + attenuation * indirect_illumination;
         }
 
-        let shadow_ray = Ray::new(intersection.hit_point, towards_light);
+        let direct_illumination = self.get_direct_illumination(&intersection, &ray);
 
-        // with light_cosine, the light emits unidirectionally
-        let light_cosine = cosine(-towards_light, light_normal);
-        if light_cosine <= 0.0 {
-            return emission + indirect_illumination;
-        }
-
-        let shadow_intersection =
-            self.world
-                .intersect(&shadow_ray, INTERSECT_OFFSET, f32::INFINITY);
-
-        // couldn't reach the sampled light
-        if !shadow_intersection.intersected() || shadow_intersection.object_id != light_id {
-            return emission + indirect_illumination;
-        }
-
-        let sample_light_pdf = distance_squared / (light_cosine * light_area);
-
-        let direct_illumination = shadow_intersection.material.emit(&shadow_intersection)
-            * attenuation
-            * intersection.material.scattering_pdf(
-            ray.direction,
-            intersection.normal,
-            towards_light,
-        )
-            / sample_light_pdf;
-
-        return emission + direct_illumination + indirect_illumination;
+        return emission + attenuation * (direct_illumination + indirect_illumination);
     }
 }
 
