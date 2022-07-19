@@ -19,6 +19,10 @@ impl Color {
     pub fn black() -> Self {
         return Color::new(0.0, 0.0, 0.0);
     }
+
+    pub fn max_val(&self) -> f32 {
+        return self.r.max(self.g).max(self.b);
+    }
 }
 
 impl ops::Add<Color> for Color {
@@ -85,5 +89,13 @@ impl ops::MulAssign<Color> for Color {
         self.r *= rhs.r;
         self.g *= rhs.g;
         self.b *= rhs.b;
+    }
+}
+
+impl ops::DivAssign<f32> for Color {
+    fn div_assign(&mut self, rhs: f32) {
+        self.r /= rhs;
+        self.g /= rhs;
+        self.b /= rhs;
     }
 }
