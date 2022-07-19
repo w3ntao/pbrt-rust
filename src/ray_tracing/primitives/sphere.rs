@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use crate::fundamental::point::*;
+use crate::fundamental::random::random_u128;
 use crate::fundamental::utility::*;
 use crate::fundamental::vector3::*;
 use crate::ray_tracing::bounding_box::BoundingBox;
@@ -70,11 +71,15 @@ impl Primitive for Sphere {
         let hit_point = ray.get_point(root);
 
         let mut intersection = if dot(ray.direction, normal) < 0.0 {
-            Intersection::from_outside(root, hit_point,
-                                       normal, self.material.clone(), self.get_id())
+            Intersection::from_outside(
+                root,
+                hit_point,
+                normal,
+                self.material.clone(),
+                self.get_id(),
+            )
         } else {
-            Intersection::from_inside(root, hit_point,
-                                      -normal, self.material.clone())
+            Intersection::from_inside(root, hit_point, -normal, self.material.clone())
         };
 
         let (u, v) = get_sphere_uv((hit_point - self.center).normalize().to_point());

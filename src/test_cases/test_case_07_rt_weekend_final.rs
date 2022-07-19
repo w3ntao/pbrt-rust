@@ -1,5 +1,4 @@
-use std::sync::Arc;
-
+use crate::fundamental::random::random_f32;
 use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::depth_of_field::DepthOfField;
 use crate::ray_tracing::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
@@ -11,6 +10,15 @@ use crate::ray_tracing::primitives::sphere::Sphere;
 use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::textures::solid_color::SolidColor;
 use crate::ray_tracing::world::World;
+use std::sync::Arc;
+
+fn random_color() -> Color {
+    return Color::new(
+        random_f32(0.0, 1.0),
+        random_f32(0.0, 1.0),
+        random_f32(0.0, 1.0),
+    );
+}
 
 pub fn many_random_spheres() -> World {
     let mut scene = World::default();
@@ -18,11 +26,11 @@ pub fn many_random_spheres() -> World {
         let a = a as f32;
         for b in -11..11 {
             let b = b as f32;
-            let choose_material = random_zero_to_one();
+            let choose_material = random_f32(0.0, 1.0);
             let center = Point::new(
-                a + 0.9 * random_zero_to_one(),
+                a + 0.9 * random_f32(0.0, 1.0),
                 0.2,
-                b + 0.9 * random_zero_to_one(),
+                b + 0.9 * random_f32(0.0, 1.0),
             );
 
             let mut too_close = false;
@@ -50,8 +58,8 @@ pub fn many_random_spheres() -> World {
                 sphere.set_material(Arc::new(material));
             } else if choose_material < 0.7 {
                 // metal
-                let albedo = random_in_range(0.5, 1.0) * Color::new(1.0, 1.0, 1.0);
-                let fuzz = random_in_range(0.0, 0.5);
+                let albedo = random_f32(0.5, 1.0) * Color::new(1.0, 1.0, 1.0);
+                let fuzz = random_f32(0.0, 0.5);
                 let metal = Metal::new(albedo, fuzz);
                 sphere.set_material(Arc::new(metal));
             } else {

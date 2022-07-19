@@ -1,6 +1,7 @@
 use std::ops;
 
 use crate::fundamental::point::*;
+use crate::fundamental::random::random_f32;
 use crate::fundamental::utility::*;
 
 #[derive(Copy, Clone)]
@@ -184,19 +185,18 @@ pub fn cosine(a: Vector3, b: Vector3) -> f32 {
 }
 
 pub fn random_in_unit_sphere() -> Vector3 {
-    let phi = random_in_range(0.0, 2.0 * PI);
+    let phi = random_f32(0.0, 2.0 * PI);
     let sin_phi = phi.sin();
     let cos_phi = phi.cos();
-
-    let cos_theta = random_in_range(-1.0, 1.0);
+    let cos_theta = random_f32(-1.0, 1.0);
     let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
 
     return Vector3::new(sin_phi * sin_theta, cos_phi * sin_theta, cos_theta);
 }
 
 pub fn random_vector_in_disk() -> (f32, f32) {
-    let r = random_zero_to_one().sqrt();
-    let theta = random_zero_to_one() * 2.0 * PI;
+    let r = random_f32(0.0, 1.0).sqrt();
+    let theta = random_f32(0.0, 2.0 * PI);
 
     return (r * theta.sin(), r * theta.cos());
 }

@@ -1,7 +1,7 @@
 use rand::Rng;
 
 use crate::fundamental::point::Point;
-use crate::fundamental::utility::random_in_range;
+use crate::fundamental::random::random_f32;
 use crate::fundamental::vector3::{dot, Vector3};
 
 const POINT_COUNT: usize = 256;
@@ -18,9 +18,11 @@ impl Perlin {
         let mut _random_vector = [Vector3::invalid(); POINT_COUNT];
         for idx in 0..POINT_COUNT {
             _random_vector[idx] = Vector3::new(
-                random_in_range(-1.0, 1.0),
-                random_in_range(-1.0, 1.0),
-                random_in_range(-1.0, 1.0)).normalize();
+                random_f32(-1.0, 1.0),
+                random_f32(-1.0, 1.0),
+                random_f32(-1.0, 1.0),
+            )
+            .normalize();
         }
 
         return Perlin {
@@ -44,10 +46,9 @@ impl Perlin {
         for di in 0..2 {
             for dj in 0..2 {
                 for dk in 0..2 {
-                    let index
-                        = self.permuted_x[((i + di) & 255) as usize] ^
-                        self.permuted_y[((j + dj) & 255) as usize] ^
-                        self.permuted_z[((k + dk) & 255) as usize];
+                    let index = self.permuted_x[((i + di) & 255) as usize]
+                        ^ self.permuted_y[((j + dj) & 255) as usize]
+                        ^ self.permuted_z[((k + dk) & 255) as usize];
 
                     c[di as usize][dj as usize][dk as usize] = self.random_vector[index as usize];
                 }
@@ -107,8 +108,7 @@ fn perlin_interpolate(c: [[[Vector3; 2]; 2]; 2], u: f32, v: f32, w: f32) -> f32 
                 let k = k as f32;
                 let weight = Vector3::new(u - i, v - j, w - k);
 
-                accumulate
-                    += (i * uu + (1.0 - i) * (1.0 - uu))
+                accumulate += (i * uu + (1.0 - i) * (1.0 - uu))
                     * (j * vv + (1.0 - j) * (1.0 - vv))
                     * (k * ww + (1.0 - k) * (1.0 - ww))
                     * dot(c[i as usize][j as usize][k as usize], weight);

@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use crate::fundamental::point::*;
-use crate::fundamental::utility::random_u128;
+use crate::fundamental::random::random_u128;
 use crate::fundamental::vector3::*;
 use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::intersection::*;
@@ -54,8 +54,10 @@ impl Primitive for Triangle {
         let gamma = dot(self.span0, cross(ray.direction, c)) / det;
         let error_tolerance = 0.01;
         // to tolerate numerical error
-        if beta < -error_tolerance || gamma < -error_tolerance ||
-            beta + gamma > 1.0 + error_tolerance {
+        if beta < -error_tolerance
+            || gamma < -error_tolerance
+            || beta + gamma > 1.0 + error_tolerance
+        {
             // if the intersection is outside of the triangle
             return Intersection::failure();
         }
@@ -63,7 +65,13 @@ impl Primitive for Triangle {
         let cos = cosine(ray.direction, self.normal);
         let normal = if cos < 0.0 { self.normal } else { -self.normal };
 
-        return Intersection::from_outside(t, ray.get_point(t), normal, self.material.clone(), self.get_id());
+        return Intersection::from_outside(
+            t,
+            ray.get_point(t),
+            normal,
+            self.material.clone(),
+            self.get_id(),
+        );
     }
 
     fn get_bounds(&self) -> BoundingBox {

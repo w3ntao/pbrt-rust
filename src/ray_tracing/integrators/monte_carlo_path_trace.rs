@@ -1,6 +1,6 @@
 use crate::fundamental::color::*;
 use crate::fundamental::constants::INTERSECT_OFFSET;
-use crate::fundamental::random_generator::RandomF32Generator;
+use crate::fundamental::random::RandomF32Generator;
 use crate::ray_tracing::integrator::Integrator;
 use crate::ray_tracing::ray::Ray;
 use crate::ray_tracing::world::World;
@@ -29,7 +29,6 @@ impl MonteCarloPathTrace {
         let mut random_generator = RandomF32Generator::new(0.0, 1.0);
         let max_russian_roulette_threshold = 0.75;
 
-        //for depth in 0..self.max_depth {
         for depth in 0..u32::MAX {
             let intersection = self.world.intersect(&ray, INTERSECT_OFFSET, f32::INFINITY);
             // with INTERSECT_OFFSET, we can avoid the situation when the ray

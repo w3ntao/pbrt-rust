@@ -1,7 +1,7 @@
 use rand_distr::num_traits::Pow;
 
 use crate::fundamental::color::*;
-use crate::fundamental::utility::random_zero_to_one;
+use crate::fundamental::random::random_f32;
 use crate::fundamental::vector3::*;
 use crate::ray_tracing::intersection::*;
 use crate::ray_tracing::material::Material;
@@ -13,7 +13,9 @@ pub struct Glass {
 
 impl Glass {
     pub fn new(_index_of_refraction: f32) -> Glass {
-        Glass { index_of_refraction: _index_of_refraction }
+        Glass {
+            index_of_refraction: _index_of_refraction,
+        }
     }
 }
 
@@ -49,17 +51,19 @@ impl Material for Glass {
         let sine_theta = (1.0 - cosine_theta * cosine_theta).sqrt();
 
         let cannot_refract = refraction_ratio * sine_theta > 1.0;
-        let direction = if cannot_refract || reflectance(cosine_theta, refraction_ratio) > random_zero_to_one() {
+        let direction = if cannot_refract
+            || reflectance(cosine_theta, refraction_ratio) > random_f32(0.0, 1.0)
+        {
             incoming_ray.direction.reflect(normal)
         } else {
-            refract(incoming_ray.direction,
-                    normal,
-                    refraction_ratio)
+            refract(incoming_ray.direction, normal, refraction_ratio)
         };
 
         let scattered_ray = Ray::new(intersection.hit_point, direction);
         return (true, scattered_ray, Color::new(1.0, 1.0, 1.0));
     }
 
-    fn is_specular(&self) -> bool { return true; }
+    fn is_specular(&self) -> bool {
+        return true;
+    }
 }

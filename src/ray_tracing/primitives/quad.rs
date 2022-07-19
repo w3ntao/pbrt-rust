@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use crate::fundamental::point::*;
-use crate::fundamental::utility::{random_u128, random_zero_to_one};
+use crate::fundamental::random::{random_f32, random_u128};
 use crate::fundamental::vector3::*;
 use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::intersection::*;
@@ -53,8 +53,18 @@ impl Primitive for Quad {
             return Intersection::failure();
         }
 
-        let normal = if dot(ray.direction, self.normal) < 0.0 { self.normal } else { -self.normal };
-        return Intersection::from_outside(t, ray.get_point(t), normal, self.material.clone(), self.get_id());
+        let normal = if dot(ray.direction, self.normal) < 0.0 {
+            self.normal
+        } else {
+            -self.normal
+        };
+        return Intersection::from_outside(
+            t,
+            ray.get_point(t),
+            normal,
+            self.material.clone(),
+            self.get_id(),
+        );
     }
 
     fn get_bounds(&self) -> BoundingBox {
@@ -66,9 +76,12 @@ impl Primitive for Quad {
     }
 
     fn sample(&self) -> (Point, Vector3) {
-        let alpha = random_zero_to_one();
-        let beta = random_zero_to_one();
-        return (self.origin + alpha * self.span0 + beta * self.span1, self.normal);
+        let alpha = random_f32(0.0, 1.0);
+        let beta = random_f32(0.0, 1.0);
+        return (
+            self.origin + alpha * self.span0 + beta * self.span1,
+            self.normal,
+        );
     }
 
     fn get_id(&self) -> u128 {

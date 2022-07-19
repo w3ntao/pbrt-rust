@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use crate::fundamental::point::*;
-use crate::fundamental::utility::random_u128;
+use crate::fundamental::random::random_u128;
 use crate::fundamental::vector3::*;
 use crate::ray_tracing::bounding_box::BoundingBox;
 use crate::ray_tracing::intersection::*;

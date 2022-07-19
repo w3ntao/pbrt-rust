@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use crate::fundamental::color::*;
 use crate::fundamental::orthonormal_basis::OrthonormalBasis;
+use crate::fundamental::random::random_f32;
 use crate::fundamental::utility::*;
 use crate::fundamental::vector3::*;
 use crate::ray_tracing::intersection::*;
@@ -15,17 +16,15 @@ pub struct Lambertian {
 
 impl Lambertian {
     pub fn new(texture: Arc<dyn Texture>) -> Lambertian {
-        Lambertian {
-            albedo: texture,
-        }
+        Lambertian { albedo: texture }
     }
 }
 
 fn random_cosine_direction() -> Vector3 {
-    let sin2_theta = random_zero_to_one();
+    let sin2_theta = random_f32(0.0, 1.0);
     let cos2_theta = 1.0 - sin2_theta;
 
-    let phi = random_in_range(0.0, 2.0 * PI);
+    let phi = random_f32(0.0, 2.0 * PI);
     let sin_phi = phi.sin();
     let cos_phi = phi.cos();
 
@@ -41,12 +40,21 @@ impl Material for Lambertian {
 
         let scattered_ray = Ray::new(intersection.hit_point, random_direction.normalize());
 
-        return (true, scattered_ray, self.albedo.get_color(intersection.u, intersection.v, intersection.hit_point));
+        return (
+            true,
+            scattered_ray,
+            self.albedo
+                .get_color(intersection.u, intersection.v, intersection.hit_point),
+        );
     }
 
     fn scattering_pdf(&self, _: Vector3, normal: Vector3, scattered_direction: Vector3) -> f32 {
         let val_cosine = cosine(normal, scattered_direction);
 
-        return if val_cosine <= 0.0 { 0.0 } else { val_cosine / PI };
+        return if val_cosine <= 0.0 {
+            0.0
+        } else {
+            val_cosine / PI
+        };
     }
 }
