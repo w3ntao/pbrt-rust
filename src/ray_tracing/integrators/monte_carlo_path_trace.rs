@@ -23,33 +23,46 @@ impl MonteCarloPathTrace {
 }
 
 impl MonteCarloPathTrace {
-    fn trace(&self, ray: Ray, depth: u32) -> Color {
-        if depth == self.max_depth {
-            return Color::black();
+    fn trace(&self, ray: Ray) -> Color {
+        let mut color = Color::black();
+        let mut throughput = Color::new(1.0, 1.0, 1.0);
+
+        let mut ray = ray;
+        for depth in 0..self.max_depth {
+            if depth == self.max_depth {
+                return Color::black();
+            }
+
+            let intersection = self.world.intersect(&ray, INTERSECT_OFFSET, f32::INFINITY);
+            // with INTERSECT_OFFSET, we can avoid the situation when the ray
+            // re-hit the surface it just leave
+
+            if !intersection.intersected() {
+                color += throughput * self.background;
+                break;
+            }
+
+            let emission = intersection.material.emit(&intersection);
+
+            let (scattered, scattered_ray, attenuation) = intersection.material.scatter(ray, &intersection);
+
+            if !scattered {
+                color += emission * throughput;
+                break;
+            }
+
+            color += emission * throughput;
+            throughput *= attenuation;
+
+            ray = scattered_ray;
         }
 
-        let intersection = self.world.intersect(&ray, INTERSECT_OFFSET, f32::INFINITY);
-        // with INTERSECT_OFFSET, we can avoid the situation when the ray
-        // re-hit the surface it just leave
-
-        if !intersection.intersected() {
-            return self.background;
-        }
-
-        let emission = intersection.material.emit(&intersection);
-
-        let (scattered, scattered_ray, attenuation) = intersection.material.scatter(ray, &intersection);
-
-        if !scattered {
-            return emission;
-        }
-
-        return emission + attenuation * self.trace(scattered_ray, depth + 1);
+        return color;
     }
 }
 
 impl Integrator for MonteCarloPathTrace {
     fn get_radiance(&self, ray: Ray) -> Color {
-        return self.trace(ray, 0);
+        return self.trace(ray);
     }
 }
