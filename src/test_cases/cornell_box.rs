@@ -81,13 +81,13 @@ fn empty_cornell_box() -> World {
 }
 
 pub fn cornell_box_camera(width: usize, height: usize) -> Perspective {
-    let camera_center = Point::new(278.0, 278.0, -800.0);
-    let look_at = Point::new(278.0, 278.0, 0.0);
-    let direction = look_at - camera_center;
+    let camera_center = Point::new(278.0, 278.0, -600.0);
+    //let look_at = Point::new(278.0, 278.0, 0.0);
+    //let direction = look_at - camera_center;
 
     return Perspective::new(
         camera_center,
-        direction,
+        Vector3::new(0.0, 0.0, 1.0),
         Vector3::new(0.0, 1.0, 0.0),
         PI / 4.0,
         (height as f32) / (width as f32),
