@@ -76,7 +76,6 @@ impl Camera for DepthOfField {
         min_v: f32,
         max_v: f32,
     ) -> Vec<Ray> {
-        // TODO: stratify aperture sampling
         let mut generator_u = thread_rng();
         let mut generator_v = thread_rng();
 
