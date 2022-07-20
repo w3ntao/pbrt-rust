@@ -8,7 +8,7 @@ use crate::ray_tracing::renderer::Renderer;
 use crate::smallpt::smallpt;
 
 #[allow(dead_code)]
-pub fn test(samples: u32) {
+pub fn test(width: usize, height: usize, samples: u32) {
     let file_name = get_file_name(file!());
 
     println!(
@@ -20,9 +20,6 @@ pub fn test(samples: u32) {
     let samples_per_dimension = (samples as f32).sqrt() as u32;
     let samples = samples_per_dimension * samples_per_dimension;
     println!("actual samples: {}", samples);
-
-    let width = 1024;
-    let height = 762;
 
     let camera_center = Point::new(50.0, 52.0, 275.6);
     let direction = Vector3::new(0.0, -0.042612, -1.0);
