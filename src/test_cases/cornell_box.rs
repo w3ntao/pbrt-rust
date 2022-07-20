@@ -1,10 +1,5 @@
-use std::sync::Arc;
-
-use crate::fundamental::obj_loader::obj_to_triangles;
 use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::perspective::Perspective;
-use crate::ray_tracing::group::Group;
-use crate::ray_tracing::groups::bvh::BVH;
 use crate::ray_tracing::instance::Instance;
 use crate::ray_tracing::materials::diffuse_light::DiffuseLight;
 use crate::ray_tracing::materials::glass::Glass;
@@ -16,6 +11,8 @@ use crate::ray_tracing::primitives::quad::Quad;
 use crate::ray_tracing::primitives::sphere::Sphere;
 use crate::ray_tracing::textures::solid_color::SolidColor;
 use crate::ray_tracing::world::World;
+use crate::utility::load_dragon;
+use std::sync::Arc;
 
 const WALL_LENGTH: f32 = 555.0;
 
@@ -183,20 +180,13 @@ pub fn cornell_box_metal_dragon() -> World {
     let quad_light = Arc::new(quad_light);
     world.add_light(quad_light);
 
-    let triangles = obj_to_triangles("models/dragon.obj");
-    let mut dragon_model = BVH::default();
-    for t in triangles {
-        dragon_model.add(t);
-    }
-
-    dragon_model.build_index();
-    let dragon_model = Arc::new(dragon_model);
-    let mut dragon_var = Instance::new(dragon_model.clone());
-    dragon_var.rotate(Vector3::new(0.0, 1.0, 0.0), 1.5 * PI);
-    dragon_var.scale_by_scalar(350.0);
-    dragon_var.translate(Vector3::new(WALL_LENGTH / 2.0, 98.0, WALL_LENGTH / 2.0));
-    dragon_var.set_material(metal.clone());
-    world.add(Arc::new(dragon_var));
+    let dragon_model = Arc::new(load_dragon());
+    let mut dragon_instance = Instance::new(dragon_model.clone());
+    dragon_instance.rotate(Vector3::new(0.0, 1.0, 0.0), 1.5 * PI);
+    dragon_instance.scale_by_scalar(350.0);
+    dragon_instance.translate(Vector3::new(WALL_LENGTH / 2.0, 98.0, WALL_LENGTH / 2.0));
+    dragon_instance.set_material(metal.clone());
+    world.add(Arc::new(dragon_instance));
 
     world.build_index();
 

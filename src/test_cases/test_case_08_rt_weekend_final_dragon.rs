@@ -1,10 +1,5 @@
-use std::sync::Arc;
-
-use crate::fundamental::obj_loader::obj_to_triangles;
 use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::depth_of_field::DepthOfField;
-use crate::ray_tracing::group::Group;
-use crate::ray_tracing::groups::bvh::BVH;
 use crate::ray_tracing::instance::*;
 use crate::ray_tracing::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
 use crate::ray_tracing::materials::glass::*;
@@ -15,6 +10,8 @@ use crate::ray_tracing::primitives::sphere::Sphere;
 use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::textures::solid_color::SolidColor;
 use crate::test_case_07_rt_weekend_final::many_random_spheres;
+use crate::utility::load_dragon;
+use std::sync::Arc;
 
 #[allow(dead_code)]
 pub fn test(width: usize, height: usize, samples: u32) {
@@ -37,13 +34,7 @@ pub fn test(width: usize, height: usize, samples: u32) {
     let glass = Arc::new(Glass::new(1.5));
     let metal = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
 
-    let mut dragon_bvh = BVH::default();
-    for t in obj_to_triangles("models/dragon.obj") {
-        dragon_bvh.add(t);
-    }
-    dragon_bvh.build_index();
-
-    let mut scaled_dragon = Instance::new(Arc::new(dragon_bvh));
+    let mut scaled_dragon = Instance::new(Arc::new(load_dragon()));
     scaled_dragon.rotate(Vector3::new(0.0, 1.0, 0.0), PI);
     scaled_dragon.translate(Vector3::new(0.0, 0.7, 0.0));
     scaled_dragon.scale_by_scalar(2.5);

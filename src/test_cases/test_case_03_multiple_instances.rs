@@ -1,26 +1,17 @@
-use std::sync::Arc;
-
-use crate::fundamental::obj_loader::obj_to_triangles;
 use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::perspective::Perspective;
-use crate::ray_tracing::group::Group;
-use crate::ray_tracing::groups::bvh::BVH;
 use crate::ray_tracing::instance::*;
 use crate::ray_tracing::integrators::ray_casting_dot_normal::RayCastingDotNormal;
 use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::world::World;
+use crate::utility::load_dragon;
+use std::sync::Arc;
 
 #[allow(dead_code)]
 pub fn test(width: usize, height: usize) {
     let file_name = get_file_name(file!());
     println!("TESTING: {}", &file_name);
-    let triangles = obj_to_triangles("models/dragon.obj");
-    let mut dragon_model = BVH::default();
-    for t in triangles {
-        dragon_model.add(t);
-    }
-    dragon_model.build_index();
-    let dragon_model = Arc::new(dragon_model);
+    let dragon_model = Arc::new(load_dragon());
 
     let num = 5;
     let radius: f32 = 1.5;
@@ -29,14 +20,14 @@ pub fn test(width: usize, height: usize) {
     let mut world = World::default();
     for idx in 0..num {
         let theta = (idx as f32) * delta;
-        let mut dragon_var = Instance::new(dragon_model.clone());
-        dragon_var.rotate(Vector3::new(0.0, 1.0, 0.0), theta);
-        dragon_var.translate(Vector3::new(
-            radius * f32::sin(theta),
+        let mut dragon_instance = Instance::new(dragon_model.clone());
+        dragon_instance.rotate(Vector3::new(0.0, 1.0, 0.0), theta);
+        dragon_instance.translate(Vector3::new(
+            radius * theta.sin(),
             0.0,
-            radius * f32::cos(theta),
+            radius * theta.cos(),
         ));
-        world.add(Arc::new(dragon_var));
+        world.add(Arc::new(dragon_instance));
     }
     world.build_index();
 

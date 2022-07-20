@@ -1,21 +1,21 @@
-use std::sync::Arc;
-
-use crate::fundamental::obj_loader::obj_to_triangles;
 use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::perspective::Perspective;
+use crate::ray_tracing::instance::Instance;
 use crate::ray_tracing::integrators::ray_casting_dot_normal::RayCastingDotNormal;
 use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::world::World;
+use crate::utility::load_dragon;
+use std::sync::Arc;
 
 #[allow(dead_code)]
 pub fn test(width: usize, height: usize) {
     let file_name = get_file_name(file!());
     println!("TESTING: {}", &file_name);
-    let triangles = obj_to_triangles("models/dragon.obj");
+
+    let dragon_instance = Instance::new(Arc::new(load_dragon()));
+
     let mut world = World::default();
-    for t in triangles {
-        world.add(t);
-    }
+    world.add(Arc::new(dragon_instance));
     world.build_index();
 
     let camera = Perspective::new(
