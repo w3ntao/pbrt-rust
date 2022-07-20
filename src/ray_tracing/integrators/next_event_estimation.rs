@@ -84,12 +84,17 @@ impl NextEventEstimation {
                 intersection.material.scatter(ray, &intersection);
             if !scattered {
                 if depth == 0 || last_hit_specular {
-                    radiance += throughput * emission;
+                    if dot(intersection.normal, ray.direction) < 0.0 {
+                        radiance += throughput * emission;
+                    }
                 }
                 break;
             }
 
-            radiance += throughput * emission;
+            if dot(intersection.normal, ray.direction) < 0.0 {
+                // so the light emits uni-directionally
+                radiance += throughput * emission;
+            }
 
             last_hit_specular = intersection.material.is_specular();
             if !last_hit_specular {

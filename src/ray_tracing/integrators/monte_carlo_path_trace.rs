@@ -1,6 +1,7 @@
 use crate::fundamental::color::*;
 use crate::fundamental::constants::INTERSECT_OFFSET;
 use crate::fundamental::random::RandomF32Generator;
+use crate::fundamental::vector3::dot;
 use crate::ray_tracing::integrator::Integrator;
 use crate::ray_tracing::ray::Ray;
 use crate::ray_tracing::world::World;
@@ -40,8 +41,10 @@ impl MonteCarloPathTrace {
                 break;
             }
 
-            let emission = intersection.material.emit(&intersection);
-            radiance += emission * throughput;
+            if dot(intersection.normal, ray.direction) < 0.0 {
+                // so the light emits uni-directionally
+                radiance += throughput * intersection.material.emit(&intersection);
+            }
 
             let (scattered, scattered_ray, attenuation) =
                 intersection.material.scatter(ray, &intersection);
