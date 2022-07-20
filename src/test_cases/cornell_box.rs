@@ -82,8 +82,6 @@ fn empty_cornell_box() -> World {
 
 pub fn cornell_box_camera(width: usize, height: usize) -> Perspective {
     let camera_center = Point::new(278.0, 278.0, -600.0);
-    //let look_at = Point::new(278.0, 278.0, 0.0);
-    //let direction = look_at - camera_center;
 
     return Perspective::new(
         camera_center,
@@ -132,11 +130,19 @@ pub fn cornell_box() -> World {
 }
 
 pub fn cornell_box_specular() -> World {
-    let glass = Arc::new(Glass::new(1.5));
-
     let mut world = empty_cornell_box();
 
-    let radius = 120.0;
+    let aluminum = Arc::new(Metal::new(Color::new(0.8, 0.85, 0.88), 0.0));
+    let box_big = AxisAlignedBox::new(Point::new(0.0, 0.0, 0.0), Point::new(165.0, 330.0, 165.0));
+    let mut box_big = Instance::new(Arc::new(box_big));
+    box_big.rotate(Vector3::new(0.0, 1.0, 0.0), PI / 12.0);
+    box_big.translate(Vector3::new(265.0, 0.0, 295.0));
+    box_big.set_material(aluminum.clone());
+    let box_big = Arc::new(box_big);
+    world.add(box_big.clone());
+
+    let glass = Arc::new(Glass::new(1.5));
+    let radius = 90.0;
     let mut sphere = Sphere::new(Point::new(190.0, radius, 190.0), radius);
     sphere.set_material(glass.clone());
     world.add(Arc::new(sphere));
