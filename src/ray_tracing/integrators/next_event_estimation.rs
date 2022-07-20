@@ -60,8 +60,10 @@ impl NextEventEstimation {
             )
             / sample_light_pdf;
     }
+}
 
-    fn trace(&self, ray: Ray) -> Color {
+impl Integrator for NextEventEstimation {
+    fn get_radiance(&self, ray: Ray) -> Color {
         let mut radiance = Color::black();
         let mut throughput = Color::new(1.0, 1.0, 1.0);
         let mut ray = ray;
@@ -116,11 +118,5 @@ impl NextEventEstimation {
         }
 
         return radiance;
-    }
-}
-
-impl Integrator for NextEventEstimation {
-    fn get_radiance(&self, ray: Ray) -> Color {
-        return self.trace(ray);
     }
 }

@@ -23,8 +23,8 @@ impl MonteCarloPathTrace {
 
 const RUSSIAN_ROULETTE_THRESHOLD: f32 = 0.8;
 
-impl MonteCarloPathTrace {
-    fn trace(&self, ray: Ray) -> Color {
+impl Integrator for MonteCarloPathTrace {
+    fn get_radiance(&self, ray: Ray) -> Color {
         let mut radiance = Color::black();
         let mut throughput = Color::new(1.0, 1.0, 1.0);
         let mut ray = ray;
@@ -67,11 +67,5 @@ impl MonteCarloPathTrace {
         }
 
         return radiance;
-    }
-}
-
-impl Integrator for MonteCarloPathTrace {
-    fn get_radiance(&self, ray: Ray) -> Color {
-        return self.trace(ray);
     }
 }
