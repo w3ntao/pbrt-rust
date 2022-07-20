@@ -62,48 +62,50 @@ impl NextEventEstimation {
             / sample_light_pdf;
     }
 
-    fn trace(&self, ray: Ray, last_hit_specular: bool, depth: u32) -> Color {
-        if depth == self.max_depth {
-            return Color::black();
+    fn trace(&self, ray: Ray) -> Color {
+        let mut radiance = Color::black();
+        let mut throughput = Color::new(1.0, 1.0, 1.0);
+        let mut ray = ray;
+        let mut last_hit_specular = false;
+
+        for depth in 0..self.max_depth {
+            let intersection = self.world.intersect(&ray, INTERSECT_OFFSET, f32::INFINITY);
+            // with INTERSECT_OFFSET, we can avoid the situation when the ray
+            // re-hit the surface it just leave
+
+            if !intersection.intersected() {
+                break;
+            }
+
+            let emission = intersection.material.emit(&intersection);
+
+            let (scattered, scattered_ray, attenuation) =
+                intersection.material.scatter(ray, &intersection);
+            if !scattered {
+                if depth == 0 || last_hit_specular {
+                    radiance += throughput * emission;
+                }
+                break;
+            }
+
+            radiance += throughput * emission;
+
+            last_hit_specular = intersection.material.is_specular();
+            if !last_hit_specular {
+                radiance +=
+                    throughput * attenuation * self.get_direct_illumination(&intersection, &ray);
+            }
+
+            throughput *= attenuation;
+            ray = scattered_ray;
         }
 
-        let intersection = self.world.intersect(&ray, INTERSECT_OFFSET, f32::INFINITY);
-        // with INTERSECT_OFFSET, we can avoid the situation when the ray
-        // re-hit the surface it just leave
-
-        if !intersection.intersected() {
-            return Color::black();
-        }
-
-        let emission = intersection.material.emit(&intersection);
-
-        let (scattered, scattered_ray, attenuation) =
-            intersection.material.scatter(ray, &intersection);
-        if !scattered {
-            // to avoid double sampling on light
-            return if depth == 0 || last_hit_specular {
-                emission
-            } else {
-                Color::black()
-            };
-        }
-
-        let last_hit_specular = intersection.material.is_specular();
-        // for scattering: cos(theta) / PI cancel out for scattering_pdf and sample_pdf
-        let indirect_illumination = self.trace(scattered_ray, last_hit_specular, depth + 1);
-
-        if last_hit_specular {
-            return emission + attenuation * indirect_illumination;
-        }
-
-        let direct_illumination = self.get_direct_illumination(&intersection, &ray);
-
-        return emission + attenuation * (direct_illumination + indirect_illumination);
+        return radiance;
     }
 }
 
 impl Integrator for NextEventEstimation {
     fn get_radiance(&self, ray: Ray) -> Color {
-        return self.trace(ray, false, 0);
+        return self.trace(ray);
     }
 }
