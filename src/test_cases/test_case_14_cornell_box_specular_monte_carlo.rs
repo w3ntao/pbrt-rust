@@ -1,10 +1,8 @@
-use std::sync::Arc;
-
-use crate::cornell_box::cornell_box_specular;
+use crate::cornell_box::{cornell_box_camera, cornell_box_specular};
 use crate::fundamental::utility::*;
-use crate::ray_tracing::cameras::perspective::Perspective;
 use crate::ray_tracing::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
 use crate::ray_tracing::renderer::Renderer;
+use std::sync::Arc;
 
 #[allow(dead_code)]
 pub fn test(width: usize, height: usize, samples: u32) {
@@ -20,20 +18,12 @@ pub fn test(width: usize, height: usize, samples: u32) {
     let samples = samples_per_dimension * samples_per_dimension;
     println!("actual samples: {}", samples);
 
-    let camera_center = Point::new(278.0, 278.0, -800.0);
-    let look_at = Point::new(278.0, 278.0, 0.0);
-    let direction = look_at - camera_center;
-
-    let camera = Perspective::new(
-        camera_center,
-        direction,
-        Vector3::new(0.0, 1.0, 0.0),
-        PI / 4.0,
-        (height as f32) / (width as f32),
-    );
-
     let integrator = MonteCarloPathTrace::new(Arc::new(cornell_box_specular()), Color::black());
-    let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
+    let renderer = Renderer::new(
+        Arc::new(cornell_box_camera(width, height)),
+        Arc::new(integrator),
+        samples,
+    );
     let image = renderer.render(width, height);
     image.write(&ppm_name);
     println!();
