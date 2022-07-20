@@ -11,12 +11,9 @@ use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::world::World;
 
 #[allow(dead_code)]
-pub fn test() {
+pub fn test(width: usize, height: usize) {
     let file_name = get_file_name(file!());
     println!("TESTING: {}", &file_name);
-
-    let width = 1600;
-    let height = 1200;
 
     let camera = Perspective::new(
         Point::new(0.0, 0.0, 10.0),

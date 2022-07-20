@@ -7,13 +7,10 @@ use crate::ray_tracing::renderer::Renderer;
 use crate::test_case_05_material_b::scene_three_spheres;
 
 #[allow(dead_code)]
-pub fn test(samples: u32) {
+pub fn test(width: usize, height: usize, samples: u32) {
     let file_name = get_file_name(file!());
     println!("TESTING: {}", &file_name);
     let ppm_name = format!("{}.ppm", file_name);
-
-    let width = 1000;
-    let height = 750;
 
     let camera_center = Point::new(-3.0, 3.0, 2.0);
     let focus_point = Point::new(0.0, 0.0, -1.0);

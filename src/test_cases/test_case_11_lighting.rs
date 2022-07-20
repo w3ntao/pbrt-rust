@@ -14,7 +14,7 @@ use crate::ray_tracing::textures::solid_color::SolidColor;
 use crate::ray_tracing::world::World;
 
 #[allow(dead_code)]
-pub fn test(samples: u32) {
+pub fn test(width: usize, height: usize, samples: u32) {
     let file_name = get_file_name(file!());
     println!("TESTING: {}", &file_name);
     let ppm_name = format!("{}.ppm", file_name);
@@ -47,9 +47,6 @@ pub fn test(samples: u32) {
     let camera_center = Point::new(26.0, 3.0, 6.0);
     let look_at = Point::new(0.0, 2.0, 0.0);
     let direction = look_at - camera_center;
-
-    let width = 1000;
-    let height = 750;
 
     let camera = DepthOfField::new(
         camera_center,

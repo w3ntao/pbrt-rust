@@ -11,7 +11,7 @@ use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::world::World;
 
 #[allow(dead_code)]
-pub fn test() {
+pub fn test(width: usize, height: usize) {
     let file_name = get_file_name(file!());
     println!("TESTING: {}", &file_name);
     let triangles = obj_to_triangles("models/dragon.obj");
@@ -39,9 +39,6 @@ pub fn test() {
         world.add(Arc::new(dragon_var));
     }
     world.build_index();
-
-    let width = 2000;
-    let height = 1500;
 
     let camera = Perspective::new(
         Point::new(-7.0, 5.0, 0.0),

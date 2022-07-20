@@ -45,13 +45,10 @@ pub fn scene_three_spheres() -> World {
 }
 
 #[allow(dead_code)]
-pub fn test(samples: u32) {
+pub fn test(width: usize, height: usize, samples: u32) {
     let file_name = get_file_name(file!());
     println!("TESTING: {}", &file_name);
     let ppm_name = format!("{}.ppm", file_name);
-
-    let width = 1000;
-    let height = 750;
 
     let camera = Perspective::new(
         Point::new(-3.0, 3.0, 2.0),
