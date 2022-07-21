@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::perspective::Perspective;
 use crate::ray_tracing::instance::Instance;
@@ -12,7 +14,6 @@ use crate::ray_tracing::primitives::sphere::Sphere;
 use crate::ray_tracing::textures::solid_color::SolidColor;
 use crate::ray_tracing::world::World;
 use crate::utility::load_dragon;
-use std::sync::Arc;
 
 const WALL_LENGTH: f32 = 555.0;
 
@@ -165,12 +166,12 @@ pub fn cornell_box_metal_dragon() -> World {
 
     let diffuse_light = DiffuseLight::new(Arc::new(SolidColor::new(Color::new(10.0, 10.0, 10.0))));
 
-    let light_length = 120.0;
+    let light_length = 150.0;
     let mut quad_light = Quad::new(
         Point::new(
             (WALL_LENGTH - light_length) / 2.0,
             WALL_LENGTH - 1.0,
-            (WALL_LENGTH - light_length) / 2.0,
+            (WALL_LENGTH - light_length) / 2.0 + 150.0,
         ),
         Vector3::new(light_length, 0.0, 0.0),
         Vector3::new(0.0, 0.0, light_length),
@@ -184,7 +185,11 @@ pub fn cornell_box_metal_dragon() -> World {
     let mut dragon_instance = Instance::new(dragon_model.clone());
     dragon_instance.rotate(Vector3::new(0.0, 1.0, 0.0), 1.5 * PI);
     dragon_instance.scale_by_scalar(350.0);
-    dragon_instance.translate(Vector3::new(WALL_LENGTH / 2.0, 98.0, WALL_LENGTH / 2.0));
+    dragon_instance.translate(Vector3::new(
+        WALL_LENGTH / 2.0,
+        -dragon_instance.get_bounds().min.y,
+        WALL_LENGTH / 2.0,
+    ));
     dragon_instance.set_material(metal.clone());
     world.add(Arc::new(dragon_instance));
 
