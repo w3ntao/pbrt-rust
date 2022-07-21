@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::depth_of_field::DepthOfField;
 use crate::ray_tracing::instance::*;
@@ -11,7 +13,6 @@ use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::textures::solid_color::SolidColor;
 use crate::test_case_07_rt_weekend_final::many_random_spheres;
 use crate::utility::load_dragon;
-use std::sync::Arc;
 
 #[allow(dead_code)]
 pub fn test(width: usize, height: usize, samples: u32) {
@@ -36,8 +37,8 @@ pub fn test(width: usize, height: usize, samples: u32) {
 
     let mut scaled_dragon = Instance::new(Arc::new(load_dragon()));
     scaled_dragon.rotate(Vector3::new(0.0, 1.0, 0.0), PI);
-    scaled_dragon.translate(Vector3::new(0.0, 0.7, 0.0));
     scaled_dragon.scale_by_scalar(2.5);
+    scaled_dragon.translate(Vector3::new(0.0, -scaled_dragon.get_bounds().min.y, 0.0));
     let dragon_instance = Arc::new(scaled_dragon);
 
     let mut dragon_instance_0 = Instance::new(dragon_instance.clone());
