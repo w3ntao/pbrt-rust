@@ -1,10 +1,10 @@
 extern crate num_cpus;
 
-use std::{io, thread, time};
 use std::io::Write;
 use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
 use std::time::Instant;
+use std::{io, thread, time};
 
 use rand::seq::SliceRandom;
 use rand::thread_rng;
@@ -47,10 +47,11 @@ impl Renderer {
         };
     }
 
-    fn time_estimator(&self,
-                      shared_job_list: &mut Arc<Mutex<Vec<usize>>>,
-                      total_job: usize,
-                      core: usize,
+    fn time_estimator(
+        &self,
+        shared_job_list: &mut Arc<Mutex<Vec<usize>>>,
+        total_job: usize,
+        core: usize,
     ) {
         let start = Instant::now();
         let one_second = time::Duration::from_secs(1);
@@ -62,7 +63,7 @@ impl Renderer {
             thread::sleep(one_second);
             let locked_job = shared_job_list.lock().unwrap();
             let length = locked_job.len();
-            std::mem::drop(locked_job);
+            drop(locked_job);
 
             if length == 0 {
                 break;
@@ -83,19 +84,21 @@ impl Renderer {
         println!();
     }
 
-    fn single_thread_render(&self,
-                            image: &mut Arc<Mutex<Image>>,
-                            shared_job_list: &mut Arc<Mutex<Vec<usize>>>) {
+    fn single_thread_render(
+        &self,
+        image: &mut Arc<Mutex<Image>>,
+        shared_job_list: &mut Arc<Mutex<Vec<usize>>>,
+    ) {
         let locked_image = image.lock().unwrap();
         let width = locked_image.width;
         let height = locked_image.height;
-        std::mem::drop(locked_image);
+        drop(locked_image);
 
         let mut rendered_pixels: Vec<(usize, usize, Color)> = vec![];
         loop {
             let mut locked_job = shared_job_list.lock().unwrap();
             let maybe_x = locked_job.pop();
-            std::mem::drop(locked_job);
+            drop(locked_job);
 
             match maybe_x {
                 Some(x) => {
@@ -106,8 +109,11 @@ impl Renderer {
 
                         for ray in self.camera.get_stratified_rays(
                             self.samples,
-                            ndc_x, ndc_x + 2.0 / (width as f32),
-                            ndc_y - 2.0 / (height as f32), ndc_y) {
+                            ndc_x,
+                            ndc_x + 2.0 / (width as f32),
+                            ndc_y - 2.0 / (height as f32),
+                            ndc_y,
+                        ) {
                             total += self.integrator.get_radiance(ray);
                         }
 
@@ -123,7 +129,7 @@ impl Renderer {
         for (y, x, color) in rendered_pixels {
             locked_image.fill(y, x, color);
         }
-        std::mem::drop(locked_image);
+        drop(locked_image);
     }
 
     pub fn render(self, width: usize, height: usize) -> Image {
@@ -135,16 +141,15 @@ impl Renderer {
 
         let mut handles: Vec<JoinHandle<()>> = vec![];
         let arc_self = Arc::new(self);
-        let cpu_num = num_cpus::get_physical();
+        let cpu_num = num_cpus::get();
         for _ in 0..cpu_num {
             let mut image_ptr = Arc::clone(&shared_image);
             let mut job_ptr = Arc::clone(&shared_job_list);
 
             let forked_self = arc_self.clone();
-            let handle =
-                thread::spawn(move ||
-                    forked_self.single_thread_render(&mut image_ptr, &mut job_ptr)
-                );
+            let handle = thread::spawn(move || {
+                forked_self.single_thread_render(&mut image_ptr, &mut job_ptr)
+            });
             handles.push(handle);
         }
         let forked_self = arc_self.clone();
