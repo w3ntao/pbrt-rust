@@ -1,5 +1,5 @@
-use rand::{Rng, thread_rng};
 use rand::distributions::Uniform;
+use rand::{thread_rng, Rng};
 
 use crate::fundamental::point::*;
 use crate::fundamental::vector3::*;
@@ -17,7 +17,13 @@ pub struct Perspective {
 }
 
 impl Perspective {
-    pub fn new(_center: Point, _forward: Vector3, _up: Vector3, _horizontal_opening_angle: f32, height_to_width_ratio: f32) -> Self {
+    pub fn new(
+        _center: Point,
+        _forward: Vector3,
+        _up: Vector3,
+        _horizontal_opening_angle: f32,
+        height_to_width_ratio: f32,
+    ) -> Self {
         let _forward = _forward.normalize();
         let _up = _up.normalize();
         let _horizontal = cross(_forward, _up).normalize();
@@ -37,18 +43,14 @@ impl Perspective {
 }
 
 impl Camera for Perspective {
-    fn get_primary_ray(&self, u: f32, v: f32) -> Ray {
-        // u, v are both in [-1, 1]
-
-        let x = u * self.x_pixel_multiplier;
-        let y = v * self.y_pixel_multiplier;
-
-        let direction = self.forward + x * self.horizontal + y * self.image_plane_vertical;
-
-        return Ray::new(self.center, direction.normalize());
-    }
-
-    fn get_stratified_rays(&self, num_samples: u32, min_u: f32, max_u: f32, min_v: f32, max_v: f32) -> Vec<Ray> {
+    fn get_stratified_rays(
+        &self,
+        num_samples: u32,
+        min_u: f32,
+        max_u: f32,
+        min_v: f32,
+        max_v: f32,
+    ) -> Vec<Ray> {
         let mut generator_u = thread_rng();
         let mut generator_v = thread_rng();
 
@@ -61,13 +63,11 @@ impl Camera for Perspective {
 
         for u_idx in 0..samples_per_dimension {
             let u_idx = u_idx as f32;
-            let range_u =
-                Uniform::new(min_u + u_unit * u_idx, min_u + u_unit * (u_idx + 1.0));
+            let range_u = Uniform::new(min_u + u_unit * u_idx, min_u + u_unit * (u_idx + 1.0));
 
             for v_idx in 0..samples_per_dimension {
                 let v_idx = v_idx as f32;
-                let range_v =
-                    Uniform::new(min_v + v_unit * v_idx, min_v + v_unit * (v_idx + 1.0));
+                let range_v = Uniform::new(min_v + v_unit * v_idx, min_v + v_unit * (v_idx + 1.0));
 
                 let u = generator_u.sample(range_u);
                 let v = generator_v.sample(range_v);

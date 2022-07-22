@@ -51,23 +51,6 @@ impl DepthOfField {
 }
 
 impl Camera for DepthOfField {
-    fn get_primary_ray(&self, u: f32, v: f32) -> Ray {
-        // u, v are both in [-1, 1]
-
-        let x = u * self.x_pixel_multiplier;
-        let y = v * self.y_pixel_multiplier;
-
-        let direction = self.forward + x * self.horizontal + y * self.vertical;
-        let target = self.center + direction.normalize() * self.focus_distance;
-
-        let (rd_x, rd_y) = random_vector_in_disk();
-        let rd_x = rd_x * self.aperture / 2.0;
-        let rd_y = rd_y * self.aperture / 2.0;
-        let origin = self.center + self.horizontal * rd_x + self.vertical * rd_y;
-
-        return Ray::new(origin, (target - origin).normalize());
-    }
-
     fn get_stratified_rays(
         &self,
         num_samples: u32,
