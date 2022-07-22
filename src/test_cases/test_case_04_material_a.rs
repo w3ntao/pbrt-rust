@@ -12,12 +12,14 @@ use crate::ray_tracing::primitives::sphere::Sphere;
 use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::textures::solid_color::SolidColor;
 use crate::ray_tracing::world::World;
+use crate::utility::get_file_name;
 
 #[allow(dead_code)]
 pub fn test(width: usize, height: usize, samples: u32) {
+    let samples = ((samples as f32).sqrt() as u32).pow(2);
     let file_name = get_file_name(file!());
-    println!("TESTING: {}", &file_name);
-    let ppm_name = format!("{}.ppm", file_name);
+    let ppm_name = format!("{}_{}.ppm", file_name, samples);
+    println!("TESTING: {} for {} samples per pixel", &file_name, samples);
 
     let material_ground = Arc::new(Lambertian::new(Arc::new(SolidColor::new(Color::new(
         0.8, 0.8, 0.0,

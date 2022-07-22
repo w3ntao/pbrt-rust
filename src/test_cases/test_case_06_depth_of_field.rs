@@ -1,16 +1,17 @@
-use std::sync::Arc;
-
 use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::depth_of_field::DepthOfField;
 use crate::ray_tracing::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
 use crate::ray_tracing::renderer::Renderer;
 use crate::test_case_05_material_b::scene_three_spheres;
+use crate::utility::get_file_name;
+use std::sync::Arc;
 
 #[allow(dead_code)]
 pub fn test(width: usize, height: usize, samples: u32) {
+    let samples = ((samples as f32).sqrt() as u32).pow(2);
     let file_name = get_file_name(file!());
-    println!("TESTING: {}", &file_name);
-    let ppm_name = format!("{}.ppm", file_name);
+    let ppm_name = format!("{}_{}.ppm", file_name, samples);
+    println!("TESTING: {} for {} samples per pixel", &file_name, samples);
 
     let camera_center = Point::new(-3.0, 3.0, 2.0);
     let focus_point = Point::new(0.0, 0.0, -1.0);

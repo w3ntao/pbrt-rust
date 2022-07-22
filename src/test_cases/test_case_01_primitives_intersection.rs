@@ -9,6 +9,7 @@ use crate::ray_tracing::primitives::sphere::Sphere;
 use crate::ray_tracing::primitives::triangle::Triangle;
 use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::world::World;
+use crate::utility::get_file_name;
 
 #[allow(dead_code)]
 pub fn test(width: usize, height: usize) {

@@ -4,7 +4,7 @@ use crate::ray_tracing::instance::*;
 use crate::ray_tracing::integrators::ray_casting_dot_normal::RayCastingDotNormal;
 use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::world::World;
-use crate::utility::load_dragon;
+use crate::utility::{get_file_name, load_dragon};
 use std::sync::Arc;
 
 #[allow(dead_code)]

@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::depth_of_field::DepthOfField;
 use crate::ray_tracing::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
@@ -12,12 +10,15 @@ use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::textures::checker_texture::CheckerTexture;
 use crate::ray_tracing::textures::solid_color::*;
 use crate::test_case_07_rt_weekend_final::many_random_spheres;
+use crate::utility::get_file_name;
+use std::sync::Arc;
 
 #[allow(dead_code)]
 pub fn test(width: usize, height: usize, samples: u32) {
+    let samples = ((samples as f32).sqrt() as u32).pow(2);
     let file_name = get_file_name(file!());
-    println!("TESTING: {}", &file_name);
-    let ppm_name = format!("{}.ppm", file_name);
+    let ppm_name = format!("{}_{}.ppm", file_name, samples);
+    println!("TESTING: {} for {} samples per pixel", &file_name, samples);
 
     let mut scene = many_random_spheres();
 
