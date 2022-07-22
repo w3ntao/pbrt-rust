@@ -185,10 +185,15 @@ pub fn cornell_box_metal_dragon() -> World {
     let mut dragon_instance = Instance::new(dragon_model.clone());
     dragon_instance.rotate(Vector3::new(0.0, 1.0, 0.0), 1.5 * PI);
     dragon_instance.scale_by_scalar(350.0);
+
+    let bounds = dragon_instance.get_bounds();
+    let center_x = (bounds.min.x + bounds.max.x) / 2.0;
+    let center_z = (bounds.min.z + bounds.max.z) / 2.0;
+
     dragon_instance.translate(Vector3::new(
-        WALL_LENGTH / 2.0,
-        -dragon_instance.get_bounds().min.y,
-        WALL_LENGTH / 2.0,
+        -center_x + WALL_LENGTH / 2.0,
+        -bounds.min.y,
+        -center_z + WALL_LENGTH / 2.0,
     ));
     dragon_instance.set_material(metal.clone());
     world.add(Arc::new(dragon_instance));
