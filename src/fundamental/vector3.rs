@@ -41,6 +41,12 @@ impl Vector3 {
     }
 }
 
+impl Into<Point> for Vector3 {
+    fn into(self) -> Point {
+        return Point::new(self.x, self.y, self.z);
+    }
+}
+
 impl ops::Index<usize> for Vector3 {
     type Output = f32;
     fn index(&self, index: usize) -> &f32 {

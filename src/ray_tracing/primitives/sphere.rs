@@ -82,7 +82,7 @@ impl Primitive for Sphere {
             Intersection::from_inside(root, hit_point, -normal, self.material.clone())
         };
 
-        let (u, v) = get_sphere_uv((hit_point - self.center).normalize().to_point());
+        let (u, v) = get_sphere_uv((hit_point - self.center).normalize().into());
         intersection.u = u;
         intersection.v = v;
 
