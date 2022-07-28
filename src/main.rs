@@ -1,4 +1,5 @@
 use crate::test_cases::*;
+
 mod fundamental;
 mod ray_tracing;
 mod test_cases;
@@ -21,8 +22,8 @@ fn all_tests(samples: u32) {
     test_case_10_perlin_texture::test(width, height, samples);
     test_case_11_lighting::test(width, height, samples);
 
-    width = 500;
-    height = 500;
+    width = 1000;
+    height = 1000;
 
     test_case_12_cornell_box_monte_carlo::test(width, height, samples);
     test_case_13_cornell_box_next_event_estimation::test(width, height, samples);
