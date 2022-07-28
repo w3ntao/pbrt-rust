@@ -1,5 +1,7 @@
 # pbr-rust
 
+[![build and test](https://github.com/w3ntao/pbr-rust/actions/workflows/build-and-test.yml/badge.svg?branch=main)](https://github.com/w3ntao/pbr-rust/actions/workflows/build-and-test.yml)
+
 A rust renderer inspired by [Ray Tracing in One Weekend Series](https://raytracing.github.io/)
 
 ## build and run

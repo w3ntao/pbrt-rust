@@ -1,4 +1,4 @@
-name: Rust
+name: build and test
 
 on:
   push:
@@ -10,7 +10,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  build-and-test:
 
     runs-on: ubuntu-latest
 
@@ -20,11 +20,11 @@ jobs:
     - name: Build
       run: cargo build --release --verbose
 
-    - name: Download Model Files
+    - name: Download model files
       run:
         wget 'https://casual-effects.com/g3d/data10/research/model/dragon/dragon.zip';
         mkdir models;
         unzip dragon.zip -d models/;
 
-    - name: Run Tests
+    - name: Run tests
       run: cargo run --release --verbose
