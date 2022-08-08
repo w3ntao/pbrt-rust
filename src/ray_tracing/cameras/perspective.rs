@@ -51,6 +51,14 @@ impl Camera for Perspective {
         min_v: f32,
         max_v: f32,
     ) -> Vec<Ray> {
+        if num_samples == 1 {
+            let x = (max_u + min_u) / 2.0 * self.x_pixel_multiplier;
+            let y = (max_v + min_v) / 2.0 * self.y_pixel_multiplier;
+            let direction = self.forward + x * self.horizontal + y * self.image_plane_vertical;
+
+            return vec![Ray::new(self.center, direction.normalize())];
+        }
+
         let mut generator_u = thread_rng();
         let mut generator_v = thread_rng();
 
