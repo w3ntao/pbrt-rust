@@ -1,8 +1,9 @@
+use std::sync::Arc;
+
 use crate::cornell_box::{cornell_box_camera, cornell_box_metal_dragon};
-use crate::ray_tracing::integrators::next_event_estimation::NextEventEstimation;
+use crate::ray_tracing::integrators::ray_casting_dot_normal::RayCastingDotNormal;
 use crate::ray_tracing::renderer::Renderer;
 use crate::utility::get_file_name;
-use std::sync::Arc;
 
 #[allow(dead_code)]
 pub fn test(width: usize, height: usize, samples: u32) {
@@ -11,7 +12,7 @@ pub fn test(width: usize, height: usize, samples: u32) {
     let ppm_name = format!("{}_{}.ppm", file_name, samples);
     println!("TESTING: {} for {} samples per pixel", &file_name, samples);
 
-    let integrator = NextEventEstimation::new(Arc::new(cornell_box_metal_dragon()));
+    let integrator = RayCastingDotNormal::new(Arc::new(cornell_box_metal_dragon()));
     let renderer = Renderer::new(
         Arc::new(cornell_box_camera(width, height)),
         Arc::new(integrator),

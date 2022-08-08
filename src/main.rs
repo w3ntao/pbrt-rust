@@ -30,8 +30,11 @@ fn all_tests(samples: u32) {
     test_case_14_cornell_box_specular_monte_carlo::test(width, height, samples);
     test_case_15_cornell_box_specular_next_event_estimation::test(width, height, samples);
 
-    test_case_16_cornell_box_metal_dragon_next_event_estimation::test(width, height, 10);
-    test_case_17_smallpt::test(1024, 762, samples);
+    test_case_16_cornell_box_metal_dragon_ray_casting_normal::test(width, height, 1);
+    test_case_17_cornell_box_metal_dragon_ray_casting_dot_normal::test(width, height, 1);
+    test_case_18_cornell_box_metal_dragon_next_event_estimation::test(width, height, samples);
+
+    test_case_19_smallpt::test(1024, 762, samples);
 }
 
 fn main() {
