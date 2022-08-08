@@ -24,6 +24,6 @@ impl Integrator for RayCastingNormal {
         }
 
         let normal = intersect.normal.normalize();
-        return Color::new(normal.x, normal.y, normal.z);
+        return Color::new(normal.x.abs(), normal.y.abs(), normal.z.abs());
     }
 }
