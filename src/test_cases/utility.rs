@@ -21,7 +21,8 @@ pub fn load_dragon() -> BVH {
         println!("\nError: couldn't find model: dragon");
         println!("Please download dragon model from https://casual-effects.com:");
         println!("$ wget 'https://casual-effects.com/g3d/data10/research/model/dragon/dragon.zip'");
-        println!("Then copy `dragon.zip` to `pbr-rust/models` and unzip it.");
+        println!("$ mkdir models");
+        println!("$ unzip dragon.zip -d models/");
         process::exit(1);
     }
 
