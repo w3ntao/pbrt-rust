@@ -27,6 +27,15 @@ impl Vector4 {
             w: 0.0,
         }
     }
+
+    pub fn dot(&self, rhs: Vector4) -> f32 {
+        let mut product = 0.0;
+        for idx in 0..4 {
+            product += self[idx] * rhs[idx];
+        }
+
+        return product;
+    }
 }
 
 impl From<Point> for Vector4 {
@@ -169,15 +178,6 @@ impl ops::Neg for Vector4 {
             w: -self.w,
         };
     }
-}
-
-pub fn dot(a: Vector4, b: Vector4) -> f32 {
-    let mut product = 0.0;
-    for idx in 0..4 {
-        product += a[idx] * b[idx];
-    }
-
-    return product;
 }
 
 impl From<Vector4> for Vector3 {
@@ -426,7 +426,7 @@ impl ops::Mul<Vector4> for Matrix {
     fn mul(self, f4: Vector4) -> Vector4 {
         let mut product = Vector4::zero();
         for idx in 0..4 {
-            product[idx] = dot(self.row[idx], f4);
+            product[idx] = self.row[idx].dot(f4);
         }
         return product;
     }
@@ -466,10 +466,10 @@ impl ops::Mul<Matrix> for Matrix {
         let mut result = Matrix::zero();
         for idx in 0..4 {
             result[idx] = Vector4::new(
-                dot(self.row[idx], rhs.column(0)),
-                dot(self.row[idx], rhs.column(1)),
-                dot(self.row[idx], rhs.column(2)),
-                dot(self.row[idx], rhs.column(3)),
+                self.row[idx].dot(rhs.column(0)),
+                self.row[idx].dot(rhs.column(1)),
+                self.row[idx].dot(rhs.column(2)),
+                self.row[idx].dot(rhs.column(3)),
             );
         }
 
