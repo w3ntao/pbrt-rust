@@ -38,19 +38,19 @@ impl Triangle {
 impl Primitive for Triangle {
     fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
         let ab = cross(self.span0, self.span1);
-        let det = -dot(ab, ray.d);
+        let det = -ab.dot(ray.d);
         if det == 0.0 {
             return Intersection::failure();
         }
 
         let c = ray.o - self.origin;
-        let t = dot(ab, c) / det;
+        let t = ab.dot(c) / det;
         if t < t_min || t > t_max {
             return Intersection::failure();
         }
 
-        let beta = dot(c, cross(ray.d, self.span1)) / det;
-        let gamma = dot(self.span0, cross(ray.d, c)) / det;
+        let beta = c.dot(cross(ray.d, self.span1)) / det;
+        let gamma = self.span0.dot(cross(ray.d, c)) / det;
         let error_tolerance = 0.01;
         // to tolerate numerical error
         if beta < -error_tolerance

@@ -1,9 +1,4 @@
-use crate::core::color::*;
-use crate::core::intersection::*;
-use crate::core::material::Material;
-use crate::core::ray::*;
-use crate::core::vector3::random_in_unit_sphere;
-use crate::core::vector3::*;
+use crate::core::interfaces::*;
 
 pub struct Metal {
     albedo: Color,
@@ -29,7 +24,7 @@ impl Material for Metal {
         );
 
         return (
-            dot(scattered_ray.d, intersection.normal) > 0.0,
+            scattered_ray.d.dot(intersection.normal) > 0.0,
             scattered_ray,
             self.albedo,
         );

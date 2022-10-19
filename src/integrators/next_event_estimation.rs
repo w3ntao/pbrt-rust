@@ -22,7 +22,7 @@ impl NextEventEstimation {
         let towards_light = towards_light.normalize();
 
         // sampled light at the back side of object normal
-        if dot(towards_light, intersection.normal) <= 0.0 {
+        if towards_light.dot(intersection.normal) <= 0.0 {
             return Color::black();
         }
 
@@ -77,14 +77,14 @@ impl Integrator for NextEventEstimation {
                 intersection.material.scatter(ray, &intersection);
             if !scattered {
                 if depth == 0 || last_hit_specular {
-                    if dot(intersection.normal, ray.d) < 0.0 {
+                    if intersection.normal.dot(ray.d) < 0.0 {
                         radiance += throughput * emission;
                     }
                 }
                 break;
             }
 
-            if dot(intersection.normal, ray.d) < 0.0 {
+            if intersection.normal.dot(ray.d) < 0.0 {
                 // so the light emits uni-directionally
                 radiance += throughput * emission;
             }

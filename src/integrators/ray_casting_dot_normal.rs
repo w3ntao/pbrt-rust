@@ -1,8 +1,4 @@
-use crate::core::color::*;
-use crate::core::integrator::Integrator;
-use crate::core::ray::Ray;
-use crate::core::vector3::*;
-use crate::core::world::World;
+use crate::core::interfaces::*;
 use std::sync::Arc;
 
 pub struct RayCastingDotNormal {
@@ -23,7 +19,7 @@ impl Integrator for RayCastingDotNormal {
         }
 
         let normal = intersect.normal.normalize();
-        let grey = dot(-ray.d, normal).max(0.0);
+        let grey = normal.dot(-ray.d).max(0.0);
         return Color::new(grey, grey, grey);
     }
 }

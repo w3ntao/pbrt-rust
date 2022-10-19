@@ -1,8 +1,6 @@
-use rand::Rng;
-
-use crate::core::point::Point;
+use crate::core::interfaces::*;
 use crate::core::random::random_f32;
-use crate::core::vector3::{dot, Vector3};
+use rand::Rng;
 
 const POINT_COUNT: usize = 256;
 
@@ -111,7 +109,7 @@ fn perlin_interpolate(c: [[[Vector3; 2]; 2]; 2], u: f32, v: f32, w: f32) -> f32 
                 accumulate += (i * uu + (1.0 - i) * (1.0 - uu))
                     * (j * vv + (1.0 - j) * (1.0 - vv))
                     * (k * ww + (1.0 - k) * (1.0 - ww))
-                    * dot(c[i as usize][j as usize][k as usize], weight);
+                    * weight.dot(c[i as usize][j as usize][k as usize]);
             }
         }
     }

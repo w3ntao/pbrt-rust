@@ -36,7 +36,7 @@ impl Integrator for MonteCarloPathTrace {
                 break;
             }
 
-            if dot(intersection.normal, ray.d) < 0.0 {
+            if intersection.normal.dot(ray.d) < 0.0 {
                 // so the light emits uni-directionally
                 radiance += throughput * intersection.material.emit(&intersection);
             }

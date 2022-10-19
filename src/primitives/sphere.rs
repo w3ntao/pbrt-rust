@@ -42,7 +42,7 @@ impl Primitive for Sphere {
     fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
         let oc = ray.o - self.center;
         let a = ray.d.length_squared();
-        let half_b = dot(oc, ray.d);
+        let half_b = oc.dot(ray.d);
         let c = oc.length_squared() - self.radius * self.radius;
 
         let discriminant = half_b * half_b - a * c;
@@ -62,7 +62,7 @@ impl Primitive for Sphere {
         let normal = (ray.get_point(root) - self.center) / self.radius;
         let hit_point = ray.get_point(root);
 
-        let mut intersection = if dot(ray.d, normal) < 0.0 {
+        let mut intersection = if ray.d.dot(normal) < 0.0 {
             Intersection::from_outside(
                 root,
                 hit_point,

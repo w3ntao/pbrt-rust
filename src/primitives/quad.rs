@@ -35,24 +35,24 @@ impl Quad {
 impl Primitive for Quad {
     fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
         let ab = cross(self.span0, self.span1);
-        let det = -dot(ab, ray.d);
+        let det = -ab.dot(ray.d);
         if det == 0.0 {
             return Intersection::failure();
         }
 
         let c = ray.o - self.origin;
-        let det_t = dot(ab, c);
+        let det_t = ab.dot(c);
         let t = det_t / det;
         if t < t_min || t > t_max {
             return Intersection::failure();
         }
-        let beta = dot(c, cross(ray.d, self.span1)) / det;
-        let gamma = dot(self.span0, cross(ray.d, c)) / det;
+        let beta = c.dot(cross(ray.d, self.span1)) / det;
+        let gamma = self.span0.dot(cross(ray.d, c)) / det;
         if beta < 0.0 || beta > 1.0 || gamma < 0.0 || gamma > 1.0 {
             return Intersection::failure();
         }
 
-        let normal = if dot(ray.d, self.normal) < 0.0 {
+        let normal = if ray.d.dot(self.normal) < 0.0 {
             self.normal
         } else {
             -self.normal

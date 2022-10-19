@@ -22,8 +22,17 @@ impl Vector3 {
         return Vector3::new(f32::NAN, f32::NAN, f32::NAN);
     }
 
+    pub fn dot(&self, rhs: Vector3) -> f32 {
+        let mut product = 0.0;
+        for idx in 0..3 {
+            product += self[idx] * rhs[idx];
+        }
+
+        return product;
+    }
+
     pub fn length_squared(&self) -> f32 {
-        return dot(*self, *self);
+        return self.dot(*self);
     }
 
     pub fn length(&self) -> f32 {
@@ -35,7 +44,7 @@ impl Vector3 {
     }
 
     pub fn reflect(&self, normal: Vector3) -> Vector3 {
-        return *self - 2.0 * dot(*self, normal) * normal;
+        return *self - 2.0 * self.dot(normal) * normal;
     }
 }
 
@@ -172,10 +181,6 @@ impl ops::MulAssign<Vector3> for Vector3 {
     }
 }
 
-pub fn dot(a: Vector3, b: Vector3) -> f32 {
-    return a.x * b.x + a.y * b.y + a.z * b.z;
-}
-
 pub fn cross(a: Vector3, b: Vector3) -> Vector3 {
     return Vector3 {
         x: a.y * b.z - a.z * b.y,
@@ -185,7 +190,7 @@ pub fn cross(a: Vector3, b: Vector3) -> Vector3 {
 }
 
 pub fn cosine(a: Vector3, b: Vector3) -> f32 {
-    return dot(a, b) / (a.length() * b.length());
+    return a.dot(b) / (a.length() * b.length());
 }
 
 pub fn random_in_unit_sphere() -> Vector3 {
