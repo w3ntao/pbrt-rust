@@ -12,13 +12,6 @@ impl Ray {
         return Self { o: _o, d: _d };
     }
 
-    pub fn dummy() -> Self {
-        Self {
-            o: Point::invalid(),
-            d: Vector3::invalid(),
-        }
-    }
-
     pub fn get_point(&self, distance: f32) -> Point {
         return self.o + distance * self.d;
     }

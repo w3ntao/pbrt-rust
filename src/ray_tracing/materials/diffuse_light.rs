@@ -12,18 +12,18 @@ pub struct DiffuseLight {
 
 impl DiffuseLight {
     pub fn new(_texture: Arc<dyn Texture>) -> DiffuseLight {
-        DiffuseLight {
-            emission: _texture,
-        }
+        DiffuseLight { emission: _texture }
     }
 }
 
 impl Material for DiffuseLight {
     fn scatter(&self, _: Ray, _: &Intersection) -> (bool, Ray, Color) {
-        return (false, Ray::dummy(), Color::black());
+        panic!("scatter() is not implemented for DiffuseLight");
     }
 
     fn emit(&self, intersection: &Intersection) -> Color {
-        return self.emission.get_color(intersection.u, intersection.v, intersection.hit_point);
+        return self
+            .emission
+            .get_color(intersection.u, intersection.v, intersection.hit_point);
     }
 }
