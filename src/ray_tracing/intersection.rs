@@ -20,28 +20,39 @@ pub struct Intersection {
 }
 
 impl Intersection {
-    pub fn from_outside(_distance: f32, _hit_point: Point, _normal: Vector3, _material: Arc<dyn Material>, id: u128) -> Self {
+    pub fn from_outside(
+        _distance: f32,
+        _hit_point: Point,
+        _normal: Vector3,
+        _material: Arc<dyn Material>,
+        id: u128,
+    ) -> Self {
         return Self {
             distance: _distance,
             hit_point: _hit_point,
             normal: _normal.normalize(),
             material: _material,
             entering_material: true,
-            u: f32::nan(),
-            v: f32::nan(),
+            u: f32::NAN,
+            v: f32::NAN,
             object_id: id,
         };
     }
 
-    pub fn from_inside(_distance: f32, _hit_point: Point, _normal: Vector3, _material: Arc<dyn Material>) -> Self {
+    pub fn from_inside(
+        _distance: f32,
+        _hit_point: Point,
+        _normal: Vector3,
+        _material: Arc<dyn Material>,
+    ) -> Self {
         return Self {
             distance: _distance,
             hit_point: _hit_point,
             normal: _normal.normalize(),
             material: _material,
             entering_material: false,
-            u: f32::nan(),
-            v: f32::nan(),
+            u: f32::NAN,
+            v: f32::NAN,
             object_id: 0,
         };
     }
@@ -53,8 +64,8 @@ impl Intersection {
             normal: Vector3::invalid(),
             material: Arc::new(NullMaterial {}),
             entering_material: true,
-            u: f32::nan(),
-            v: f32::nan(),
+            u: f32::NAN,
+            v: f32::NAN,
             object_id: 0,
         };
     }
