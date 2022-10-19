@@ -1,7 +1,7 @@
 use crate::core::texture::Texture;
 use crate::fundamental::color::Color;
 use crate::fundamental::point::Point;
-use crate::ray_tracing::textures::perlin::Perlin;
+use crate::textures::perlin::Perlin;
 
 pub struct NoiseTexture {
     noise: Perlin,

@@ -4,8 +4,11 @@ pub mod cameras;
 mod core;
 mod fundamental;
 pub mod groups;
-mod ray_tracing;
+pub mod integrators;
+pub mod materials;
+pub mod primitives;
 mod test_cases;
+pub mod textures;
 
 fn all_tests(samples: u32) {
     println!();

@@ -3,7 +3,7 @@ use crate::core::instance::Instance;
 use crate::core::renderer::Renderer;
 use crate::core::world::World;
 use crate::fundamental::utility::*;
-use crate::ray_tracing::integrators::ray_casting_dot_normal::RayCastingDotNormal;
+use crate::integrators::ray_casting_dot_normal::RayCastingDotNormal;
 use crate::utility::{get_file_name, load_dragon};
 use std::sync::Arc;
 

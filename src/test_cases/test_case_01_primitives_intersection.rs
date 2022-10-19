@@ -2,11 +2,11 @@ use crate::cameras::perspective::Perspective;
 use crate::core::renderer::Renderer;
 use crate::core::world::World;
 use crate::fundamental::utility::*;
-use crate::ray_tracing::integrators::ray_casting_dot_normal::RayCastingDotNormal;
-use crate::ray_tracing::primitives::axis_aligned_box::AxisAlignedBox;
-use crate::ray_tracing::primitives::quad::Quad;
-use crate::ray_tracing::primitives::sphere::Sphere;
-use crate::ray_tracing::primitives::triangle::Triangle;
+use crate::integrators::ray_casting_dot_normal::RayCastingDotNormal;
+use crate::primitives::axis_aligned_box::AxisAlignedBox;
+use crate::primitives::quad::Quad;
+use crate::primitives::sphere::Sphere;
+use crate::primitives::triangle::Triangle;
 use crate::utility::get_file_name;
 use std::sync::Arc;
 

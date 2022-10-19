@@ -1,17 +1,17 @@
-use std::sync::Arc;
 use crate::fundamental::point::Point;
-use crate::ray_tracing::primitives::triangle::Triangle;
+use crate::primitives::triangle::Triangle;
+use std::sync::Arc;
 
 pub fn obj_to_triangles(obj_file: &str) -> Vec<Arc<Triangle>> {
-    let (loaded_models, _materials) =
-        tobj::load_obj(
-            &obj_file,
-            &tobj::LoadOptions {
-                single_index: true,
-                triangulate: true,
-                ..Default::default()
-            },
-        ).expect("Failed to OBJ load file");
+    let (loaded_models, _materials) = tobj::load_obj(
+        &obj_file,
+        &tobj::LoadOptions {
+            single_index: true,
+            triangulate: true,
+            ..Default::default()
+        },
+    )
+    .expect("Failed to OBJ load file");
 
     if loaded_models.len() != 1 {
         panic!("Currently we deal with only 1 model per time")
@@ -25,7 +25,8 @@ pub fn obj_to_triangles(obj_file: &str) -> Vec<Arc<Triangle>> {
         vertices.push(Point::new(
             mesh.positions[index],
             mesh.positions[index + 1],
-            mesh.positions[index + 2]));
+            mesh.positions[index + 2],
+        ));
     }
     let vertices = vertices;
 

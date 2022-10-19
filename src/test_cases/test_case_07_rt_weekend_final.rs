@@ -4,12 +4,12 @@ use crate::core::renderer::Renderer;
 use crate::core::world::World;
 use crate::fundamental::random::random_f32;
 use crate::fundamental::utility::*;
-use crate::ray_tracing::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
-use crate::ray_tracing::materials::glass::*;
-use crate::ray_tracing::materials::lambertian::*;
-use crate::ray_tracing::materials::metal::*;
-use crate::ray_tracing::primitives::sphere::Sphere;
-use crate::ray_tracing::textures::solid_color::SolidColor;
+use crate::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
+use crate::materials::glass::*;
+use crate::materials::lambertian::*;
+use crate::materials::metal::*;
+use crate::primitives::sphere::Sphere;
+use crate::textures::solid_color::SolidColor;
 use crate::utility::get_file_name;
 use std::sync::Arc;
 

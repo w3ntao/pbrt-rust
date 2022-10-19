@@ -5,7 +5,7 @@ use crate::core::primitive::Primitive;
 use crate::core::ray::*;
 use crate::fundamental::constants::INTERSECT_OFFSET;
 use crate::fundamental::point::*;
-use crate::ray_tracing::primitives::sphere::*;
+use crate::primitives::sphere::*;
 use std::sync::Arc;
 
 pub struct HollowSphere {

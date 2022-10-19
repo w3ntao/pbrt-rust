@@ -3,13 +3,13 @@ use std::sync::Arc;
 use crate::core::primitive::Primitive;
 use crate::core::world::World;
 use crate::fundamental::utility::*;
-use crate::ray_tracing::materials::diffuse_light::DiffuseLight;
-use crate::ray_tracing::materials::glass::Glass;
-use crate::ray_tracing::materials::lambertian::*;
-use crate::ray_tracing::materials::mirror::Mirror;
-use crate::ray_tracing::primitives::quad::Quad;
-use crate::ray_tracing::primitives::sphere::Sphere;
-use crate::ray_tracing::textures::solid_color::SolidColor;
+use crate::materials::diffuse_light::DiffuseLight;
+use crate::materials::glass::Glass;
+use crate::materials::lambertian::*;
+use crate::materials::mirror::Mirror;
+use crate::primitives::quad::Quad;
+use crate::primitives::sphere::Sphere;
+use crate::textures::solid_color::SolidColor;
 
 pub fn smallpt() -> World {
     let mut world = World::default();

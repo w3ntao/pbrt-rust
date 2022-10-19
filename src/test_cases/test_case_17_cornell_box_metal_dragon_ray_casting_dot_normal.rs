@@ -1,6 +1,6 @@
 use crate::core::renderer::Renderer;
 use crate::cornell_box::{cornell_box_camera, cornell_box_metal_dragon};
-use crate::ray_tracing::integrators::ray_casting_dot_normal::RayCastingDotNormal;
+use crate::integrators::ray_casting_dot_normal::RayCastingDotNormal;
 use crate::utility::get_file_name;
 use std::sync::Arc;
 
