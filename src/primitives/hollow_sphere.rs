@@ -1,4 +1,4 @@
-use crate::core::bounding_box::BoundingBox;
+use crate::core::bounds::Bounds;
 use crate::core::intersection::*;
 use crate::core::material::Material;
 use crate::core::primitive::Primitive;
@@ -41,7 +41,7 @@ impl Primitive for HollowSphere {
         return internal_intersection;
     }
 
-    fn get_bounds(&self) -> BoundingBox {
+    fn get_bounds(&self) -> Bounds {
         return self.external_sphere.get_bounds();
     }
 

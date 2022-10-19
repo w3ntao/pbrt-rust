@@ -1,4 +1,4 @@
-use crate::core::bounding_box::BoundingBox;
+use crate::core::bounds::Bounds;
 use crate::core::intersection::*;
 use crate::core::material::*;
 use crate::core::primitive::Primitive;
@@ -13,7 +13,7 @@ pub struct Quad {
     pub span0: Vector3,
     pub span1: Vector3,
     pub normal: Vector3,
-    bounds: BoundingBox,
+    bounds: Bounds,
     material: Arc<dyn Material>,
     id: u128,
 }
@@ -25,7 +25,7 @@ impl Quad {
             span0: _span0,
             span1: _span1,
             normal: cross(_span0, _span1).normalize(),
-            bounds: BoundingBox::build(&[v0, v0 + _span0, v0 + _span1, v0 + _span0 + _span1]),
+            bounds: Bounds::build(&[v0, v0 + _span0, v0 + _span1, v0 + _span0 + _span1]),
             material: Arc::new(NullMaterial {}),
             id: random_u128(),
         };
@@ -66,7 +66,7 @@ impl Primitive for Quad {
         );
     }
 
-    fn get_bounds(&self) -> BoundingBox {
+    fn get_bounds(&self) -> Bounds {
         return self.bounds;
     }
 

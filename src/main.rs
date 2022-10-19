@@ -1,9 +1,9 @@
 use crate::test_cases::*;
 
+pub mod accelerators;
 pub mod cameras;
 mod core;
 mod fundamental;
-pub mod groups;
 pub mod integrators;
 pub mod materials;
 pub mod primitives;

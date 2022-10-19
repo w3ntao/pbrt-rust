@@ -4,20 +4,20 @@ use std::mem;
 use std::ops;
 
 #[derive(Copy, Clone)]
-pub struct BoundingBox {
+pub struct Bounds {
     pub min: Point,
     pub max: Point,
 }
 
-impl Default for BoundingBox {
+impl Default for Bounds {
     fn default() -> Self {
-        return BoundingBox::empty();
+        return Bounds::empty();
     }
 }
 
-impl BoundingBox {
+impl Bounds {
     pub fn empty() -> Self {
-        return BoundingBox {
+        return Bounds {
             min: Point::invalid(),
             max: Point::invalid(),
         };
@@ -26,7 +26,7 @@ impl BoundingBox {
     pub fn build(points: &[Point]) -> Self {
         let _min = min_of(&points);
         let _max = max_of(&points);
-        return BoundingBox {
+        return Bounds {
             min: _min,
             max: _max,
         };
@@ -79,18 +79,18 @@ impl BoundingBox {
     }
 }
 
-impl ops::Add<BoundingBox> for BoundingBox {
-    type Output = BoundingBox;
-    fn add(self, rhs: BoundingBox) -> BoundingBox {
-        return BoundingBox {
+impl ops::Add<Bounds> for Bounds {
+    type Output = Bounds;
+    fn add(self, rhs: Bounds) -> Bounds {
+        return Bounds {
             min: min_of(&[self.min, rhs.min]),
             max: max_of(&[self.max, rhs.max]),
         };
     }
 }
 
-impl ops::AddAssign<BoundingBox> for BoundingBox {
-    fn add_assign(&mut self, rhs: BoundingBox) {
+impl ops::AddAssign<Bounds> for Bounds {
+    fn add_assign(&mut self, rhs: Bounds) {
         self.min = min_of(&[self.min, rhs.min]);
         self.max = max_of(&[self.max, rhs.max]);
     }

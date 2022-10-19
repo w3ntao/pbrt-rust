@@ -1,19 +1,17 @@
-use std::sync::Arc;
-use std::time::Instant;
-
-use crate::core::bounding_box::BoundingBox;
-use crate::core::group::Group;
+use crate::accelerators::bvh_node::{Node, PrimitiveInfo};
+use crate::core::bounds::Bounds;
 use crate::core::intersection::*;
 use crate::core::material::Material;
-use crate::core::primitive::Primitive;
+use crate::core::primitive::{Aggregate, Primitive};
 use crate::core::ray::*;
 use crate::fundamental::point::Point;
 use crate::fundamental::vector3::Vector3;
-use crate::groups::bvh_node::{Node, PrimitiveInfo};
+use std::sync::Arc;
+use std::time::Instant;
 
 pub struct BVH {
     primitives: Vec<Arc<dyn Primitive>>,
-    bounds: BoundingBox,
+    bounds: Bounds,
     root: Option<Box<Node>>,
     index_built: bool,
 }
@@ -22,14 +20,14 @@ impl Default for BVH {
     fn default() -> Self {
         BVH {
             primitives: Vec::default(),
-            bounds: BoundingBox::empty(),
+            bounds: Bounds::empty(),
             root: None,
             index_built: false,
         }
     }
 }
 
-impl Group for BVH {
+impl Aggregate for BVH {
     fn add(&mut self, p: Arc<dyn Primitive>) {
         self.bounds += p.get_bounds();
         self.primitives.push(p);
@@ -50,7 +48,7 @@ impl Primitive for BVH {
             .intersect(ray, t_min, t_max, &self.primitives);
     }
 
-    fn get_bounds(&self) -> BoundingBox {
+    fn get_bounds(&self) -> Bounds {
         return self.bounds;
     }
 

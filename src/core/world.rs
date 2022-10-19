@@ -1,10 +1,9 @@
-use crate::core::group::Group;
+use crate::accelerators::bvh::BVH;
 use crate::core::intersection::Intersection;
-use crate::core::primitive::Primitive;
+use crate::core::primitive::{Aggregate, Primitive};
 use crate::core::ray::Ray;
 use crate::fundamental::point::Point;
 use crate::fundamental::utility::Vector3;
-use crate::groups::bvh::BVH;
 use rand::Rng;
 use std::sync::Arc;
 

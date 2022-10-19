@@ -1,4 +1,4 @@
-use crate::core::bounding_box::BoundingBox;
+use crate::core::bounds::Bounds;
 use crate::core::intersection::*;
 use crate::core::material::*;
 use crate::core::primitive::Primitive;
@@ -12,7 +12,7 @@ pub struct AxisAlignedBox {
     pub axis_min: Point,
     pub axis_max: Point,
     pub id: u128,
-    bounds: BoundingBox,
+    bounds: Bounds,
     material: Arc<dyn Material>,
 }
 
@@ -22,7 +22,7 @@ impl AxisAlignedBox {
             axis_min: min_of(&[corner_0, corner_1]),
             axis_max: max_of(&[corner_0, corner_1]),
             id: random_u128(),
-            bounds: BoundingBox::build(&[corner_0, corner_1]),
+            bounds: Bounds::build(&[corner_0, corner_1]),
             material: Arc::new(NullMaterial {}),
         };
     }
@@ -77,7 +77,7 @@ impl Primitive for AxisAlignedBox {
         );
     }
 
-    fn get_bounds(&self) -> BoundingBox {
+    fn get_bounds(&self) -> Bounds {
         return self.bounds;
     }
 

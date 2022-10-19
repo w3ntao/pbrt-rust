@@ -1,4 +1,4 @@
-use crate::core::bounding_box::BoundingBox;
+use crate::core::bounds::Bounds;
 use crate::core::intersection::*;
 use crate::core::material::*;
 use crate::core::primitive::Primitive;
@@ -13,7 +13,7 @@ pub struct Sphere {
     pub center: Point,
     pub radius: f32,
     pub material: Arc<dyn Material>,
-    bounds: BoundingBox,
+    bounds: Bounds,
     id: u128,
 }
 
@@ -24,7 +24,7 @@ impl Sphere {
         return Self {
             center: _center,
             radius: _radius,
-            bounds: BoundingBox::build(&[min, max]),
+            bounds: Bounds::build(&[min, max]),
             material: Arc::new(NullMaterial {}),
             id: random_u128(),
         };
@@ -88,7 +88,7 @@ impl Primitive for Sphere {
         return intersection;
     }
 
-    fn get_bounds(&self) -> BoundingBox {
+    fn get_bounds(&self) -> Bounds {
         return self.bounds;
     }
 

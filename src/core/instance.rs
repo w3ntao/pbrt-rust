@@ -1,4 +1,4 @@
-use crate::core::bounding_box::BoundingBox;
+use crate::core::bounds::Bounds;
 use crate::core::intersection::Intersection;
 use crate::core::material::*;
 use crate::core::primitive::Primitive;
@@ -42,7 +42,7 @@ impl Primitive for Instance {
         return intersection;
     }
 
-    fn get_bounds(&self) -> BoundingBox {
+    fn get_bounds(&self) -> Bounds {
         let bounds = self.primitive.get_bounds();
         let min = bounds.min;
         let max = bounds.max;
@@ -62,7 +62,7 @@ impl Primitive for Instance {
             points[idx] = self.transform.clone() * points[idx];
         }
 
-        return BoundingBox::build(&points);
+        return Bounds::build(&points);
     }
 
     fn set_material(&mut self, material: Arc<dyn Material>) {

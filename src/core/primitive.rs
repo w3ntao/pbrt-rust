@@ -1,4 +1,4 @@
-use crate::core::bounding_box::BoundingBox;
+use crate::core::bounds::Bounds;
 use crate::core::intersection::*;
 use crate::core::material::Material;
 use crate::core::ray::*;
@@ -9,7 +9,7 @@ use std::sync::Arc;
 pub trait Primitive: Send + Sync {
     fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection;
 
-    fn get_bounds(&self) -> BoundingBox;
+    fn get_bounds(&self) -> Bounds;
 
     fn set_material(&mut self, material: Arc<dyn Material>);
 
@@ -24,4 +24,8 @@ pub trait Primitive: Send + Sync {
     fn get_area(&self) -> f32 {
         panic!("get_area() not implemented for this Primitive");
     }
+}
+
+pub trait Aggregate {
+    fn add(&mut self, p: Arc<dyn Primitive>);
 }
