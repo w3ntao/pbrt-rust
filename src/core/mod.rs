@@ -1,11 +1,14 @@
 pub mod bounds;
 pub mod camera;
+pub mod color;
 pub mod instance;
 pub mod integrator;
 pub mod intersection;
 pub mod material;
+pub mod point;
 pub mod primitive;
 pub mod ray;
 pub mod renderer;
 pub mod texture;
+pub mod vector3;
 pub mod world;

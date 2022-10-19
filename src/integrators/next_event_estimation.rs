@@ -1,11 +1,11 @@
+use crate::core::color::*;
 use crate::core::integrator::Integrator;
 use crate::core::intersection::Intersection;
 use crate::core::ray::Ray;
+use crate::core::vector3::{cosine, dot};
 use crate::core::world::World;
-use crate::fundamental::color::*;
 use crate::fundamental::constants::INTERSECT_OFFSET;
 use crate::fundamental::random::RandomF32Generator;
-use crate::fundamental::vector3::{cosine, dot};
 use std::sync::Arc;
 
 pub struct NextEventEstimation {

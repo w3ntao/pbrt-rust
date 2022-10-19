@@ -1,8 +1,8 @@
 use crate::core::bounds::Bounds;
 use crate::core::intersection::*;
+use crate::core::point::*;
 use crate::core::primitive::Primitive;
 use crate::core::ray::*;
-use crate::fundamental::point::*;
 use std::sync::Arc;
 
 const BUCKET_NUM: usize = 12;

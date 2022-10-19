@@ -1,7 +1,7 @@
+use crate::core::color::*;
 use crate::core::intersection::*;
 use crate::core::material::Material;
 use crate::core::ray::*;
-use crate::fundamental::color::*;
 
 pub struct Mirror {}
 

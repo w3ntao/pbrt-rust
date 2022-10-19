@@ -1,8 +1,8 @@
 use crate::core::bounds::Bounds;
 use crate::core::intersection::*;
 use crate::core::material::Material;
+use crate::core::point::Point;
 use crate::core::ray::*;
-use crate::fundamental::point::Point;
 use crate::fundamental::utility::Vector3;
 use std::sync::Arc;
 

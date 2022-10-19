@@ -1,6 +1,6 @@
+use crate::core::color::Color;
+use crate::core::point::Point;
 use crate::core::texture::Texture;
-use crate::fundamental::color::Color;
-use crate::fundamental::point::Point;
 use std::sync::Arc;
 
 pub struct CheckerTexture {

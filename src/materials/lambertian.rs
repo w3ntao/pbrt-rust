@@ -1,12 +1,12 @@
+use crate::core::color::*;
 use crate::core::intersection::*;
 use crate::core::material::Material;
 use crate::core::ray::*;
 use crate::core::texture::Texture;
-use crate::fundamental::color::*;
+use crate::core::vector3::*;
 use crate::fundamental::orthonormal_basis::OrthonormalBasis;
 use crate::fundamental::random::random_f32;
 use crate::fundamental::utility::*;
-use crate::fundamental::vector3::*;
 use std::sync::Arc;
 
 pub struct Lambertian {

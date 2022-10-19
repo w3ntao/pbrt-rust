@@ -1,5 +1,5 @@
+use crate::core::vector3::cross;
 use crate::fundamental::utility::Vector3;
-use crate::fundamental::vector3::cross;
 
 #[derive(Copy, Clone)]
 pub struct OrthonormalBasis {
@@ -11,12 +11,11 @@ pub struct OrthonormalBasis {
 impl OrthonormalBasis {
     pub fn build_from_w(n: Vector3) -> Self {
         let _w = n.normalize();
-        let a =
-            if _w.x.abs() > 0.9 {
-                Vector3::new(0.0, 1.0, 0.0)
-            } else {
-                Vector3::new(1.0, 0.0, 0.0)
-            };
+        let a = if _w.x.abs() > 0.9 {
+            Vector3::new(0.0, 1.0, 0.0)
+        } else {
+            Vector3::new(1.0, 0.0, 0.0)
+        };
 
         let _v = cross(_w, a);
 

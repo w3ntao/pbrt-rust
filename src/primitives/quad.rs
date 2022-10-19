@@ -1,11 +1,11 @@
 use crate::core::bounds::Bounds;
 use crate::core::intersection::*;
 use crate::core::material::*;
+use crate::core::point::*;
 use crate::core::primitive::Primitive;
 use crate::core::ray::*;
-use crate::fundamental::point::*;
+use crate::core::vector3::*;
 use crate::fundamental::random::{random_f32, random_u128};
-use crate::fundamental::vector3::*;
 use std::sync::Arc;
 
 pub struct Quad {

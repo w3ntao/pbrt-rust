@@ -1,8 +1,8 @@
 use rand::Rng;
 
-use crate::fundamental::point::Point;
+use crate::core::point::Point;
+use crate::core::vector3::{dot, Vector3};
 use crate::fundamental::random::random_f32;
-use crate::fundamental::vector3::{dot, Vector3};
 
 const POINT_COUNT: usize = 256;
 

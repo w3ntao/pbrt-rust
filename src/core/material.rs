@@ -1,7 +1,7 @@
+use crate::core::color::*;
 use crate::core::intersection::*;
 use crate::core::ray::*;
-use crate::fundamental::color::*;
-use crate::fundamental::vector3::Vector3;
+use crate::core::vector3::Vector3;
 
 pub trait Material: Send + Sync {
     fn scatter(&self, _incoming_ray: Ray, _intersection: &Intersection) -> (bool, Ray, Color) {

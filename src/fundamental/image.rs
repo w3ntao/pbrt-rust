@@ -1,7 +1,7 @@
 use std::fs;
 use std::io::{BufWriter, Write};
 
-use crate::fundamental::color::*;
+use crate::core::color::*;
 
 #[derive(Clone)]
 pub struct Image {
@@ -32,10 +32,12 @@ impl Image {
         for h in 0usize..self.height {
             for w in 0usize..self.width {
                 let pixel = &self.pixels[h][w];
-                let line = format!("{} {} {}\n",
-                                   (pixel.r.sqrt() * factor) as i32,
-                                   (pixel.g.sqrt() * factor) as i32,
-                                   (pixel.b.sqrt() * factor) as i32);
+                let line = format!(
+                    "{} {} {}\n",
+                    (pixel.r.sqrt() * factor) as i32,
+                    (pixel.g.sqrt() * factor) as i32,
+                    (pixel.b.sqrt() * factor) as i32
+                );
                 // sqrt(): gamma correction
                 buf_writer.write(line.as_bytes()).unwrap();
             }

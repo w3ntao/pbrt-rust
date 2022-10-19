@@ -1,4 +1,4 @@
-use crate::fundamental::point::Point;
+use crate::core::point::Point;
 use crate::primitives::triangle::Triangle;
 use std::sync::Arc;
 

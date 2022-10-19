@@ -1,7 +1,7 @@
+use crate::core::color::*;
 use crate::core::integrator::Integrator;
 use crate::core::ray::Ray;
 use crate::core::world::World;
-use crate::fundamental::color::*;
 use std::sync::Arc;
 
 pub struct RayCastingNormal {

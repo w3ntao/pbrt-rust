@@ -1,6 +1,6 @@
 use crate::core::material::{Material, NullMaterial};
-use crate::fundamental::point::*;
-use crate::fundamental::vector3::*;
+use crate::core::point::*;
+use crate::core::vector3::*;
 use std::sync::Arc;
 
 #[derive(Clone)]

@@ -1,11 +1,11 @@
 use crate::core::bounds::Bounds;
 use crate::core::intersection::Intersection;
 use crate::core::material::*;
+use crate::core::point::Point;
 use crate::core::primitive::Primitive;
 use crate::core::ray::Ray;
+use crate::core::vector3::Vector3;
 use crate::fundamental::matrix::*;
-use crate::fundamental::point::Point;
-use crate::fundamental::vector3::Vector3;
 use crate::fundamental::vector4::Vector4;
 use std::sync::Arc;
 

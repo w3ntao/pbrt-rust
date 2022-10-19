@@ -1,6 +1,6 @@
 use std::ops;
 
-use crate::fundamental::point::*;
+use crate::core::point::*;
 use crate::fundamental::random::random_f32;
 use crate::fundamental::utility::*;
 
