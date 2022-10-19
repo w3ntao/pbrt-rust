@@ -1,6 +1,4 @@
-use rand::distributions::{Distribution, Uniform};
-use rand::rngs::ThreadRng;
-use rand::{thread_rng, Rng};
+use crate::core::pbrt::*;
 
 pub struct RandomF32Generator {
     generator: ThreadRng,

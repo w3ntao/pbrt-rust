@@ -19,4 +19,3 @@ pub mod test_case_16_cornell_box_metal_dragon_ray_casting_normal;
 pub mod test_case_17_cornell_box_metal_dragon_ray_casting_dot_normal;
 pub mod test_case_18_cornell_box_metal_dragon_next_event_estimation;
 pub mod test_case_19_smallpt;
-pub mod utility;

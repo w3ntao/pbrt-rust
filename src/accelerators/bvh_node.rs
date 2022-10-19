@@ -1,5 +1,4 @@
-use crate::core::interfaces::*;
-use std::sync::Arc;
+use crate::core::pbrt::*;
 
 const BUCKET_NUM: usize = 12;
 const EPSILON: f32 = 1.0e-6;

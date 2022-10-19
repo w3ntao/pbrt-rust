@@ -1,12 +1,4 @@
-use crate::core::interfaces::*;
-use crate::materials::diffuse_light::DiffuseLight;
-use crate::materials::glass::Glass;
-use crate::materials::lambertian::*;
-use crate::materials::mirror::Mirror;
-use crate::primitives::quad::Quad;
-use crate::primitives::sphere::Sphere;
-use crate::textures::solid_color::SolidColor;
-use std::sync::Arc;
+use crate::core::pbrt::*;
 
 pub fn smallpt() -> World {
     let mut world = World::default();

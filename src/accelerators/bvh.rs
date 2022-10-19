@@ -1,7 +1,5 @@
 use crate::accelerators::bvh_node::{Node, PrimitiveInfo};
-use crate::core::interfaces::*;
-use std::sync::Arc;
-use std::time::Instant;
+use crate::core::pbrt::*;
 
 pub struct BVH {
     primitives: Vec<Arc<dyn Primitive>>,

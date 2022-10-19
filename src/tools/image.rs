@@ -1,7 +1,4 @@
-use std::fs;
-use std::io::{BufWriter, Write};
-
-use crate::core::color::*;
+use crate::core::pbrt::*;
 
 #[derive(Clone)]
 pub struct Image {

@@ -1,8 +1,4 @@
-use crate::accelerators::bvh::BVH;
-use crate::core::primitive::Aggregate;
-use crate::tools::obj_loader::obj_to_triangles;
-use std::path::Path;
-use std::process;
+use crate::core::pbrt::*;
 
 pub fn get_file_name(full_path: &str) -> String {
     let file_name_with_postfix = Path::new(full_path)

@@ -1,4 +1,4 @@
-use crate::core::interfaces::*;
+use crate::core::pbrt::*;
 
 pub struct Mirror {}
 

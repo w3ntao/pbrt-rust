@@ -1,12 +1,4 @@
-use crate::cameras::perspective::Perspective;
-use crate::core::interfaces::*;
-use crate::integrators::ray_casting_dot_normal::RayCastingDotNormal;
-use crate::primitives::axis_aligned_box::AxisAlignedBox;
-use crate::primitives::quad::Quad;
-use crate::primitives::sphere::Sphere;
-use crate::primitives::triangle::Triangle;
-use crate::utility::get_file_name;
-use std::sync::Arc;
+use crate::core::pbrt::*;
 
 #[allow(dead_code)]
 pub fn test(width: usize, height: usize) {

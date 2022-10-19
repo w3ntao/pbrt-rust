@@ -1,8 +1,5 @@
-use crate::core::renderer::Renderer;
+use crate::core::pbrt::*;
 use crate::cornell_box::{cornell_box_camera, cornell_box_metal_dragon};
-use crate::integrators::ray_casting_dot_normal::RayCastingDotNormal;
-use crate::utility::get_file_name;
-use std::sync::Arc;
 
 #[allow(dead_code)]
 pub fn test(width: usize, height: usize, samples: u32) {

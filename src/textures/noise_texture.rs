@@ -1,4 +1,4 @@
-use crate::core::interfaces::*;
+use crate::core::pbrt::*;
 use crate::textures::perlin::Perlin;
 
 pub struct NoiseTexture {

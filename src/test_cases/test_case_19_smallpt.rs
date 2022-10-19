@@ -1,9 +1,5 @@
-use crate::cameras::perspective::Perspective;
-use crate::core::interfaces::*;
-use crate::integrators::next_event_estimation::NextEventEstimation;
+use crate::core::pbrt::*;
 use crate::smallpt::smallpt;
-use crate::utility::get_file_name;
-use std::sync::Arc;
 
 #[allow(dead_code)]
 pub fn test(width: usize, height: usize, samples: u32) {

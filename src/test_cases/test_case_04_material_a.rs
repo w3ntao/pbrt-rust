@@ -1,14 +1,4 @@
-use crate::cameras::perspective::Perspective;
-use crate::core::interfaces::*;
-use crate::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
-use crate::materials::glass::*;
-use crate::materials::lambertian::*;
-use crate::materials::metal::*;
-use crate::materials::mirror::*;
-use crate::primitives::sphere::Sphere;
-use crate::textures::solid_color::SolidColor;
-use crate::utility::get_file_name;
-use std::sync::Arc;
+use crate::core::pbrt::*;
 
 #[allow(dead_code)]
 pub fn test(width: usize, height: usize, samples: u32) {

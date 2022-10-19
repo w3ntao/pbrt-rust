@@ -1,13 +1,5 @@
 extern crate num_cpus;
-use crate::core::interfaces::*;
-use crate::tools::image::Image;
-use rand::seq::SliceRandom;
-use rand::thread_rng;
-use std::io::Write;
-use std::sync::{Arc, Mutex};
-use std::thread::JoinHandle;
-use std::time::Instant;
-use std::{io, thread, time};
+use crate::core::pbrt::*;
 
 pub struct Renderer {
     camera: Arc<dyn Camera>,

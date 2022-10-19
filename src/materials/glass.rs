@@ -1,5 +1,4 @@
-use crate::core::interfaces::*;
-use rand_distr::num_traits::Pow;
+use crate::core::pbrt::*;
 
 pub struct Glass {
     index_of_refraction: f32,

@@ -1,5 +1,4 @@
-use crate::core::interfaces::*;
-use std::sync::Arc;
+use crate::core::pbrt::*;
 
 pub trait Primitive: Send + Sync {
     fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection;

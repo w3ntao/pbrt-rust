@@ -1,15 +1,4 @@
-use crate::cameras::perspective::Perspective;
-use crate::core::interfaces::*;
-use crate::materials::diffuse_light::DiffuseLight;
-use crate::materials::glass::Glass;
-use crate::materials::lambertian::*;
-use crate::materials::metal::Metal;
-use crate::primitives::axis_aligned_box::AxisAlignedBox;
-use crate::primitives::quad::Quad;
-use crate::primitives::sphere::Sphere;
-use crate::textures::solid_color::SolidColor;
-use crate::utility::load_dragon;
-use std::sync::Arc;
+use crate::core::pbrt::*;
 
 const WALL_LENGTH: f32 = 555.0;
 

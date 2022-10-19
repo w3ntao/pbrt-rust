@@ -1,5 +1,4 @@
-use crate::core::interfaces::*;
-use std::sync::Arc;
+use crate::core::pbrt::*;
 
 pub struct NextEventEstimation {
     world: Arc<World>,

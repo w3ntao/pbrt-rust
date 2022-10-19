@@ -1,8 +1,5 @@
-use crate::core::interfaces::*;
+use crate::core::pbrt::*;
 use crate::cornell_box::{cornell_box, cornell_box_camera};
-use crate::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
-use crate::utility::get_file_name;
-use std::sync::Arc;
 
 #[allow(dead_code)]
 pub fn test(width: usize, height: usize, samples: u32) {

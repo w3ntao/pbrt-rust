@@ -1,15 +1,5 @@
-use crate::cameras::depth_of_field::DepthOfField;
-use crate::core::interfaces::*;
-use crate::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
-use crate::materials::glass::*;
-use crate::materials::lambertian::*;
-use crate::materials::metal::*;
-use crate::primitives::sphere::Sphere;
+use crate::core::pbrt::*;
 use crate::test_case_07_rt_weekend_final::many_random_spheres;
-use crate::textures::checker_texture::CheckerTexture;
-use crate::textures::solid_color::*;
-use crate::utility::get_file_name;
-use std::sync::Arc;
 
 #[allow(dead_code)]
 pub fn test(width: usize, height: usize, samples: u32) {

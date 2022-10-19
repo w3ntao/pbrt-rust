@@ -1,4 +1,4 @@
-use crate::core::interfaces::*;
+use crate::core::pbrt::*;
 
 pub trait Material: Send + Sync {
     fn scatter(&self, _incoming_ray: Ray, _intersection: &Intersection) -> (bool, Ray, Color) {

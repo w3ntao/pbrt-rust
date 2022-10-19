@@ -1,6 +1,4 @@
-use crate::core::interfaces::*;
-use rand::distributions::Uniform;
-use rand::{thread_rng, Rng};
+use crate::core::pbrt::*;
 
 pub struct DepthOfField {
     center: Point,

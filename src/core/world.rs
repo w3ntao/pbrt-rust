@@ -1,7 +1,4 @@
-use crate::accelerators::bvh::BVH;
-use crate::core::interfaces::*;
-use rand::Rng;
-use std::sync::Arc;
+use crate::core::pbrt::*;
 
 pub struct World {
     lights: Vec<Arc<dyn Primitive>>,

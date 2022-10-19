@@ -1,6 +1,4 @@
-use crate::core::point::Point;
-use crate::primitives::triangle::Triangle;
-use std::sync::Arc;
+use crate::core::pbrt::*;
 
 pub fn obj_to_triangles(obj_file: &str) -> Vec<Arc<Triangle>> {
     let (loaded_models, _materials) = tobj::load_obj(

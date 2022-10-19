@@ -1,4 +1,4 @@
-use std::ops;
+use crate::core::pbrt::*;
 
 #[derive(Copy, Clone)]
 pub struct Point {
@@ -25,19 +25,11 @@ impl Point {
     }
 
     fn min(&self, b: Point) -> Point {
-        return Point::new(
-            self.x.min(b.x),
-            self.y.min(b.y),
-            self.z.min(b.z),
-        );
+        return Point::new(self.x.min(b.x), self.y.min(b.y), self.z.min(b.z));
     }
 
     fn max(&self, b: Point) -> Point {
-        return Point::new(
-            self.x.max(b.x),
-            self.y.max(b.y),
-            self.z.max(b.z),
-        );
+        return Point::new(self.x.max(b.x), self.y.max(b.y), self.z.max(b.z));
     }
 }
 
@@ -90,14 +82,12 @@ impl ops::Mul<f32> for Point {
     }
 }
 
-
 impl ops::Mul<Point> for f32 {
     type Output = Point;
     fn mul(self, p: Point) -> Self::Output {
         p * self
     }
 }
-
 
 pub fn max_of(points: &[Point]) -> Point {
     let mut _max = points[0];
@@ -118,4 +108,3 @@ pub fn min_of(points: &[Point]) -> Point {
 
     return _min;
 }
-

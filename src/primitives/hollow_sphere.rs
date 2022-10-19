@@ -1,6 +1,4 @@
-use crate::core::interfaces::*;
-use crate::primitives::sphere::*;
-use std::sync::Arc;
+use crate::core::pbrt::*;
 
 pub struct HollowSphere {
     pub external_sphere: Sphere,

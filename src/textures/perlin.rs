@@ -1,5 +1,4 @@
-use crate::core::interfaces::*;
-use rand::Rng;
+use crate::core::pbrt::*;
 
 const POINT_COUNT: usize = 256;
 
