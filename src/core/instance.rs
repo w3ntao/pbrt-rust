@@ -1,5 +1,5 @@
 use crate::core::interfaces::*;
-use crate::fundamental::matrix::*;
+use crate::core::matrix::*;
 use std::sync::Arc;
 
 pub struct Instance {

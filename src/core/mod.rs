@@ -6,6 +6,8 @@ pub mod integrator;
 pub mod interfaces;
 pub mod intersection;
 pub mod material;
+pub mod matrix;
+pub mod orthonormal_basis;
 pub mod point;
 pub mod primitive;
 pub mod random;

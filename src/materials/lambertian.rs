@@ -1,6 +1,6 @@
 use crate::core::interfaces::*;
+use crate::core::orthonormal_basis::OrthonormalBasis;
 use crate::core::random::random_f32;
-use crate::fundamental::orthonormal_basis::OrthonormalBasis;
 use std::sync::Arc;
 
 pub struct Lambertian {
