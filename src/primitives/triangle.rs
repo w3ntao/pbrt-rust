@@ -1,12 +1,4 @@
-use crate::core::bounds::Bounds;
-use crate::core::intersection::*;
-use crate::core::material::Material;
-use crate::core::material::NullMaterial;
-use crate::core::point::*;
-use crate::core::primitive::Primitive;
-use crate::core::random::random_u128;
-use crate::core::ray::*;
-use crate::core::vector3::*;
+use crate::core::interfaces::*;
 use std::sync::Arc;
 
 pub struct Triangle {

@@ -1,5 +1,4 @@
 use crate::core::interfaces::*;
-use crate::core::random::RandomF32Generator;
 use std::sync::Arc;
 
 pub struct NextEventEstimation {

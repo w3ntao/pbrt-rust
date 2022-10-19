@@ -1,8 +1,4 @@
-use crate::core::color::Color;
-use crate::core::intersection::Intersection;
-use crate::core::material::Material;
-use crate::core::ray::Ray;
-use crate::core::texture::Texture;
+use crate::core::interfaces::*;
 use std::sync::Arc;
 
 pub struct DiffuseLight {

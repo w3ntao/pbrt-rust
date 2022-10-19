@@ -1,7 +1,4 @@
-use crate::core::camera::Camera;
-use crate::core::point::*;
-use crate::core::ray::Ray;
-use crate::core::vector3::*;
+use crate::core::interfaces::*;
 use rand::distributions::Uniform;
 use rand::{thread_rng, Rng};
 

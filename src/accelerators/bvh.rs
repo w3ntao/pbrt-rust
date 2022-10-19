@@ -1,11 +1,5 @@
 use crate::accelerators::bvh_node::{Node, PrimitiveInfo};
-use crate::core::bounds::Bounds;
-use crate::core::intersection::*;
-use crate::core::material::Material;
-use crate::core::point::Point;
-use crate::core::primitive::{Aggregate, Primitive};
-use crate::core::ray::*;
-use crate::core::vector3::Vector3;
+use crate::core::interfaces::*;
 use std::sync::Arc;
 use std::time::Instant;
 

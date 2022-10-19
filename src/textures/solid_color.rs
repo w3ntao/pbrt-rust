@@ -1,6 +1,4 @@
-use crate::core::color::Color;
-use crate::core::point::Point;
-use crate::core::texture::Texture;
+use crate::core::interfaces::*;
 
 pub struct SolidColor {
     color: Color,

@@ -1,5 +1,4 @@
 use crate::core::interfaces::*;
-use crate::core::random::random_f32;
 use rand::Rng;
 
 const POINT_COUNT: usize = 256;
