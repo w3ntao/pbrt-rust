@@ -1,6 +1,5 @@
 use crate::core::interfaces::*;
 use crate::fundamental::matrix::*;
-use crate::fundamental::vector4::Vector4;
 use std::sync::Arc;
 
 pub struct Instance {
