@@ -1,4 +1,4 @@
-use crate::core::pbrt::*;
+use crate::core::interfaces::*;
 use crate::cornell_box::{cornell_box, cornell_box_camera};
 use crate::integrators::next_event_estimation::NextEventEstimation;
 use crate::utility::get_file_name;

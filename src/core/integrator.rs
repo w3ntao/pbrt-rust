@@ -1,5 +1,4 @@
-use crate::core::color::Color;
-use crate::core::ray::Ray;
+use crate::core::interfaces::*;
 
 pub trait Integrator: Send + Sync {
     fn get_radiance(&self, ray: Ray) -> Color;

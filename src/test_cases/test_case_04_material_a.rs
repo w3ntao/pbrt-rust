@@ -1,5 +1,5 @@
 use crate::cameras::perspective::Perspective;
-use crate::core::pbrt::*;
+use crate::core::interfaces::*;
 use crate::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
 use crate::materials::glass::*;
 use crate::materials::lambertian::*;

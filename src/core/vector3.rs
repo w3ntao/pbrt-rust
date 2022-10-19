@@ -1,4 +1,4 @@
-use crate::core::pbrt::*;
+use crate::core::interfaces::*;
 use crate::fundamental::random::random_f32;
 use std::ops;
 

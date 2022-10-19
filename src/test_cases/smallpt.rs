@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::core::pbrt::*;
+use crate::core::interfaces::*;
 use crate::core::primitive::Primitive;
 use crate::core::world::World;
 use crate::materials::diffuse_light::DiffuseLight;

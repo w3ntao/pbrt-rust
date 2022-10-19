@@ -1,4 +1,4 @@
-use crate::core::ray::Ray;
+use crate::core::interfaces::*;
 
 pub trait Camera: Send + Sync {
     fn get_stratified_rays(

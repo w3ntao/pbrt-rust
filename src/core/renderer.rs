@@ -1,7 +1,5 @@
 extern crate num_cpus;
-use crate::core::camera::Camera;
-use crate::core::color::Color;
-use crate::core::integrator::Integrator;
+use crate::core::interfaces::*;
 use crate::fundamental::image::Image;
 use rand::seq::SliceRandom;
 use rand::thread_rng;

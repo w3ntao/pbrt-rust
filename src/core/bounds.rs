@@ -1,5 +1,4 @@
-use crate::core::point::*;
-use crate::core::ray::Ray;
+use crate::core::interfaces::*;
 use std::mem;
 use std::ops;
 

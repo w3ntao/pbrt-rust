@@ -1,4 +1,4 @@
-use crate::core::pbrt::*;
+use crate::core::interfaces::*;
 use crate::fundamental::random::random_u128;
 use std::sync::Arc;
 

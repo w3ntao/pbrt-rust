@@ -1,9 +1,4 @@
-use crate::core::bounds::Bounds;
-use crate::core::intersection::*;
-use crate::core::material::Material;
-use crate::core::pbrt::Vector3;
-use crate::core::point::Point;
-use crate::core::ray::*;
+use crate::core::interfaces::*;
 use std::sync::Arc;
 
 pub trait Primitive: Send + Sync {

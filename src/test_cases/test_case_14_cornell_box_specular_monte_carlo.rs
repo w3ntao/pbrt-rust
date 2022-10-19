@@ -1,4 +1,4 @@
-use crate::core::pbrt::*;
+use crate::core::interfaces::*;
 use crate::cornell_box::{cornell_box_camera, cornell_box_specular};
 use crate::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
 use crate::utility::get_file_name;

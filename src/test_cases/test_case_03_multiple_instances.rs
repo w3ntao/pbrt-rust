@@ -1,5 +1,5 @@
 use crate::cameras::perspective::Perspective;
-use crate::core::pbrt::*;
+use crate::core::interfaces::*;
 use crate::integrators::ray_casting_dot_normal::RayCastingDotNormal;
 use crate::utility::{get_file_name, load_dragon};
 use std::sync::Arc;

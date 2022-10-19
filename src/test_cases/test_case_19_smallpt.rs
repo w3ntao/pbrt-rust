@@ -1,5 +1,5 @@
 use crate::cameras::perspective::Perspective;
-use crate::core::pbrt::*;
+use crate::core::interfaces::*;
 use crate::integrators::next_event_estimation::NextEventEstimation;
 use crate::smallpt::smallpt;
 use crate::utility::get_file_name;

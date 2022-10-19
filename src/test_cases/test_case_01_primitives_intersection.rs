@@ -1,5 +1,5 @@
 use crate::cameras::perspective::Perspective;
-use crate::core::pbrt::*;
+use crate::core::interfaces::*;
 use crate::integrators::ray_casting_dot_normal::RayCastingDotNormal;
 use crate::primitives::axis_aligned_box::AxisAlignedBox;
 use crate::primitives::quad::Quad;
