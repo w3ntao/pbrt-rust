@@ -36,14 +36,13 @@ impl Primitive for AxisAlignedBox {
         let mut normal = Vector3::invalid();
 
         for axis in 0..3 {
-            if ray.direction[axis] == 0.0 {
-                if self.axis_min[axis] > ray.origin[axis] || self.axis_max[axis] < ray.origin[axis]
-                {
+            if ray.d[axis] == 0.0 {
+                if self.axis_min[axis] > ray.o[axis] || self.axis_max[axis] < ray.o[axis] {
                     return Intersection::failure();
                 }
             } else {
-                let t0 = (self.axis_min[axis] - ray.origin[axis]) / ray.direction[axis];
-                let t1 = (self.axis_max[axis] - ray.origin[axis]) / ray.direction[axis];
+                let t0 = (self.axis_min[axis] - ray.o[axis]) / ray.d[axis];
+                let t1 = (self.axis_max[axis] - ray.o[axis]) / ray.d[axis];
 
                 if t0 > t1 {
                     if root_in < t1 {

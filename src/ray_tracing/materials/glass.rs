@@ -47,16 +47,16 @@ impl Material for Glass {
 
         let normal = intersection.normal;
 
-        let cosine_theta = cosine(-incoming_ray.direction, normal);
+        let cosine_theta = cosine(-incoming_ray.d, normal);
         let sine_theta = (1.0 - cosine_theta * cosine_theta).sqrt();
 
         let cannot_refract = refraction_ratio * sine_theta > 1.0;
         let direction = if cannot_refract
             || reflectance(cosine_theta, refraction_ratio) > random_f32(0.0, 1.0)
         {
-            incoming_ray.direction.reflect(normal)
+            incoming_ray.d.reflect(normal)
         } else {
-            refract(incoming_ray.direction, normal, refraction_ratio)
+            refract(incoming_ray.d, normal, refraction_ratio)
         };
 
         let scattered_ray = Ray::new(intersection.hit_point, direction);

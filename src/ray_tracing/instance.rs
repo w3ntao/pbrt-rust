@@ -19,14 +19,15 @@ pub struct Instance {
 impl Primitive for Instance {
     fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
         let inverted_transform = self.transform.invert();
-        let mut inverted_ray_direction = inverted_transform.clone() * ray.direction;
+        let mut inverted_ray_direction = inverted_transform.clone() * ray.d;
         let inverted_length = inverted_ray_direction.length();
         inverted_ray_direction = inverted_ray_direction / inverted_length;
 
         let mut intersection = self.primitive.intersect(
-            &Ray::new(inverted_transform.clone() * ray.origin, inverted_ray_direction),
+            &Ray::new(inverted_transform.clone() * ray.o, inverted_ray_direction),
             t_min / inverted_length,
-            t_max / inverted_length);
+            t_max / inverted_length,
+        );
         if !intersection.intersected() {
             return intersection;
         }
@@ -48,7 +49,8 @@ impl Primitive for Instance {
         let max = bounds.max;
 
         let mut points = [
-            min, max,
+            min,
+            max,
             Point::new(max.x, min.y, min.z),
             Point::new(max.x, min.y, max.z),
             Point::new(max.x, max.y, min.z),
@@ -123,18 +125,22 @@ impl Instance {
                 x * x * (1.0 - cosine) + cosine,
                 x * y * (1.0 - cosine) - z * sine,
                 x * z * (1.0 - cosine) + y * sine,
-                0.0),
+                0.0,
+            ),
             Vector4::new(
                 x * y * (1.0 - cosine) + z * sine,
                 cosine + y * y * (1.0 - cosine),
                 y * z * (1.0 - cosine) - x * sine,
-                0.0),
+                0.0,
+            ),
             Vector4::new(
                 x * z * (1.0 - cosine) - y * sine,
                 y * z * (1.0 - cosine) + x * sine,
                 cosine + z * z * (1.0 - cosine),
-                0.0),
-            Vector4::new(0.0, 0.0, 0.0, 1.0));
+                0.0,
+            ),
+            Vector4::new(0.0, 0.0, 0.0, 1.0),
+        );
 
         self.transform = rotate_matrix * self.transform.clone();
     }

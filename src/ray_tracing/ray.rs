@@ -3,26 +3,23 @@ use crate::fundamental::vector3::*;
 
 #[derive(Copy, Clone)]
 pub struct Ray {
-    pub origin: Point,
-    pub direction: Vector3,
+    pub o: Point,
+    pub d: Vector3,
 }
 
 impl Ray {
-    pub fn new(_origin: Point, _direction: Vector3) -> Self {
-        return Self {
-            origin: _origin,
-            direction: _direction,
-        };
+    pub fn new(_o: Point, _d: Vector3) -> Self {
+        return Self { o: _o, d: _d };
     }
 
     pub fn dummy() -> Self {
         Self {
-            origin: Point::invalid(),
-            direction: Vector3::invalid(),
+            o: Point::invalid(),
+            d: Vector3::invalid(),
         }
     }
 
     pub fn get_point(&self, distance: f32) -> Point {
-        return self.origin + distance * self.direction;
+        return self.o + distance * self.d;
     }
 }

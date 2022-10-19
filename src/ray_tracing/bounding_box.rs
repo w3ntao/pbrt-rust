@@ -58,13 +58,13 @@ impl BoundingBox {
         let mut t_max = f32::INFINITY;
 
         for axis in 0..3 {
-            if ray.direction[axis] == 0.0 {
-                if ray.origin[axis] < self.min[axis] || ray.origin[axis] > self.max[axis] {
+            if ray.d[axis] == 0.0 {
+                if ray.o[axis] < self.min[axis] || ray.o[axis] > self.max[axis] {
                     return no_intersection;
                 }
             } else {
-                let mut t1 = (self.min[axis] - ray.origin[axis]) / ray.direction[axis];
-                let mut t2 = (self.max[axis] - ray.origin[axis]) / ray.direction[axis];
+                let mut t1 = (self.min[axis] - ray.o[axis]) / ray.d[axis];
+                let mut t2 = (self.max[axis] - ray.o[axis]) / ray.d[axis];
                 if t1 > t2 {
                     mem::swap(&mut t1, &mut t2);
                 }

@@ -53,11 +53,9 @@ impl NextEventEstimation {
         let sample_light_pdf = distance_squared / (light_cosine * light_area);
 
         return shadow_intersection.material.emit(&shadow_intersection)
-            * intersection.material.scattering_pdf(
-                ray.direction,
-                intersection.normal,
-                towards_light,
-            )
+            * intersection
+                .material
+                .scattering_pdf(ray.d, intersection.normal, towards_light)
             / sample_light_pdf;
     }
 }
@@ -86,14 +84,14 @@ impl Integrator for NextEventEstimation {
                 intersection.material.scatter(ray, &intersection);
             if !scattered {
                 if depth == 0 || last_hit_specular {
-                    if dot(intersection.normal, ray.direction) < 0.0 {
+                    if dot(intersection.normal, ray.d) < 0.0 {
                         radiance += throughput * emission;
                     }
                 }
                 break;
             }
 
-            if dot(intersection.normal, ray.direction) < 0.0 {
+            if dot(intersection.normal, ray.d) < 0.0 {
                 // so the light emits uni-directionally
                 radiance += throughput * emission;
             }

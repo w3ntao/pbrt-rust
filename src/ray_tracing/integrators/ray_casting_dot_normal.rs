@@ -24,7 +24,7 @@ impl Integrator for RayCastingDotNormal {
         }
 
         let normal = intersect.normal.normalize();
-        let grey = dot(-ray.direction, normal).max(0.0);
+        let grey = dot(-ray.d, normal).max(0.0);
         return Color::new(grey, grey, grey);
     }
 }
