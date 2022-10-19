@@ -1,9 +1,9 @@
 use crate::accelerators::bvh::BVH;
 use crate::core::intersection::Intersection;
+use crate::core::pbrt::Vector3;
 use crate::core::point::Point;
 use crate::core::primitive::{Aggregate, Primitive};
 use crate::core::ray::Ray;
-use crate::fundamental::utility::Vector3;
 use rand::Rng;
 use std::sync::Arc;
 

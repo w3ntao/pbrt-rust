@@ -1,8 +1,5 @@
 use crate::cameras::perspective::Perspective;
-use crate::core::primitive::Primitive;
-use crate::core::renderer::Renderer;
-use crate::core::world::World;
-use crate::fundamental::utility::*;
+use crate::core::pbrt::*;
 use crate::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
 use crate::materials::glass::*;
 use crate::materials::lambertian::*;

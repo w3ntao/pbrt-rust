@@ -1,12 +1,5 @@
-use crate::core::bounds::Bounds;
-use crate::core::intersection::*;
-use crate::core::material::*;
-use crate::core::point::*;
-use crate::core::primitive::Primitive;
-use crate::core::ray::*;
-use crate::core::vector3::*;
+use crate::core::pbrt::*;
 use crate::fundamental::random::random_u128;
-use crate::fundamental::utility::*;
 use std::sync::Arc;
 
 pub struct Sphere {

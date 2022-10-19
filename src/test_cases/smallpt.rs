@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
+use crate::core::pbrt::*;
 use crate::core::primitive::Primitive;
 use crate::core::world::World;
-use crate::fundamental::utility::*;
 use crate::materials::diffuse_light::DiffuseLight;
 use crate::materials::glass::Glass;
 use crate::materials::lambertian::*;

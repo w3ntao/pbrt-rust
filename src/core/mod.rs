@@ -5,6 +5,7 @@ pub mod instance;
 pub mod integrator;
 pub mod intersection;
 pub mod material;
+pub mod pbrt;
 pub mod point;
 pub mod primitive;
 pub mod ray;

@@ -1,8 +1,6 @@
-use std::ops;
-
-use crate::core::point::*;
+use crate::core::pbrt::*;
 use crate::fundamental::random::random_f32;
-use crate::fundamental::utility::*;
+use std::ops;
 
 #[derive(Copy, Clone)]
 pub struct Vector3 {

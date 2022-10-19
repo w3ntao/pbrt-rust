@@ -1,9 +1,6 @@
 use crate::cameras::depth_of_field::DepthOfField;
-use crate::core::primitive::Primitive;
-use crate::core::renderer::Renderer;
-use crate::core::world::World;
+use crate::core::pbrt::*;
 use crate::fundamental::random::random_f32;
-use crate::fundamental::utility::*;
 use crate::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
 use crate::materials::glass::*;
 use crate::materials::lambertian::*;
