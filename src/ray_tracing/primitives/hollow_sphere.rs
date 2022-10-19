@@ -1,13 +1,12 @@
-use std::sync::Arc;
-
+use crate::core::bounding_box::BoundingBox;
+use crate::core::intersection::*;
+use crate::core::material::Material;
+use crate::core::primitive::Primitive;
+use crate::core::ray::*;
 use crate::fundamental::constants::INTERSECT_OFFSET;
 use crate::fundamental::point::*;
-use crate::ray_tracing::bounding_box::BoundingBox;
-use crate::ray_tracing::intersection::*;
-use crate::ray_tracing::material::Material;
-use crate::ray_tracing::primitive::Primitive;
 use crate::ray_tracing::primitives::sphere::*;
-use crate::ray_tracing::ray::*;
+use std::sync::Arc;
 
 pub struct HollowSphere {
     pub external_sphere: Sphere,
@@ -30,7 +29,9 @@ impl Primitive for HollowSphere {
             return external_intersection;
         }
 
-        let mut internal_intersection = self.internal_sphere.intersect(ray, INTERSECT_OFFSET, external_intersection.distance);
+        let mut internal_intersection =
+            self.internal_sphere
+                .intersect(ray, INTERSECT_OFFSET, external_intersection.distance);
         if !internal_intersection.intersected() {
             return external_intersection;
         }

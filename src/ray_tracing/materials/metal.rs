@@ -1,9 +1,9 @@
+use crate::core::intersection::*;
+use crate::core::material::Material;
+use crate::core::ray::*;
 use crate::fundamental::color::*;
 use crate::fundamental::vector3::random_in_unit_sphere;
 use crate::fundamental::vector3::*;
-use crate::ray_tracing::intersection::*;
-use crate::ray_tracing::material::Material;
-use crate::ray_tracing::ray::*;
 
 pub struct Metal {
     albedo: Color,

@@ -1,10 +1,7 @@
-use std::sync::Arc;
-
-use rand_distr::num_traits::Float;
-
+use crate::core::material::{Material, NullMaterial};
 use crate::fundamental::point::*;
 use crate::fundamental::vector3::*;
-use crate::ray_tracing::material::{Material, NullMaterial};
+use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct Intersection {

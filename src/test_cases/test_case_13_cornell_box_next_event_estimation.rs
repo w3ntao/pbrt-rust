@@ -1,6 +1,6 @@
+use crate::core::renderer::Renderer;
 use crate::cornell_box::{cornell_box, cornell_box_camera};
 use crate::ray_tracing::integrators::next_event_estimation::NextEventEstimation;
-use crate::ray_tracing::renderer::Renderer;
 use crate::utility::get_file_name;
 use std::sync::Arc;
 

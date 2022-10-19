@@ -1,10 +1,9 @@
-use std::sync::Arc;
-
+use crate::core::bounding_box::BoundingBox;
+use crate::core::intersection::*;
+use crate::core::primitive::Primitive;
+use crate::core::ray::*;
 use crate::fundamental::point::*;
-use crate::ray_tracing::bounding_box::BoundingBox;
-use crate::ray_tracing::intersection::*;
-use crate::ray_tracing::primitive::Primitive;
-use crate::ray_tracing::ray::*;
+use std::sync::Arc;
 
 const BUCKET_NUM: usize = 12;
 const EPSILON: f32 = 1.0e-6;
@@ -61,7 +60,13 @@ pub struct Node {
 }
 
 impl Node {
-    pub fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32, primitives: &Vec<Arc<dyn Primitive>>) -> Intersection {
+    pub fn intersect(
+        &self,
+        ray: &Ray,
+        t_min: f32,
+        t_max: f32,
+        primitives: &Vec<Arc<dyn Primitive>>,
+    ) -> Intersection {
         let (t1, t2) = self.bounds.intersect(ray);
         if t1 > t2 || t1 > t_max || t2 < t_min {
             return Intersection::failure();
@@ -92,14 +97,20 @@ impl Node {
         }
 
         let right_intersect = right_node.intersect(ray, t_min, left_intersect.distance, primitives);
-        return if right_intersect.intersected() { right_intersect } else { left_intersect };
+        return if right_intersect.intersected() {
+            right_intersect
+        } else {
+            left_intersect
+        };
     }
 }
 
 impl Node {
-    pub fn build_leaf(ordered_primitives: &mut Vec<Arc<dyn Primitive>>,
-                      infos: Vec<PrimitiveInfo>,
-                      primitives: &Vec<Arc<dyn Primitive>>) -> Self {
+    pub fn build_leaf(
+        ordered_primitives: &mut Vec<Arc<dyn Primitive>>,
+        infos: Vec<PrimitiveInfo>,
+        primitives: &Vec<Arc<dyn Primitive>>,
+    ) -> Self {
         let _start = ordered_primitives.len();
         let _end = _start + infos.len();
         let mut total_bounds = BoundingBox::empty();
@@ -117,9 +128,11 @@ impl Node {
         }
     }
 
-    pub fn recursive_build(ordered_primitives: &mut Vec<Arc<dyn Primitive>>,
-                           infos: Vec<PrimitiveInfo>,
-                           primitives: &Vec<Arc<dyn Primitive>>) -> Self {
+    pub fn recursive_build(
+        ordered_primitives: &mut Vec<Arc<dyn Primitive>>,
+        infos: Vec<PrimitiveInfo>,
+        primitives: &Vec<Arc<dyn Primitive>>,
+    ) -> Self {
         let mut total_bounds = BoundingBox::empty();
         for info in &infos {
             total_bounds += info.bounds;
@@ -132,8 +145,7 @@ impl Node {
             return Node::build_leaf(ordered_primitives, infos, primitives);
         }
 
-        let centroids: Vec<Point> = (&infos).into_iter().map(
-            |info| info.centroid).collect();
+        let centroids: Vec<Point> = (&infos).into_iter().map(|info| info.centroid).collect();
         let axis_min = min_of(&centroids);
         let axis_max = max_of(&centroids);
         let axis_extent = axis_max - axis_min;
@@ -167,9 +179,10 @@ impl Node {
                 }
             }
 
-            let split_cost = 1.0 +
-                (left_bounds.get_area() * (left_infos.len() as f32) +
-                    right_bounds.get_area() * (right_infos.len() as f32)) / total_bounds.get_area();
+            let split_cost = 1.0
+                + (left_bounds.get_area() * (left_infos.len() as f32)
+                    + right_bounds.get_area() * (right_infos.len() as f32))
+                    / total_bounds.get_area();
 
             let leaf_cost = num_primitives as f32;
             if leaf_cost <= split_cost {
@@ -181,15 +194,24 @@ impl Node {
                 start: usize::MAX,
                 end: usize::MAX,
                 bounds: total_bounds,
-                left: Some(Box::new(Node::recursive_build(ordered_primitives, left_infos, primitives))),
-                right: Some(Box::new(Node::recursive_build(ordered_primitives, right_infos, primitives))),
+                left: Some(Box::new(Node::recursive_build(
+                    ordered_primitives,
+                    left_infos,
+                    primitives,
+                ))),
+                right: Some(Box::new(Node::recursive_build(
+                    ordered_primitives,
+                    right_infos,
+                    primitives,
+                ))),
             };
         }
 
         let mut ignored_axis = [false; 3];
         for axis_idx in 0..3 {
-            if axis_extent[axis_idx] < 0.5 * axis_extent[(axis_idx + 1) % 3] ||
-                axis_extent[axis_idx] < 0.5 * axis_extent[(axis_idx + 2) % 3] {
+            if axis_extent[axis_idx] < 0.5 * axis_extent[(axis_idx + 1) % 3]
+                || axis_extent[axis_idx] < 0.5 * axis_extent[(axis_idx + 2) % 3]
+            {
                 // ignore this axis when it's extent is
                 // comparably small compared with the other two
                 ignored_axis[axis_idx] = true;
@@ -214,7 +236,8 @@ impl Node {
             }
 
             for info in &infos {
-                let bucket_idx_float = (info.centroid[axis_idx] - axis_min[axis_idx]) / bucket_width;
+                let bucket_idx_float =
+                    (info.centroid[axis_idx] - axis_min[axis_idx]) / bucket_width;
                 let bucket_idx = (bucket_idx_float as usize).max(0).min(BUCKET_NUM - 1);
 
                 bucket_list[bucket_idx].count += 1;
@@ -237,9 +260,10 @@ impl Node {
                     right_count += bucket_list[right_idx].count;
                 }
 
-                let cost = 1.0 +
-                    (left_bounds.get_area() * (left_count as f32) +
-                        right_bounds.get_area() * (right_count as f32)) / total_bounds.get_area();
+                let cost = 1.0
+                    + (left_bounds.get_area() * (left_count as f32)
+                        + right_bounds.get_area() * (right_count as f32))
+                        / total_bounds.get_area();
 
                 if cost < min_cost {
                     min_cost = cost;
@@ -269,8 +293,16 @@ impl Node {
             start: usize::MAX,
             end: usize::MAX,
             bounds: total_bounds,
-            left: Some(Box::new(Node::recursive_build(ordered_primitives, left_infos, primitives))),
-            right: Some(Box::new(Node::recursive_build(ordered_primitives, right_infos, primitives))),
+            left: Some(Box::new(Node::recursive_build(
+                ordered_primitives,
+                left_infos,
+                primitives,
+            ))),
+            right: Some(Box::new(Node::recursive_build(
+                ordered_primitives,
+                right_infos,
+                primitives,
+            ))),
         };
     }
 }

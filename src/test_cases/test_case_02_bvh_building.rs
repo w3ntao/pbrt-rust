@@ -1,9 +1,9 @@
+use crate::core::instance::Instance;
+use crate::core::renderer::Renderer;
+use crate::core::world::World;
 use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::perspective::Perspective;
-use crate::ray_tracing::instance::Instance;
 use crate::ray_tracing::integrators::ray_casting_dot_normal::RayCastingDotNormal;
-use crate::ray_tracing::renderer::Renderer;
-use crate::ray_tracing::world::World;
 use crate::utility::{get_file_name, load_dragon};
 use std::sync::Arc;
 

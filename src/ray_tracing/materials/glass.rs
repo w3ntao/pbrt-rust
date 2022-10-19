@@ -1,11 +1,10 @@
-use rand_distr::num_traits::Pow;
-
+use crate::core::intersection::*;
+use crate::core::material::Material;
+use crate::core::ray::*;
 use crate::fundamental::color::*;
 use crate::fundamental::random::random_f32;
 use crate::fundamental::vector3::*;
-use crate::ray_tracing::intersection::*;
-use crate::ray_tracing::material::Material;
-use crate::ray_tracing::ray::*;
+use rand_distr::num_traits::Pow;
 
 pub struct Glass {
     index_of_refraction: f32,

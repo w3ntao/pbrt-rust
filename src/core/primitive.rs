@@ -1,11 +1,10 @@
-use std::sync::Arc;
-
+use crate::core::bounding_box::BoundingBox;
+use crate::core::intersection::*;
+use crate::core::material::Material;
+use crate::core::ray::*;
 use crate::fundamental::point::Point;
 use crate::fundamental::utility::Vector3;
-use crate::ray_tracing::bounding_box::BoundingBox;
-use crate::ray_tracing::intersection::*;
-use crate::ray_tracing::material::Material;
-use crate::ray_tracing::ray::*;
+use std::sync::Arc;
 
 pub trait Primitive: Send + Sync {
     fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection;

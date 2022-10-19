@@ -1,18 +1,15 @@
 extern crate num_cpus;
-
+use crate::core::camera::Camera;
+use crate::core::integrator::Integrator;
+use crate::fundamental::color::Color;
+use crate::fundamental::image::Image;
+use rand::seq::SliceRandom;
+use rand::thread_rng;
 use std::io::Write;
 use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
 use std::time::Instant;
 use std::{io, thread, time};
-
-use rand::seq::SliceRandom;
-use rand::thread_rng;
-
-use crate::fundamental::color::Color;
-use crate::fundamental::image::Image;
-use crate::ray_tracing::camera::Camera;
-use crate::ray_tracing::integrator::Integrator;
 
 pub struct Renderer {
     camera: Arc<dyn Camera>,

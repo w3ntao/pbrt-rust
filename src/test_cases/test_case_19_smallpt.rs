@@ -1,7 +1,7 @@
+use crate::core::renderer::Renderer;
 use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::perspective::Perspective;
 use crate::ray_tracing::integrators::next_event_estimation::NextEventEstimation;
-use crate::ray_tracing::renderer::Renderer;
 use crate::smallpt::smallpt;
 use crate::utility::get_file_name;
 use std::sync::Arc;

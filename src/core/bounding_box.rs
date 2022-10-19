@@ -1,8 +1,7 @@
+use crate::core::ray::Ray;
+use crate::fundamental::point::*;
 use std::mem;
 use std::ops;
-
-use crate::fundamental::point::*;
-use crate::ray_tracing::ray::Ray;
 
 #[derive(Copy, Clone)]
 pub struct BoundingBox {

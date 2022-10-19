@@ -1,9 +1,8 @@
-use std::sync::Arc;
-
+use crate::core::integrator::Integrator;
+use crate::core::ray::Ray;
+use crate::core::world::World;
 use crate::fundamental::color::*;
-use crate::ray_tracing::integrator::Integrator;
-use crate::ray_tracing::ray::Ray;
-use crate::ray_tracing::world::World;
+use std::sync::Arc;
 
 pub struct RayCastingNormal {
     world: Arc<World>,

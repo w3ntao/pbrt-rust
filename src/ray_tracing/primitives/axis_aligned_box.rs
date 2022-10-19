@@ -1,13 +1,12 @@
-use std::sync::Arc;
-
+use crate::core::bounding_box::BoundingBox;
+use crate::core::intersection::*;
+use crate::core::material::*;
+use crate::core::primitive::Primitive;
+use crate::core::ray::*;
 use crate::fundamental::point::*;
 use crate::fundamental::random::random_u128;
 use crate::fundamental::vector3::*;
-use crate::ray_tracing::bounding_box::BoundingBox;
-use crate::ray_tracing::intersection::*;
-use crate::ray_tracing::material::*;
-use crate::ray_tracing::primitive::Primitive;
-use crate::ray_tracing::ray::*;
+use std::sync::Arc;
 
 pub struct AxisAlignedBox {
     pub axis_min: Point,

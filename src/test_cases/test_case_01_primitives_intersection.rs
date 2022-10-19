@@ -1,5 +1,5 @@
-use std::sync::Arc;
-
+use crate::core::renderer::Renderer;
+use crate::core::world::World;
 use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::perspective::Perspective;
 use crate::ray_tracing::integrators::ray_casting_dot_normal::RayCastingDotNormal;
@@ -7,9 +7,8 @@ use crate::ray_tracing::primitives::axis_aligned_box::AxisAlignedBox;
 use crate::ray_tracing::primitives::quad::Quad;
 use crate::ray_tracing::primitives::sphere::Sphere;
 use crate::ray_tracing::primitives::triangle::Triangle;
-use crate::ray_tracing::renderer::Renderer;
-use crate::ray_tracing::world::World;
 use crate::utility::get_file_name;
+use std::sync::Arc;
 
 #[allow(dead_code)]
 pub fn test(width: usize, height: usize) {

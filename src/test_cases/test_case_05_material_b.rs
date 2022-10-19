@@ -1,18 +1,17 @@
-use std::sync::Arc;
-
+use crate::core::primitive::Primitive;
+use crate::core::renderer::Renderer;
+use crate::core::world::World;
 use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::perspective::Perspective;
 use crate::ray_tracing::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
 use crate::ray_tracing::materials::glass::*;
 use crate::ray_tracing::materials::lambertian::*;
 use crate::ray_tracing::materials::metal::*;
-use crate::ray_tracing::primitive::Primitive;
 use crate::ray_tracing::primitives::hollow_sphere::HollowSphere;
 use crate::ray_tracing::primitives::sphere::Sphere;
-use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::textures::solid_color::SolidColor;
-use crate::ray_tracing::world::World;
 use crate::utility::get_file_name;
+use std::sync::Arc;
 
 pub fn scene_three_spheres() -> World {
     let solid_color_ground = Arc::new(SolidColor::new(Color::new(0.8, 0.8, 0.0)));

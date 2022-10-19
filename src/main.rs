@@ -1,5 +1,6 @@
 use crate::test_cases::*;
 
+mod core;
 mod fundamental;
 mod ray_tracing;
 mod test_cases;
@@ -7,8 +8,8 @@ mod test_cases;
 fn all_tests(samples: u32) {
     println!();
 
-    let mut width = 1000;
-    let mut height = 750;
+    let mut width = 500;
+    let mut height = 375;
 
     test_case_01_primitives_intersection::test(width, height);
     test_case_02_bvh_building::test(width, height);
@@ -22,8 +23,8 @@ fn all_tests(samples: u32) {
     test_case_10_perlin_texture::test(width, height, samples);
     test_case_11_lighting::test(width, height, samples);
 
-    width = 1000;
-    height = 1000;
+    width = 500;
+    height = 500;
 
     test_case_12_cornell_box_monte_carlo::test(width, height, samples);
     test_case_13_cornell_box_next_event_estimation::test(width, height, samples);
@@ -38,5 +39,5 @@ fn all_tests(samples: u32) {
 }
 
 fn main() {
-    all_tests(10);
+    all_tests(5);
 }

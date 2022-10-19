@@ -1,10 +1,10 @@
 use rand::distributions::Uniform;
 use rand::{thread_rng, Rng};
 
+use crate::core::camera::Camera;
+use crate::core::ray::Ray;
 use crate::fundamental::point::*;
 use crate::fundamental::vector3::*;
-use crate::ray_tracing::camera::Camera;
-use crate::ray_tracing::ray::Ray;
 
 pub struct DepthOfField {
     center: Point,

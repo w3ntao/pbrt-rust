@@ -1,13 +1,12 @@
-use std::sync::Arc;
-use rand::Rng;
-
+use crate::core::group::Group;
+use crate::core::intersection::Intersection;
+use crate::core::primitive::Primitive;
+use crate::core::ray::Ray;
 use crate::fundamental::point::Point;
 use crate::fundamental::utility::Vector3;
-use crate::ray_tracing::group::Group;
 use crate::ray_tracing::groups::bvh::BVH;
-use crate::ray_tracing::intersection::Intersection;
-use crate::ray_tracing::primitive::Primitive;
-use crate::ray_tracing::ray::Ray;
+use rand::Rng;
+use std::sync::Arc;
 
 pub struct World {
     lights: Vec<Arc<dyn Primitive>>,
@@ -45,6 +44,11 @@ impl World {
         let idx = rand::thread_rng().gen_range(0..self.lights.len());
         let (point, normal) = self.lights[idx].sample();
 
-        return (self.lights[idx].get_id(), point, normal, self.lights[idx].get_area());
+        return (
+            self.lights[idx].get_id(),
+            point,
+            normal,
+            self.lights[idx].get_area(),
+        );
     }
 }

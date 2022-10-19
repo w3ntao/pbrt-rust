@@ -1,12 +1,12 @@
+use crate::core::primitive::Primitive;
+use crate::core::renderer::Renderer;
 use crate::fundamental::utility::*;
 use crate::ray_tracing::cameras::depth_of_field::DepthOfField;
 use crate::ray_tracing::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
 use crate::ray_tracing::materials::glass::*;
 use crate::ray_tracing::materials::lambertian::*;
 use crate::ray_tracing::materials::metal::*;
-use crate::ray_tracing::primitive::Primitive;
 use crate::ray_tracing::primitives::sphere::Sphere;
-use crate::ray_tracing::renderer::Renderer;
 use crate::ray_tracing::textures::checker_texture::CheckerTexture;
 use crate::ray_tracing::textures::solid_color::*;
 use crate::test_case_07_rt_weekend_final::many_random_spheres;

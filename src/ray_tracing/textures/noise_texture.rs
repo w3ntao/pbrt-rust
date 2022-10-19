@@ -1,6 +1,6 @@
+use crate::core::texture::Texture;
 use crate::fundamental::color::Color;
 use crate::fundamental::point::Point;
-use crate::ray_tracing::texture::Texture;
 use crate::ray_tracing::textures::perlin::Perlin;
 
 pub struct NoiseTexture {
@@ -19,7 +19,8 @@ impl NoiseTexture {
 
 impl Texture for NoiseTexture {
     fn get_color(&self, _: f32, _: f32, point: Point) -> Color {
-        return Color::new(1.0, 1.0, 1.0) * 0.5 *
-            (1.0 + (self.scale * point.z + 10.0 * self.noise.turbulence(point, 7)).sin());
+        return Color::new(1.0, 1.0, 1.0)
+            * 0.5
+            * (1.0 + (self.scale * point.z + 10.0 * self.noise.turbulence(point, 7)).sin());
     }
 }

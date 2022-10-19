@@ -1,10 +1,9 @@
-use std::sync::Arc;
-
+use crate::core::intersection::Intersection;
+use crate::core::material::Material;
+use crate::core::ray::Ray;
+use crate::core::texture::Texture;
 use crate::fundamental::color::Color;
-use crate::ray_tracing::intersection::Intersection;
-use crate::ray_tracing::material::Material;
-use crate::ray_tracing::ray::Ray;
-use crate::ray_tracing::texture::Texture;
+use std::sync::Arc;
 
 pub struct DiffuseLight {
     emission: Arc<dyn Texture>,
@@ -18,7 +17,7 @@ impl DiffuseLight {
 
 impl Material for DiffuseLight {
     fn scatter(&self, _: Ray, _: &Intersection) -> (bool, Ray, Color) {
-        panic!("scatter() is not implemented for DiffuseLight");
+        return (false, Ray::dummy(), Color::black());
     }
 
     fn emit(&self, intersection: &Intersection) -> Color {

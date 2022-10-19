@@ -1,10 +1,10 @@
+use crate::core::integrator::Integrator;
+use crate::core::ray::Ray;
+use crate::core::world::World;
 use crate::fundamental::color::*;
 use crate::fundamental::constants::INTERSECT_OFFSET;
 use crate::fundamental::random::RandomF32Generator;
 use crate::fundamental::vector3::dot;
-use crate::ray_tracing::integrator::Integrator;
-use crate::ray_tracing::ray::Ray;
-use crate::ray_tracing::world::World;
 use std::sync::Arc;
 
 pub struct MonteCarloPathTrace {

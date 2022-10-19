@@ -1,14 +1,13 @@
-use std::sync::Arc;
-
+use crate::core::bounding_box::BoundingBox;
+use crate::core::intersection::Intersection;
+use crate::core::material::*;
+use crate::core::primitive::Primitive;
+use crate::core::ray::Ray;
 use crate::fundamental::matrix::*;
 use crate::fundamental::point::Point;
 use crate::fundamental::vector3::Vector3;
 use crate::fundamental::vector4::Vector4;
-use crate::ray_tracing::bounding_box::BoundingBox;
-use crate::ray_tracing::intersection::Intersection;
-use crate::ray_tracing::material::*;
-use crate::ray_tracing::primitive::Primitive;
-use crate::ray_tracing::ray::Ray;
+use std::sync::Arc;
 
 pub struct Instance {
     pub primitive: Arc<dyn Primitive>,
