@@ -4,7 +4,6 @@ use crate::core::material::Material;
 use crate::core::point::*;
 use crate::core::primitive::Primitive;
 use crate::core::ray::*;
-use crate::fundamental::constants::INTERSECT_OFFSET;
 use crate::primitives::sphere::*;
 use std::sync::Arc;
 

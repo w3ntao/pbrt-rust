@@ -1,5 +1,5 @@
 use crate::core::interfaces::*;
-use crate::fundamental::random::random_u128;
+use crate::core::random::random_u128;
 use std::sync::Arc;
 
 pub struct Sphere {

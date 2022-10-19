@@ -1,7 +1,5 @@
+use crate::core::interfaces::*;
 use std::ops;
-
-use crate::core::point::Point;
-use crate::core::vector3::Vector3;
 
 #[derive(Clone, Copy)]
 pub struct Vector4 {

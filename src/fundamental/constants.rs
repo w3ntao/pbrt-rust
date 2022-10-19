@@ -1,1 +1,0 @@
-pub const INTERSECT_OFFSET: f32 = 0.001;

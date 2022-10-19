@@ -1,6 +1,8 @@
 use crate::core::interfaces::*;
 use std::sync::Arc;
 
+pub const INTERSECT_OFFSET: f32 = 0.001;
+
 #[derive(Clone)]
 pub struct Intersection {
     pub distance: f32,

@@ -1,5 +1,4 @@
 use crate::test_cases::*;
-
 pub mod accelerators;
 pub mod cameras;
 mod core;
@@ -9,6 +8,7 @@ pub mod materials;
 pub mod primitives;
 mod test_cases;
 pub mod textures;
+pub mod tools;
 
 fn all_tests(samples: u32) {
     println!();

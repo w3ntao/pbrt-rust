@@ -8,6 +8,7 @@ pub mod intersection;
 pub mod material;
 pub mod point;
 pub mod primitive;
+pub mod random;
 pub mod ray;
 pub mod renderer;
 pub mod texture;

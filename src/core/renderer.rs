@@ -1,6 +1,6 @@
 extern crate num_cpus;
 use crate::core::interfaces::*;
-use crate::fundamental::image::Image;
+use crate::tools::image::Image;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::io::Write;

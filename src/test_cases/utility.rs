@@ -1,6 +1,6 @@
 use crate::accelerators::bvh::BVH;
 use crate::core::primitive::Aggregate;
-use crate::fundamental::obj_loader::obj_to_triangles;
+use crate::tools::obj_loader::obj_to_triangles;
 use std::path::Path;
 use std::process;
 

@@ -1,4 +1,5 @@
 pub use crate::core::bounds::*;
+pub use crate::core::camera::*;
 pub use crate::core::color::*;
 pub use crate::core::instance::*;
 pub use crate::core::integrator::*;

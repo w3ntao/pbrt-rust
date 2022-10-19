@@ -1,5 +1,4 @@
-use crate::core::interfaces::Vector3;
-use crate::core::vector3::cross;
+use crate::core::interfaces::*;
 
 #[derive(Copy, Clone)]
 pub struct OrthonormalBasis {

@@ -1,9 +1,9 @@
 use crate::core::color::*;
 use crate::core::intersection::*;
 use crate::core::material::Material;
+use crate::core::random::random_f32;
 use crate::core::ray::*;
 use crate::core::vector3::*;
-use crate::fundamental::random::random_f32;
 use rand_distr::num_traits::Pow;
 
 pub struct Glass {
