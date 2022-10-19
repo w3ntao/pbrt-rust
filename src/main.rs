@@ -1,7 +1,9 @@
 use crate::test_cases::*;
 
+pub mod cameras;
 mod core;
 mod fundamental;
+pub mod groups;
 mod ray_tracing;
 mod test_cases;
 

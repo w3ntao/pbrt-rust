@@ -9,7 +9,7 @@ use crate::core::primitive::Primitive;
 use crate::core::ray::*;
 use crate::fundamental::point::Point;
 use crate::fundamental::vector3::Vector3;
-use crate::ray_tracing::groups::bvh_node::{Node, PrimitiveInfo};
+use crate::groups::bvh_node::{Node, PrimitiveInfo};
 
 pub struct BVH {
     primitives: Vec<Arc<dyn Primitive>>,

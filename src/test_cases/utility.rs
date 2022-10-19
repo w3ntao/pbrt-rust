@@ -1,6 +1,6 @@
 use crate::core::group::Group;
 use crate::fundamental::obj_loader::obj_to_triangles;
-use crate::ray_tracing::groups::bvh::BVH;
+use crate::groups::bvh::BVH;
 use std::path::Path;
 use std::process;
 

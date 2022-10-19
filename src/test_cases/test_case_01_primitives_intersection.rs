@@ -1,7 +1,7 @@
+use crate::cameras::perspective::Perspective;
 use crate::core::renderer::Renderer;
 use crate::core::world::World;
 use crate::fundamental::utility::*;
-use crate::ray_tracing::cameras::perspective::Perspective;
 use crate::ray_tracing::integrators::ray_casting_dot_normal::RayCastingDotNormal;
 use crate::ray_tracing::primitives::axis_aligned_box::AxisAlignedBox;
 use crate::ray_tracing::primitives::quad::Quad;

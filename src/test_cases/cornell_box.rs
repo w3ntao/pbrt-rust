@@ -1,8 +1,8 @@
+use crate::cameras::perspective::Perspective;
 use crate::core::instance::Instance;
 use crate::core::primitive::Primitive;
 use crate::core::world::World;
 use crate::fundamental::utility::*;
-use crate::ray_tracing::cameras::perspective::Perspective;
 use crate::ray_tracing::materials::diffuse_light::DiffuseLight;
 use crate::ray_tracing::materials::glass::Glass;
 use crate::ray_tracing::materials::lambertian::*;

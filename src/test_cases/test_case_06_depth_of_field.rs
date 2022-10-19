@@ -1,6 +1,6 @@
+use crate::cameras::depth_of_field::DepthOfField;
 use crate::core::renderer::Renderer;
 use crate::fundamental::utility::*;
-use crate::ray_tracing::cameras::depth_of_field::DepthOfField;
 use crate::ray_tracing::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
 use crate::test_case_05_material_b::scene_three_spheres;
 use crate::utility::get_file_name;

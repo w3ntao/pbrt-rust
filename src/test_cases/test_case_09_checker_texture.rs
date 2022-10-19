@@ -1,7 +1,7 @@
+use crate::cameras::depth_of_field::DepthOfField;
 use crate::core::primitive::Primitive;
 use crate::core::renderer::Renderer;
 use crate::fundamental::utility::*;
-use crate::ray_tracing::cameras::depth_of_field::DepthOfField;
 use crate::ray_tracing::integrators::monte_carlo_path_trace::MonteCarloPathTrace;
 use crate::ray_tracing::materials::glass::*;
 use crate::ray_tracing::materials::lambertian::*;

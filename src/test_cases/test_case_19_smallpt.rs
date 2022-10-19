@@ -1,6 +1,6 @@
+use crate::cameras::perspective::Perspective;
 use crate::core::renderer::Renderer;
 use crate::fundamental::utility::*;
-use crate::ray_tracing::cameras::perspective::Perspective;
 use crate::ray_tracing::integrators::next_event_estimation::NextEventEstimation;
 use crate::smallpt::smallpt;
 use crate::utility::get_file_name;

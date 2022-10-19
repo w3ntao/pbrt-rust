@@ -4,7 +4,7 @@ use crate::core::primitive::Primitive;
 use crate::core::ray::Ray;
 use crate::fundamental::point::Point;
 use crate::fundamental::utility::Vector3;
-use crate::ray_tracing::groups::bvh::BVH;
+use crate::groups::bvh::BVH;
 use rand::Rng;
 use std::sync::Arc;
 
