@@ -68,10 +68,11 @@ impl ops::Mul<Color> for Color {
 impl ops::Div<f32> for Color {
     type Output = Color;
     fn div(self, divisor: f32) -> Color {
+        let inv = 1.0 / divisor;
         return Color {
-            r: self.r / divisor,
-            g: self.g / divisor,
-            b: self.b / divisor,
+            r: self.r * inv,
+            g: self.g * inv,
+            b: self.b * inv,
         };
     }
 }
@@ -93,9 +94,10 @@ impl ops::MulAssign<Color> for Color {
 }
 
 impl ops::DivAssign<f32> for Color {
-    fn div_assign(&mut self, rhs: f32) {
-        self.r /= rhs;
-        self.g /= rhs;
-        self.b /= rhs;
+    fn div_assign(&mut self, divisor: f32) {
+        let inv = 1.0 / divisor;
+        self.r *= inv;
+        self.g *= inv;
+        self.b *= inv;
     }
 }

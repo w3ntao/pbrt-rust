@@ -155,10 +155,11 @@ impl ops::Mul<Vector3> for f32 {
 impl ops::Div<f32> for Vector3 {
     type Output = Vector3;
     fn div(self, rhs: f32) -> Vector3 {
+        let inv = 1.0 / rhs;
         return Vector3 {
-            x: self.x / rhs,
-            y: self.y / rhs,
-            z: self.z / rhs,
+            x: self.x * inv,
+            y: self.y * inv,
+            z: self.z * inv,
         };
     }
 }

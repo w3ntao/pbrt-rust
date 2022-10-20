@@ -143,26 +143,15 @@ impl ops::Mul<Vector4> for f32 {
     }
 }
 
-impl ops::Div<Vector4> for Vector4 {
-    type Output = Vector4;
-    fn div(self, rhs: Vector4) -> Vector4 {
-        return Vector4 {
-            x: self.x / rhs.x,
-            y: self.y / rhs.y,
-            z: self.z / rhs.z,
-            w: self.w / rhs.w,
-        };
-    }
-}
-
 impl ops::Div<f32> for Vector4 {
     type Output = Vector4;
     fn div(self, divisor: f32) -> Vector4 {
+        let inv = 1.0 / divisor;
         return Vector4 {
-            x: self.x / divisor,
-            y: self.y / divisor,
-            z: self.z / divisor,
-            w: self.w / divisor,
+            x: self.x * inv,
+            y: self.y * inv,
+            z: self.z * inv,
+            w: self.w * inv,
         };
     }
 }
@@ -448,12 +437,13 @@ impl ops::Mul<Point> for Matrix {
 impl ops::Div<f32> for Matrix {
     type Output = Matrix;
     fn div(self, divisor: f32) -> Matrix {
+        let inv = 1.0 / divisor;
         Matrix {
             row: [
-                self.row[0] / divisor,
-                self.row[1] / divisor,
-                self.row[2] / divisor,
-                self.row[3] / divisor,
+                self.row[0] * inv,
+                self.row[1] * inv,
+                self.row[2] * inv,
+                self.row[3] * inv,
             ],
         }
     }
