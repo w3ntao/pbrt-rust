@@ -62,7 +62,7 @@ impl Primitive for AxisAlignedBox {
 
         return Intersection::from_outside(
             root_in,
-            ray.get_point(root_in),
+            ray(root_in),
             normal,
             self.material.clone(),
             self.get_id(),

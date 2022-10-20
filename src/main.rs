@@ -1,3 +1,5 @@
+#![feature(unboxed_closures, fn_traits)]
+
 use crate::test_cases::*;
 mod accelerators;
 mod cameras;

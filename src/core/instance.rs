@@ -24,7 +24,7 @@ impl Primitive for Instance {
 
         intersection.normal = (inverted_transform.transpose() * intersection.normal).normalize();
         intersection.distance = intersection.distance / inverted_length;
-        intersection.hit_point = ray.get_point(intersection.distance);
+        intersection.hit_point = ray(intersection.distance);
 
         if !self.material.is_null() {
             intersection.material = self.material.clone();

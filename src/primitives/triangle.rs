@@ -55,13 +55,7 @@ impl Primitive for Triangle {
         let cos = cosine(ray.d, self.normal);
         let normal = if cos < 0.0 { self.normal } else { -self.normal };
 
-        return Intersection::from_outside(
-            t,
-            ray.get_point(t),
-            normal,
-            self.material.clone(),
-            self.get_id(),
-        );
+        return Intersection::from_outside(t, ray(t), normal, self.material.clone(), self.get_id());
     }
 
     fn get_bounds(&self) -> Bounds {

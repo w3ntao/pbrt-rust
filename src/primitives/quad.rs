@@ -49,13 +49,7 @@ impl Primitive for Quad {
         } else {
             -self.normal
         };
-        return Intersection::from_outside(
-            t,
-            ray.get_point(t),
-            normal,
-            self.material.clone(),
-            self.get_id(),
-        );
+        return Intersection::from_outside(t, ray(t), normal, self.material.clone(), self.get_id());
     }
 
     fn get_bounds(&self) -> Bounds {

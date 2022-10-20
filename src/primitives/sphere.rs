@@ -57,8 +57,8 @@ impl Primitive for Sphere {
             }
         }
         let root = root;
-        let normal = (ray.get_point(root) - self.center) / self.radius;
-        let hit_point = ray.get_point(root);
+        let hit_point = ray(root);
+        let normal = (hit_point - self.center) / self.radius;
 
         let mut intersection = if ray.d.dot(normal) < 0.0 {
             Intersection::from_outside(
