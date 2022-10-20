@@ -41,6 +41,10 @@ impl Vector3 {
         return *self / self.length();
     }
 
+    pub fn cosine(&self, v: Vector3) -> f32 {
+        return self.dot(v) / (self.length() * v.length());
+    }
+
     pub fn reflect(&self, normal: Normal) -> Vector3 {
         return *self - 2.0 * normal.dot(*self) * Vector3::from(normal);
     }
@@ -190,10 +194,6 @@ pub fn cross(a: Vector3, b: Vector3) -> Vector3 {
         y: a.z * b.x - a.x * b.z,
         z: a.x * b.y - a.y * b.x,
     };
-}
-
-pub fn cosine(a: Vector3, b: Vector3) -> f32 {
-    return a.dot(b) / (a.length() * b.length());
 }
 
 pub fn random_in_unit_sphere() -> Vector3 {

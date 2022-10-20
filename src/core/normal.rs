@@ -41,6 +41,10 @@ impl Normal {
         return *self / self.length();
     }
 
+    pub fn cosine(&self, v: Vector3) -> f32 {
+        return self.dot(v) / (self.length() * v.length());
+    }
+
     pub fn face_forward(&self, v: Vector3) -> Normal {
         return if self.dot(v) < 0.0 { -*self } else { *self };
     }

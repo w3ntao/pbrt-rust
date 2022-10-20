@@ -40,7 +40,7 @@ impl Material for Glass {
 
         let normal = intersection.normal;
 
-        let cosine_theta = cosine(-incoming_ray.d, Vector3::from(normal));
+        let cosine_theta = normal.cosine(-incoming_ray.d);
         let sine_theta = (1.0 - cosine_theta * cosine_theta).sqrt();
 
         let cannot_refract = refraction_ratio * sine_theta > 1.0;

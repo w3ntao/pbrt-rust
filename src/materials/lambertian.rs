@@ -39,7 +39,7 @@ impl Material for Lambertian {
     }
 
     fn scattering_pdf(&self, _: Vector3, normal: Normal, scattered_direction: Vector3) -> f32 {
-        let val_cosine = cosine(Vector3::from(normal), scattered_direction);
+        let val_cosine = normal.cosine(scattered_direction);
 
         return if val_cosine <= 0.0 {
             0.0

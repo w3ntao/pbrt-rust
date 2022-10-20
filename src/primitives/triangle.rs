@@ -52,7 +52,7 @@ impl Primitive for Triangle {
             return Intersection::failure();
         }
 
-        let cos = cosine(ray.d, Vector3::from(self.normal));
+        let cos = self.normal.cosine(ray.d);
         let normal = if cos < 0.0 { self.normal } else { -self.normal };
 
         return Intersection::from_outside(t, ray(t), normal, self.material.clone(), self.get_id());

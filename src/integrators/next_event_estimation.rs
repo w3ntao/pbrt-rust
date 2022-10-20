@@ -27,7 +27,7 @@ impl NextEventEstimation {
         let shadow_ray = Ray::new(intersection.hit_point, towards_light);
 
         // with light_cosine, the light emits uni-directionally
-        let light_cosine = cosine(-towards_light, light_normal);
+        let light_cosine = light_normal.cosine(-towards_light);
         if light_cosine <= 0.0 {
             return Color::black();
         }
