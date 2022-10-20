@@ -20,7 +20,7 @@ pub trait Material: Send + Sync {
     fn scattering_pdf(
         &self,
         _incoming_direction: Vector3,
-        _normal: Vector3,
+        _normal: Normal,
         _scattered_direction: Vector3,
     ) -> f32 {
         panic!("scattering_pdf() not implemented for this Material");

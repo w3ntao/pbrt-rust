@@ -6,7 +6,7 @@ pub const INTERSECT_OFFSET: f32 = 0.001;
 pub struct Intersection {
     pub distance: f32,
     pub hit_point: Point,
-    pub normal: Vector3,
+    pub normal: Normal,
     pub material: Arc<dyn Material>,
     pub entering_material: bool,
     pub u: f32,
@@ -19,7 +19,7 @@ impl Intersection {
     pub fn from_outside(
         _distance: f32,
         _hit_point: Point,
-        _normal: Vector3,
+        _normal: Normal,
         _material: Arc<dyn Material>,
         id: u128,
     ) -> Self {
@@ -38,7 +38,7 @@ impl Intersection {
     pub fn from_inside(
         _distance: f32,
         _hit_point: Point,
-        _normal: Vector3,
+        _normal: Normal,
         _material: Arc<dyn Material>,
     ) -> Self {
         return Self {
@@ -57,7 +57,7 @@ impl Intersection {
         return Self {
             distance: f32::INFINITY,
             hit_point: Point::invalid(),
-            normal: Vector3::invalid(),
+            normal: Normal::invalid(),
             material: Arc::new(NullMaterial {}),
             entering_material: true,
             u: f32::NAN,

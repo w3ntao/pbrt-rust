@@ -20,7 +20,7 @@ impl NextEventEstimation {
         let towards_light = towards_light.normalize();
 
         // sampled light at the back side of object normal
-        if towards_light.dot(intersection.normal) <= 0.0 {
+        if intersection.normal.dot(towards_light) <= 0.0 {
             return Color::black();
         }
 

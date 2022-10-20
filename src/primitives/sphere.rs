@@ -64,12 +64,17 @@ impl Primitive for Sphere {
             Intersection::from_outside(
                 root,
                 hit_point,
-                normal,
+                Normal::from(normal),
                 self.material.clone(),
                 self.get_id(),
             )
         } else {
-            Intersection::from_inside(root, hit_point, -normal, self.material.clone())
+            Intersection::from_inside(
+                root,
+                hit_point,
+                Normal::from(-normal),
+                self.material.clone(),
+            )
         };
 
         let (u, v) = get_sphere_uv(Point::from((hit_point - self.center).normalize()));

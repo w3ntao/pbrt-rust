@@ -21,8 +21,10 @@ impl Primitive for Instance {
         if !intersection.intersected() {
             return intersection;
         }
+        intersection.normal =
+            Normal::from(inverted_transform.transpose() * Vector3::from(intersection.normal))
+                .normalize();
 
-        intersection.normal = (inverted_transform.transpose() * intersection.normal).normalize();
         intersection.distance = intersection.distance / inverted_length;
         intersection.hit_point = ray(intersection.distance);
 

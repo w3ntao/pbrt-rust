@@ -24,7 +24,7 @@ impl Primitive for AxisAlignedBox {
     fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
         let mut root_in = -f32::INFINITY;
         let mut root_out = f32::INFINITY;
-        let mut normal = Vector3::invalid();
+        let mut normal = Normal::invalid();
 
         for axis in 0..3 {
             if ray.d[axis] == 0.0 {
@@ -38,14 +38,14 @@ impl Primitive for AxisAlignedBox {
                 if t0 > t1 {
                     if root_in < t1 {
                         root_in = t1;
-                        normal = Vector3::new(0.0, 0.0, 0.0);
+                        normal = Normal::new(0.0, 0.0, 0.0);
                         normal[axis] = 1.0;
                     }
                     root_out = root_out.min(t0);
                 } else {
                     if root_in < t0 {
                         root_in = t0;
-                        normal = Vector3::new(0.0, 0.0, 0.0);
+                        normal = Normal::new(0.0, 0.0, 0.0);
                         normal[axis] = -1.0;
                     }
                     root_out = root_out.min(t1);

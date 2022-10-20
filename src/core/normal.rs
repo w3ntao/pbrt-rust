@@ -146,7 +146,6 @@ impl ops::Div<f32> for Normal {
     }
 }
 
-/*
 impl ops::AddAssign<Normal> for Normal {
     fn add_assign(&mut self, n: Normal) {
         self.x += n.x;
@@ -154,12 +153,3 @@ impl ops::AddAssign<Normal> for Normal {
         self.z += n.z;
     }
 }
-
-impl ops::MulAssign<Normal> for Normal {
-    fn mul_assign(&mut self, n: Normal) {
-        self.x *= n.x;
-        self.y *= n.y;
-        self.z *= n.z;
-    }
-}
-*/

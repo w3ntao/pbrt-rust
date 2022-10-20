@@ -25,7 +25,7 @@ fn random_cosine_direction() -> Vector3 {
 
 impl Material for Lambertian {
     fn scatter(&self, _: Ray, intersection: &Intersection) -> (bool, Ray, Color) {
-        let uvw = OrthonormalBasis::build_from_w(intersection.normal);
+        let uvw = OrthonormalBasis::build_from_w(Vector3::from(intersection.normal));
         let random_direction = uvw.local(random_cosine_direction());
 
         let scattered_ray = Ray::new(intersection.hit_point, random_direction.normalize());
@@ -38,8 +38,8 @@ impl Material for Lambertian {
         );
     }
 
-    fn scattering_pdf(&self, _: Vector3, normal: Vector3, scattered_direction: Vector3) -> f32 {
-        let val_cosine = cosine(normal, scattered_direction);
+    fn scattering_pdf(&self, _: Vector3, normal: Normal, scattered_direction: Vector3) -> f32 {
+        let val_cosine = cosine(Vector3::from(normal), scattered_direction);
 
         return if val_cosine <= 0.0 {
             0.0

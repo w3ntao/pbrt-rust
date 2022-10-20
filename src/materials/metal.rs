@@ -24,7 +24,7 @@ impl Material for Metal {
         );
 
         return (
-            scattered_ray.d.dot(intersection.normal) > 0.0,
+            intersection.normal.dot(scattered_ray.d) > 0.0,
             scattered_ray,
             self.albedo,
         );

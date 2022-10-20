@@ -12,11 +12,11 @@ impl Glass {
     }
 }
 
-fn refract(uv: Vector3, n: Vector3, etai_over_etat: f32) -> Vector3 {
+fn refract(uv: Vector3, n: Normal, etai_over_etat: f32) -> Vector3 {
     let cos_theta = n.dot(-uv).min(1.0);
-    let r_out_perp = etai_over_etat * (uv + cos_theta * n);
+    let r_out_perp = etai_over_etat * (uv + cos_theta * Vector3::from(n));
     let r_out_parallel = -(1.0 - r_out_perp.length_squared()).abs().sqrt() * n;
-    return r_out_perp + r_out_parallel;
+    return r_out_perp + Vector3::from(r_out_parallel);
 }
 
 fn reflectance(cosine: f32, index_of_refraction: f32) -> f32 {
@@ -40,7 +40,7 @@ impl Material for Glass {
 
         let normal = intersection.normal;
 
-        let cosine_theta = cosine(-incoming_ray.d, normal);
+        let cosine_theta = cosine(-incoming_ray.d, Vector3::from(normal));
         let sine_theta = (1.0 - cosine_theta * cosine_theta).sqrt();
 
         let cannot_refract = refraction_ratio * sine_theta > 1.0;

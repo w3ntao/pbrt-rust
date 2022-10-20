@@ -4,7 +4,7 @@ pub struct Triangle {
     pub origin: Point,
     pub span0: Vector3,
     pub span1: Vector3,
-    pub normal: Vector3,
+    pub normal: Normal,
     bounds: Bounds,
     material: Arc<dyn Material>,
     id: u128,
@@ -18,7 +18,7 @@ impl Triangle {
             origin: v0,
             span0: _span0,
             span1: _span1,
-            normal: cross(_span0, _span1).normalize(),
+            normal: Normal::from(cross(_span0, _span1).normalize()),
             bounds: Bounds::build(&[v0, v1, v2]),
             material: Arc::new(NullMaterial {}),
             id: random_u128(),
@@ -52,7 +52,7 @@ impl Primitive for Triangle {
             return Intersection::failure();
         }
 
-        let cos = cosine(ray.d, self.normal);
+        let cos = cosine(ray.d, Vector3::from(self.normal));
         let normal = if cos < 0.0 { self.normal } else { -self.normal };
 
         return Intersection::from_outside(t, ray(t), normal, self.material.clone(), self.get_id());

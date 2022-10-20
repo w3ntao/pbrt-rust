@@ -41,8 +41,8 @@ impl Vector3 {
         return *self / self.length();
     }
 
-    pub fn reflect(&self, normal: Vector3) -> Vector3 {
-        return *self - 2.0 * self.dot(normal) * normal;
+    pub fn reflect(&self, normal: Normal) -> Vector3 {
+        return *self - 2.0 * normal.dot(*self) * Vector3::from(normal);
     }
 }
 

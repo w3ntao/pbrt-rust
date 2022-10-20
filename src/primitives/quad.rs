@@ -4,7 +4,7 @@ pub struct Quad {
     pub origin: Point,
     pub span0: Vector3,
     pub span1: Vector3,
-    pub normal: Vector3,
+    pub normal: Normal,
     bounds: Bounds,
     material: Arc<dyn Material>,
     id: u128,
@@ -16,7 +16,7 @@ impl Quad {
             origin: v0,
             span0: _span0,
             span1: _span1,
-            normal: cross(_span0, _span1).normalize(),
+            normal: Normal::from(cross(_span0, _span1).normalize()),
             bounds: Bounds::build(&[v0, v0 + _span0, v0 + _span1, v0 + _span0 + _span1]),
             material: Arc::new(NullMaterial {}),
             id: random_u128(),
@@ -44,7 +44,7 @@ impl Primitive for Quad {
             return Intersection::failure();
         }
 
-        let normal = if ray.d.dot(self.normal) < 0.0 {
+        let normal = if self.normal.dot(ray.d) < 0.0 {
             self.normal
         } else {
             -self.normal
@@ -65,7 +65,7 @@ impl Primitive for Quad {
         let beta = random_f32(0.0, 1.0);
         return (
             self.origin + alpha * self.span0 + beta * self.span1,
-            self.normal,
+            Vector3::from(self.normal),
         );
     }
 
