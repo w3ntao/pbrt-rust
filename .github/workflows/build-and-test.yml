@@ -22,13 +22,13 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Download model files
+    - name: download model files
       run:
         wget 'https://casual-effects.com/g3d/data10/research/model/dragon/dragon.zip';
         mkdir models;
         unzip dragon.zip -d models/;
 
-    - name: Build and run tests
+    - name: build and run tests
       run:
         rustup default nightly;
         cargo run --release --verbose;

@@ -1,4 +1,4 @@
-# rust ray tracer
+# pbrt-rust
 
 [![build and test](https://github.com/w3ntao/rust-ray-tracer/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/w3ntao/rust-ray-tracer/actions/workflows/build-and-test.yml)
 
@@ -9,16 +9,14 @@ A rust ray tracer inspired by [Ray Tracing in One Weekend Series](https://raytra
 
 download stanford dragon model:
 ```
-$ cd rust-ray-tracer
+$ cd pbrt-rust
 $ wget 'https://casual-effects.com/g3d/data10/research/model/dragon/dragon.zip'
-$ mkdir models
-$ unzip dragon.zip -d models/
+$ mkdir models; unzip dragon.zip -d models/
 ```
 
-run:
+switch to channel nightly and run:
 ```
-$ rustup default nightly
-$ cargo run --release
+$ rustup default nightly; cargo run --release
 ```
 
 ## rendering samples
