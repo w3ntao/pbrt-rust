@@ -2,8 +2,8 @@ use crate::core::pbrt::*;
 
 #[derive(Copy, Clone)]
 pub struct Bounds {
-    pub min: Point,
-    pub max: Point,
+    pub p_min: Point,
+    pub p_max: Point,
 }
 
 impl Default for Bounds {
@@ -15,8 +15,8 @@ impl Default for Bounds {
 impl Bounds {
     pub fn empty() -> Self {
         return Bounds {
-            min: Point::invalid(),
-            max: Point::invalid(),
+            p_min: Point::invalid(),
+            p_max: Point::invalid(),
         };
     }
 
@@ -24,22 +24,25 @@ impl Bounds {
         let _min = min_of(&points);
         let _max = max_of(&points);
         return Bounds {
-            min: _min,
-            max: _max,
+            p_min: _min,
+            p_max: _max,
         };
     }
 
     pub fn is_empty(&self) -> bool {
-        return !self.min.is_valid() || !self.max.is_valid();
+        if self.p_min.is_valid() && self.p_max.is_valid() {
+            return false;
+        }
+        return true;
     }
 
     pub fn get_area(&self) -> f32 {
         if self.is_empty() {
             return 0.0;
         }
-        let x_extent = self.max.x - self.min.x;
-        let y_extent = self.max.y - self.min.y;
-        let z_extent = self.max.z - self.min.z;
+        let x_extent = self.p_max.x - self.p_min.x;
+        let y_extent = self.p_max.y - self.p_min.y;
+        let z_extent = self.p_max.z - self.p_min.z;
 
         return 2.0 * (x_extent * y_extent + x_extent * z_extent + y_extent * z_extent);
     }
@@ -55,12 +58,12 @@ impl Bounds {
 
         for axis in 0..3 {
             if ray.d[axis] == 0.0 {
-                if ray.o[axis] < self.min[axis] || ray.o[axis] > self.max[axis] {
+                if ray.o[axis] < self.p_min[axis] || ray.o[axis] > self.p_max[axis] {
                     return no_intersection;
                 }
             } else {
-                let mut t1 = (self.min[axis] - ray.o[axis]) / ray.d[axis];
-                let mut t2 = (self.max[axis] - ray.o[axis]) / ray.d[axis];
+                let mut t1 = (self.p_min[axis] - ray.o[axis]) / ray.d[axis];
+                let mut t2 = (self.p_max[axis] - ray.o[axis]) / ray.d[axis];
                 if t1 > t2 {
                     mem::swap(&mut t1, &mut t2);
                 }
@@ -80,15 +83,15 @@ impl ops::Add<Bounds> for Bounds {
     type Output = Bounds;
     fn add(self, rhs: Bounds) -> Bounds {
         return Bounds {
-            min: min_of(&[self.min, rhs.min]),
-            max: max_of(&[self.max, rhs.max]),
+            p_min: min_of(&[self.p_min, rhs.p_min]),
+            p_max: max_of(&[self.p_max, rhs.p_max]),
         };
     }
 }
 
 impl ops::AddAssign<Bounds> for Bounds {
     fn add_assign(&mut self, rhs: Bounds) {
-        self.min = min_of(&[self.min, rhs.min]);
-        self.max = max_of(&[self.max, rhs.max]);
+        self.p_min = min_of(&[self.p_min, rhs.p_min]);
+        self.p_max = max_of(&[self.p_max, rhs.p_max]);
     }
 }

@@ -67,7 +67,7 @@ impl BVH {
         let mut primitive_infos = vec![PrimitiveInfo::default(); self.primitives.len()];
         for idx in 0..self.primitives.len() {
             let bounds = self.primitives[idx].get_bounds();
-            let centroid = 0.5 * (bounds.min + bounds.max);
+            let centroid = 0.5 * (bounds.p_min + bounds.p_max);
             primitive_infos[idx] = PrimitiveInfo::new(idx, bounds, centroid);
         }
 

@@ -37,8 +37,8 @@ impl Primitive for Instance {
 
     fn get_bounds(&self) -> Bounds {
         let bounds = self.primitive.get_bounds();
-        let min = bounds.min;
-        let max = bounds.max;
+        let min = bounds.p_min;
+        let max = bounds.p_max;
 
         let mut points = [
             min,
