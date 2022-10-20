@@ -17,6 +17,7 @@ $ unzip dragon.zip -d models/
 
 run:
 ```
+$ rustup default nightly
 $ cargo run --release
 ```
 
