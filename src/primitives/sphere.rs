@@ -10,8 +10,8 @@ pub struct Sphere {
 
 impl Sphere {
     pub fn new(_center: Point, _radius: f32) -> Self {
-        let min = _center + Point::new(-_radius, -_radius, -_radius);
-        let max = _center + Point::new(_radius, _radius, _radius);
+        let min = _center + Vector3::new(-_radius, -_radius, -_radius);
+        let max = _center + Vector3::new(_radius, _radius, _radius);
         return Self {
             center: _center,
             radius: _radius,
@@ -72,7 +72,7 @@ impl Primitive for Sphere {
             Intersection::from_inside(root, hit_point, -normal, self.material.clone())
         };
 
-        let (u, v) = get_sphere_uv((hit_point - self.center).normalize().into());
+        let (u, v) = get_sphere_uv(Point::from((hit_point - self.center).normalize()));
         intersection.u = u;
         intersection.v = v;
 

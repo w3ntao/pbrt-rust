@@ -33,6 +33,16 @@ impl Point {
     }
 }
 
+impl From<Vector3> for Point {
+    fn from(v: Vector3) -> Self {
+        Point {
+            x: v.x,
+            y: v.y,
+            z: v.z,
+        }
+    }
+}
+
 impl ops::Index<usize> for Point {
     type Output = f32;
     fn index(&self, index: usize) -> &f32 {
