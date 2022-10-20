@@ -46,6 +46,16 @@ impl Vector3 {
     }
 }
 
+impl From<Normal> for Vector3 {
+    fn from(n: Normal) -> Self {
+        Vector3 {
+            x: n.x,
+            y: n.y,
+            z: n.z,
+        }
+    }
+}
+
 impl ops::Index<usize> for Vector3 {
     type Output = f32;
     fn index(&self, index: usize) -> &f32 {

@@ -6,6 +6,7 @@ pub use crate::core::integrator::*;
 pub use crate::core::intersection::*;
 pub use crate::core::material::*;
 pub use crate::core::matrix::*;
+pub use crate::core::normal::*;
 pub use crate::core::orthonormal_basis::*;
 pub use crate::core::point::*;
 pub use crate::core::primitive::*;
