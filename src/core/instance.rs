@@ -2,28 +2,24 @@ use crate::core::pbrt::*;
 
 pub struct Instance {
     pub primitive: Arc<dyn Primitive>,
-    transform: Matrix,
+    transform: Transform,
     material: Arc<dyn Material>,
 }
 
 impl Primitive for Instance {
     fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
-        let inverted_transform = self.transform.invert();
-        let mut inverted_ray_direction = inverted_transform.clone() * ray.d;
-        let inverted_length = inverted_ray_direction.length();
-        inverted_ray_direction = inverted_ray_direction / inverted_length;
-
+        let (inverted_ray, inverted_length) = (self.transform)(ray);
         let mut intersection = self.primitive.intersect(
-            &Ray::new(inverted_transform.clone() * ray.o, inverted_ray_direction),
+            &inverted_ray,
             t_min / inverted_length,
             t_max / inverted_length,
         );
+
         if !intersection.intersected() {
             return intersection;
         }
-        intersection.normal =
-            Normal::from(inverted_transform.transpose() * Vector3::from(intersection.normal))
-                .normalize();
+
+        intersection.normal = (self.transform)(intersection.normal);
 
         intersection.distance = intersection.distance / inverted_length;
         intersection.hit_point = ray(intersection.distance);
@@ -52,7 +48,7 @@ impl Primitive for Instance {
         ];
 
         for idx in 0..points.len() {
-            points[idx] = self.transform.clone() * points[idx];
+            points[idx] = (self.transform)(points[idx])
         }
 
         return Bounds::build(&points);
@@ -79,61 +75,25 @@ impl Instance {
     pub fn new(_primitive: Arc<dyn Primitive>) -> Instance {
         Instance {
             primitive: _primitive,
-            transform: Matrix::identity(),
+            transform: Transform::identity(),
             material: Arc::new(NullMaterial {}),
         }
     }
 
     #[allow(dead_code)]
     pub fn reset(&mut self) {
-        self.transform = Matrix::identity();
+        self.transform.reset();
     }
 
     pub fn translate(&mut self, t: Vector3) {
-        for idx in 0..3 {
-            self.transform[idx][3] += t[idx];
-        }
+        self.transform.translate(t);
     }
 
     pub fn scale_by_scalar(&mut self, scalar: f32) {
-        for row in 0..3 {
-            for col in 0..3 {
-                self.transform[row][col] *= scalar;
-            }
-        }
+        self.transform.scale_by_scalar(scalar);
     }
 
     pub fn rotate(&mut self, axis: Vector3, angle: f32) {
-        let cosine = f32::cos(angle);
-        let sine = f32::sin(angle);
-
-        let normalized_axis = axis.normalize();
-        let x = normalized_axis.x;
-        let y = normalized_axis.y;
-        let z = normalized_axis.z;
-
-        let rotate_matrix = Matrix::new(
-            Vector4::new(
-                x * x * (1.0 - cosine) + cosine,
-                x * y * (1.0 - cosine) - z * sine,
-                x * z * (1.0 - cosine) + y * sine,
-                0.0,
-            ),
-            Vector4::new(
-                x * y * (1.0 - cosine) + z * sine,
-                cosine + y * y * (1.0 - cosine),
-                y * z * (1.0 - cosine) - x * sine,
-                0.0,
-            ),
-            Vector4::new(
-                x * z * (1.0 - cosine) - y * sine,
-                y * z * (1.0 - cosine) + x * sine,
-                cosine + z * z * (1.0 - cosine),
-                0.0,
-            ),
-            Vector4::new(0.0, 0.0, 0.0, 1.0),
-        );
-
-        self.transform = rotate_matrix * self.transform.clone();
+        self.transform.rotate(axis, angle);
     }
 }

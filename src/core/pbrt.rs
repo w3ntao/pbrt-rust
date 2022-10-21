@@ -14,6 +14,7 @@ pub use crate::core::random::*;
 pub use crate::core::ray::*;
 pub use crate::core::renderer::*;
 pub use crate::core::texture::*;
+pub use crate::core::transform::*;
 pub use crate::core::vector3::*;
 pub use crate::core::world::*;
 

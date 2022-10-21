@@ -15,5 +15,6 @@ pub mod random;
 pub mod ray;
 pub mod renderer;
 pub mod texture;
+pub mod transform;
 pub mod vector3;
 pub mod world;

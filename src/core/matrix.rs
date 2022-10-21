@@ -188,7 +188,7 @@ impl From<Vector4> for Point {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct Matrix {
     row: [Vector4; 4],
 }
@@ -234,7 +234,7 @@ impl Matrix {
         )
     }
 
-    pub fn invert(&self) -> Matrix {
+    pub fn inverse(&self) -> Matrix {
         let mut result = Matrix::zero();
         let m = self;
 
@@ -337,8 +337,7 @@ impl Matrix {
                 + m[2][0] * m[0][1] * m[1][2]
                 - m[2][0] * m[0][2] * m[1][1];
 
-        result = result / determinant;
-        return result;
+        return &result / determinant;
     }
 
     pub fn determinant(&self) -> f32 {
@@ -373,6 +372,54 @@ impl Matrix {
             + m[0][2] * result[2][0]
             + m[0][3] * result[3][0];
     }
+
+    pub fn translate(&mut self, t: Vector3) {
+        for idx in 0..3 {
+            self[idx][3] += t[idx];
+        }
+    }
+
+    pub fn scale_by_scalar(&mut self, scalar: f32) {
+        for row in 0..3 {
+            for col in 0..3 {
+                self[row][col] *= scalar;
+            }
+        }
+    }
+
+    pub fn rotate(&mut self, axis: Vector3, angle: f32) {
+        let cosine = f32::cos(angle);
+        let sine = f32::sin(angle);
+
+        let normalized_axis = axis.normalize();
+        let x = normalized_axis.x;
+        let y = normalized_axis.y;
+        let z = normalized_axis.z;
+
+        let rotate_matrix = Matrix::new(
+            Vector4::new(
+                x * x * (1.0 - cosine) + cosine,
+                x * y * (1.0 - cosine) - z * sine,
+                x * z * (1.0 - cosine) + y * sine,
+                0.0,
+            ),
+            Vector4::new(
+                x * y * (1.0 - cosine) + z * sine,
+                cosine + y * y * (1.0 - cosine),
+                y * z * (1.0 - cosine) - x * sine,
+                0.0,
+            ),
+            Vector4::new(
+                x * z * (1.0 - cosine) - y * sine,
+                y * z * (1.0 - cosine) + x * sine,
+                cosine + z * z * (1.0 - cosine),
+                0.0,
+            ),
+            Vector4::new(0.0, 0.0, 0.0, 1.0),
+        );
+
+        *self *= rotate_matrix;
+    }
 }
 
 impl ops::Index<usize> for Matrix {
@@ -388,7 +435,7 @@ impl ops::IndexMut<usize> for Matrix {
     }
 }
 
-impl ops::Mul<f32> for Matrix {
+impl ops::Mul<f32> for &Matrix {
     type Output = Matrix;
     fn mul(self, scalar: f32) -> Matrix {
         Matrix {
@@ -402,39 +449,39 @@ impl ops::Mul<f32> for Matrix {
     }
 }
 
-impl ops::Mul<Matrix> for f32 {
+impl ops::Mul<&Matrix> for f32 {
     type Output = Matrix;
-    fn mul(self, m: Matrix) -> Matrix {
+    fn mul(self, m: &Matrix) -> Matrix {
         return m * self;
     }
 }
 
-impl ops::Mul<Vector4> for Matrix {
+impl ops::Mul<Vector4> for &Matrix {
     type Output = Vector4;
-    fn mul(self, f4: Vector4) -> Vector4 {
+    fn mul(self, v4: Vector4) -> Vector4 {
         let mut product = Vector4::zero();
         for idx in 0..4 {
-            product[idx] = self.row[idx].dot(f4);
+            product[idx] = self.row[idx].dot(v4);
         }
         return product;
     }
 }
 
-impl ops::Mul<Vector3> for Matrix {
+impl ops::Mul<Vector3> for &Matrix {
     type Output = Vector3;
     fn mul(self, v: Vector3) -> Vector3 {
         return Vector3::from(self * Vector4::from(v));
     }
 }
 
-impl ops::Mul<Point> for Matrix {
+impl ops::Mul<Point> for &Matrix {
     type Output = Point;
     fn mul(self, p: Point) -> Point {
         return Point::from(self * Vector4::from(p));
     }
 }
 
-impl ops::Div<f32> for Matrix {
+impl ops::Div<f32> for &Matrix {
     type Output = Matrix;
     fn div(self, divisor: f32) -> Matrix {
         let inv = 1.0 / divisor;
@@ -449,9 +496,9 @@ impl ops::Div<f32> for Matrix {
     }
 }
 
-impl ops::Mul<Matrix> for Matrix {
+impl ops::Mul<&Matrix> for Matrix {
     type Output = Matrix;
-    fn mul(self, rhs: Matrix) -> Matrix {
+    fn mul(self, rhs: &Matrix) -> Matrix {
         let mut result = Matrix::zero();
         for idx in 0..4 {
             result[idx] = Vector4::new(
@@ -463,5 +510,24 @@ impl ops::Mul<Matrix> for Matrix {
         }
 
         return result;
+    }
+}
+
+impl ops::Mul<Matrix> for Matrix {
+    type Output = Matrix;
+    fn mul(self, rhs: Matrix) -> Matrix {
+        return self * &rhs;
+    }
+}
+
+impl ops::MulAssign<&Matrix> for Matrix {
+    fn mul_assign(&mut self, rhs: &Matrix) {
+        *self = *self * rhs;
+    }
+}
+
+impl ops::MulAssign<Matrix> for Matrix {
+    fn mul_assign(&mut self, rhs: Matrix) {
+        *self *= &rhs;
     }
 }
