@@ -8,11 +8,11 @@ pub struct Instance {
 
 impl Primitive for Instance {
     fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
-        let (inverted_ray, inverted_length) = (self.transform)(ray);
+        let (inverted_ray, inverted_distance) = (self.transform)(ray);
         let mut intersection = self.primitive.intersect(
             &inverted_ray,
-            t_min / inverted_length,
-            t_max / inverted_length,
+            t_min / inverted_distance,
+            t_max / inverted_distance,
         );
 
         if !intersection.intersected() {
@@ -21,7 +21,7 @@ impl Primitive for Instance {
 
         intersection.normal = (self.transform)(intersection.normal);
 
-        intersection.distance = intersection.distance / inverted_length;
+        intersection.distance = intersection.distance / inverted_distance;
         intersection.hit_point = ray(intersection.distance);
 
         if !self.material.is_null() {

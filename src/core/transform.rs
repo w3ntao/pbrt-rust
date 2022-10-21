@@ -151,11 +151,11 @@ impl Fn<(&Ray,)> for Transform {
 
         let inverted_matrix = &self.inv_m;
         let inverted_ray_direction = inverted_matrix * ray.d;
-        let inverted_length = (inverted_matrix * ray.d).length();
+        let inverted_distance = (inverted_matrix * ray.d).length();
 
         return (
             Ray::new(inverted_matrix * ray.o, inverted_ray_direction.normalize()),
-            inverted_length,
+            inverted_distance,
         );
     }
 }
