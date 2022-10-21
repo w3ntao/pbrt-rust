@@ -19,17 +19,54 @@ impl Transform {
     }
 
     pub fn translate(&mut self, t: Vector3) {
-        self.m.translate(t);
+        for idx in 0..3 {
+            self.m[idx][3] += t[idx];
+        }
         self.inv_m = self.m.inverse();
     }
 
     pub fn scale_by_scalar(&mut self, scalar: f32) {
-        self.m.scale_by_scalar(scalar);
+        for row in 0..3 {
+            for col in 0..3 {
+                self.m[row][col] *= scalar;
+            }
+        }
+
         self.inv_m = self.m.inverse();
     }
 
     pub fn rotate(&mut self, axis: Vector3, angle: f32) {
-        self.m.rotate(axis, angle);
+        let cosine = f32::cos(angle);
+        let sine = f32::sin(angle);
+
+        let normalized_axis = axis.normalize();
+        let x = normalized_axis.x;
+        let y = normalized_axis.y;
+        let z = normalized_axis.z;
+
+        let rotate_matrix = Matrix::new(
+            Vector4::new(
+                x * x * (1.0 - cosine) + cosine,
+                x * y * (1.0 - cosine) - z * sine,
+                x * z * (1.0 - cosine) + y * sine,
+                0.0,
+            ),
+            Vector4::new(
+                x * y * (1.0 - cosine) + z * sine,
+                cosine + y * y * (1.0 - cosine),
+                y * z * (1.0 - cosine) - x * sine,
+                0.0,
+            ),
+            Vector4::new(
+                x * z * (1.0 - cosine) - y * sine,
+                y * z * (1.0 - cosine) + x * sine,
+                cosine + z * z * (1.0 - cosine),
+                0.0,
+            ),
+            Vector4::new(0.0, 0.0, 0.0, 1.0),
+        );
+
+        self.m *= rotate_matrix;
         self.inv_m = self.m.inverse();
     }
 }
