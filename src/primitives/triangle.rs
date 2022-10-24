@@ -1,20 +1,41 @@
 use crate::core::pbrt::*;
 
+pub struct TriangleMesh {
+    vertices: Vec<Point>,
+    indices: Vec<usize>,
+}
+
+impl TriangleMesh {
+    pub fn new(_vertices: Vec<Point>, _indices: Vec<usize>) -> Self {
+        return Self {
+            vertices: _vertices,
+            indices: _indices,
+        };
+    }
+
+    pub fn build_triangle(self) -> Vec<Arc<Triangle>> {
+        let mut triangles = Vec::new();
+        let arc_self = Arc::new(self);
+        for index in (0..arc_self.indices.len()).step_by(3) {
+            triangles.push(Arc::new(Triangle::new(index, arc_self.clone())));
+        }
+        return triangles;
+    }
+}
+
 pub struct Triangle {
-    p0: Point,
-    p1: Point,
-    p2: Point,
+    mesh_index: usize,
+    mesh_root: Arc<TriangleMesh>,
     material: Arc<dyn Material>,
     id: u128,
 }
 
 impl Triangle {
-    pub fn new(v0: Point, v1: Point, v2: Point) -> Self {
+    pub fn new(_index: usize, _mesh: Arc<TriangleMesh>) -> Self {
         return Self {
-            p0: v0,
-            p1: v1,
-            p2: v2,
+            mesh_index: _index,
             material: Arc::new(NullMaterial {}),
+            mesh_root: _mesh,
             id: random_u128(),
         };
     }
@@ -22,8 +43,15 @@ impl Triangle {
 
 impl Primitive for Triangle {
     fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
-        let span0 = self.p1 - self.p0;
-        let span1 = self.p2 - self.p0;
+        let vertex_idx0 = self.mesh_root.indices[self.mesh_index];
+        let vertex_idx1 = self.mesh_root.indices[self.mesh_index + 1];
+        let vertex_idx2 = self.mesh_root.indices[self.mesh_index + 2];
+        let p0 = self.mesh_root.vertices[vertex_idx0];
+        let p1 = self.mesh_root.vertices[vertex_idx1];
+        let p2 = self.mesh_root.vertices[vertex_idx2];
+
+        let span0 = p1 - p0;
+        let span1 = p2 - p0;
         let normal = Normal::from(cross(span0, span1).normalize());
 
         let ab = cross(span0, span1);
@@ -32,7 +60,7 @@ impl Primitive for Triangle {
             return Intersection::failure();
         }
 
-        let c = ray.o - self.p0;
+        let c = ray.o - p0;
         let t = ab.dot(c) / det;
         if t < t_min || t > t_max {
             return Intersection::failure();
@@ -57,7 +85,14 @@ impl Primitive for Triangle {
     }
 
     fn get_bounds(&self) -> Bounds {
-        return Bounds::build(&[self.p0, self.p1, self.p2]);
+        let p0_idx = self.mesh_root.indices[self.mesh_index];
+        let p1_idx = self.mesh_root.indices[self.mesh_index + 1];
+        let p2_idx = self.mesh_root.indices[self.mesh_index + 2];
+        let p0 = self.mesh_root.vertices[p0_idx];
+        let p1 = self.mesh_root.vertices[p1_idx];
+        let p2 = self.mesh_root.vertices[p2_idx];
+
+        return Bounds::build(&[p0, p1, p2]);
     }
 
     fn set_material(&mut self, material: Arc<dyn Material>) {

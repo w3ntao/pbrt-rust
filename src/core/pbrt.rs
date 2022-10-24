@@ -36,7 +36,6 @@ pub use crate::materials::mirror::*;
 
 pub use crate::primitives::axis_aligned_box::*;
 pub use crate::primitives::hollow_sphere::*;
-pub use crate::primitives::new_triangle::*;
 pub use crate::primitives::quad::*;
 pub use crate::primitives::sphere::*;
 pub use crate::primitives::triangle::*;

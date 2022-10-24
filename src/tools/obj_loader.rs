@@ -1,6 +1,6 @@
 use crate::core::pbrt::*;
 
-pub fn obj_to_triangles(obj_file: &str) -> Vec<Arc<NewTriangle>> {
+pub fn obj_to_triangles(obj_file: &str) -> Vec<Arc<Triangle>> {
     let (loaded_models, _materials) = tobj::load_obj(
         &obj_file,
         &tobj::LoadOptions {

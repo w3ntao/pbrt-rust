@@ -1,5 +1,5 @@
 use crate::core::pbrt::*;
-use crate::test_case_07_rt_weekend_final::many_random_spheres;
+use crate::test_case_rt_weekend_final::many_random_spheres;
 
 #[allow(dead_code)]
 pub fn test(width: usize, height: usize, samples: u32) {

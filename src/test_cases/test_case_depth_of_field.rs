@@ -1,5 +1,5 @@
 use crate::core::pbrt::*;
-use crate::test_case_05_material_b::scene_three_spheres;
+use crate::test_case_material_b::scene_three_spheres;
 
 #[allow(dead_code)]
 pub fn test(width: usize, height: usize, samples: u32) {
