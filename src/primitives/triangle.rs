@@ -85,12 +85,12 @@ impl Primitive for Triangle {
     }
 
     fn get_bounds(&self) -> Bounds {
-        let p0_idx = self.mesh_root.indices[self.mesh_index];
-        let p1_idx = self.mesh_root.indices[self.mesh_index + 1];
-        let p2_idx = self.mesh_root.indices[self.mesh_index + 2];
-        let p0 = self.mesh_root.vertices[p0_idx];
-        let p1 = self.mesh_root.vertices[p1_idx];
-        let p2 = self.mesh_root.vertices[p2_idx];
+        let vertex_idx0 = self.mesh_root.indices[self.mesh_index];
+        let vertex_idx1 = self.mesh_root.indices[self.mesh_index + 1];
+        let vertex_idx2 = self.mesh_root.indices[self.mesh_index + 2];
+        let p0 = self.mesh_root.vertices[vertex_idx0];
+        let p1 = self.mesh_root.vertices[vertex_idx1];
+        let p2 = self.mesh_root.vertices[vertex_idx2];
 
         return Bounds::build(&[p0, p1, p2]);
     }
