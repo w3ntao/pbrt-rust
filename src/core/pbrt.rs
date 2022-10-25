@@ -3,7 +3,7 @@ pub use crate::core::camera::*;
 pub use crate::core::color::*;
 pub use crate::core::instance::*;
 pub use crate::core::integrator::*;
-pub use crate::core::intersection::*;
+pub use crate::core::interaction::*;
 pub use crate::core::material::*;
 pub use crate::core::matrix::*;
 pub use crate::core::normal::*;

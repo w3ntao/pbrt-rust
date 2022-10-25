@@ -28,7 +28,7 @@ impl Aggregate for BVH {
 }
 
 impl Primitive for BVH {
-    fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
+    fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> SurfaceInteraction {
         if !self.index_built {
             panic!("BVH: You should invoke function `build_index()` before intersect with it")
         }

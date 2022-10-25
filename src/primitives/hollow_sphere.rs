@@ -15,7 +15,7 @@ impl HollowSphere {
 }
 
 impl Primitive for HollowSphere {
-    fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
+    fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> SurfaceInteraction {
         let external_intersection = self.external_sphere.intersect(ray, t_min, t_max);
         if !external_intersection.intersected() || external_intersection.entering_material {
             return external_intersection;

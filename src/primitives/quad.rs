@@ -25,23 +25,23 @@ impl Quad {
 }
 
 impl Primitive for Quad {
-    fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
+    fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> SurfaceInteraction {
         let ab = cross(self.span0, self.span1);
         let det = -ab.dot(ray.d);
         if det == 0.0 {
-            return Intersection::failure();
+            return SurfaceInteraction::failure();
         }
 
         let c = ray.o - self.origin;
         let det_t = ab.dot(c);
         let t = det_t / det;
         if t < t_min || t > t_max {
-            return Intersection::failure();
+            return SurfaceInteraction::failure();
         }
         let beta = c.dot(cross(ray.d, self.span1)) / det;
         let gamma = self.span0.dot(cross(ray.d, c)) / det;
         if beta < 0.0 || beta > 1.0 || gamma < 0.0 || gamma > 1.0 {
-            return Intersection::failure();
+            return SurfaceInteraction::failure();
         }
 
         let normal = if self.normal.dot(ray.d) < 0.0 {
@@ -49,7 +49,13 @@ impl Primitive for Quad {
         } else {
             -self.normal
         };
-        return Intersection::from_outside(t, ray(t), normal, self.material.clone(), self.get_id());
+        return SurfaceInteraction::from_outside(
+            t,
+            ray(t),
+            normal,
+            self.material.clone(),
+            self.get_id(),
+        );
     }
 
     fn get_bounds(&self) -> Bounds {

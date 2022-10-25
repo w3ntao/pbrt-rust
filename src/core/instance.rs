@@ -7,7 +7,7 @@ pub struct Instance {
 }
 
 impl Primitive for Instance {
-    fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
+    fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> SurfaceInteraction {
         let (inverted_ray, inverted_distance) = (self.transform)(ray);
         let mut intersection = self.primitive.intersect(
             &inverted_ray,

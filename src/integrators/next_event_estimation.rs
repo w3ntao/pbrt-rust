@@ -13,7 +13,7 @@ impl NextEventEstimation {
 const RUSSIAN_ROULETTE_THRESHOLD: f32 = 0.8;
 
 impl NextEventEstimation {
-    fn get_direct_illumination(&self, intersection: &Intersection, ray: &Ray) -> Color {
+    fn get_direct_illumination(&self, intersection: &SurfaceInteraction, ray: &Ray) -> Color {
         let (light_id, light_point, light_normal, light_area) = self.world.sample_light();
         let towards_light = light_point - intersection.hit_point;
         let distance_squared = towards_light.length_squared();

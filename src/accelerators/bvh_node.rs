@@ -61,14 +61,14 @@ impl Node {
         t_min: f32,
         t_max: f32,
         primitives: &Vec<Arc<dyn Primitive>>,
-    ) -> Intersection {
+    ) -> SurfaceInteraction {
         let (t1, t2) = self.bounds.intersect(ray);
         if t1 > t2 || t1 > t_max || t2 < t_min {
-            return Intersection::failure();
+            return SurfaceInteraction::failure();
         }
 
         if self.left.is_none() && self.right.is_none() {
-            let mut closest_intersect = Intersection::failure();
+            let mut closest_intersect = SurfaceInteraction::failure();
             let mut closest_distance = t_max;
 
             for idx in self.start..self.end {

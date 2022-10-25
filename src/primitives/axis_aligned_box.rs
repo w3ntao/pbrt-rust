@@ -21,7 +21,7 @@ impl AxisAlignedBox {
 }
 
 impl Primitive for AxisAlignedBox {
-    fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
+    fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> SurfaceInteraction {
         let mut root_in = -f32::INFINITY;
         let mut root_out = f32::INFINITY;
         let mut normal = Normal::invalid();
@@ -29,7 +29,7 @@ impl Primitive for AxisAlignedBox {
         for axis in 0..3 {
             if ray.d[axis] == 0.0 {
                 if self.axis_min[axis] > ray.o[axis] || self.axis_max[axis] < ray.o[axis] {
-                    return Intersection::failure();
+                    return SurfaceInteraction::failure();
                 }
             } else {
                 let t0 = (self.axis_min[axis] - ray.o[axis]) / ray.d[axis];
@@ -51,16 +51,16 @@ impl Primitive for AxisAlignedBox {
                     root_out = root_out.min(t1);
                 }
                 if root_out < root_in {
-                    return Intersection::failure();
+                    return SurfaceInteraction::failure();
                 }
             }
         }
 
         if root_in < t_min || root_in > t_max {
-            return Intersection::failure();
+            return SurfaceInteraction::failure();
         }
 
-        return Intersection::from_outside(
+        return SurfaceInteraction::from_outside(
             root_in,
             ray(root_in),
             normal,

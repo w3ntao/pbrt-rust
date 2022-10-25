@@ -3,7 +3,7 @@ pub mod camera;
 pub mod color;
 pub mod instance;
 pub mod integrator;
-pub mod intersection;
+pub mod interaction;
 pub mod material;
 pub mod matrix;
 pub mod normal;

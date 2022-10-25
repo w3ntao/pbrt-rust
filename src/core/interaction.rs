@@ -3,7 +3,7 @@ use crate::core::pbrt::*;
 pub const INTERSECT_OFFSET: f32 = 0.001;
 
 #[derive(Clone)]
-pub struct Intersection {
+pub struct SurfaceInteraction {
     pub distance: f32,
     pub hit_point: Point,
     pub normal: Normal,
@@ -15,7 +15,7 @@ pub struct Intersection {
     pub object_id: u128,
 }
 
-impl Intersection {
+impl SurfaceInteraction {
     pub fn from_outside(
         _distance: f32,
         _hit_point: Point,

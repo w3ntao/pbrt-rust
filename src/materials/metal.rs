@@ -15,7 +15,7 @@ impl Metal {
 }
 
 impl Material for Metal {
-    fn scatter(&self, incoming_ray: Ray, intersection: &Intersection) -> (bool, Ray, Color) {
+    fn scatter(&self, incoming_ray: Ray, intersection: &SurfaceInteraction) -> (bool, Ray, Color) {
         let reflected = incoming_ray.d.reflect(intersection.normal);
 
         let scattered_ray = Ray::new(

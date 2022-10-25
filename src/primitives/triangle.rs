@@ -42,7 +42,7 @@ impl Triangle {
 }
 
 impl Primitive for Triangle {
-    fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
+    fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> SurfaceInteraction {
         let vertex_idx0 = self.mesh_root.indices[self.mesh_index];
         let vertex_idx1 = self.mesh_root.indices[self.mesh_index + 1];
         let vertex_idx2 = self.mesh_root.indices[self.mesh_index + 2];
@@ -57,13 +57,13 @@ impl Primitive for Triangle {
         let ab = cross(span0, span1);
         let det = -ab.dot(ray.d);
         if det == 0.0 {
-            return Intersection::failure();
+            return SurfaceInteraction::failure();
         }
 
         let c = ray.o - p0;
         let t = ab.dot(c) / det;
         if t < t_min || t > t_max {
-            return Intersection::failure();
+            return SurfaceInteraction::failure();
         }
 
         let beta = c.dot(cross(ray.d, span1)) / det;
@@ -75,13 +75,19 @@ impl Primitive for Triangle {
             || beta + gamma > 1.0 + error_tolerance
         {
             // if the intersection is outside of the triangle
-            return Intersection::failure();
+            return SurfaceInteraction::failure();
         }
 
         let cos = normal.cosine(ray.d);
         let normal = if cos < 0.0 { normal } else { -normal };
 
-        return Intersection::from_outside(t, ray(t), normal, self.material.clone(), self.get_id());
+        return SurfaceInteraction::from_outside(
+            t,
+            ray(t),
+            normal,
+            self.material.clone(),
+            self.get_id(),
+        );
     }
 
     fn get_bounds(&self) -> Bounds {

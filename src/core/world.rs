@@ -28,7 +28,7 @@ impl World {
         self.scene.build_index();
     }
 
-    pub fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> Intersection {
+    pub fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> SurfaceInteraction {
         return self.scene.intersect(ray, t_min, t_max);
     }
 
