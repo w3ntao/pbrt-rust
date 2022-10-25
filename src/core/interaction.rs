@@ -16,7 +16,7 @@ pub struct SurfaceInteraction {
 }
 
 impl SurfaceInteraction {
-    pub fn from_outside(
+    pub fn new(
         _distance: f32,
         _hit_point: Point,
         _normal: Normal,
@@ -32,24 +32,6 @@ impl SurfaceInteraction {
             u: f32::NAN,
             v: f32::NAN,
             object_id: id,
-        };
-    }
-
-    pub fn from_inside(
-        _distance: f32,
-        _hit_point: Point,
-        _normal: Normal,
-        _material: Arc<dyn Material>,
-    ) -> Self {
-        return Self {
-            distance: _distance,
-            hit_point: _hit_point,
-            normal: _normal.normalize(),
-            material: _material,
-            entering_material: false,
-            u: f32::NAN,
-            v: f32::NAN,
-            object_id: 0,
         };
     }
 

@@ -81,13 +81,7 @@ impl Primitive for Triangle {
         let cos = normal.cosine(ray.d);
         let normal = if cos < 0.0 { normal } else { -normal };
 
-        return SurfaceInteraction::from_outside(
-            t,
-            ray(t),
-            normal,
-            self.material.clone(),
-            self.get_id(),
-        );
+        return SurfaceInteraction::new(t, ray(t), normal, self.material.clone(), self.get_id());
     }
 
     fn get_bounds(&self) -> Bounds {

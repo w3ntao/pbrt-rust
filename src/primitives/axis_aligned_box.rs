@@ -60,7 +60,7 @@ impl Primitive for AxisAlignedBox {
             return SurfaceInteraction::failure();
         }
 
-        return SurfaceInteraction::from_outside(
+        return SurfaceInteraction::new(
             root_in,
             ray(root_in),
             normal,

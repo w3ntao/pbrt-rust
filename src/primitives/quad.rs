@@ -49,13 +49,7 @@ impl Primitive for Quad {
         } else {
             -self.normal
         };
-        return SurfaceInteraction::from_outside(
-            t,
-            ray(t),
-            normal,
-            self.material.clone(),
-            self.get_id(),
-        );
+        return SurfaceInteraction::new(t, ray(t), normal, self.material.clone(), self.get_id());
     }
 
     fn get_bounds(&self) -> Bounds {
