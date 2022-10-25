@@ -4,9 +4,9 @@ pub const INTERSECT_OFFSET: f32 = 0.001;
 
 #[derive(Clone)]
 pub struct SurfaceInteraction {
-    pub distance: f32,
-    pub hit_point: Point,
-    pub normal: Normal,
+    pub t: f32,
+    pub p: Point,
+    pub n: Normal,
     pub material: Arc<dyn Material>,
     pub entering_material: bool,
     pub u: f32,
@@ -16,17 +16,11 @@ pub struct SurfaceInteraction {
 }
 
 impl SurfaceInteraction {
-    pub fn new(
-        _distance: f32,
-        _hit_point: Point,
-        _normal: Normal,
-        _material: Arc<dyn Material>,
-        id: u128,
-    ) -> Self {
+    pub fn new(_t: f32, _p: Point, _n: Normal, _material: Arc<dyn Material>, id: u128) -> Self {
         return Self {
-            distance: _distance,
-            hit_point: _hit_point,
-            normal: _normal.normalize(),
+            t: _t,
+            p: _p,
+            n: _n.normalize(),
             material: _material,
             entering_material: true,
             u: f32::NAN,
@@ -37,9 +31,9 @@ impl SurfaceInteraction {
 
     pub fn failure() -> Self {
         return Self {
-            distance: f32::INFINITY,
-            hit_point: Point::invalid(),
-            normal: Normal::invalid(),
+            t: f32::INFINITY,
+            p: Point::invalid(),
+            n: Normal::invalid(),
             material: Arc::new(NullMaterial {}),
             entering_material: true,
             u: f32::NAN,
@@ -49,6 +43,6 @@ impl SurfaceInteraction {
     }
 
     pub fn intersected(&self) -> bool {
-        return self.distance.is_finite();
+        return self.t.is_finite();
     }
 }

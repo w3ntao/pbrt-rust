@@ -48,9 +48,9 @@ impl Bounds {
     }
 
     pub fn intersect(&self, ray: &Ray) -> (f32, f32) {
-        let no_intersection = (f32::INFINITY, -f32::INFINITY);
+        let no_hit = (f32::INFINITY, -f32::INFINITY);
         if self.is_empty() {
-            return no_intersection;
+            return no_hit;
         }
 
         let mut t_min = -f32::INFINITY;
@@ -59,7 +59,7 @@ impl Bounds {
         for axis in 0..3 {
             if ray.d[axis] == 0.0 {
                 if ray.o[axis] < self.p_min[axis] || ray.o[axis] > self.p_max[axis] {
-                    return no_intersection;
+                    return no_hit;
                 }
             } else {
                 let mut t1 = (self.p_min[axis] - ray.o[axis]) / ray.d[axis];
@@ -70,7 +70,7 @@ impl Bounds {
                 t_min = t_min.max(t1);
                 t_max = t_max.min(t2);
                 if t_min > t_max {
-                    return no_intersection;
+                    return no_hit;
                 }
             }
         }

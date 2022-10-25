@@ -15,16 +15,20 @@ impl Metal {
 }
 
 impl Material for Metal {
-    fn scatter(&self, incoming_ray: Ray, intersection: &SurfaceInteraction) -> (bool, Ray, Color) {
-        let reflected = incoming_ray.d.reflect(intersection.normal);
+    fn scatter(
+        &self,
+        incoming_ray: Ray,
+        surface_interaction: &SurfaceInteraction,
+    ) -> (bool, Ray, Color) {
+        let reflected = incoming_ray.d.reflect(surface_interaction.n);
 
         let scattered_ray = Ray::new(
-            intersection.hit_point,
+            surface_interaction.p,
             reflected + self.fuzz * random_in_unit_sphere(),
         );
 
         return (
-            intersection.normal.dot(scattered_ray.d) > 0.0,
+            surface_interaction.n.dot(scattered_ray.d) > 0.0,
             scattered_ray,
             self.albedo,
         );

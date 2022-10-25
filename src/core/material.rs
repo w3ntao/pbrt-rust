@@ -4,12 +4,12 @@ pub trait Material: Send + Sync {
     fn scatter(
         &self,
         _incoming_ray: Ray,
-        _intersection: &SurfaceInteraction,
+        _surface_interaction: &SurfaceInteraction,
     ) -> (bool, Ray, Color) {
         panic!("scatter() not implemented for this Material");
     }
 
-    fn emit(&self, _intersection: &SurfaceInteraction) -> Color {
+    fn emit(&self, _surface_interaction: &SurfaceInteraction) -> Color {
         return Color::black();
     }
 

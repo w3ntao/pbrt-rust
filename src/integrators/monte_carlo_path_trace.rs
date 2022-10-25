@@ -25,22 +25,23 @@ impl Integrator for MonteCarloPathTrace {
         let mut random_generator = RandomF32Generator::new(0.0, 1.0);
 
         for depth in 0..u32::MAX {
-            let intersection = self.world.intersect(&ray, INTERSECT_OFFSET, f32::INFINITY);
+            let surface_interaction = self.world.intersect(&ray, INTERSECT_OFFSET, f32::INFINITY);
             // with INTERSECT_OFFSET, we can avoid the situation when the ray
             // re-hit the surface it just leave
 
-            if !intersection.intersected() {
+            if !surface_interaction.intersected() {
                 radiance += throughput * self.background;
                 break;
             }
 
-            if intersection.normal.dot(ray.d) < 0.0 {
+            if surface_interaction.n.dot(ray.d) < 0.0 {
                 // so the light emits uni-directionally
-                radiance += throughput * intersection.material.emit(&intersection);
+                radiance += throughput * surface_interaction.material.emit(&surface_interaction);
             }
 
-            let (scattered, scattered_ray, attenuation) =
-                intersection.material.scatter(ray, &intersection);
+            let (scattered, scattered_ray, attenuation) = surface_interaction
+                .material
+                .scatter(ray, &surface_interaction);
             if !scattered {
                 break;
             }

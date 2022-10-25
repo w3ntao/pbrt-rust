@@ -27,7 +27,7 @@ pub struct Triangle {
     mesh_index: usize,
     mesh_root: Arc<TriangleMesh>,
     material: Arc<dyn Material>,
-    id: u128,
+    object_id: u128,
 }
 
 impl Triangle {
@@ -36,7 +36,7 @@ impl Triangle {
             mesh_index: _index,
             material: Arc::new(NullMaterial {}),
             mesh_root: _mesh,
-            id: random_u128(),
+            object_id: random_u128(),
         };
     }
 }
@@ -100,6 +100,6 @@ impl Primitive for Triangle {
     }
 
     fn get_id(&self) -> u128 {
-        return self.id;
+        return self.object_id;
     }
 }

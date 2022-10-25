@@ -68,34 +68,35 @@ impl Node {
         }
 
         if self.left.is_none() && self.right.is_none() {
-            let mut closest_intersect = SurfaceInteraction::failure();
-            let mut closest_distance = t_max;
+            let mut closest_surface_interaction = SurfaceInteraction::failure();
+            let mut closest_t = t_max;
 
             for idx in self.start..self.end {
                 let p = &primitives[idx];
-                let intersect = p.intersect(ray, t_min, closest_distance);
-                if intersect.intersected() {
-                    closest_distance = intersect.distance;
-                    closest_intersect = intersect;
+                let surface_interaction = p.intersect(ray, t_min, closest_t);
+                if surface_interaction.intersected() {
+                    closest_t = surface_interaction.t;
+                    closest_surface_interaction = surface_interaction;
                 }
             }
 
-            return closest_intersect;
+            return closest_surface_interaction;
         }
 
         let left_node = self.left.as_ref().unwrap();
         let right_node = self.right.as_ref().unwrap();
 
-        let left_intersect = left_node.intersect(ray, t_min, t_max, primitives);
-        if !left_intersect.intersected() {
+        let left_surface_interaction = left_node.intersect(ray, t_min, t_max, primitives);
+        if !left_surface_interaction.intersected() {
             return right_node.intersect(ray, t_min, t_max, primitives);
         }
 
-        let right_intersect = right_node.intersect(ray, t_min, left_intersect.distance, primitives);
-        return if right_intersect.intersected() {
-            right_intersect
+        let right_surface_interaction =
+            right_node.intersect(ray, t_min, left_surface_interaction.t, primitives);
+        return if right_surface_interaction.intersected() {
+            right_surface_interaction
         } else {
-            left_intersect
+            left_surface_interaction
         };
     }
 }

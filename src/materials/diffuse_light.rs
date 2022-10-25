@@ -15,9 +15,11 @@ impl Material for DiffuseLight {
         return (false, Ray::dummy(), Color::black());
     }
 
-    fn emit(&self, intersection: &SurfaceInteraction) -> Color {
-        return self
-            .emission
-            .get_color(intersection.u, intersection.v, intersection.hit_point);
+    fn emit(&self, surface_interaction: &SurfaceInteraction) -> Color {
+        return self.emission.get_color(
+            surface_interaction.u,
+            surface_interaction.v,
+            surface_interaction.p,
+        );
     }
 }

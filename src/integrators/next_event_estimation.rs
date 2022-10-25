@@ -13,18 +13,22 @@ impl NextEventEstimation {
 const RUSSIAN_ROULETTE_THRESHOLD: f32 = 0.8;
 
 impl NextEventEstimation {
-    fn get_direct_illumination(&self, intersection: &SurfaceInteraction, ray: &Ray) -> Color {
+    fn get_direct_illumination(
+        &self,
+        surface_interaction: &SurfaceInteraction,
+        ray: &Ray,
+    ) -> Color {
         let (light_id, light_point, light_normal, light_area) = self.world.sample_light();
-        let towards_light = light_point - intersection.hit_point;
+        let towards_light = light_point - surface_interaction.p;
         let distance_squared = towards_light.length_squared();
         let towards_light = towards_light.normalize();
 
         // sampled light at the back side of object normal
-        if intersection.normal.dot(towards_light) <= 0.0 {
+        if surface_interaction.n.dot(towards_light) <= 0.0 {
             return Color::black();
         }
 
-        let shadow_ray = Ray::new(intersection.hit_point, towards_light);
+        let shadow_ray = Ray::new(surface_interaction.p, towards_light);
 
         // with light_cosine, the light emits uni-directionally
         let light_cosine = light_normal.cosine(-towards_light);
@@ -32,21 +36,27 @@ impl NextEventEstimation {
             return Color::black();
         }
 
-        let shadow_intersection =
+        let shadow_surface_interaction =
             self.world
                 .intersect(&shadow_ray, INTERSECT_OFFSET, f32::INFINITY);
 
         // couldn't reach the sampled light
-        if !shadow_intersection.intersected() || shadow_intersection.object_id != light_id {
+        if !shadow_surface_interaction.intersected()
+            || shadow_surface_interaction.object_id != light_id
+        {
             return Color::black();
         }
 
         let sample_light_pdf = distance_squared / (light_cosine * light_area);
 
-        return shadow_intersection.material.emit(&shadow_intersection)
-            * intersection
-                .material
-                .scattering_pdf(ray.d, intersection.normal, towards_light)
+        return shadow_surface_interaction
+            .material
+            .emit(&shadow_surface_interaction)
+            * surface_interaction.material.scattering_pdf(
+                ray.d,
+                surface_interaction.n,
+                towards_light,
+            )
             / sample_light_pdf;
     }
 }
@@ -61,36 +71,38 @@ impl Integrator for NextEventEstimation {
         let mut random_generator = RandomF32Generator::new(0.0, 1.0);
 
         for depth in 0..u32::MAX {
-            let intersection = self.world.intersect(&ray, INTERSECT_OFFSET, f32::INFINITY);
+            let surface_interaction = self.world.intersect(&ray, INTERSECT_OFFSET, f32::INFINITY);
             // with INTERSECT_OFFSET, we can avoid the situation when the ray
             // re-hit the surface it just leave
 
-            if !intersection.intersected() {
+            if !surface_interaction.intersected() {
                 break;
             }
 
-            let emission = intersection.material.emit(&intersection);
+            let emission = surface_interaction.material.emit(&surface_interaction);
 
-            let (scattered, scattered_ray, attenuation) =
-                intersection.material.scatter(ray, &intersection);
+            let (scattered, scattered_ray, attenuation) = surface_interaction
+                .material
+                .scatter(ray, &surface_interaction);
             if !scattered {
                 if depth == 0 || last_hit_specular {
-                    if intersection.normal.dot(ray.d) < 0.0 {
+                    if surface_interaction.n.dot(ray.d) < 0.0 {
                         radiance += throughput * emission;
                     }
                 }
                 break;
             }
 
-            if intersection.normal.dot(ray.d) < 0.0 {
+            if surface_interaction.n.dot(ray.d) < 0.0 {
                 // so the light emits uni-directionally
                 radiance += throughput * emission;
             }
 
-            last_hit_specular = intersection.material.is_specular();
+            last_hit_specular = surface_interaction.material.is_specular();
             if !last_hit_specular {
-                radiance +=
-                    throughput * attenuation * self.get_direct_illumination(&intersection, &ray);
+                radiance += throughput
+                    * attenuation
+                    * self.get_direct_illumination(&surface_interaction, &ray);
             }
 
             if depth > 5 {

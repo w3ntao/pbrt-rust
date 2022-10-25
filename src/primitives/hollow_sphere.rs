@@ -16,21 +16,24 @@ impl HollowSphere {
 
 impl Primitive for HollowSphere {
     fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> SurfaceInteraction {
-        let external_intersection = self.external_sphere.intersect(ray, t_min, t_max);
-        if !external_intersection.intersected() || external_intersection.entering_material {
-            return external_intersection;
+        let external_surface_interaction = self.external_sphere.intersect(ray, t_min, t_max);
+        if !external_surface_interaction.intersected()
+            || external_surface_interaction.entering_material
+        {
+            return external_surface_interaction;
         }
 
-        let mut internal_intersection =
+        let mut internal_surface_interaction =
             self.internal_sphere
-                .intersect(ray, INTERSECT_OFFSET, external_intersection.distance);
-        if !internal_intersection.intersected() {
-            return external_intersection;
+                .intersect(ray, INTERSECT_OFFSET, external_surface_interaction.t);
+        if !internal_surface_interaction.intersected() {
+            return external_surface_interaction;
         }
 
-        internal_intersection.entering_material = !internal_intersection.entering_material;
+        internal_surface_interaction.entering_material =
+            !internal_surface_interaction.entering_material;
 
-        return internal_intersection;
+        return internal_surface_interaction;
     }
 
     fn get_bounds(&self) -> Bounds {

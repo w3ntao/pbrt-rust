@@ -60,7 +60,7 @@ impl Primitive for Sphere {
         let hit_point = ray(root);
         let normal = (hit_point - self.center) / self.radius;
 
-        let mut intersection = SurfaceInteraction::new(
+        let mut surface_interaction = SurfaceInteraction::new(
             root,
             hit_point,
             Normal::from(normal),
@@ -69,15 +69,15 @@ impl Primitive for Sphere {
         );
 
         if ray.d.dot(normal) > 0.0 {
-            intersection.entering_material = false;
-            intersection.normal = -intersection.normal;
+            surface_interaction.entering_material = false;
+            surface_interaction.n = -surface_interaction.n;
         }
 
         let (u, v) = get_sphere_uv(Point::from((hit_point - self.center).normalize()));
-        intersection.u = u;
-        intersection.v = v;
+        surface_interaction.u = u;
+        surface_interaction.v = v;
 
-        return intersection;
+        return surface_interaction;
     }
 
     fn get_bounds(&self) -> Bounds {

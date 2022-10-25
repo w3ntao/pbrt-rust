@@ -28,9 +28,13 @@ fn reflectance(cosine: f32, index_of_refraction: f32) -> f32 {
 }
 
 impl Material for Glass {
-    fn scatter(&self, incoming_ray: Ray, intersection: &SurfaceInteraction) -> (bool, Ray, Color) {
+    fn scatter(
+        &self,
+        incoming_ray: Ray,
+        surface_interaction: &SurfaceInteraction,
+    ) -> (bool, Ray, Color) {
         let refraction_ratio = {
-            if intersection.entering_material {
+            if surface_interaction.entering_material {
                 1.0 / self.index_of_refraction
             } else {
                 // otherwise leaving the material
@@ -38,7 +42,7 @@ impl Material for Glass {
             }
         };
 
-        let normal = intersection.normal;
+        let normal = surface_interaction.n;
 
         let cosine_theta = normal.cosine(-incoming_ray.d);
         let sine_theta = (1.0 - cosine_theta * cosine_theta).sqrt();
@@ -52,7 +56,7 @@ impl Material for Glass {
             refract(incoming_ray.d, normal, refraction_ratio)
         };
 
-        let scattered_ray = Ray::new(intersection.hit_point, direction);
+        let scattered_ray = Ray::new(surface_interaction.p, direction);
         return (true, scattered_ray, Color::new(1.0, 1.0, 1.0));
     }
 
