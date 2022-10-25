@@ -44,7 +44,6 @@ impl Renderer {
         let one_second = time::Duration::from_secs(1);
 
         let mut last_length = total_job;
-        print!("time left: estimating...");
         let _ = io::stdout().flush();
         loop {
             thread::sleep(one_second);

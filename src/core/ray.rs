@@ -4,17 +4,23 @@ use crate::core::pbrt::*;
 pub struct Ray {
     pub o: Point,
     pub d: Vector3,
+    pub t_max: f32,
 }
 
 impl Ray {
     pub fn new(_o: Point, _d: Vector3) -> Self {
-        return Self { o: _o, d: _d };
+        return Self {
+            o: _o,
+            d: _d,
+            t_max: f32::INFINITY,
+        };
     }
 
     pub fn dummy() -> Self {
         Self {
             o: Point::invalid(),
             d: Vector3::invalid(),
+            t_max: f32::NAN,
         }
     }
 }

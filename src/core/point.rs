@@ -24,6 +24,10 @@ impl Point {
         return !self.x.is_nan() && !self.y.is_nan() && !self.z.is_nan();
     }
 
+    pub fn permute(self, dim_x: usize, dim_y: usize, dim_z: usize) -> Point {
+        return Point::new(self[dim_x], self[dim_y], self[dim_z]);
+    }
+
     fn min(&self, b: Point) -> Point {
         return Point::new(self.x.min(b.x), self.y.min(b.y), self.z.min(b.z));
     }

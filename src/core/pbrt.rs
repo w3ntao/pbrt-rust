@@ -55,6 +55,7 @@ pub use rand::{thread_rng, Rng};
 
 pub use rand_distr::num_traits::Pow;
 
+use std::any::type_name;
 pub use std::f32::consts::PI;
 pub use std::fs;
 pub use std::io::{BufWriter, Write};
@@ -65,3 +66,12 @@ pub use std::thread::JoinHandle;
 pub use std::time::Instant;
 pub use std::{io, thread, time};
 pub use std::{mem, ops};
+
+pub fn type_of<T>(_: T) -> &'static str {
+    type_name::<T>()
+}
+
+pub fn gamma(n: i32) -> f32 {
+    let machine_epsilon = f32::EPSILON * 0.5;
+    return (n as f32 * machine_epsilon) / ((1 - n) as f32 * machine_epsilon);
+}

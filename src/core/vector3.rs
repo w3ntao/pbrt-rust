@@ -20,6 +20,34 @@ impl Vector3 {
         return Vector3::new(f32::NAN, f32::NAN, f32::NAN);
     }
 
+    pub fn max_dimension(self) -> usize {
+        if self.x > self.y && self.x > self.z {
+            return 0;
+        }
+        if self.y > self.z {
+            return 1;
+        }
+        return 2;
+    }
+
+    pub fn max_component(self) -> f32 {
+        if self.x > self.y && self.x > self.z {
+            return self.x;
+        }
+        if self.y > self.z {
+            return self.y;
+        }
+        return self.z;
+    }
+
+    pub fn abs(self) -> Vector3 {
+        return Vector3::new(self.x.abs(), self.y.abs(), self.z.abs());
+    }
+
+    pub fn permute(self, dim_x: usize, dim_y: usize, dim_z: usize) -> Vector3 {
+        return Vector3::new(self[dim_x], self[dim_y], self[dim_z]);
+    }
+
     pub fn dot(&self, rhs: Vector3) -> f32 {
         let mut product = 0.0;
         for idx in 0..3 {
@@ -47,6 +75,16 @@ impl Vector3 {
 
     pub fn reflect(&self, normal: Normal) -> Vector3 {
         return *self - 2.0 * normal.dot(*self) * Vector3::from(normal);
+    }
+}
+
+impl From<Point> for Vector3 {
+    fn from(p: Point) -> Self {
+        Vector3 {
+            x: p.x,
+            y: p.y,
+            z: p.z,
+        }
     }
 }
 
