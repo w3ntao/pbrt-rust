@@ -28,7 +28,7 @@ impl Integrator for MonteCarloPathTrace {
             let mut interaction = SurfaceInteraction::failure();
             if !self
                 .world
-                .intersect(&ray, INTERSECT_OFFSET, f32::INFINITY, &mut interaction)
+                .intersect(&ray, INTERSECT_OFFSET, &mut interaction)
             {
                 radiance += throughput * self.background;
                 break;

@@ -21,13 +21,7 @@ impl AxisAlignedBox {
 }
 
 impl Primitive for AxisAlignedBox {
-    fn intersect(
-        &self,
-        ray: &Ray,
-        t_min: f32,
-        t_max: f32,
-        interaction: &mut SurfaceInteraction,
-    ) -> bool {
+    fn intersect(&self, ray: &Ray, t_min: f32, interaction: &mut SurfaceInteraction) -> bool {
         let mut root_in = -f32::INFINITY;
         let mut root_out = f32::INFINITY;
         let mut normal = Normal::invalid();
@@ -62,7 +56,7 @@ impl Primitive for AxisAlignedBox {
             }
         }
 
-        if root_in < t_min || root_in > t_max {
+        if root_in < t_min || root_in > ray.t_max {
             return false;
         }
 

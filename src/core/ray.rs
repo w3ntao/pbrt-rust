@@ -8,11 +8,19 @@ pub struct Ray {
 }
 
 impl Ray {
-    pub fn new(_o: Point, _d: Vector3) -> Self {
+    pub fn new(_o: Point, _d: Vector3, _t_max: f32) -> Self {
         return Self {
             o: _o,
             d: _d,
-            t_max: f32::INFINITY,
+            t_max: _t_max,
+        };
+    }
+
+    pub fn update_t(self, new_t: f32) -> Ray {
+        return Ray {
+            o: self.o,
+            d: self.d,
+            t_max: new_t,
         };
     }
 

@@ -28,7 +28,7 @@ impl NextEventEstimation {
             return Color::black();
         }
 
-        let shadow_ray = Ray::new(surface_interaction.p, towards_light);
+        let shadow_ray = Ray::new(surface_interaction.p, towards_light, f32::INFINITY);
 
         // with light_cosine, the light emits uni-directionally
         let light_cosine = light_normal.cosine(-towards_light);
@@ -41,7 +41,6 @@ impl NextEventEstimation {
         if !self.world.intersect(
             &shadow_ray,
             INTERSECT_OFFSET,
-            f32::INFINITY,
             &mut shadow_surface_interaction,
         ) || shadow_surface_interaction.object_id != light_id
         {
@@ -78,7 +77,7 @@ impl Integrator for NextEventEstimation {
 
             if !self
                 .world
-                .intersect(&ray, INTERSECT_OFFSET, f32::INFINITY, &mut interaction)
+                .intersect(&ray, INTERSECT_OFFSET, &mut interaction)
             {
                 break;
             }

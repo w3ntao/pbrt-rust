@@ -28,7 +28,11 @@ impl Material for Lambertian {
         let uvw = OrthonormalBasis::build_from_w(Vector3::from(surface_interaction.n));
         let random_direction = uvw.local(random_cosine_direction());
 
-        let scattered_ray = Ray::new(surface_interaction.p, random_direction.normalize());
+        let scattered_ray = Ray::new(
+            surface_interaction.p,
+            random_direction.normalize(),
+            f32::INFINITY,
+        );
 
         return (
             true,

@@ -85,7 +85,11 @@ impl Camera for DepthOfField {
                 let rd_y = rd_y * self.aperture / 2.0;
                 let origin = self.center + self.horizontal * rd_x + self.vertical * rd_y;
 
-                rays.push(Ray::new(origin, (target - origin).normalize()));
+                rays.push(Ray::new(
+                    origin,
+                    (target - origin).normalize(),
+                    f32::INFINITY,
+                ));
             }
         }
 

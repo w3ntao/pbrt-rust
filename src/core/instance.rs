@@ -11,7 +11,6 @@ impl Primitive for Instance {
         &self,
         ray: &Ray,
         t_min: f32,
-        t_max: f32,
         surface_interaction: &mut SurfaceInteraction,
     ) -> bool {
         let (inverted_ray, inverted_distance) = (self.transform)(ray);
@@ -19,7 +18,6 @@ impl Primitive for Instance {
         if !self.primitive.intersect(
             &inverted_ray,
             t_min / inverted_distance,
-            t_max / inverted_distance,
             surface_interaction,
         ) {
             return false;

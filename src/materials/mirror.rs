@@ -17,6 +17,7 @@ impl Material for Mirror {
         let scattered_ray = Ray::new(
             surface_interaction.p,
             incoming_ray.d.reflect(surface_interaction.n),
+            f32::INFINITY,
         );
 
         return (true, scattered_ray, Color::new(1.0, 1.0, 1.0));

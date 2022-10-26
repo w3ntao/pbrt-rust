@@ -25,6 +25,7 @@ impl Material for Metal {
         let scattered_ray = Ray::new(
             surface_interaction.p,
             reflected + self.fuzz * random_in_unit_sphere(),
+            f32::INFINITY,
         );
 
         return (

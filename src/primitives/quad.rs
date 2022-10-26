@@ -25,13 +25,7 @@ impl Quad {
 }
 
 impl Primitive for Quad {
-    fn intersect(
-        &self,
-        ray: &Ray,
-        t_min: f32,
-        t_max: f32,
-        interaction: &mut SurfaceInteraction,
-    ) -> bool {
+    fn intersect(&self, ray: &Ray, t_min: f32, interaction: &mut SurfaceInteraction) -> bool {
         let ab = cross(self.span0, self.span1);
         let det = -ab.dot(ray.d);
         if det == 0.0 {
@@ -41,7 +35,7 @@ impl Primitive for Quad {
         let c = ray.o - self.origin;
         let det_t = ab.dot(c);
         let t = det_t / det;
-        if t < t_min || t > t_max {
+        if t < t_min || t > ray.t_max {
             return false;
         }
         let beta = c.dot(cross(ray.d, self.span1)) / det;

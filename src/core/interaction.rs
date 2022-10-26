@@ -41,8 +41,4 @@ impl SurfaceInteraction {
             object_id: 0,
         };
     }
-
-    pub fn intersected(&self) -> bool {
-        return self.t.is_finite();
-    }
 }
