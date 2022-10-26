@@ -91,16 +91,16 @@ impl Node {
         }
 
         let mut right_interaction = SurfaceInteraction::failure();
-        if !right_node.intersect(
+        if right_node.intersect(
             &ray.update_t(left_interaction.t),
             t_min,
             primitives,
             &mut right_interaction,
         ) {
-            *interaction = left_interaction;
-        } else {
             *interaction = right_interaction;
+            return true;
         }
+        *interaction = left_interaction;
         return true;
     }
 }

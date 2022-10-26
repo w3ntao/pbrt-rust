@@ -8,7 +8,7 @@ pub fn test(width: usize, height: usize, samples: u32) {
     let ppm_name = format!("{}_{}.ppm", file_name, samples);
     println!("TESTING: {} for {} samples per pixel", &file_name, samples);
 
-    let integrator = MonteCarloPathTrace::new(Arc::new(cornell_box()), Color::black());
+    let integrator = PathTrace::new(Arc::new(cornell_box()), Color::black());
     let renderer = Renderer::new(
         Arc::new(cornell_box_camera(width, height)),
         Arc::new(integrator),

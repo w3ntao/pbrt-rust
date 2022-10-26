@@ -62,7 +62,7 @@ pub fn test(width: usize, height: usize, samples: u32) {
         (camera_center - middle_dragon_center).length(),
     );
 
-    let integrator = MonteCarloPathTrace::new(Arc::new(scene), Color::new(0.7, 0.8, 1.0));
+    let integrator = PathTrace::new(Arc::new(scene), Color::new(0.7, 0.8, 1.0));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
     let image = renderer.render(width, height);
     image.write(&ppm_name);

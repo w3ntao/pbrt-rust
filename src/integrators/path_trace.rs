@@ -1,11 +1,11 @@
 use crate::core::pbrt::*;
 
-pub struct MonteCarloPathTrace {
+pub struct PathTrace {
     world: Arc<World>,
     background: Color,
 }
 
-impl MonteCarloPathTrace {
+impl PathTrace {
     pub fn new(_world: Arc<World>, _background: Color) -> Self {
         return Self {
             world: _world,
@@ -16,7 +16,7 @@ impl MonteCarloPathTrace {
 
 const RUSSIAN_ROULETTE_THRESHOLD: f32 = 0.8;
 
-impl Integrator for MonteCarloPathTrace {
+impl Integrator for PathTrace {
     fn get_radiance(&self, ray: Ray) -> Color {
         let mut radiance = Color::black();
         let mut throughput = Color::new(1.0, 1.0, 1.0);

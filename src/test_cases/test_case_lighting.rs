@@ -46,7 +46,7 @@ pub fn test(width: usize, height: usize, samples: u32) {
         (look_at - camera_center).length(),
     );
 
-    let integrator = MonteCarloPathTrace::new(Arc::new(scene), Color::new(0.0, 0.0, 0.0));
+    let integrator = PathTrace::new(Arc::new(scene), Color::new(0.0, 0.0, 0.0));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
     let image = renderer.render(width, height);
     image.write(&ppm_name);
