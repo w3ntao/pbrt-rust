@@ -104,6 +104,12 @@ impl Renderer {
                         }
 
                         let color = total / (self.samples as f32);
+                        if !color.is_finite() {
+                            panic!(
+                                "\n\ninfinite color rendered: {}\nat position (x={}, y={})\n\n",
+                                color, x, y
+                            );
+                        }
                         rendered_pixels.push((y, x, color));
                     }
                 }

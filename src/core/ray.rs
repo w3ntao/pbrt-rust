@@ -16,7 +16,7 @@ impl Ray {
         };
     }
 
-    pub fn update_t(self, new_t: f32) -> Ray {
+    pub fn update_t(&self, new_t: f32) -> Ray {
         return Ray {
             o: self.o,
             d: self.d,

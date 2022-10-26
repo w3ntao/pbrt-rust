@@ -1,4 +1,5 @@
 use crate::core::pbrt::*;
+use std::fmt::Formatter;
 
 #[derive(Copy, Clone)]
 pub struct Color {
@@ -20,8 +21,19 @@ impl Color {
         return Color::new(0.0, 0.0, 0.0);
     }
 
-    pub fn max_val(&self) -> f32 {
+    pub fn is_finite(&self) -> bool {
+        let finite = |x: f32| -> bool { x.is_finite() };
+        return finite(self.b) && finite(self.g) && finite(self.b);
+    }
+
+    pub fn max_component(&self) -> f32 {
         return self.r.max(self.g).max(self.b);
+    }
+}
+
+impl std::fmt::Display for Color {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "({}, {}, {})", self.r, self.g, self.b)
     }
 }
 

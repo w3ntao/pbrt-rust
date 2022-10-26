@@ -31,13 +31,7 @@ impl Vector3 {
     }
 
     pub fn max_component(self) -> f32 {
-        if self.x > self.y && self.x > self.z {
-            return self.x;
-        }
-        if self.y > self.z {
-            return self.y;
-        }
-        return self.z;
+        return self.x.max(self.y).max(self.z);
     }
 
     pub fn abs(self) -> Vector3 {

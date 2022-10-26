@@ -49,7 +49,7 @@ impl Integrator for MonteCarloPathTrace {
 
             if depth > 5 {
                 let russian_roulette_probability =
-                    throughput.max_val().min(RUSSIAN_ROULETTE_THRESHOLD);
+                    throughput.max_component().min(RUSSIAN_ROULETTE_THRESHOLD);
                 if random_generator.generate() > russian_roulette_probability {
                     break;
                 }
