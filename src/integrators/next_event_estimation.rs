@@ -36,13 +36,14 @@ impl NextEventEstimation {
             return Color::black();
         }
 
-        let shadow_surface_interaction =
-            self.world
-                .intersect(&shadow_ray, INTERSECT_OFFSET, f32::INFINITY);
-
+        let mut shadow_surface_interaction = SurfaceInteraction::failure();
         // couldn't reach the sampled light
-        if !shadow_surface_interaction.intersected()
-            || shadow_surface_interaction.object_id != light_id
+        if !self.world.intersect(
+            &shadow_ray,
+            INTERSECT_OFFSET,
+            f32::INFINITY,
+            &mut shadow_surface_interaction,
+        ) || shadow_surface_interaction.object_id != light_id
         {
             return Color::black();
         }
@@ -71,38 +72,39 @@ impl Integrator for NextEventEstimation {
         let mut random_generator = RandomF32Generator::new(0.0, 1.0);
 
         for depth in 0..u32::MAX {
-            let surface_interaction = self.world.intersect(&ray, INTERSECT_OFFSET, f32::INFINITY);
+            let mut interaction = SurfaceInteraction::failure();
             // with INTERSECT_OFFSET, we can avoid the situation when the ray
             // re-hit the surface it just leave
 
-            if !surface_interaction.intersected() {
+            if !self
+                .world
+                .intersect(&ray, INTERSECT_OFFSET, f32::INFINITY, &mut interaction)
+            {
                 break;
             }
 
-            let emission = surface_interaction.material.emit(&surface_interaction);
+            let emission = interaction.material.emit(&interaction);
 
-            let (scattered, scattered_ray, attenuation) = surface_interaction
-                .material
-                .scatter(ray, &surface_interaction);
+            let (scattered, scattered_ray, attenuation) =
+                interaction.material.scatter(ray, &interaction);
             if !scattered {
                 if depth == 0 || last_hit_specular {
-                    if surface_interaction.n.dot(ray.d) < 0.0 {
+                    if interaction.n.dot(ray.d) < 0.0 {
                         radiance += throughput * emission;
                     }
                 }
                 break;
             }
 
-            if surface_interaction.n.dot(ray.d) < 0.0 {
+            if interaction.n.dot(ray.d) < 0.0 {
                 // so the light emits uni-directionally
                 radiance += throughput * emission;
             }
 
-            last_hit_specular = surface_interaction.material.is_specular();
+            last_hit_specular = interaction.material.is_specular();
             if !last_hit_specular {
-                radiance += throughput
-                    * attenuation
-                    * self.get_direct_illumination(&surface_interaction, &ray);
+                radiance +=
+                    throughput * attenuation * self.get_direct_illumination(&interaction, &ray);
             }
 
             if depth > 5 {

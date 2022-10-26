@@ -28,12 +28,18 @@ impl World {
         self.scene.build_index();
     }
 
-    pub fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> SurfaceInteraction {
-        return self.scene.intersect(ray, t_min, t_max);
+    pub fn intersect(
+        &self,
+        ray: &Ray,
+        t_min: f32,
+        t_max: f32,
+        interaction: &mut SurfaceInteraction,
+    ) -> bool {
+        return self.scene.intersect(ray, t_min, t_max, interaction);
     }
 
     pub fn sample_light(&self) -> (u128, Point, Vector3, f32) {
-        let idx = rand::thread_rng().gen_range(0..self.lights.len());
+        let idx = thread_rng().gen_range(0..self.lights.len());
         let (point, normal) = self.lights[idx].sample();
 
         return (

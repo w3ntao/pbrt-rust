@@ -21,7 +21,13 @@ impl AxisAlignedBox {
 }
 
 impl Primitive for AxisAlignedBox {
-    fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> SurfaceInteraction {
+    fn intersect(
+        &self,
+        ray: &Ray,
+        t_min: f32,
+        t_max: f32,
+        interaction: &mut SurfaceInteraction,
+    ) -> bool {
         let mut root_in = -f32::INFINITY;
         let mut root_out = f32::INFINITY;
         let mut normal = Normal::invalid();
@@ -29,7 +35,7 @@ impl Primitive for AxisAlignedBox {
         for axis in 0..3 {
             if ray.d[axis] == 0.0 {
                 if self.axis_min[axis] > ray.o[axis] || self.axis_max[axis] < ray.o[axis] {
-                    return SurfaceInteraction::failure();
+                    return false;
                 }
             } else {
                 let t0 = (self.axis_min[axis] - ray.o[axis]) / ray.d[axis];
@@ -51,22 +57,24 @@ impl Primitive for AxisAlignedBox {
                     root_out = root_out.min(t1);
                 }
                 if root_out < root_in {
-                    return SurfaceInteraction::failure();
+                    return false;
                 }
             }
         }
 
         if root_in < t_min || root_in > t_max {
-            return SurfaceInteraction::failure();
+            return false;
         }
 
-        return SurfaceInteraction::new(
+        *interaction = SurfaceInteraction::new(
             root_in,
             ray(root_in),
             normal,
             self.material.clone(),
             self.get_id(),
         );
+
+        return true;
     }
 
     fn get_bounds(&self) -> Bounds {

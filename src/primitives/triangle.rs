@@ -42,7 +42,13 @@ impl Triangle {
 }
 
 impl Primitive for Triangle {
-    fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> SurfaceInteraction {
+    fn intersect(
+        &self,
+        ray: &Ray,
+        t_min: f32,
+        t_max: f32,
+        interaction: &mut SurfaceInteraction,
+    ) -> bool {
         let vertex_idx0 = self.mesh_root.indices[self.mesh_index];
         let vertex_idx1 = self.mesh_root.indices[self.mesh_index + 1];
         let vertex_idx2 = self.mesh_root.indices[self.mesh_index + 2];
@@ -100,12 +106,12 @@ impl Primitive for Triangle {
         }
 
         if (e0 < 0.0 || e1 < 0.0 || e2 < 0.0) && (e0 > 0.0 || e1 > 0.0 || e2 > 0.0) {
-            return SurfaceInteraction::failure();
+            return false;
         }
 
         let det = e0 + e1 + e2;
         if det == 0.0 {
-            return SurfaceInteraction::failure();
+            return false;
         }
 
         // Compute scaled hit distance to triangle and test against ray $t$ range
@@ -115,10 +121,10 @@ impl Primitive for Triangle {
 
         let tScaled = e0 * p0t.z + e1 * p1t.z + e2 * p2t.z;
         if det < 0.0 && (tScaled >= 0.0 || tScaled < ray.t_max * det) {
-            return SurfaceInteraction::failure();
+            return false;
         }
         if det > 0.0 && (tScaled <= 0.0 || tScaled > ray.t_max * det) {
-            return SurfaceInteraction::failure();
+            return false;
         }
 
         // Compute barycentric coordinates and $t$ value for triangle intersection
@@ -128,7 +134,7 @@ impl Primitive for Triangle {
         let b2 = e2 * invDet;
         let t = tScaled * invDet;
         if t < t_min || t > t_max {
-            return SurfaceInteraction::failure();
+            return false;
         }
 
         // Ensure that computed triangle $t$ is conservatively greater than zero
@@ -152,7 +158,7 @@ impl Primitive for Triangle {
             3.0 * (gamma(3) * maxE * maxZt + deltaE * maxZt + deltaZ * maxE) * invDet.abs();
 
         if t <= deltaT {
-            return SurfaceInteraction::failure();
+            return false;
         };
 
         let pHit = b0 * p0 + b1 * p1 + b2 * p2;
@@ -162,7 +168,9 @@ impl Primitive for Triangle {
             normal = -normal;
         }
 
-        return SurfaceInteraction::new(t, pHit, normal, self.material.clone(), self.object_id);
+        *interaction =
+            SurfaceInteraction::new(t, pHit, normal, self.material.clone(), self.object_id);
+        return true;
     }
 
     fn get_bounds(&self) -> Bounds {

@@ -37,7 +37,13 @@ fn get_sphere_uv(p: Point) -> (f32, f32) {
 }
 
 impl Primitive for Sphere {
-    fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> SurfaceInteraction {
+    fn intersect(
+        &self,
+        ray: &Ray,
+        t_min: f32,
+        t_max: f32,
+        interaction: &mut SurfaceInteraction,
+    ) -> bool {
         let oc = ray.o - self.center;
         let a = ray.d.length_squared();
         let half_b = oc.dot(ray.d);
@@ -45,7 +51,7 @@ impl Primitive for Sphere {
 
         let discriminant = half_b * half_b - a * c;
         if discriminant < 0.0 {
-            return SurfaceInteraction::failure();
+            return false;
         }
         let sqrt_d = discriminant.sqrt();
 
@@ -53,14 +59,14 @@ impl Primitive for Sphere {
         if root < t_min || root > t_max {
             root = (-half_b + sqrt_d) / a;
             if root < t_min || root > t_max {
-                return SurfaceInteraction::failure();
+                return false;
             }
         }
         let root = root;
         let hit_point = ray(root);
         let normal = (hit_point - self.center) / self.radius;
 
-        let mut surface_interaction = SurfaceInteraction::new(
+        *interaction = SurfaceInteraction::new(
             root,
             hit_point,
             Normal::from(normal),
@@ -69,15 +75,15 @@ impl Primitive for Sphere {
         );
 
         if ray.d.dot(normal) > 0.0 {
-            surface_interaction.entering_material = false;
-            surface_interaction.n = -surface_interaction.n;
+            interaction.entering_material = false;
+            interaction.n = -interaction.n;
         }
 
         let (u, v) = get_sphere_uv(Point::from((hit_point - self.center).normalize()));
-        surface_interaction.u = u;
-        surface_interaction.v = v;
+        interaction.u = u;
+        interaction.v = v;
 
-        return surface_interaction;
+        return true;
     }
 
     fn get_bounds(&self) -> Bounds {

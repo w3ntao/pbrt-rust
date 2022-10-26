@@ -12,12 +12,16 @@ impl RayCastingDotNormal {
 
 impl Integrator for RayCastingDotNormal {
     fn get_radiance(&self, ray: Ray) -> Color {
-        let surface_interaction = self.world.intersect(&ray, 0.0, f32::INFINITY);
-        if !surface_interaction.intersected() {
+        let mut interaction = SurfaceInteraction::failure();
+
+        if !self
+            .world
+            .intersect(&ray, 0.0, f32::INFINITY, &mut interaction)
+        {
             return Color::black();
         }
 
-        let normal = surface_interaction.n.normalize();
+        let normal = interaction.n.normalize();
         let grey = normal.dot(-ray.d).max(0.0);
         return Color::new(grey, grey, grey);
     }

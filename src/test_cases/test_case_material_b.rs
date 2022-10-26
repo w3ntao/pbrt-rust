@@ -15,7 +15,7 @@ pub fn scene_three_spheres() -> World {
     let mut sphere_center = Sphere::new(Point::new(0.0, 0.0, -1.0), 0.5);
     sphere_center.set_material(material_center);
 
-    let mut sphere_left = HollowSphere::new(Point::new(-1.0, 0.0, -1.0), 0.5, 0.05);
+    let mut sphere_left = Sphere::new(Point::new(-1.0, 0.0, -1.0), 0.5);
     sphere_left.set_material(glass);
 
     let mut sphere_right = Sphere::new(Point::new(1.0, 0.0, -1.0), 0.5);

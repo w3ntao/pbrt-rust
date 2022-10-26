@@ -7,20 +7,25 @@ pub struct Instance {
 }
 
 impl Primitive for Instance {
-    fn intersect(&self, ray: &Ray, t_min: f32, t_max: f32) -> SurfaceInteraction {
+    fn intersect(
+        &self,
+        ray: &Ray,
+        t_min: f32,
+        t_max: f32,
+        surface_interaction: &mut SurfaceInteraction,
+    ) -> bool {
         let (inverted_ray, inverted_distance) = (self.transform)(ray);
-        let mut surface_interaction = self.primitive.intersect(
+
+        if !self.primitive.intersect(
             &inverted_ray,
             t_min / inverted_distance,
             t_max / inverted_distance,
-        );
-
-        if !surface_interaction.intersected() {
-            return surface_interaction;
+            surface_interaction,
+        ) {
+            return false;
         }
 
         surface_interaction.n = (self.transform)(surface_interaction.n);
-
         surface_interaction.t = surface_interaction.t / inverted_distance;
         surface_interaction.p = ray(surface_interaction.t);
 
@@ -28,7 +33,7 @@ impl Primitive for Instance {
             surface_interaction.material = self.material.clone();
         }
 
-        return surface_interaction;
+        return true;
     }
 
     fn get_bounds(&self) -> Bounds {

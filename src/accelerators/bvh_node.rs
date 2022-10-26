@@ -61,43 +61,49 @@ impl Node {
         t_min: f32,
         t_max: f32,
         primitives: &Vec<Arc<dyn Primitive>>,
-    ) -> SurfaceInteraction {
+        interaction: &mut SurfaceInteraction,
+    ) -> bool {
         let (t1, t2) = self.bounds.intersect(ray);
         if t1 > t2 || t1 > t_max || t2 < t_min {
-            return SurfaceInteraction::failure();
+            return false;
         }
 
         if self.left.is_none() && self.right.is_none() {
-            let mut closest_surface_interaction = SurfaceInteraction::failure();
             let mut closest_t = t_max;
-
+            let mut hit = false;
             for idx in self.start..self.end {
                 let p = &primitives[idx];
-                let surface_interaction = p.intersect(ray, t_min, closest_t);
-                if surface_interaction.intersected() {
-                    closest_t = surface_interaction.t;
-                    closest_surface_interaction = surface_interaction;
+
+                if p.intersect(ray, t_min, closest_t, interaction) {
+                    closest_t = interaction.t;
+                    hit = true;
                 }
             }
 
-            return closest_surface_interaction;
+            return hit;
         }
 
         let left_node = self.left.as_ref().unwrap();
         let right_node = self.right.as_ref().unwrap();
 
-        let left_surface_interaction = left_node.intersect(ray, t_min, t_max, primitives);
-        if !left_surface_interaction.intersected() {
-            return right_node.intersect(ray, t_min, t_max, primitives);
+        let mut left_interaction = SurfaceInteraction::failure();
+        if !left_node.intersect(ray, t_min, t_max, primitives, &mut left_interaction) {
+            return right_node.intersect(ray, t_min, t_max, primitives, interaction);
         }
 
-        let right_surface_interaction =
-            right_node.intersect(ray, t_min, left_surface_interaction.t, primitives);
-        return if right_surface_interaction.intersected() {
-            right_surface_interaction
+        let mut right_interaction = SurfaceInteraction::failure();
+        if !right_node.intersect(
+            ray,
+            t_min,
+            left_interaction.t,
+            primitives,
+            &mut right_interaction,
+        ) {
+            *interaction = left_interaction;
         } else {
-            left_surface_interaction
-        };
+            *interaction = right_interaction;
+        }
+        return true;
     }
 }
 
