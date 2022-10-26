@@ -85,22 +85,11 @@ impl Node {
         let left_node = self.left.as_ref().unwrap();
         let right_node = self.right.as_ref().unwrap();
 
-        let mut left_interaction = SurfaceInteraction::failure();
-        if !left_node.intersect(ray, t_min, primitives, &mut left_interaction) {
+        if !left_node.intersect(ray, t_min, primitives, interaction) {
             return right_node.intersect(ray, t_min, primitives, interaction);
         }
 
-        let mut right_interaction = SurfaceInteraction::failure();
-        if right_node.intersect(
-            &ray.update_t(left_interaction.t),
-            t_min,
-            primitives,
-            &mut right_interaction,
-        ) {
-            *interaction = right_interaction;
-            return true;
-        }
-        *interaction = left_interaction;
+        right_node.intersect(&ray.update_t(interaction.t), t_min, primitives, interaction);
         return true;
     }
 }
