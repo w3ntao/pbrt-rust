@@ -18,9 +18,9 @@ impl NextEventEstimation {
         surface_interaction: &SurfaceInteraction,
         ray: &Ray,
     ) -> Color {
-        let (light_id, light_point, light_normal, light_area) = self.world.sample_light();
+        let (light_point, light_normal, light_area) = self.world.sample_light();
         let towards_light = light_point - surface_interaction.p;
-        let distance_squared = towards_light.length_squared();
+        let distance = towards_light.length();
         let towards_light = towards_light.normalize();
 
         // sampled light at the back side of object normal
@@ -28,30 +28,39 @@ impl NextEventEstimation {
             return Color::black();
         }
 
-        let shadow_ray = Ray::new(surface_interaction.p, towards_light, f32::INFINITY);
-
         // with light_cosine, the light emits uni-directionally
         let light_cosine = light_normal.cosine(-towards_light);
         if light_cosine <= 0.0 {
             return Color::black();
         }
 
-        let mut shadow_surface_interaction = SurfaceInteraction::failure();
+        let shadow_epsilon = 0.001;
+        let shadow_ray = Ray::new(
+            surface_interaction.p,
+            towards_light,
+            distance * (1.0 + shadow_epsilon),
+        );
+
+        let mut light_surface_interaction = SurfaceInteraction::failure();
         // couldn't reach the sampled light
         if !self.world.intersect(
             &shadow_ray,
             INTERSECT_OFFSET,
-            &mut shadow_surface_interaction,
-        ) || shadow_surface_interaction.object_id != light_id
+            &mut light_surface_interaction,
+        ) {
+            return Color::black();
+        }
+
+        if !light_surface_interaction.material.is_light_source()
+            || light_surface_interaction.t < distance * (1.0 - shadow_epsilon)
         {
             return Color::black();
         }
 
-        let sample_light_pdf = distance_squared / (light_cosine * light_area);
-
-        return shadow_surface_interaction
+        let sample_light_pdf = distance * distance / (light_cosine * light_area);
+        return light_surface_interaction
             .material
-            .emit(&shadow_surface_interaction)
+            .emit(&light_surface_interaction)
             * surface_interaction.material.scattering_pdf(
                 ray.d,
                 surface_interaction.n,

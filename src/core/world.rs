@@ -32,15 +32,10 @@ impl World {
         return self.scene.intersect(ray, t_min, interaction);
     }
 
-    pub fn sample_light(&self) -> (u128, Point, Vector3, f32) {
+    pub fn sample_light(&self) -> (Point, Vector3, f32) {
         let idx = thread_rng().gen_range(0..self.lights.len());
         let (point, normal) = self.lights[idx].sample();
 
-        return (
-            self.lights[idx].get_id(),
-            point,
-            normal,
-            self.lights[idx].get_area(),
-        );
+        return (point, normal, self.lights[idx].get_area());
     }
 }

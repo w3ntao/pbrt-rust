@@ -21,6 +21,10 @@ pub trait Material: Send + Sync {
         return false;
     }
 
+    fn is_light_source(&self) -> bool {
+        return false;
+    }
+
     fn scattering_pdf(
         &self,
         _incoming_direction: Vector3,
