@@ -1,5 +1,7 @@
 use crate::core::pbrt::*;
 
+const SHADOW_EPSILON: f32 = 0.001;
+
 pub struct NextEventEstimation {
     world: Arc<World>,
 }
@@ -34,11 +36,10 @@ impl NextEventEstimation {
             return Color::black();
         }
 
-        let shadow_epsilon = 0.001;
         let shadow_ray = Ray::new(
             surface_interaction.p,
             towards_light,
-            distance * (1.0 + shadow_epsilon),
+            distance * (1.0 + SHADOW_EPSILON),
         );
 
         let mut light_surface_interaction = SurfaceInteraction::failure();
@@ -52,7 +53,7 @@ impl NextEventEstimation {
         }
 
         if !light_surface_interaction.material.is_light_source()
-            || light_surface_interaction.t < distance * (1.0 - shadow_epsilon)
+            || light_surface_interaction.t < distance * (1.0 - SHADOW_EPSILON)
         {
             // this program also works fine without checking if the material is_light_source()
             // as non light source emits nothing thus still return Color::black();

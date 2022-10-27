@@ -1,7 +1,7 @@
 use crate::core::pbrt::*;
 
 const BUCKET_NUM: usize = 12;
-const EPSILON: f32 = 1.0e-6;
+const MINIMAL_BOUNDS_AREA: f32 = 1.0e-6;
 
 #[derive(Copy, Clone)]
 pub struct PrimitiveInfo {
@@ -128,7 +128,7 @@ impl Node {
         }
         let total_bounds = total_bounds;
 
-        if total_bounds.get_area() <= EPSILON {
+        if total_bounds.get_area() <= MINIMAL_BOUNDS_AREA {
             // when all primitives are accumulated close enough that
             // the bounding box is too small
             return Node::build_leaf(ordered_primitives, infos, primitives);
