@@ -99,7 +99,7 @@ impl Integrator for NextEventEstimation {
             let (scattered, scattered_ray, attenuation) =
                 interaction.material.scatter(ray, &interaction);
             if !scattered {
-                if emit && (depth == 0 || last_hit_specular) && interaction.n.dot(ray.d) < 0.0 {
+                if (depth == 0 || last_hit_specular) && emit && interaction.n.dot(ray.d) < 0.0 {
                     radiance += throughput * emission;
                 }
                 break;
