@@ -27,7 +27,6 @@ pub struct Triangle {
     mesh_index: usize,
     mesh_root: Arc<TriangleMesh>,
     material: Arc<dyn Material>,
-    object_id: u128,
 }
 
 impl Triangle {
@@ -36,7 +35,6 @@ impl Triangle {
             mesh_index: _index,
             material: Arc::new(NullMaterial {}),
             mesh_root: _mesh,
-            object_id: random_u128(),
         };
     }
 }
@@ -162,8 +160,7 @@ impl Primitive for Triangle {
             normal = -normal;
         }
 
-        *interaction =
-            SurfaceInteraction::new(t, pHit, normal, self.material.clone(), self.object_id);
+        *interaction = SurfaceInteraction::new(t, pHit, normal, self.material.clone());
         return true;
     }
 
@@ -180,9 +177,5 @@ impl Primitive for Triangle {
 
     fn set_material(&mut self, material: Arc<dyn Material>) {
         self.material = material;
-    }
-
-    fn get_id(&self) -> u128 {
-        return self.object_id;
     }
 }

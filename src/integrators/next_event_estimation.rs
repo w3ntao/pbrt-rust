@@ -54,6 +54,9 @@ impl NextEventEstimation {
         if !light_surface_interaction.material.is_light_source()
             || light_surface_interaction.t < distance * (1.0 - shadow_epsilon)
         {
+            // this program also works fine without checking if the material is_light_source()
+            // as non light source emits nothing thus still return Color::black();
+            // but with this checking it returns quickly, saving unnecessary computation
             return Color::black();
         }
 

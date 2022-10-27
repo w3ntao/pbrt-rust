@@ -7,7 +7,6 @@ pub struct Quad {
     pub normal: Normal,
     bounds: Bounds,
     material: Arc<dyn Material>,
-    id: u128,
 }
 
 impl Quad {
@@ -19,7 +18,6 @@ impl Quad {
             normal: Normal::from(cross(_span0, _span1).normalize()),
             bounds: Bounds::build(&[v0, v0 + _span0, v0 + _span1, v0 + _span0 + _span1]),
             material: Arc::new(NullMaterial {}),
-            id: random_u128(),
         };
     }
 }
@@ -49,8 +47,7 @@ impl Primitive for Quad {
         } else {
             -self.normal
         };
-        *interaction =
-            SurfaceInteraction::new(t, ray(t), normal, self.material.clone(), self.get_id());
+        *interaction = SurfaceInteraction::new(t, ray(t), normal, self.material.clone());
         return true;
     }
 
@@ -69,10 +66,6 @@ impl Primitive for Quad {
             self.origin + alpha * self.span0 + beta * self.span1,
             Vector3::from(self.normal),
         );
-    }
-
-    fn get_id(&self) -> u128 {
-        return self.id;
     }
 
     fn get_area(&self) -> f32 {

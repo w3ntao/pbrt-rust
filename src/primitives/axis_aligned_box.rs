@@ -3,7 +3,6 @@ use crate::core::pbrt::*;
 pub struct AxisAlignedBox {
     pub axis_min: Point,
     pub axis_max: Point,
-    pub id: u128,
     bounds: Bounds,
     material: Arc<dyn Material>,
 }
@@ -13,7 +12,6 @@ impl AxisAlignedBox {
         return Self {
             axis_min: min_of(&[corner_0, corner_1]),
             axis_max: max_of(&[corner_0, corner_1]),
-            id: random_u128(),
             bounds: Bounds::build(&[corner_0, corner_1]),
             material: Arc::new(NullMaterial {}),
         };
@@ -60,13 +58,8 @@ impl Primitive for AxisAlignedBox {
             return false;
         }
 
-        *interaction = SurfaceInteraction::new(
-            root_in,
-            ray(root_in),
-            normal,
-            self.material.clone(),
-            self.get_id(),
-        );
+        *interaction =
+            SurfaceInteraction::new(root_in, ray(root_in), normal, self.material.clone());
 
         return true;
     }
@@ -77,9 +70,5 @@ impl Primitive for AxisAlignedBox {
 
     fn set_material(&mut self, material: Arc<dyn Material>) {
         self.material = material;
-    }
-
-    fn get_id(&self) -> u128 {
-        return self.id;
     }
 }

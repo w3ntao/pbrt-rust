@@ -5,7 +5,6 @@ pub struct Sphere {
     pub radius: f32,
     pub material: Arc<dyn Material>,
     bounds: Bounds,
-    id: u128,
 }
 
 impl Sphere {
@@ -17,7 +16,6 @@ impl Sphere {
             radius: _radius,
             bounds: Bounds::build(&[min, max]),
             material: Arc::new(NullMaterial {}),
-            id: random_u128(),
         };
     }
 }
@@ -60,13 +58,8 @@ impl Primitive for Sphere {
         let hit_point = ray(root);
         let normal = (hit_point - self.center) / self.radius;
 
-        *interaction = SurfaceInteraction::new(
-            root,
-            hit_point,
-            Normal::from(normal),
-            self.material.clone(),
-            self.get_id(),
-        );
+        *interaction =
+            SurfaceInteraction::new(root, hit_point, Normal::from(normal), self.material.clone());
 
         if ray.d.dot(normal) > 0.0 {
             interaction.entering_material = false;
@@ -86,9 +79,5 @@ impl Primitive for Sphere {
 
     fn set_material(&mut self, material: Arc<dyn Material>) {
         self.material = material;
-    }
-
-    fn get_id(&self) -> u128 {
-        return self.id;
     }
 }

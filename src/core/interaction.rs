@@ -12,11 +12,10 @@ pub struct SurfaceInteraction {
     pub u: f32,
     pub v: f32,
     // uv coordinate is for texture
-    pub object_id: u128,
 }
 
 impl SurfaceInteraction {
-    pub fn new(_t: f32, _p: Point, _n: Normal, _material: Arc<dyn Material>, id: u128) -> Self {
+    pub fn new(_t: f32, _p: Point, _n: Normal, _material: Arc<dyn Material>) -> Self {
         return Self {
             t: _t,
             p: _p,
@@ -25,7 +24,6 @@ impl SurfaceInteraction {
             entering_material: true,
             u: f32::NAN,
             v: f32::NAN,
-            object_id: id,
         };
     }
 
@@ -38,7 +36,6 @@ impl SurfaceInteraction {
             entering_material: true,
             u: f32::NAN,
             v: f32::NAN,
-            object_id: 0,
         };
     }
 }

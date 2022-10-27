@@ -11,10 +11,6 @@ pub trait Primitive: Send + Sync {
         panic!("sample() not implemented for this Primitive");
     }
 
-    fn get_id(&self) -> u128 {
-        panic!("get_id() not implemented for this Primitive");
-    }
-
     fn get_area(&self) -> f32 {
         panic!("get_area() not implemented for this Primitive");
     }

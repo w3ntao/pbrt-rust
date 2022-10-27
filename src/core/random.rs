@@ -22,8 +22,3 @@ pub fn random_f32(low: f32, high: f32) -> f32 {
     let uniform_distribution = Uniform::new(low, high);
     return uniform_distribution.sample(&mut rng);
 }
-
-pub fn random_u128() -> u128 {
-    let mut rng = thread_rng();
-    return rng.gen::<u128>();
-}

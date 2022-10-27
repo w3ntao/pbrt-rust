@@ -52,10 +52,6 @@ impl Primitive for BVH {
         panic!("sample() is not implemented for BVH");
     }
 
-    fn get_id(&self) -> u128 {
-        panic!("get_id() is not implemented for BVH");
-    }
-
     fn get_area(&self) -> f32 {
         panic!("get_area() is not implemented for BVH");
     }
