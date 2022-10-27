@@ -11,19 +11,15 @@ impl DiffuseLight {
 }
 
 impl Material for DiffuseLight {
-    fn is_light_source(&self) -> bool {
-        return true;
-    }
-
     fn scatter(&self, _: Ray, _: &SurfaceInteraction) -> (bool, Ray, Color) {
         return (false, Ray::dummy(), Color::black());
     }
 
-    fn emit(&self, surface_interaction: &SurfaceInteraction) -> Color {
-        return self.emission.get_color(
-            surface_interaction.u,
-            surface_interaction.v,
-            surface_interaction.p,
-        );
+    fn emit(&self, _emission: &mut Color, _interaction: &SurfaceInteraction) -> bool {
+        *_emission = self
+            .emission
+            .get_color(_interaction.u, _interaction.v, _interaction.p);
+
+        return true;
     }
 }

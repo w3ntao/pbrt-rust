@@ -48,23 +48,21 @@ impl NextEventEstimation {
             &shadow_ray,
             INTERSECT_OFFSET,
             &mut light_surface_interaction,
-        ) {
+        ) || light_surface_interaction.t < distance * (1.0 - SHADOW_EPSILON)
+        {
             return Color::black();
         }
 
-        if !light_surface_interaction.material.is_light_source()
-            || light_surface_interaction.t < distance * (1.0 - SHADOW_EPSILON)
+        let mut emission = Color::black();
+        if !light_surface_interaction
+            .material
+            .emit(&mut emission, &light_surface_interaction)
         {
-            // this program also works fine without checking if the material is_light_source()
-            // as non light source emits nothing thus still return Color::black();
-            // but with this checking it returns quickly, saving unnecessary computation
-            return Color::black();
+            return emission;
         }
 
         let sample_light_pdf = distance * distance / (light_cosine * light_area);
-        return light_surface_interaction
-            .material
-            .emit(&light_surface_interaction)
+        return emission
             * surface_interaction.material.scattering_pdf(
                 ray.d,
                 surface_interaction.n,
@@ -95,20 +93,19 @@ impl Integrator for NextEventEstimation {
                 break;
             }
 
-            let emission = interaction.material.emit(&interaction);
+            let mut emission = Color::black();
+            let emit = interaction.material.emit(&mut emission, &interaction);
 
             let (scattered, scattered_ray, attenuation) =
                 interaction.material.scatter(ray, &interaction);
             if !scattered {
-                if depth == 0 || last_hit_specular {
-                    if interaction.n.dot(ray.d) < 0.0 {
-                        radiance += throughput * emission;
-                    }
+                if emit && (depth == 0 || last_hit_specular) && interaction.n.dot(ray.d) < 0.0 {
+                    radiance += throughput * emission;
                 }
                 break;
             }
 
-            if interaction.n.dot(ray.d) < 0.0 {
+            if emit && interaction.n.dot(ray.d) < 0.0 {
                 // so the light emits uni-directionally
                 radiance += throughput * emission;
             }

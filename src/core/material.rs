@@ -9,8 +9,8 @@ pub trait Material: Send + Sync {
         panic!("scatter() not implemented for this Material");
     }
 
-    fn emit(&self, _surface_interaction: &SurfaceInteraction) -> Color {
-        return Color::black();
+    fn emit(&self, _emission: &mut Color, _interaction: &SurfaceInteraction) -> bool {
+        return false;
     }
 
     fn is_null(&self) -> bool {
@@ -18,10 +18,6 @@ pub trait Material: Send + Sync {
     }
 
     fn is_specular(&self) -> bool {
-        return false;
-    }
-
-    fn is_light_source(&self) -> bool {
         return false;
     }
 
