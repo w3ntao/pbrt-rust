@@ -154,9 +154,9 @@ impl Primitive for Triangle {
         };
 
         // Compute error bounds for triangle intersection
-        let xAbsSum = ((b0 * p0.x).abs() + (b1 * p1.x).abs() + (b2 * p2.x).abs());
-        let yAbsSum = ((b0 * p0.y).abs() + (b1 * p1.y).abs() + (b2 * p2.y).abs());
-        let zAbsSum = ((b0 * p0.z).abs() + (b1 * p1.z).abs() + (b2 * p2.z).abs());
+        let xAbsSum = (b0 * p0.x).abs() + (b1 * p1.x).abs() + (b2 * p2.x).abs();
+        let yAbsSum = (b0 * p0.y).abs() + (b1 * p1.y).abs() + (b2 * p2.y).abs();
+        let zAbsSum = (b0 * p0.z).abs() + (b1 * p1.z).abs() + (b2 * p2.z).abs();
         let pError = gamma(7) * Vector3::new(xAbsSum, yAbsSum, zAbsSum);
 
         let pHit = b0 * p0 + b1 * p1 + b2 * p2;

@@ -1,6 +1,7 @@
 #![feature(unboxed_closures, fn_traits)]
 
 use crate::test_cases::*;
+
 mod accelerators;
 mod cameras;
 mod core;
@@ -19,8 +20,8 @@ fn all_tests(samples: u32) {
 
     test_case_rt_weekend_final_dragon::test(width, height, samples);
 
-    let width = 1500;
-    let height = 1500;
+    let width = 1000;
+    let height = 1000;
 
     test_case_cornell_box_next_event_estimation::test(width, height, samples);
     test_case_cornell_box_specular_path_trace::test(width, height, samples);

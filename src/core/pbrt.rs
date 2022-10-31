@@ -65,6 +65,7 @@ pub use std::thread::JoinHandle;
 pub use std::time::Instant;
 pub use std::{io, thread, time};
 pub use std::{mem, ops};
+pub use std::fmt::Formatter;
 
 pub fn type_of<T>(_: T) -> &'static str {
     type_name::<T>()

@@ -1,5 +1,4 @@
 use crate::core::pbrt::*;
-use std::fmt::Formatter;
 
 #[derive(Copy, Clone)]
 pub struct Color {

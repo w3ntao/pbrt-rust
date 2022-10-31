@@ -72,6 +72,12 @@ impl Vector3 {
     }
 }
 
+impl std::fmt::Display for Vector3 {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "({}, {}, {})", self.x, self.y, self.z)
+    }
+}
+
 impl From<Point> for Vector3 {
     fn from(p: Point) -> Self {
         Vector3 {

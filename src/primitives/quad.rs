@@ -4,55 +4,43 @@ pub struct Quad {
     pub origin: Point,
     pub span0: Vector3,
     pub span1: Vector3,
-    pub normal: Normal,
-    bounds: Bounds,
     material: Arc<dyn Material>,
+    pub triangles: Vec<Arc<Triangle>>,
+    // TODO: rewrite Quad, especially intersect()
 }
 
 impl Quad {
     pub fn new(v0: Point, _span0: Vector3, _span1: Vector3) -> Self {
+        let vertices = vec![v0, v0 + _span0, v0 + _span1, v0 + _span0 + _span1];
+        let indices = vec![0, 1, 2, 1, 2, 3];
+
+        let mesh = TriangleMesh::new(vertices, indices);
+        let _triangles = mesh.build_triangle();
+
         return Self {
             origin: v0,
             span0: _span0,
             span1: _span1,
-            normal: Normal::from(cross(_span0, _span1).normalize()),
-            bounds: Bounds::build(&[v0, v0 + _span0, v0 + _span1, v0 + _span0 + _span1]),
             material: Arc::new(NullMaterial {}),
+            triangles: _triangles,
         };
     }
 }
 
 impl Primitive for Quad {
     fn intersect(&self, ray: &Ray, interaction: &mut SurfaceInteraction) -> bool {
-        let ab = cross(self.span0, self.span1);
-        let det = -ab.dot(ray.d);
-        if det == 0.0 {
-            return false;
+        for triangle in &self.triangles {
+            if triangle.intersect(ray, interaction) {
+                interaction.material = self.material.clone();
+                return true;
+            }
         }
 
-        let c = ray.o - self.origin;
-        let det_t = ab.dot(c);
-        let t = det_t / det;
-        if t < ray.t_min || t > ray.t_max {
-            return false;
-        }
-        let beta = c.dot(cross(ray.d, self.span1)) / det;
-        let gamma = self.span0.dot(cross(ray.d, c)) / det;
-        if beta < 0.0 || beta > 1.0 || gamma < 0.0 || gamma > 1.0 {
-            return false;
-        }
-
-        let normal = if self.normal.dot(ray.d) < 0.0 {
-            self.normal
-        } else {
-            -self.normal
-        };
-        *interaction = SurfaceInteraction::new(t, ray(t), normal, self.material.clone());
-        return true;
+        return false;
     }
 
     fn get_bounds(&self) -> Bounds {
-        return self.bounds;
+        return self.triangles[0].get_bounds() + self.triangles[1].get_bounds();
     }
 
     fn set_material(&mut self, material: Arc<dyn Material>) {
@@ -62,9 +50,10 @@ impl Primitive for Quad {
     fn sample(&self) -> (Point, Vector3) {
         let alpha = random_f32(0.0, 1.0);
         let beta = random_f32(0.0, 1.0);
+
         return (
             self.origin + alpha * self.span0 + beta * self.span1,
-            Vector3::from(self.normal),
+            cross(self.span0, self.span1),
         );
     }
 
