@@ -88,6 +88,7 @@ impl Camera for DepthOfField {
                 rays.push(Ray::new(
                     origin,
                     (target - origin).normalize(),
+                    0.0,
                     f32::INFINITY,
                 ));
             }

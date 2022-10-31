@@ -39,16 +39,16 @@ impl NextEventEstimation {
         let shadow_ray = Ray::new(
             surface_interaction.p,
             towards_light,
+            INTERSECT_EPSILON,
             distance * (1.0 + SHADOW_EPSILON),
         );
 
         let mut light_surface_interaction = SurfaceInteraction::failure();
         // couldn't reach the sampled light
-        if !self.world.intersect(
-            &shadow_ray,
-            INTERSECT_OFFSET,
-            &mut light_surface_interaction,
-        ) || light_surface_interaction.t < distance * (1.0 - SHADOW_EPSILON)
+        if !self
+            .world
+            .intersect(&shadow_ray, &mut light_surface_interaction)
+            || light_surface_interaction.t < distance * (1.0 - SHADOW_EPSILON)
         {
             return Color::black();
         }
@@ -86,10 +86,7 @@ impl Integrator for NextEventEstimation {
             // with INTERSECT_OFFSET, we can avoid the situation when the ray
             // re-hit the surface it just leave
 
-            if !self
-                .world
-                .intersect(&ray, INTERSECT_OFFSET, &mut interaction)
-            {
+            if !self.world.intersect(&ray, &mut interaction) {
                 break;
             }
 

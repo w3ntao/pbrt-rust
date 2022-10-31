@@ -17,6 +17,7 @@ impl Material for Mirror {
         let scattered_ray = Ray::new(
             surface_interaction.p,
             incoming_ray.d.reflect(surface_interaction.n),
+            INTERSECT_EPSILON,
             f32::INFINITY,
         );
 

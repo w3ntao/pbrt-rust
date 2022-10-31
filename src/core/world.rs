@@ -28,8 +28,8 @@ impl World {
         self.scene.build_index();
     }
 
-    pub fn intersect(&self, ray: &Ray, t_min: f32, interaction: &mut SurfaceInteraction) -> bool {
-        return self.scene.intersect(ray, t_min, interaction);
+    pub fn intersect(&self, ray: &Ray, interaction: &mut SurfaceInteraction) -> bool {
+        return self.scene.intersect(ray, interaction);
     }
 
     pub fn sample_light(&self) -> (Point, Vector3, f32) {

@@ -26,10 +26,7 @@ impl Integrator for PathTrace {
 
         for depth in 0..u32::MAX {
             let mut interaction = SurfaceInteraction::failure();
-            if !self
-                .world
-                .intersect(&ray, INTERSECT_OFFSET, &mut interaction)
-            {
+            if !self.world.intersect(&ray, &mut interaction) {
                 radiance += throughput * self.background;
                 break;
             }

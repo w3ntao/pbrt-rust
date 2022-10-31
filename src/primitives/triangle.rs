@@ -40,7 +40,7 @@ impl Triangle {
 }
 
 impl Primitive for Triangle {
-    fn intersect(&self, ray: &Ray, t_min: f32, interaction: &mut SurfaceInteraction) -> bool {
+    fn intersect(&self, ray: &Ray, interaction: &mut SurfaceInteraction) -> bool {
         let vertex_idx0 = self.mesh_root.indices[self.mesh_index];
         let vertex_idx1 = self.mesh_root.indices[self.mesh_index + 1];
         let vertex_idx2 = self.mesh_root.indices[self.mesh_index + 2];
@@ -125,7 +125,7 @@ impl Primitive for Triangle {
         let b1 = e1 * invDet;
         let b2 = e2 * invDet;
         let t = tScaled * invDet;
-        if t < t_min || t > ray.t_max {
+        if t < ray.t_min || t > ray.t_max {
             return false;
         }
 

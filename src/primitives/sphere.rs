@@ -35,7 +35,7 @@ fn get_sphere_uv(p: Point) -> (f32, f32) {
 }
 
 impl Primitive for Sphere {
-    fn intersect(&self, ray: &Ray, t_min: f32, interaction: &mut SurfaceInteraction) -> bool {
+    fn intersect(&self, ray: &Ray, interaction: &mut SurfaceInteraction) -> bool {
         let oc = ray.o - self.center;
         let a = ray.d.length_squared();
         let half_b = oc.dot(ray.d);
@@ -48,9 +48,9 @@ impl Primitive for Sphere {
         let sqrt_d = discriminant.sqrt();
 
         let mut root = (-half_b - sqrt_d) / a;
-        if root < t_min || root > ray.t_max {
+        if root < ray.t_min || root > ray.t_max {
             root = (-half_b + sqrt_d) / a;
-            if root < t_min || root > ray.t_max {
+            if root < ray.t_min || root > ray.t_max {
                 return false;
             }
         }

@@ -31,6 +31,7 @@ impl Material for Lambertian {
         let scattered_ray = Ray::new(
             surface_interaction.p,
             random_direction.normalize(),
+            INTERSECT_EPSILON,
             f32::INFINITY,
         );
 

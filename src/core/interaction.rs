@@ -1,6 +1,6 @@
 use crate::core::pbrt::*;
 
-pub const INTERSECT_OFFSET: f32 = 0.001;
+pub const INTERSECT_EPSILON: f32 = 0.001;
 
 #[derive(Clone)]
 pub struct SurfaceInteraction {

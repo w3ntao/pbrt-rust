@@ -157,6 +157,7 @@ impl Fn<(&Ray,)> for Transform {
             Ray::new(
                 inverted_matrix * ray.o,
                 inverted_ray_direction.normalize(),
+                ray.t_min / inverted_distance,
                 ray.t_max / inverted_distance,
             ),
             inverted_distance,

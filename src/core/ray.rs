@@ -4,14 +4,18 @@ use crate::core::pbrt::*;
 pub struct Ray {
     pub o: Point,
     pub d: Vector3,
+    pub t_min: f32,
     pub t_max: f32,
 }
 
+const RAY_T_MIN: f32 = 0.001;
+
 impl Ray {
-    pub fn new(_o: Point, _d: Vector3, _t_max: f32) -> Self {
+    pub fn new(_o: Point, _d: Vector3, _t_min: f32, _t_max: f32) -> Self {
         return Self {
             o: _o,
             d: _d,
+            t_min: _t_min,
             t_max: _t_max,
         };
     }
@@ -20,6 +24,7 @@ impl Ray {
         return Ray {
             o: self.o,
             d: self.d,
+            t_min: RAY_T_MIN,
             t_max: new_t,
         };
     }
@@ -28,6 +33,7 @@ impl Ray {
         Self {
             o: Point::invalid(),
             d: Vector3::invalid(),
+            t_min: f32::NAN,
             t_max: f32::NAN,
         }
     }

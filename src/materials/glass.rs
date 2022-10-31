@@ -56,7 +56,12 @@ impl Material for Glass {
             refract(incoming_ray.d, normal, refraction_ratio)
         };
 
-        let scattered_ray = Ray::new(surface_interaction.p, direction, f32::INFINITY);
+        let scattered_ray = Ray::new(
+            surface_interaction.p,
+            direction,
+            INTERSECT_EPSILON,
+            f32::INFINITY,
+        );
         return (true, scattered_ray, Color::new(1.0, 1.0, 1.0));
     }
 

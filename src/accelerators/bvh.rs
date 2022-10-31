@@ -28,7 +28,7 @@ impl Aggregate for BVH {
 }
 
 impl Primitive for BVH {
-    fn intersect(&self, ray: &Ray, t_min: f32, interaction: &mut SurfaceInteraction) -> bool {
+    fn intersect(&self, ray: &Ray, interaction: &mut SurfaceInteraction) -> bool {
         if !self.index_built {
             panic!("BVH: You should invoke function `build_index()` before intersect with it")
         }
@@ -37,7 +37,7 @@ impl Primitive for BVH {
             .root
             .as_ref()
             .unwrap()
-            .intersect(ray, t_min, &self.primitives, interaction);
+            .intersect(ray, &self.primitives, interaction);
     }
 
     fn get_bounds(&self) -> Bounds {
