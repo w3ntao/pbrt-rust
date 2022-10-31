@@ -6,6 +6,7 @@ pub const INTERSECT_EPSILON: f32 = 0.001;
 pub struct SurfaceInteraction {
     pub t: f32,
     pub p: Point,
+    pub p_error: Vector3,
     pub n: Normal,
     pub material: Arc<dyn Material>,
     pub entering_material: bool,
@@ -19,6 +20,26 @@ impl SurfaceInteraction {
         return Self {
             t: _t,
             p: _p,
+            p_error: Vector3::invalid(),
+            n: _n.normalize(),
+            material: _material,
+            entering_material: true,
+            u: f32::NAN,
+            v: f32::NAN,
+        };
+    }
+
+    pub fn new_with_error(
+        _t: f32,
+        _p: Point,
+        _p_error: Vector3,
+        _n: Normal,
+        _material: Arc<dyn Material>,
+    ) -> Self {
+        return Self {
+            t: _t,
+            p: _p,
+            p_error: _p_error,
             n: _n.normalize(),
             material: _material,
             entering_material: true,
@@ -31,6 +52,7 @@ impl SurfaceInteraction {
         return Self {
             t: f32::INFINITY,
             p: Point::invalid(),
+            p_error: Vector3::invalid(),
             n: Normal::invalid(),
             material: Arc::new(NullMaterial {}),
             entering_material: true,
