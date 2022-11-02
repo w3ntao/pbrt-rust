@@ -6,17 +6,11 @@ pub struct Bounds {
     pub p_max: Point,
 }
 
-impl Default for Bounds {
-    fn default() -> Self {
-        return Bounds::empty();
-    }
-}
-
 impl Bounds {
     pub fn empty() -> Self {
         return Bounds {
-            p_min: Point::invalid(),
-            p_max: Point::invalid(),
+            p_min: Point::new(f32::INFINITY, f32::INFINITY, f32::INFINITY),
+            p_max: Point::new(-f32::INFINITY, -f32::INFINITY, -f32::INFINITY),
         };
     }
 
@@ -30,10 +24,12 @@ impl Bounds {
     }
 
     pub fn is_empty(&self) -> bool {
-        if self.p_min.is_valid() && self.p_max.is_valid() {
-            return false;
+        for idx in 0..3 {
+            if self.p_min[idx] > self.p_max[idx] {
+                return true;
+            }
         }
-        return true;
+        return false;
     }
 
     pub fn get_area(&self) -> f32 {
@@ -53,8 +49,8 @@ impl Bounds {
             return no_hit;
         }
 
-        let mut t_min = -f32::INFINITY;
-        let mut t_max = f32::INFINITY;
+        let mut t0 = -f32::INFINITY;
+        let mut t1 = f32::INFINITY;
 
         for axis in 0..3 {
             if ray.d[axis] == 0.0 {
@@ -62,20 +58,26 @@ impl Bounds {
                     return no_hit;
                 }
             } else {
-                let mut t1 = (self.p_min[axis] - ray.o[axis]) / ray.d[axis];
-                let mut t2 = (self.p_max[axis] - ray.o[axis]) / ray.d[axis];
-                if t1 > t2 {
-                    mem::swap(&mut t1, &mut t2);
+                let inv_ray_dir = 1.0 / ray.d[axis];
+                let mut t_near = (self.p_min[axis] - ray.o[axis]) * inv_ray_dir;
+                let mut t_far = (self.p_max[axis] - ray.o[axis]) * inv_ray_dir;
+                if t_near > t_far {
+                    mem::swap(&mut t_near, &mut t_far);
                 }
-                t_min = t_min.max(t1);
-                t_max = t_max.min(t2);
-                if t_min > t_max {
+
+                t_far *= 1.0 + 2.0 * gamma(3);
+                // PBRT: managing rounding error
+                // https://www.pbr-book.org/3ed-2018/Shapes/Managing_Rounding_Error#ConservativeRayndashBoundsIntersections
+
+                t0 = t0.max(t_near);
+                t1 = t1.min(t_far);
+                if t0 > t1 {
                     return no_hit;
                 }
             }
         }
 
-        return (t_min, t_max);
+        return (t0, t1);
     }
 }
 
@@ -91,7 +93,6 @@ impl ops::Add<Bounds> for Bounds {
 
 impl ops::AddAssign<Bounds> for Bounds {
     fn add_assign(&mut self, rhs: Bounds) {
-        self.p_min = min_of(&[self.p_min, rhs.p_min]);
-        self.p_max = max_of(&[self.p_max, rhs.p_max]);
+        *self = *self + rhs;
     }
 }
