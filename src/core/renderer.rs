@@ -1,4 +1,5 @@
 extern crate num_cpus;
+
 use crate::core::pbrt::*;
 
 pub struct Renderer {
@@ -44,6 +45,7 @@ impl Renderer {
         let one_second = time::Duration::from_secs(1);
 
         let mut last_length = total_job;
+        print!("time left: estimating...");
         let _ = io::stdout().flush();
         loop {
             thread::sleep(one_second);
@@ -60,12 +62,13 @@ impl Renderer {
             }
             last_length = length;
             let unit_job_time = start.elapsed().as_secs_f32() / (finished_job as f32);
+            print!("\r                          ");
             print!("\rtime left: ");
             print_time((unit_job_time * ((length + core) as f32)) as i32);
             let _ = io::stdout().flush();
         }
 
-        print!("\nRendering took ");
+        print!("\nrendering took ");
         print_time(start.elapsed().as_secs_f32() as i32);
         println!();
     }
