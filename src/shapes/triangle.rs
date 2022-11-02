@@ -39,7 +39,7 @@ impl Triangle {
     }
 }
 
-impl Primitive for Triangle {
+impl Shape for Triangle {
     fn intersect(&self, ray: &Ray, interaction: &mut SurfaceInteraction) -> bool {
         let vertex_idx0 = self.mesh_root.indices[self.mesh_index];
         let vertex_idx1 = self.mesh_root.indices[self.mesh_index + 1];

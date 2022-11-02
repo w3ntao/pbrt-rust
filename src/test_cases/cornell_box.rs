@@ -82,7 +82,7 @@ pub fn cornell_box() -> World {
     let mut world = empty_cornell_box();
 
     let box_big = AxisAlignedBox::new(Point::new(0.0, 0.0, 0.0), Point::new(165.0, 330.0, 165.0));
-    let mut box_big = Instance::new(Arc::new(box_big));
+    let mut box_big = Primitive::new(Arc::new(box_big));
     box_big.rotate(Vector3::new(0.0, 1.0, 0.0), PI / 12.0);
     box_big.translate(Vector3::new(265.0, 0.0, 295.0));
     box_big.set_material(lambertian_white.clone());
@@ -90,7 +90,7 @@ pub fn cornell_box() -> World {
     world.add(box_big.clone());
 
     let box_small = AxisAlignedBox::new(Point::new(0.0, 0.0, 0.0), Point::new(165.0, 165.0, 165.0));
-    let mut box_small = Instance::new(Arc::new(box_small));
+    let mut box_small = Primitive::new(Arc::new(box_small));
     box_small.rotate(Vector3::new(0.0, 1.0, 0.0), -PI / 10.0);
     box_small.translate(Vector3::new(130.0, 0.0, 65.0));
     box_small.set_material(lambertian_white.clone());
@@ -117,7 +117,7 @@ pub fn cornell_box_specular() -> World {
 
     let aluminum = Arc::new(Metal::new(Color::new(0.8, 0.85, 0.88), 0.0));
     let box_big = AxisAlignedBox::new(Point::new(0.0, 0.0, 0.0), Point::new(165.0, 330.0, 165.0));
-    let mut box_big = Instance::new(Arc::new(box_big));
+    let mut box_big = Primitive::new(Arc::new(box_big));
     box_big.rotate(Vector3::new(0.0, 1.0, 0.0), PI / 12.0);
     box_big.translate(Vector3::new(265.0, 0.0, 295.0));
     box_big.set_material(aluminum.clone());
@@ -167,7 +167,7 @@ pub fn cornell_box_metal_dragon() -> World {
     world.add_light(quad_light);
 
     let dragon_model = Arc::new(load_dragon());
-    let mut dragon_instance = Instance::new(dragon_model.clone());
+    let mut dragon_instance = Primitive::new(dragon_model.clone());
     dragon_instance.rotate(Vector3::new(0.0, 1.0, 0.0), 1.5 * PI);
     dragon_instance.scale_by_scalar(350.0);
 

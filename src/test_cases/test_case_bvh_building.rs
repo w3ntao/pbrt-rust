@@ -5,7 +5,7 @@ pub fn test(width: usize, height: usize) {
     let file_name = get_file_name(file!());
     println!("TESTING: {}", &file_name);
 
-    let dragon_instance = Instance::new(Arc::new(load_dragon()));
+    let dragon_instance = Primitive::new(Arc::new(load_dragon()));
 
     let mut world = World::default();
     world.add(Arc::new(dragon_instance));

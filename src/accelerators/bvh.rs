@@ -2,7 +2,7 @@ use crate::accelerators::bvh_node::{Node, PrimitiveInfo};
 use crate::core::pbrt::*;
 
 pub struct BVH {
-    primitives: Vec<Arc<dyn Primitive>>,
+    primitives: Vec<Arc<dyn Shape>>,
     bounds: Bounds,
     root: Option<Box<Node>>,
     index_built: bool,
@@ -20,14 +20,14 @@ impl Default for BVH {
 }
 
 impl Aggregate for BVH {
-    fn add(&mut self, p: Arc<dyn Primitive>) {
+    fn add(&mut self, p: Arc<dyn Shape>) {
         self.bounds += p.get_bounds();
         self.primitives.push(p);
         self.index_built = false;
     }
 }
 
-impl Primitive for BVH {
+impl Shape for BVH {
     fn intersect(&self, ray: &Ray, interaction: &mut SurfaceInteraction) -> bool {
         if !self.index_built {
             panic!("BVH: You should invoke function `build_index()` before intersect with it")
@@ -67,7 +67,7 @@ impl BVH {
             primitive_infos[idx] = PrimitiveInfo::new(idx, bounds, centroid);
         }
 
-        let mut ordered_primitives = Vec::<Arc<dyn Primitive>>::new();
+        let mut ordered_primitives = Vec::<Arc<dyn Shape>>::new();
         self.root = Some(Box::new(Node::recursive_build(
             &mut ordered_primitives,
             primitive_infos,

@@ -27,7 +27,7 @@ impl Quad {
     }
 }
 
-impl Primitive for Quad {
+impl Shape for Quad {
     fn intersect(&self, ray: &Ray, interaction: &mut SurfaceInteraction) -> bool {
         for triangle in &self.triangles {
             if triangle.intersect(ray, interaction) {

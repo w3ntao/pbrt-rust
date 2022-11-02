@@ -34,7 +34,7 @@ fn get_sphere_uv(p: Point) -> (f32, f32) {
     return (phi / (2.0 * PI), theta / PI);
 }
 
-impl Primitive for Sphere {
+impl Shape for Sphere {
     fn intersect(&self, ray: &Ray, interaction: &mut SurfaceInteraction) -> bool {
         let oc = ray.o - self.center;
         let a = ray.d.length_squared();

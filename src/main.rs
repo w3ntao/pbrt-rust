@@ -7,7 +7,7 @@ mod cameras;
 mod core;
 mod integrators;
 mod materials;
-mod primitives;
+mod shapes;
 mod test_cases;
 mod textures;
 mod tools;
