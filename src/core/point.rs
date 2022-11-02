@@ -109,6 +109,13 @@ impl ops::Mul<Point> for f32 {
     }
 }
 
+impl ops::Div<f32> for Point {
+    type Output = Point;
+    fn div(self, divisor: f32) -> Self::Output {
+        return self * (1.0 / divisor);
+    }
+}
+
 pub fn max_of(points: &[Point]) -> Point {
     let mut _max = points[0];
 

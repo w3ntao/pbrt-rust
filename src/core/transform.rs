@@ -5,6 +5,7 @@ pub struct Transform {
     m: Matrix,
     inv_m: Matrix,
 }
+
 impl Transform {
     pub fn identity() -> Transform {
         let identity = Matrix::identity();
@@ -127,7 +128,41 @@ impl FnMut<(&Ray,)> for Transform {
 impl Fn<(Point,)> for Transform {
     extern "rust-call" fn call(&self, p: (Point,)) -> Point {
         let p = p.0;
-        return Point::from(&self.m * Vector4::from(p));
+
+        // PBRT: Managing Rounding Error
+        // https://www.pbr-book.org/3ed-2018/Shapes/Managing_Rounding_Error#x4-EffectofTransformations
+
+        let x = p.x;
+        let y = p.y;
+        let z = p.z;
+
+        // Compute transformed coordinates from point _pt_
+        let xp = (self.m[0][0] * x + self.m[0][1] * y) + (self.m[0][2] * z + self.m[0][3]);
+        let yp = (self.m[1][0] * x + self.m[1][1] * y) + (self.m[1][2] * z + self.m[1][3]);
+        let zp = (self.m[2][0] * x + self.m[2][1] * y) + (self.m[2][2] * z + self.m[2][3]);
+        let wp = (self.m[3][0] * x + self.m[3][1] * y) + (self.m[3][2] * z + self.m[3][3]);
+        assert_ne!(wp, 0.0);
+
+        // Compute absolute error for transformed point
+        let xAbsSum = ((self.m[0][0].abs() * x)
+            + (self.m[0][1].abs() * y)
+            + (self.m[0][2].abs() * z)
+            + (self.m[0][3]).abs());
+        let yAbsSum = ((self.m[1][0].abs() * x)
+            + (self.m[1][1].abs() * y)
+            + (self.m[1][2].abs() * z)
+            + (self.m[1][3]).abs());
+        let zAbsSum = ((self.m[2][0].abs() * x)
+            + (self.m[2][1].abs() * y)
+            + (self.m[2][2].abs() * z)
+            + (self.m[2][3]).abs());
+
+        let pError = gamma(3) * Vector3::new(xAbsSum, yAbsSum, zAbsSum);
+
+        if wp == 1.0 {
+            return Point::new(xp, yp, zp);
+        }
+        return Point::new(xp, yp, zp) / wp;
     }
 }
 
