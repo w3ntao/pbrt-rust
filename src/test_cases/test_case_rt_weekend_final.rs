@@ -37,7 +37,7 @@ pub fn many_random_spheres() -> World {
                 continue;
             }
 
-            let mut sphere = Sphere::new(center, 0.2);
+            let sphere = Sphere::new(center, 0.2);
             let glass = Arc::new(Glass::new(1.5));
 
             let mut sphere = GeometricPrimitive::new(Arc::new(sphere), glass.clone());

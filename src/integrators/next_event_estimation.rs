@@ -43,7 +43,7 @@ impl NextEventEstimation {
             distance * (1.0 + SHADOW_EPSILON),
         );
 
-        let mut light_surface_interaction = SurfaceInteraction::failure();
+        let mut light_surface_interaction = SurfaceInteraction::default();
         // couldn't reach the sampled light
         if !self
             .world
@@ -84,7 +84,7 @@ impl Integrator for NextEventEstimation {
         let mut random_generator = RandomF32Generator::new(0.0, 1.0);
 
         for depth in 0..u32::MAX {
-            let mut interaction = SurfaceInteraction::failure();
+            let mut interaction = SurfaceInteraction::default();
             // with INTERSECT_OFFSET, we can avoid the situation when the ray
             // re-hit the surface it just leave
 

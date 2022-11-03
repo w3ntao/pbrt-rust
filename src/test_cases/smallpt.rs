@@ -13,7 +13,7 @@ pub fn smallpt() -> World {
 
     let wall_length = 150.0;
 
-    let mut wall_left = Quad::new(
+    let wall_left = Quad::new(
         Point::new(1.0, 40.8 - 0.5 * wall_length, 81.6 - 0.5 * wall_length),
         Vector3::new(0.0, wall_length, 0.0),
         Vector3::new(0.0, 0.0, wall_length),
@@ -24,7 +24,7 @@ pub fn smallpt() -> World {
     ));
     world.add(wall_left.clone());
 
-    let mut wall_right = Quad::new(
+    let wall_right = Quad::new(
         Point::new(99.0, 40.8 - 0.5 * wall_length, 81.6 - 0.5 * wall_length),
         Vector3::new(0.0, wall_length, 0.0),
         Vector3::new(0.0, 0.0, wall_length),
@@ -35,7 +35,7 @@ pub fn smallpt() -> World {
     ));
     world.add(wall_right.clone());
 
-    let mut wall_back = Quad::new(
+    let wall_back = Quad::new(
         Point::new(50.0 - 0.5 * wall_length, 40.8 - 0.5 * wall_length, 0.0),
         Vector3::new(0.0, wall_length, 0.0),
         Vector3::new(wall_length, 0.0, 0.0),
@@ -46,7 +46,7 @@ pub fn smallpt() -> World {
     ));
     world.add(wall_back.clone());
 
-    let mut wall_bottom = Quad::new(
+    let wall_bottom = Quad::new(
         Point::new(50.0 - 0.5 * wall_length, 0.0, 81.6 - 0.5 * wall_length),
         Vector3::new(wall_length, 0.0, 0.0),
         Vector3::new(0.0, 0.0, wall_length),
@@ -57,7 +57,7 @@ pub fn smallpt() -> World {
     ));
     world.add(wall_bottom.clone());
 
-    let mut wall_up = Quad::new(
+    let wall_up = Quad::new(
         Point::new(50.0 - wall_length * 0.5, 81.6, 81.6 - wall_length * 0.5),
         Vector3::new(wall_length, 0.0, 0.0),
         Vector3::new(0.0, 0.0, wall_length),
@@ -78,13 +78,13 @@ pub fn smallpt() -> World {
     world.add(sphere_glass);
 
     let mirror = Arc::new(Mirror::new());
-    let mut sphere_mirror = Sphere::new(Point::new(27.0, 16.5, 47.0), 16.5);
+    let sphere_mirror = Sphere::new(Point::new(27.0, 16.5, 47.0), 16.5);
     let sphere_mirror = Arc::new(GeometricPrimitive::new(Arc::new(sphere_mirror), mirror));
     world.add(sphere_mirror);
 
     let light_len = 40.0;
     let diffuse_light = DiffuseLight::new(Arc::new(SolidColor::new(Color::new(12.0, 12.0, 12.0))));
-    let mut quad_light = Quad::new(
+    let quad_light = Quad::new(
         Point::new(50.0 - 0.5 * light_len, 81.6 - 0.2, 81.6 - 0.5 * light_len),
         Vector3::new(light_len, 0.0, 0.0),
         Vector3::new(0.0, 0.0, light_len),

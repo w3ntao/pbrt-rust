@@ -152,18 +152,18 @@ impl Fn<(Point,)> for Transform {
         assert_ne!(wp, 0.0);
 
         // Compute absolute error for transformed point
-        let xAbsSum = ((self.m[0][0].abs() * x)
+        let xAbsSum = (self.m[0][0].abs() * x)
             + (self.m[0][1].abs() * y)
             + (self.m[0][2].abs() * z)
-            + (self.m[0][3]).abs());
-        let yAbsSum = ((self.m[1][0].abs() * x)
+            + (self.m[0][3]).abs();
+        let yAbsSum = (self.m[1][0].abs() * x)
             + (self.m[1][1].abs() * y)
             + (self.m[1][2].abs() * z)
-            + (self.m[1][3]).abs());
-        let zAbsSum = ((self.m[2][0].abs() * x)
+            + (self.m[1][3]).abs();
+        let zAbsSum = (self.m[2][0].abs() * x)
             + (self.m[2][1].abs() * y)
             + (self.m[2][2].abs() * z)
-            + (self.m[2][3]).abs());
+            + (self.m[2][3]).abs();
 
         let pError = gamma(3) * Vector3::new(xAbsSum, yAbsSum, zAbsSum);
 

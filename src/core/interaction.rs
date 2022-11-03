@@ -15,40 +15,8 @@ pub struct SurfaceInteraction {
     // uv coordinate is for texture
 }
 
-impl SurfaceInteraction {
-    pub fn new(_t: f32, _p: Point, _n: Normal, _material: Arc<dyn Material>) -> Self {
-        return Self {
-            t: _t,
-            p: _p,
-            p_error: Vector3::invalid(),
-            n: _n.normalize(),
-            material: Some(_material),
-            entering_material: true,
-            u: f32::NAN,
-            v: f32::NAN,
-        };
-    }
-
-    pub fn new_with_error(
-        _t: f32,
-        _p: Point,
-        _p_error: Vector3,
-        _n: Normal,
-        _material: Arc<dyn Material>,
-    ) -> Self {
-        return Self {
-            t: _t,
-            p: _p,
-            p_error: _p_error,
-            n: _n.normalize(),
-            material: Some(_material),
-            entering_material: true,
-            u: f32::NAN,
-            v: f32::NAN,
-        };
-    }
-
-    pub fn failure() -> Self {
+impl Default for SurfaceInteraction {
+    fn default() -> Self {
         return Self {
             t: f32::INFINITY,
             p: Point::invalid(),

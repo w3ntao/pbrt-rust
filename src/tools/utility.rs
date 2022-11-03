@@ -25,7 +25,7 @@ pub fn load_dragon(material: Arc<dyn Material>) -> BVH {
     let triangles = obj_to_triangles(dragon_path);
     let mut dragon_model = BVH::default();
     for t in triangles {
-        let mut primitive = GeometricPrimitive::new(t, material.clone());
+        let primitive = GeometricPrimitive::new(t, material.clone());
         dragon_model.add(Arc::new(primitive));
     }
     dragon_model.build_index();

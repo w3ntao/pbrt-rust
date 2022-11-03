@@ -9,22 +9,22 @@ pub fn scene_three_spheres() -> World {
     let metal = Arc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.4));
     let glass = Arc::new(Glass::new(1.5));
 
-    let mut sphere_ground = Sphere::new(Point::new(0.0, -100.5, -1.0), 100.0);
+    let sphere_ground = Sphere::new(Point::new(0.0, -100.5, -1.0), 100.0);
     let sphere_ground = Arc::new(GeometricPrimitive::new(
         Arc::new(sphere_ground),
         material_ground,
     ));
 
-    let mut sphere_center = Sphere::new(Point::new(0.0, 0.0, -1.0), 0.5);
+    let sphere_center = Sphere::new(Point::new(0.0, 0.0, -1.0), 0.5);
     let sphere_center = Arc::new(GeometricPrimitive::new(
         Arc::new(sphere_center),
         material_center,
     ));
 
-    let mut sphere_left = Sphere::new(Point::new(-1.0, 0.0, -1.0), 0.5);
+    let sphere_left = Sphere::new(Point::new(-1.0, 0.0, -1.0), 0.5);
     let sphere_left = Arc::new(GeometricPrimitive::new(Arc::new(sphere_left), glass));
 
-    let mut sphere_right = Sphere::new(Point::new(1.0, 0.0, -1.0), 0.5);
+    let sphere_right = Sphere::new(Point::new(1.0, 0.0, -1.0), 0.5);
     let sphere_right = Arc::new(GeometricPrimitive::new(Arc::new(sphere_right), metal));
 
     let mut world = World::default();

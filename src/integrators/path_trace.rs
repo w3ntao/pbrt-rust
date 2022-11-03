@@ -25,7 +25,7 @@ impl Integrator for PathTrace {
         let mut random_generator = RandomF32Generator::new(0.0, 1.0);
 
         for depth in 0..u32::MAX {
-            let mut interaction = SurfaceInteraction::failure();
+            let mut interaction = SurfaceInteraction::default();
             if !self.world.intersect(&ray, &mut interaction) {
                 radiance += throughput * self.background;
                 break;

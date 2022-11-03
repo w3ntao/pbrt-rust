@@ -13,7 +13,7 @@ fn empty_cornell_box() -> World {
     let lambertian_green = Arc::new(Lambertian::new(solid_color_green.clone()));
     let lambertian_white = Arc::new(Lambertian::new(solid_color_white.clone()));
 
-    let mut wall_left = Quad::new(
+    let wall_left = Quad::new(
         Point::new(WALL_LENGTH, 0.0, 0.0),
         Vector3::new(0.0, WALL_LENGTH, 0.0),
         Vector3::new(0.0, 0.0, WALL_LENGTH),
@@ -24,7 +24,7 @@ fn empty_cornell_box() -> World {
     ));
     world.add(wall_left.clone());
 
-    let mut wall_right = Quad::new(
+    let wall_right = Quad::new(
         Point::new(0.0, 0.0, 0.0),
         Vector3::new(0.0, WALL_LENGTH, 0.0),
         Vector3::new(0.0, 0.0, WALL_LENGTH),
@@ -35,7 +35,7 @@ fn empty_cornell_box() -> World {
     ));
     world.add(wall_right.clone());
 
-    let mut wall_back = Quad::new(
+    let wall_back = Quad::new(
         Point::new(0.0, 0.0, WALL_LENGTH),
         Vector3::new(0.0, WALL_LENGTH, 0.0),
         Vector3::new(WALL_LENGTH, 0.0, 0.0),
@@ -46,7 +46,7 @@ fn empty_cornell_box() -> World {
     ));
     world.add(wall_back.clone());
 
-    let mut wall_bottom = Quad::new(
+    let wall_bottom = Quad::new(
         Point::new(0.0, 0.0, 0.0),
         Vector3::new(WALL_LENGTH, 0.0, 0.0),
         Vector3::new(0.0, 0.0, WALL_LENGTH),
@@ -57,7 +57,7 @@ fn empty_cornell_box() -> World {
     ));
     world.add(wall_bottom.clone());
 
-    let mut wall_up = Quad::new(
+    let wall_up = Quad::new(
         Point::new(0.0, WALL_LENGTH, 0.0),
         Vector3::new(WALL_LENGTH, 0.0, 0.0),
         Vector3::new(0.0, 0.0, WALL_LENGTH),
@@ -108,7 +108,7 @@ pub fn cornell_box() -> World {
     world.add(box_small.clone());
 
     let diffuse_light = DiffuseLight::new(Arc::new(SolidColor::new(Color::new(15.0, 15.0, 15.0))));
-    let mut quad_light = Quad::new(
+    let quad_light = Quad::new(
         Point::new(213.0, WALL_LENGTH - 1.0, 227.0),
         Vector3::new(130.0, 0.0, 0.0),
         Vector3::new(0.0, 0.0, 105.0),
@@ -139,13 +139,13 @@ pub fn cornell_box_specular() -> World {
 
     let glass = Arc::new(Glass::new(1.5));
     let radius = 90.0;
-    let mut sphere = Sphere::new(Point::new(190.0, radius, 190.0), radius);
+    let sphere = Sphere::new(Point::new(190.0, radius, 190.0), radius);
 
     let sphere = Arc::new(GeometricPrimitive::new(Arc::new(sphere), glass.clone()));
     world.add(sphere);
 
     let diffuse_light = DiffuseLight::new(Arc::new(SolidColor::new(Color::new(15.0, 15.0, 15.0))));
-    let mut quad_light = Quad::new(
+    let quad_light = Quad::new(
         Point::new(213.0, WALL_LENGTH - 1.0, 227.0),
         Vector3::new(130.0, 0.0, 0.0),
         Vector3::new(0.0, 0.0, 105.0),
@@ -168,7 +168,7 @@ pub fn cornell_box_metal_dragon() -> World {
     let diffuse_light = DiffuseLight::new(Arc::new(SolidColor::new(Color::new(10.0, 10.0, 10.0))));
 
     let light_length = 150.0;
-    let mut quad_light = Quad::new(
+    let quad_light = Quad::new(
         Point::new(
             (WALL_LENGTH - light_length) / 2.0,
             WALL_LENGTH - 1.0,

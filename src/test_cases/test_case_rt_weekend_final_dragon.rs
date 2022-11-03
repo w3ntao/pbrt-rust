@@ -13,7 +13,7 @@ pub fn test(width: usize, height: usize, samples: u32) {
     let material_ground = Arc::new(Lambertian::new(solid_color_ground.clone()));
 
     let ground_radius = 2000.0;
-    let mut sphere_ground = Sphere::new(Point::new(0.0, -ground_radius, 0.0), ground_radius);
+    let sphere_ground = Sphere::new(Point::new(0.0, -ground_radius, 0.0), ground_radius);
     let ground = Arc::new(GeometricPrimitive::new(
         Arc::new(sphere_ground),
         material_ground,

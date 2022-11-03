@@ -12,7 +12,7 @@ pub fn test(width: usize, height: usize, samples: u32) {
     let perlin_texture = Arc::new(NoiseTexture::new(4.0));
     let lambertian_perlin = Arc::new(Lambertian::new(perlin_texture.clone()));
 
-    let mut big_sphere = Sphere::new(Point::new(0.0, -1000.0, 0.0), 1000.0);
+    let big_sphere = Sphere::new(Point::new(0.0, -1000.0, 0.0), 1000.0);
     let big_sphere = Arc::new(GeometricPrimitive::new(
         Arc::new(big_sphere),
         lambertian_perlin.clone(),
@@ -21,7 +21,7 @@ pub fn test(width: usize, height: usize, samples: u32) {
     scene.add(big_sphere);
 
     let sphere_center = Point::new(0.0, 2.0, 0.0);
-    let mut small_sphere = Sphere::new(sphere_center, 2.0);
+    let small_sphere = Sphere::new(sphere_center, 2.0);
     let small_sphere = Arc::new(GeometricPrimitive::new(
         Arc::new(small_sphere),
         lambertian_perlin.clone(),
