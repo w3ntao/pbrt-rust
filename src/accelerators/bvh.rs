@@ -33,11 +33,14 @@ impl Primitive for BVH {
             panic!("BVH: You should invoke function `build_index()` before intersect with it")
         }
 
-        return self
-            .root
-            .as_ref()
-            .unwrap()
-            .intersect(ray, &self.primitives, interaction);
+        match &self.root {
+            None => {
+                panic!("BVH::intersect(): no node available");
+            }
+            Some(node) => {
+                return node.intersect(ray, &self.primitives, interaction);
+            }
+        }
     }
 
     fn set_material(&mut self, _: Arc<dyn Material>) {

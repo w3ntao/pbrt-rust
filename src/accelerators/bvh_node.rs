@@ -66,30 +66,35 @@ impl Node {
             return false;
         }
 
-        if self.left.is_none() && self.right.is_none() {
-            let mut closest_t = ray.t_max;
-            let mut hit = false;
-            for idx in self.start..self.end {
-                let p = &primitives[idx];
+        match (&self.left, &self.right) {
+            (None, None) => {
+                let mut closest_t = ray.t_max;
+                let mut hit = false;
+                for idx in self.start..self.end {
+                    let p = &primitives[idx];
 
-                if p.intersect(&ray.update_t(closest_t), interaction) {
-                    closest_t = interaction.t;
-                    hit = true;
+                    if p.intersect(&ray.update_t(closest_t), interaction) {
+                        closest_t = interaction.t;
+                        hit = true;
+                    }
                 }
+
+                return hit;
             }
+            (Some(left_node), Some(right_node)) => {
+                if !left_node.intersect(ray, primitives, interaction) {
+                    return right_node.intersect(ray, primitives, interaction);
+                }
 
-            return hit;
+                right_node.intersect(&ray.update_t(interaction.t), primitives, interaction);
+                return true;
+            }
+            _ => {
+                panic!(
+                    "Node::intersect(): illegal case --> one child is none but the other is not"
+                );
+            }
         }
-
-        let left_node = self.left.as_ref().unwrap();
-        let right_node = self.right.as_ref().unwrap();
-
-        if !left_node.intersect(ray, primitives, interaction) {
-            return right_node.intersect(ray, primitives, interaction);
-        }
-
-        right_node.intersect(&ray.update_t(interaction.t), primitives, interaction);
-        return true;
     }
 }
 
