@@ -26,14 +26,12 @@ impl TriangleMesh {
 pub struct Triangle {
     mesh_index: usize,
     mesh_root: Arc<TriangleMesh>,
-    material: Arc<dyn Material>,
 }
 
 impl Triangle {
     pub fn new(_index: usize, _mesh: Arc<TriangleMesh>) -> Self {
         return Self {
             mesh_index: _index,
-            material: Arc::new(NullMaterial {}),
             mesh_root: _mesh,
         };
     }
@@ -166,8 +164,11 @@ impl Shape for Triangle {
             normal = -normal;
         }
 
-        *interaction =
-            SurfaceInteraction::new_with_error(t, pHit, pError, normal, self.material.clone());
+        interaction.t = t;
+        interaction.p = pHit;
+        interaction.n = normal;
+        interaction.p_error = pError;
+
         return true;
     }
 
@@ -180,9 +181,5 @@ impl Shape for Triangle {
         let p2 = self.mesh_root.vertices[vertex_idx2];
 
         return Bounds::build(&[p0, p1, p2]);
-    }
-
-    fn set_material(&mut self, material: Arc<dyn Material>) {
-        self.material = material;
     }
 }

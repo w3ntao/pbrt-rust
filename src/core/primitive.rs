@@ -29,7 +29,7 @@ impl Primitive for GeometricPrimitive {
 
         match &self.material {
             Some(material) => {
-                surface_interaction.material = material.clone();
+                surface_interaction.material = Some(material.clone());
             }
             _ => {}
         }
@@ -55,10 +55,10 @@ impl Primitive for GeometricPrimitive {
 }
 
 impl GeometricPrimitive {
-    pub fn new(_shape: Arc<dyn Shape>) -> GeometricPrimitive {
+    pub fn new(_shape: Arc<dyn Shape>, _material: Arc<dyn Material>) -> GeometricPrimitive {
         GeometricPrimitive {
             shape: _shape,
-            material: None,
+            material: Some(_material),
         }
     }
 }
@@ -83,7 +83,7 @@ impl Primitive for TransformedPrimitive {
 
         match &self.material {
             Some(material) => {
-                surface_interaction.material = material.clone();
+                surface_interaction.material = Some(material.clone());
             }
             _ => {}
         }

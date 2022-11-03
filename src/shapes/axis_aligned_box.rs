@@ -4,7 +4,6 @@ pub struct AxisAlignedBox {
     pub axis_min: Point,
     pub axis_max: Point,
     bounds: Bounds,
-    material: Arc<dyn Material>,
 }
 
 impl AxisAlignedBox {
@@ -13,7 +12,6 @@ impl AxisAlignedBox {
             axis_min: min_of(&[corner_0, corner_1]),
             axis_max: max_of(&[corner_0, corner_1]),
             bounds: Bounds::build(&[corner_0, corner_1]),
-            material: Arc::new(NullMaterial {}),
         };
     }
 }
@@ -58,17 +56,14 @@ impl Shape for AxisAlignedBox {
             return false;
         }
 
-        *interaction =
-            SurfaceInteraction::new(root_in, ray(root_in), normal, self.material.clone());
+        interaction.t = root_in;
+        interaction.p = ray(root_in);
+        interaction.n = normal;
 
         return true;
     }
 
     fn get_bounds(&self) -> Bounds {
         return self.bounds;
-    }
-
-    fn set_material(&mut self, material: Arc<dyn Material>) {
-        self.material = material;
     }
 }

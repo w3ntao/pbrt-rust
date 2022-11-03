@@ -4,7 +4,6 @@ pub struct Quad {
     pub origin: Point,
     pub span0: Vector3,
     pub span1: Vector3,
-    material: Arc<dyn Material>,
     pub triangles: Vec<Arc<Triangle>>,
     // TODO: rewrite Quad, especially intersect()
 }
@@ -21,7 +20,6 @@ impl Quad {
             origin: v0,
             span0: _span0,
             span1: _span1,
-            material: Arc::new(NullMaterial {}),
             triangles: _triangles,
         };
     }
@@ -31,7 +29,6 @@ impl Shape for Quad {
     fn intersect(&self, ray: &Ray, interaction: &mut SurfaceInteraction) -> bool {
         for triangle in &self.triangles {
             if triangle.intersect(ray, interaction) {
-                interaction.material = self.material.clone();
                 return true;
             }
         }
@@ -41,10 +38,6 @@ impl Shape for Quad {
 
     fn get_bounds(&self) -> Bounds {
         return self.triangles[0].get_bounds() + self.triangles[1].get_bounds();
-    }
-
-    fn set_material(&mut self, material: Arc<dyn Material>) {
-        self.material = material;
     }
 
     fn sample(&self) -> (Point, Vector3) {

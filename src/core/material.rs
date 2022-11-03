@@ -13,10 +13,6 @@ pub trait Material: Send + Sync {
         return false;
     }
 
-    fn is_null(&self) -> bool {
-        return false;
-    }
-
     fn is_specular(&self) -> bool {
         return false;
     }
@@ -28,13 +24,5 @@ pub trait Material: Send + Sync {
         _scattered_direction: Vector3,
     ) -> f32 {
         panic!("scattering_pdf() not implemented for this Material");
-    }
-}
-
-pub struct NullMaterial {}
-
-impl Material for NullMaterial {
-    fn is_null(&self) -> bool {
-        return true;
     }
 }

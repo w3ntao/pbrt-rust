@@ -38,12 +38,16 @@ pub fn many_random_spheres() -> World {
             }
 
             let mut sphere = Sphere::new(center, 0.2);
+            let glass = Arc::new(Glass::new(1.5));
+
+            let mut sphere = GeometricPrimitive::new(Arc::new(sphere), glass.clone());
+
             if choose_material < 0.4 {
                 //diffuse
                 let albedo = random_color() * random_color();
                 let texture = Arc::new(SolidColor::new(albedo));
-                let material = Lambertian::new(texture.clone());
-                sphere.set_material(Arc::new(material));
+                let lambertian = Lambertian::new(texture.clone());
+                sphere.set_material(Arc::new(lambertian));
             } else if choose_material < 0.7 {
                 // metal
                 let albedo = random_f32(0.5, 1.0) * Color::new(1.0, 1.0, 1.0);
@@ -52,12 +56,10 @@ pub fn many_random_spheres() -> World {
                 sphere.set_material(Arc::new(metal));
             } else {
                 //glass
-                let glass = Glass::new(1.5);
-                sphere.set_material(Arc::new(glass));
+                sphere.set_material(glass);
             }
 
-            let sphere = Arc::new(GeometricPrimitive::new(Arc::new(sphere)));
-            scene.add(sphere);
+            scene.add(Arc::new(sphere));
         }
     }
 
@@ -76,9 +78,11 @@ pub fn test(width: usize, height: usize, samples: u32) {
     let material_ground = Arc::new(Lambertian::new(solid_color_ground.clone()));
 
     let ground_radius = 2000.0;
-    let mut sphere_ground = Sphere::new(Point::new(0.0, -ground_radius, 0.0), ground_radius);
-    sphere_ground.set_material(material_ground);
-    let ground = Arc::new(GeometricPrimitive::new(Arc::new(sphere_ground)));
+    let sphere_ground = Sphere::new(Point::new(0.0, -ground_radius, 0.0), ground_radius);
+    let ground = Arc::new(GeometricPrimitive::new(
+        Arc::new(sphere_ground),
+        material_ground,
+    ));
 
     scene.add(ground.clone());
 
@@ -87,22 +91,28 @@ pub fn test(width: usize, height: usize, samples: u32) {
     let glass = Arc::new(Glass::new(1.5));
     let metal = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
 
-    let mut sphere_far = Sphere::new(Point::new(-4.0, 1.0, 0.0), 1.0);
-    sphere_far.set_material(lambertian.clone());
-    let sphere_far = Arc::new(GeometricPrimitive::new(Arc::new(sphere_far)));
+    let sphere_far = Sphere::new(Point::new(-4.0, 1.0, 0.0), 1.0);
+    let sphere_far = Arc::new(GeometricPrimitive::new(
+        Arc::new(sphere_far),
+        lambertian.clone(),
+    ));
 
     scene.add(sphere_far);
 
-    let mut sphere_middle = Sphere::new(Point::new(0.0, 1.0, 0.0), 1.0);
-    sphere_middle.set_material(glass.clone());
-    let sphere_middle = Arc::new(GeometricPrimitive::new(Arc::new(sphere_middle)));
+    let sphere_middle = Sphere::new(Point::new(0.0, 1.0, 0.0), 1.0);
+    let sphere_middle = Arc::new(GeometricPrimitive::new(
+        Arc::new(sphere_middle),
+        glass.clone(),
+    ));
 
     scene.add(sphere_middle);
 
     let center_sphere_close = Point::new(4.0, 1.0, 0.0);
-    let mut sphere_near = Sphere::new(center_sphere_close, 1.0);
-    sphere_near.set_material(metal.clone());
-    let sphere_near = Arc::new(GeometricPrimitive::new(Arc::new(sphere_near)));
+    let sphere_near = Sphere::new(center_sphere_close, 1.0);
+    let sphere_near = Arc::new(GeometricPrimitive::new(
+        Arc::new(sphere_near),
+        metal.clone(),
+    ));
 
     scene.add(sphere_near);
 

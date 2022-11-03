@@ -5,8 +5,6 @@ pub trait Shape: Send + Sync {
 
     fn get_bounds(&self) -> Bounds;
 
-    fn set_material(&mut self, material: Arc<dyn Material>);
-
     fn sample(&self) -> (Point, Vector3) {
         panic!("sample() not implemented for this Shape");
     }

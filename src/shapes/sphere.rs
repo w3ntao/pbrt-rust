@@ -3,7 +3,6 @@ use crate::core::pbrt::*;
 pub struct Sphere {
     pub center: Point,
     pub radius: f32,
-    pub material: Arc<dyn Material>,
     bounds: Bounds,
 }
 
@@ -15,7 +14,6 @@ impl Sphere {
             center: _center,
             radius: _radius,
             bounds: Bounds::build(&[min, max]),
-            material: Arc::new(NullMaterial {}),
         };
     }
 }
@@ -58,8 +56,9 @@ impl Shape for Sphere {
         let hit_point = ray(root);
         let normal = (hit_point - self.center) / self.radius;
 
-        *interaction =
-            SurfaceInteraction::new(root, hit_point, Normal::from(normal), self.material.clone());
+        interaction.t = root;
+        interaction.p = hit_point;
+        interaction.n = Normal::from(normal);
 
         if ray.d.dot(normal) > 0.0 {
             interaction.entering_material = false;
@@ -75,9 +74,5 @@ impl Shape for Sphere {
 
     fn get_bounds(&self) -> Bounds {
         return self.bounds;
-    }
-
-    fn set_material(&mut self, material: Arc<dyn Material>) {
-        self.material = material;
     }
 }

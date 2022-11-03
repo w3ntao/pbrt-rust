@@ -34,13 +34,23 @@ impl Integrator for PathTrace {
             if interaction.n.dot(ray.d) < 0.0 {
                 // so the light emits uni-directionally
                 let mut emission = Color::black();
-                if interaction.material.emit(&mut emission, &interaction) {
+
+                if interaction
+                    .material
+                    .as_ref()
+                    .expect("material is None")
+                    .emit(&mut emission, &interaction)
+                {
                     radiance += throughput * emission;
                 }
             }
 
-            let (scattered, scattered_ray, attenuation) =
-                interaction.material.scatter(ray, &interaction);
+            let (scattered, scattered_ray, attenuation) = interaction
+                .material
+                .as_ref()
+                .expect("material is None")
+                .scatter(ray, &interaction);
+
             if !scattered {
                 break;
             }

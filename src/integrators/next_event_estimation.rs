@@ -56,6 +56,8 @@ impl NextEventEstimation {
         let mut emission = Color::black();
         if !light_surface_interaction
             .material
+            .as_ref()
+            .expect("material is None")
             .emit(&mut emission, &light_surface_interaction)
         {
             return emission;
@@ -63,11 +65,11 @@ impl NextEventEstimation {
 
         let sample_light_pdf = distance * distance / (light_cosine * light_area);
         return emission
-            * surface_interaction.material.scattering_pdf(
-                ray.d,
-                surface_interaction.n,
-                towards_light,
-            )
+            * surface_interaction
+                .material
+                .as_ref()
+                .expect("material is None")
+                .scattering_pdf(ray.d, surface_interaction.n, towards_light)
             / sample_light_pdf;
     }
 }
@@ -91,10 +93,17 @@ impl Integrator for NextEventEstimation {
             }
 
             let mut emission = Color::black();
-            let emit = interaction.material.emit(&mut emission, &interaction);
+            let emit = interaction
+                .material
+                .as_ref()
+                .expect("material is None")
+                .emit(&mut emission, &interaction);
 
-            let (scattered, scattered_ray, attenuation) =
-                interaction.material.scatter(ray, &interaction);
+            let (scattered, scattered_ray, attenuation) = interaction
+                .material
+                .as_ref()
+                .expect("material is None")
+                .scatter(ray, &interaction);
             if !scattered {
                 if (depth == 0 || last_hit_specular) && emit && interaction.n.dot(ray.d) < 0.0 {
                     radiance += throughput * emission;
@@ -107,7 +116,11 @@ impl Integrator for NextEventEstimation {
                 radiance += throughput * emission;
             }
 
-            last_hit_specular = interaction.material.is_specular();
+            last_hit_specular = interaction
+                .material
+                .as_ref()
+                .expect("material is None")
+                .is_specular();
             if !last_hit_specular {
                 radiance +=
                     throughput * attenuation * self.get_direct_illumination(&interaction, &ray);

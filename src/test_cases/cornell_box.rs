@@ -18,8 +18,10 @@ fn empty_cornell_box() -> World {
         Vector3::new(0.0, WALL_LENGTH, 0.0),
         Vector3::new(0.0, 0.0, WALL_LENGTH),
     );
-    wall_left.set_material(lambertian_green.clone());
-    let wall_left = Arc::new(GeometricPrimitive::new(Arc::new(wall_left)));
+    let wall_left = Arc::new(GeometricPrimitive::new(
+        Arc::new(wall_left),
+        lambertian_green.clone(),
+    ));
     world.add(wall_left.clone());
 
     let mut wall_right = Quad::new(
@@ -27,8 +29,10 @@ fn empty_cornell_box() -> World {
         Vector3::new(0.0, WALL_LENGTH, 0.0),
         Vector3::new(0.0, 0.0, WALL_LENGTH),
     );
-    wall_right.set_material(lambertian_red.clone());
-    let wall_right = Arc::new(GeometricPrimitive::new(Arc::new(wall_right)));
+    let wall_right = Arc::new(GeometricPrimitive::new(
+        Arc::new(wall_right),
+        lambertian_red.clone(),
+    ));
     world.add(wall_right.clone());
 
     let mut wall_back = Quad::new(
@@ -36,8 +40,10 @@ fn empty_cornell_box() -> World {
         Vector3::new(0.0, WALL_LENGTH, 0.0),
         Vector3::new(WALL_LENGTH, 0.0, 0.0),
     );
-    wall_back.set_material(lambertian_white.clone());
-    let wall_back = Arc::new(GeometricPrimitive::new(Arc::new(wall_back)));
+    let wall_back = Arc::new(GeometricPrimitive::new(
+        Arc::new(wall_back),
+        lambertian_white.clone(),
+    ));
     world.add(wall_back.clone());
 
     let mut wall_bottom = Quad::new(
@@ -45,8 +51,10 @@ fn empty_cornell_box() -> World {
         Vector3::new(WALL_LENGTH, 0.0, 0.0),
         Vector3::new(0.0, 0.0, WALL_LENGTH),
     );
-    wall_bottom.set_material(lambertian_white.clone());
-    let wall_bottom = Arc::new(GeometricPrimitive::new(Arc::new(wall_bottom)));
+    let wall_bottom = Arc::new(GeometricPrimitive::new(
+        Arc::new(wall_bottom),
+        lambertian_white.clone(),
+    ));
     world.add(wall_bottom.clone());
 
     let mut wall_up = Quad::new(
@@ -54,8 +62,10 @@ fn empty_cornell_box() -> World {
         Vector3::new(WALL_LENGTH, 0.0, 0.0),
         Vector3::new(0.0, 0.0, WALL_LENGTH),
     );
-    wall_up.set_material(lambertian_white.clone());
-    let wall_up = Arc::new(GeometricPrimitive::new(Arc::new(wall_up)));
+    let wall_up = Arc::new(GeometricPrimitive::new(
+        Arc::new(wall_up),
+        lambertian_white.clone(),
+    ));
     world.add(wall_up.clone());
 
     world.build_index();
@@ -82,20 +92,18 @@ pub fn cornell_box() -> World {
     let mut world = empty_cornell_box();
 
     let box_big = AxisAlignedBox::new(Point::new(0.0, 0.0, 0.0), Point::new(165.0, 330.0, 165.0));
-    let box_big = GeometricPrimitive::new(Arc::new(box_big));
+    let box_big = GeometricPrimitive::new(Arc::new(box_big), lambertian_white.clone());
     let mut box_big = TransformedPrimitive::new(Arc::new(box_big));
     box_big.rotate(Vector3::new(0.0, 1.0, 0.0), PI / 12.0);
     box_big.translate(Vector3::new(265.0, 0.0, 295.0));
-    box_big.set_material(lambertian_white.clone());
     let box_big = Arc::new(box_big);
     world.add(box_big.clone());
 
     let box_small = AxisAlignedBox::new(Point::new(0.0, 0.0, 0.0), Point::new(165.0, 165.0, 165.0));
-    let box_small = GeometricPrimitive::new(Arc::new(box_small));
+    let box_small = GeometricPrimitive::new(Arc::new(box_small), lambertian_white.clone());
     let mut box_small = TransformedPrimitive::new(Arc::new(box_small));
     box_small.rotate(Vector3::new(0.0, 1.0, 0.0), -PI / 10.0);
     box_small.translate(Vector3::new(130.0, 0.0, 65.0));
-    box_small.set_material(lambertian_white.clone());
     let box_small = Arc::new(box_small);
     world.add(box_small.clone());
 
@@ -105,9 +113,11 @@ pub fn cornell_box() -> World {
         Vector3::new(130.0, 0.0, 0.0),
         Vector3::new(0.0, 0.0, 105.0),
     );
-    quad_light.set_material(Arc::new(diffuse_light));
 
-    let quad_light = Arc::new(GeometricPrimitive::new(Arc::new(quad_light)));
+    let quad_light = Arc::new(GeometricPrimitive::new(
+        Arc::new(quad_light),
+        Arc::new(diffuse_light),
+    ));
     world.add_light(quad_light);
     world.build_index();
 
@@ -119,21 +129,19 @@ pub fn cornell_box_specular() -> World {
 
     let aluminum = Arc::new(Metal::new(Color::new(0.8, 0.85, 0.88), 0.0));
     let box_big = AxisAlignedBox::new(Point::new(0.0, 0.0, 0.0), Point::new(165.0, 330.0, 165.0));
-    let box_big = GeometricPrimitive::new(Arc::new(box_big));
+    let box_big = GeometricPrimitive::new(Arc::new(box_big), aluminum.clone());
     let mut box_big = TransformedPrimitive::new(Arc::new(box_big));
 
     box_big.rotate(Vector3::new(0.0, 1.0, 0.0), PI / 12.0);
     box_big.translate(Vector3::new(265.0, 0.0, 295.0));
-    box_big.set_material(aluminum.clone());
     let box_big = Arc::new(box_big);
     world.add(box_big.clone());
 
     let glass = Arc::new(Glass::new(1.5));
     let radius = 90.0;
     let mut sphere = Sphere::new(Point::new(190.0, radius, 190.0), radius);
-    sphere.set_material(glass.clone());
 
-    let sphere = Arc::new(GeometricPrimitive::new(Arc::new(sphere)));
+    let sphere = Arc::new(GeometricPrimitive::new(Arc::new(sphere), glass.clone()));
     world.add(sphere);
 
     let diffuse_light = DiffuseLight::new(Arc::new(SolidColor::new(Color::new(15.0, 15.0, 15.0))));
@@ -142,9 +150,11 @@ pub fn cornell_box_specular() -> World {
         Vector3::new(130.0, 0.0, 0.0),
         Vector3::new(0.0, 0.0, 105.0),
     );
-    quad_light.set_material(Arc::new(diffuse_light));
 
-    let quad_light = Arc::new(GeometricPrimitive::new(Arc::new(quad_light)));
+    let quad_light = Arc::new(GeometricPrimitive::new(
+        Arc::new(quad_light),
+        Arc::new(diffuse_light),
+    ));
     world.add_light(quad_light);
     world.build_index();
 
@@ -167,9 +177,11 @@ pub fn cornell_box_metal_dragon() -> World {
         Vector3::new(light_length, 0.0, 0.0),
         Vector3::new(0.0, 0.0, light_length),
     );
-    quad_light.set_material(Arc::new(diffuse_light));
 
-    let quad_light = Arc::new(GeometricPrimitive::new(Arc::new(quad_light)));
+    let quad_light = Arc::new(GeometricPrimitive::new(
+        Arc::new(quad_light),
+        Arc::new(diffuse_light),
+    ));
     world.add_light(quad_light);
 
     let dragon_model = Arc::new(load_dragon(metal.clone()));
