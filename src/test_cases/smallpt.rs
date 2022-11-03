@@ -19,7 +19,7 @@ pub fn smallpt() -> World {
         Vector3::new(0.0, 0.0, wall_length),
     );
     wall_left.set_material(lambertian_red.clone());
-    let wall_left = Arc::new(Primitive::new(Arc::new(wall_left)));
+    let wall_left = Arc::new(GeometricPrimitive::new(Arc::new(wall_left)));
     world.add(wall_left.clone());
 
     let mut wall_right = Quad::new(
@@ -28,7 +28,7 @@ pub fn smallpt() -> World {
         Vector3::new(0.0, 0.0, wall_length),
     );
     wall_right.set_material(lambertian_blue.clone());
-    let wall_right = Arc::new(Primitive::new(Arc::new(wall_right)));
+    let wall_right = Arc::new(GeometricPrimitive::new(Arc::new(wall_right)));
     world.add(wall_right.clone());
 
     let mut wall_back = Quad::new(
@@ -37,7 +37,7 @@ pub fn smallpt() -> World {
         Vector3::new(wall_length, 0.0, 0.0),
     );
     wall_back.set_material(lambertian_white.clone());
-    let wall_back = Arc::new(Primitive::new(Arc::new(wall_back)));
+    let wall_back = Arc::new(GeometricPrimitive::new(Arc::new(wall_back)));
     world.add(wall_back.clone());
 
     let mut wall_bottom = Quad::new(
@@ -46,7 +46,7 @@ pub fn smallpt() -> World {
         Vector3::new(0.0, 0.0, wall_length),
     );
     wall_bottom.set_material(lambertian_white.clone());
-    let wall_bottom = Arc::new(Primitive::new(Arc::new(wall_bottom)));
+    let wall_bottom = Arc::new(GeometricPrimitive::new(Arc::new(wall_bottom)));
     world.add(wall_bottom.clone());
 
     let mut wall_up = Quad::new(
@@ -56,19 +56,19 @@ pub fn smallpt() -> World {
     );
 
     wall_up.set_material(lambertian_white.clone());
-    let wall_up = Arc::new(Primitive::new(Arc::new(wall_up)));
+    let wall_up = Arc::new(GeometricPrimitive::new(Arc::new(wall_up)));
     world.add(wall_up.clone());
 
     let glass = Arc::new(Glass::new(1.5));
     let mut sphere_glass = Sphere::new(Point::new(73.0, 16.5, 78.0), 16.5);
     sphere_glass.set_material(glass.clone());
-    let sphere_glass = Arc::new(Primitive::new(Arc::new(sphere_glass)));
+    let sphere_glass = Arc::new(GeometricPrimitive::new(Arc::new(sphere_glass)));
     world.add(sphere_glass);
 
     let mirror = Arc::new(Mirror::new());
     let mut sphere_mirror = Sphere::new(Point::new(27.0, 16.5, 47.0), 16.5);
     sphere_mirror.set_material(mirror);
-    let sphere_mirror = Arc::new(Primitive::new(Arc::new(sphere_mirror)));
+    let sphere_mirror = Arc::new(GeometricPrimitive::new(Arc::new(sphere_mirror)));
     world.add(sphere_mirror);
 
     let light_len = 40.0;
@@ -80,7 +80,7 @@ pub fn smallpt() -> World {
     );
     quad_light.set_material(Arc::new(diffuse_light));
 
-    let quad_light = Arc::new(Primitive::new(Arc::new(quad_light)));
+    let quad_light = Arc::new(GeometricPrimitive::new(Arc::new(quad_light)));
     world.add_light(quad_light);
     world.build_index();
 

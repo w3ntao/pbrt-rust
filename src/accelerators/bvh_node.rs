@@ -58,7 +58,7 @@ impl Node {
     pub fn intersect(
         &self,
         ray: &Ray,
-        primitives: &Vec<Arc<Primitive>>,
+        primitives: &Vec<Arc<dyn Primitive>>,
         interaction: &mut SurfaceInteraction,
     ) -> bool {
         let (t1, t2) = self.bounds.intersect(ray);
@@ -95,9 +95,9 @@ impl Node {
 
 impl Node {
     pub fn build_leaf(
-        ordered_primitives: &mut Vec<Arc<Primitive>>,
+        ordered_primitives: &mut Vec<Arc<dyn Primitive>>,
         infos: Vec<PrimitiveInfo>,
-        primitives: &Vec<Arc<Primitive>>,
+        primitives: &Vec<Arc<dyn Primitive>>,
     ) -> Self {
         let _start = ordered_primitives.len();
         let _end = _start + infos.len();
@@ -117,9 +117,9 @@ impl Node {
     }
 
     pub fn recursive_build(
-        ordered_primitives: &mut Vec<Arc<Primitive>>,
+        ordered_primitives: &mut Vec<Arc<dyn Primitive>>,
         infos: Vec<PrimitiveInfo>,
-        primitives: &Vec<Arc<Primitive>>,
+        primitives: &Vec<Arc<dyn Primitive>>,
     ) -> Self {
         let mut total_bounds = Bounds::empty();
         for info in &infos {

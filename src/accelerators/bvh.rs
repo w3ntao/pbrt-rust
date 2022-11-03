@@ -2,7 +2,7 @@ use crate::accelerators::bvh_node::{Node, PrimitiveInfo};
 use crate::core::pbrt::*;
 
 pub struct BVH {
-    primitives: Vec<Arc<Primitive>>,
+    primitives: Vec<Arc<dyn Primitive>>,
     bounds: Bounds,
     root: Option<Box<Node>>,
     index_built: bool,
@@ -20,14 +20,14 @@ impl Default for BVH {
 }
 
 impl Aggregate for BVH {
-    fn add(&mut self, p: Arc<Primitive>) {
+    fn add(&mut self, p: Arc<dyn Primitive>) {
         self.bounds += p.get_bounds();
         self.primitives.push(p);
         self.index_built = false;
     }
 }
 
-impl Shape for BVH {
+impl Primitive for BVH {
     fn intersect(&self, ray: &Ray, interaction: &mut SurfaceInteraction) -> bool {
         if !self.index_built {
             panic!("BVH: You should invoke function `build_index()` before intersect with it")
@@ -40,20 +40,20 @@ impl Shape for BVH {
             .intersect(ray, &self.primitives, interaction);
     }
 
-    fn get_bounds(&self) -> Bounds {
-        return self.bounds;
-    }
-
     fn set_material(&mut self, _: Arc<dyn Material>) {
         panic!("You shouldn't invoke function `set_material()` from BVH")
     }
 
-    fn sample(&self) -> (Point, Vector3) {
-        panic!("sample() is not implemented for BVH");
+    fn get_bounds(&self) -> Bounds {
+        return self.bounds;
     }
 
     fn get_area(&self) -> f32 {
         panic!("get_area() is not implemented for BVH");
+    }
+
+    fn sample(&self) -> (Point, Vector3) {
+        panic!("sample() is not implemented for BVH");
     }
 }
 
@@ -67,7 +67,7 @@ impl BVH {
             primitive_infos[idx] = PrimitiveInfo::new(idx, bounds, centroid);
         }
 
-        let mut ordered_primitives = Vec::<Arc<Primitive>>::new();
+        let mut ordered_primitives = Vec::<Arc<dyn Primitive>>::new();
         self.root = Some(Box::new(Node::recursive_build(
             &mut ordered_primitives,
             primitive_infos,

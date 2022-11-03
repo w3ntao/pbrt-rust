@@ -14,13 +14,13 @@ pub fn test(width: usize, height: usize, samples: u32) {
 
     let mut big_sphere = Sphere::new(Point::new(0.0, -1000.0, 0.0), 1000.0);
     big_sphere.set_material(lambertian_perlin.clone());
-    let big_sphere = Arc::new(Primitive::new(Arc::new(big_sphere)));
+    let big_sphere = Arc::new(GeometricPrimitive::new(Arc::new(big_sphere)));
     scene.add(big_sphere);
 
     let sphere_center = Point::new(0.0, 2.0, 0.0);
     let mut small_sphere = Sphere::new(sphere_center, 2.0);
     small_sphere.set_material(lambertian_perlin.clone());
-    let small_sphere = Arc::new(Primitive::new(Arc::new(small_sphere)));
+    let small_sphere = Arc::new(GeometricPrimitive::new(Arc::new(small_sphere)));
     scene.add(small_sphere);
 
     let diffuse_light = DiffuseLight::new(Arc::new(SolidColor::new(Color::new(4.0, 4.0, 4.0))));
@@ -30,7 +30,7 @@ pub fn test(width: usize, height: usize, samples: u32) {
         Vector3::new(0.0, 2.0, 0.0),
     );
     quad_light.set_material(Arc::new(diffuse_light));
-    let quad_light = Arc::new(Primitive::new(Arc::new(quad_light)));
+    let quad_light = Arc::new(GeometricPrimitive::new(Arc::new(quad_light)));
     scene.add(quad_light);
 
     scene.build_index();

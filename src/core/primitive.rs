@@ -1,20 +1,68 @@
 use crate::core::pbrt::*;
 
-pub struct Primitive {
+pub trait Primitive: Send + Sync {
+    fn intersect(&self, ray: &Ray, surface_interaction: &mut SurfaceInteraction) -> bool;
+
+    fn set_material(&mut self, material: Arc<dyn Material>);
+
+    fn get_bounds(&self) -> Bounds;
+
+    fn get_area(&self) -> f32;
+
+    fn sample(&self) -> (Point, Vector3);
+}
+
+pub trait Aggregate {
+    fn add(&mut self, p: Arc<dyn Primitive>);
+}
+
+pub struct GeometricPrimitive {
     shape: Arc<dyn Shape>,
+    material: Arc<dyn Material>,
+}
+
+impl Primitive for GeometricPrimitive {
+    fn intersect(&self, ray: &Ray, surface_interaction: &mut SurfaceInteraction) -> bool {
+        return self.shape.intersect(ray, surface_interaction);
+    }
+
+    fn set_material(&mut self, material: Arc<dyn Material>) {
+        self.material = material;
+    }
+
+    fn get_bounds(&self) -> Bounds {
+        return self.shape.get_bounds();
+    }
+
+    fn get_area(&self) -> f32 {
+        return self.shape.get_area();
+    }
+
+    fn sample(&self) -> (Point, Vector3) {
+        return self.shape.sample();
+    }
+}
+
+impl GeometricPrimitive {
+    pub fn new(_shape: Arc<dyn Shape>) -> GeometricPrimitive {
+        GeometricPrimitive {
+            shape: _shape,
+            material: Arc::new(NullMaterial {}),
+        }
+    }
+}
+
+pub struct TransformedPrimitive {
+    primitive: Arc<dyn Primitive>,
     transform: Transform,
     material: Arc<dyn Material>,
 }
 
-pub trait Aggregate {
-    fn add(&mut self, p: Arc<Primitive>);
-}
-
-impl Shape for Primitive {
+impl Primitive for TransformedPrimitive {
     fn intersect(&self, ray: &Ray, surface_interaction: &mut SurfaceInteraction) -> bool {
         let (inverted_ray, inverted_distance) = (self.transform)(ray);
 
-        if !self.shape.intersect(&inverted_ray, surface_interaction) {
+        if !self.primitive.intersect(&inverted_ray, surface_interaction) {
             return false;
         }
 
@@ -29,8 +77,12 @@ impl Shape for Primitive {
         return true;
     }
 
+    fn set_material(&mut self, material: Arc<dyn Material>) {
+        self.material = material;
+    }
+
     fn get_bounds(&self) -> Bounds {
-        let bounds = self.shape.get_bounds();
+        let bounds = self.primitive.get_bounds();
         let min = bounds.p_min;
         let max = bounds.p_max;
 
@@ -52,33 +104,29 @@ impl Shape for Primitive {
         return Bounds::build(&points);
     }
 
-    fn set_material(&mut self, material: Arc<dyn Material>) {
-        self.material = material;
-    }
-
-    fn sample(&self) -> (Point, Vector3) {
-        let (p, v) = self.shape.sample();
-        return if self.transform.is_identity() {
-            (p, v)
-        } else {
-            ((self.transform)(p), (self.transform)(v))
-        };
-    }
-
     fn get_area(&self) -> f32 {
-        let area = self.shape.get_area();
+        let area = self.primitive.get_area();
         return if self.transform.is_identity() {
             area
         } else {
             area * self.transform.determinant()
         };
     }
+
+    fn sample(&self) -> (Point, Vector3) {
+        let (p, v) = self.primitive.sample();
+        return if self.transform.is_identity() {
+            (p, v)
+        } else {
+            ((self.transform)(p), (self.transform)(v))
+        };
+    }
 }
 
-impl Primitive {
-    pub fn new(_shape: Arc<dyn Shape>) -> Primitive {
-        Primitive {
-            shape: _shape,
+impl TransformedPrimitive {
+    pub fn new(_primitive: Arc<dyn Primitive>) -> TransformedPrimitive {
+        TransformedPrimitive {
+            primitive: _primitive,
             transform: Transform::identity(),
             material: Arc::new(NullMaterial {}),
         }

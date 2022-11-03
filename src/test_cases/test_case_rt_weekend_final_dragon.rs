@@ -15,7 +15,7 @@ pub fn test(width: usize, height: usize, samples: u32) {
     let ground_radius = 2000.0;
     let mut sphere_ground = Sphere::new(Point::new(0.0, -ground_radius, 0.0), ground_radius);
     sphere_ground.set_material(material_ground);
-    let ground = Arc::new(Primitive::new(Arc::new(sphere_ground)));
+    let ground = Arc::new(GeometricPrimitive::new(Arc::new(sphere_ground)));
 
     scene.add(ground.clone());
 
@@ -24,23 +24,23 @@ pub fn test(width: usize, height: usize, samples: u32) {
     let glass = Arc::new(Glass::new(1.5));
     let metal = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
 
-    let mut scaled_dragon = Primitive::new(Arc::new(load_dragon()));
+    let mut scaled_dragon = TransformedPrimitive::new(Arc::new(load_dragon()));
     scaled_dragon.rotate(Vector3::new(0.0, 1.0, 0.0), PI);
     scaled_dragon.scale_by_scalar(2.5);
     scaled_dragon.translate(Vector3::new(0.0, -scaled_dragon.get_bounds().p_min.y, 0.0));
     let dragon_instance = Arc::new(scaled_dragon);
 
-    let mut dragon_instance_0 = Primitive::new(dragon_instance.clone());
+    let mut dragon_instance_0 = TransformedPrimitive::new(dragon_instance.clone());
     dragon_instance_0.set_material(lambertian.clone());
     dragon_instance_0.translate(Vector3::new(-4.0, 0.0, 0.0));
     scene.add(Arc::new(dragon_instance_0));
 
-    let mut dragon_instance_1 = Primitive::new(dragon_instance.clone());
+    let mut dragon_instance_1 = TransformedPrimitive::new(dragon_instance.clone());
     dragon_instance_1.set_material(glass.clone());
     dragon_instance_1.translate(Vector3::new(0.0, 0.0, 0.0));
     scene.add(Arc::new(dragon_instance_1));
 
-    let mut dragon_instance_2 = Primitive::new(dragon_instance.clone());
+    let mut dragon_instance_2 = TransformedPrimitive::new(dragon_instance.clone());
     dragon_instance_2.set_material(metal.clone());
     dragon_instance_2.translate(Vector3::new(4.0, 0.0, 0.0));
     scene.add(Arc::new(dragon_instance_2));

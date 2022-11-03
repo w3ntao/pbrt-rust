@@ -25,7 +25,7 @@ pub fn load_dragon() -> BVH {
     let triangles = obj_to_triangles(dragon_path);
     let mut dragon_model = BVH::default();
     for t in triangles {
-        dragon_model.add(Arc::new(Primitive::new(t)));
+        dragon_model.add(Arc::new(GeometricPrimitive::new(t)));
     }
     dragon_model.build_index();
 

@@ -1,7 +1,7 @@
 use crate::core::pbrt::*;
 
 pub struct World {
-    lights: Vec<Arc<dyn Shape>>,
+    lights: Vec<Arc<dyn Primitive>>,
     scene: BVH,
 }
 
@@ -15,11 +15,11 @@ impl Default for World {
 }
 
 impl World {
-    pub fn add(&mut self, object: Arc<Primitive>) {
+    pub fn add(&mut self, object: Arc<dyn Primitive>) {
         self.scene.add(object.clone());
     }
 
-    pub fn add_light(&mut self, light: Arc<Primitive>) {
+    pub fn add_light(&mut self, light: Arc<dyn Primitive>) {
         self.lights.push(light.clone());
         self.scene.add(light.clone());
     }

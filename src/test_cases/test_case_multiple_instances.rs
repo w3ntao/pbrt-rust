@@ -13,7 +13,7 @@ pub fn test(width: usize, height: usize) {
     let mut world = World::default();
     for idx in 0..num {
         let theta = (idx as f32) * delta;
-        let mut dragon_instance = Primitive::new(dragon_model.clone());
+        let mut dragon_instance = TransformedPrimitive::new(dragon_model.clone());
         dragon_instance.rotate(Vector3::new(0.0, 1.0, 0.0), theta);
         dragon_instance.translate(Vector3::new(
             radius * theta.sin(),
