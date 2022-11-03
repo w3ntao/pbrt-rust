@@ -16,12 +16,12 @@ impl Default for World {
 
 impl World {
     pub fn add(&mut self, object: Arc<dyn Primitive>) {
-        self.scene.add(object.clone());
+        self.scene.add(object);
     }
 
     pub fn add_light(&mut self, light: Arc<dyn Primitive>) {
         self.lights.push(light.clone());
-        self.scene.add(light.clone());
+        self.scene.add(light);
     }
 
     pub fn build_index(&mut self) {
