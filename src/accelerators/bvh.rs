@@ -64,10 +64,16 @@ impl BVH {
     pub fn build_index(&mut self) {
         let start = Instant::now();
         let mut primitive_infos = vec![PrimitiveInfo::default(); self.primitives.len()];
+        let mut total_bounds = Bounds::empty();
         for idx in 0..self.primitives.len() {
             let bounds = self.primitives[idx].get_bounds();
             let centroid = 0.5 * (bounds.p_min + bounds.p_max);
             primitive_infos[idx] = PrimitiveInfo::new(idx, bounds, centroid);
+            total_bounds += bounds;
+        }
+
+        if total_bounds.is_empty() || total_bounds.get_area() < 0.0 {
+            panic!("BVH::build_index(): an empty bounds was sent in");
         }
 
         let mut ordered_primitives = Vec::<Arc<dyn Primitive>>::new();
@@ -75,6 +81,7 @@ impl BVH {
             &mut ordered_primitives,
             primitive_infos,
             &self.primitives,
+            total_bounds.get_area() * 1.0e-5,
         )));
         self.primitives = ordered_primitives;
         println!("BVH building took {:.2}s", start.elapsed().as_secs_f32());

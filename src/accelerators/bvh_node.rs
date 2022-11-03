@@ -1,7 +1,6 @@
 use crate::core::pbrt::*;
 
 const BUCKET_NUM: usize = 12;
-const MINIMAL_BOUNDS_AREA: f32 = 1.0e-6;
 
 #[derive(Copy, Clone)]
 pub struct PrimitiveInfo {
@@ -125,6 +124,7 @@ impl Node {
         ordered_primitives: &mut Vec<Arc<dyn Primitive>>,
         infos: Vec<PrimitiveInfo>,
         primitives: &Vec<Arc<dyn Primitive>>,
+        minimal_bounds_area: f32,
     ) -> Self {
         let mut total_bounds = Bounds::empty();
         for info in &infos {
@@ -132,7 +132,7 @@ impl Node {
         }
         let total_bounds = total_bounds;
 
-        if total_bounds.get_area() <= MINIMAL_BOUNDS_AREA {
+        if total_bounds.get_area() <= minimal_bounds_area {
             // when all primitives are accumulated close enough that
             // the bounding box is too small
             return Node::build_leaf(ordered_primitives, infos, primitives);
@@ -147,15 +147,7 @@ impl Node {
         if num_primitives < BUCKET_NUM {
             // stop dividing primitives into buckets
             // when primitive number is too small
-            let split_axis = {
-                if axis_extent.x > axis_extent.y && axis_extent.x > axis_extent.z {
-                    0
-                } else if axis_extent.y > axis_extent.z {
-                    1
-                } else {
-                    2
-                }
-            };
+            let split_axis = axis_extent.max_dimension();
             let split_val = (0.5 * (axis_min + axis_max))[split_axis];
 
             let mut left_infos = Vec::new();
@@ -191,11 +183,13 @@ impl Node {
                     ordered_primitives,
                     left_infos,
                     primitives,
+                    minimal_bounds_area,
                 ))),
                 right: Some(Box::new(Node::recursive_build(
                     ordered_primitives,
                     right_infos,
                     primitives,
+                    minimal_bounds_area,
                 ))),
             };
         }
@@ -290,11 +284,13 @@ impl Node {
                 ordered_primitives,
                 left_infos,
                 primitives,
+                minimal_bounds_area,
             ))),
             right: Some(Box::new(Node::recursive_build(
                 ordered_primitives,
                 right_infos,
                 primitives,
+                minimal_bounds_area,
             ))),
         };
     }
