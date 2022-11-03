@@ -96,26 +96,29 @@ impl Primitive for TransformedPrimitive {
     }
 
     fn get_bounds(&self) -> Bounds {
+        // a smarter way to transform bounds:
+        // takes roughly 2 transforms instead of 8
+        // https://stackoverflow.com/a/58630206
+
+        let mut transformed_bounds = Bounds::empty();
+        for idx in 0..3 {
+            transformed_bounds.p_min[idx] = self.transform[idx][3];
+        }
+        transformed_bounds.p_max = transformed_bounds.p_min;
+
         let bounds = self.primitive.get_bounds();
-        let min = bounds.p_min;
-        let max = bounds.p_max;
 
-        let mut points = [
-            min,
-            max,
-            Point::new(max.x, min.y, min.z),
-            Point::new(max.x, min.y, max.z),
-            Point::new(max.x, max.y, min.z),
-            Point::new(min.x, max.y, min.z),
-            Point::new(min.x, min.y, max.z),
-            Point::new(min.x, max.y, max.z),
-        ];
+        for i in 0..3 {
+            for k in 0..3 {
+                let a = self.transform[i][k] * bounds.p_min[k];
+                let b = self.transform[i][k] * bounds.p_max[k];
 
-        for idx in 0..points.len() {
-            points[idx] = (self.transform)(points[idx])
+                transformed_bounds.p_min[i] += if a < b { a } else { b };
+                transformed_bounds.p_max[i] += if a < b { b } else { a };
+            }
         }
 
-        return Bounds::build(&points);
+        return transformed_bounds;
     }
 
     fn get_area(&self) -> f32 {

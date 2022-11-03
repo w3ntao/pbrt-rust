@@ -80,6 +80,13 @@ impl Transform {
     }
 }
 
+impl ops::Index<usize> for Transform {
+    type Output = Vector4;
+    fn index(&self, idx: usize) -> &Vector4 {
+        &self.m[idx]
+    }
+}
+
 // https://docs.rs/fn_ops/latest/fn_ops/
 impl FnOnce<(Point,)> for Transform {
     type Output = Point;
