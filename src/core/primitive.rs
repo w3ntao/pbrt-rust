@@ -18,16 +18,27 @@ pub trait Aggregate {
 
 pub struct GeometricPrimitive {
     shape: Arc<dyn Shape>,
-    material: Arc<dyn Material>,
+    material: Option<Arc<dyn Material>>,
 }
 
 impl Primitive for GeometricPrimitive {
     fn intersect(&self, ray: &Ray, surface_interaction: &mut SurfaceInteraction) -> bool {
-        return self.shape.intersect(ray, surface_interaction);
+        if !self.shape.intersect(&ray, surface_interaction) {
+            return false;
+        }
+
+        match &self.material {
+            Some(material) => {
+                surface_interaction.material = material.clone();
+            }
+            _ => {}
+        }
+
+        return true;
     }
 
     fn set_material(&mut self, material: Arc<dyn Material>) {
-        self.material = material;
+        self.material = Some(material);
     }
 
     fn get_bounds(&self) -> Bounds {
@@ -47,7 +58,7 @@ impl GeometricPrimitive {
     pub fn new(_shape: Arc<dyn Shape>) -> GeometricPrimitive {
         GeometricPrimitive {
             shape: _shape,
-            material: Arc::new(NullMaterial {}),
+            material: None,
         }
     }
 }
@@ -55,7 +66,7 @@ impl GeometricPrimitive {
 pub struct TransformedPrimitive {
     primitive: Arc<dyn Primitive>,
     transform: Transform,
-    material: Arc<dyn Material>,
+    material: Option<Arc<dyn Material>>,
 }
 
 impl Primitive for TransformedPrimitive {
@@ -70,15 +81,18 @@ impl Primitive for TransformedPrimitive {
         surface_interaction.t = surface_interaction.t / inverted_distance;
         surface_interaction.p = ray(surface_interaction.t);
 
-        if !self.material.is_null() {
-            surface_interaction.material = self.material.clone();
+        match &self.material {
+            Some(material) => {
+                surface_interaction.material = material.clone();
+            }
+            _ => {}
         }
 
         return true;
     }
 
     fn set_material(&mut self, material: Arc<dyn Material>) {
-        self.material = material;
+        self.material = Some(material);
     }
 
     fn get_bounds(&self) -> Bounds {
@@ -128,7 +142,7 @@ impl TransformedPrimitive {
         TransformedPrimitive {
             primitive: _primitive,
             transform: Transform::identity(),
-            material: Arc::new(NullMaterial {}),
+            material: None,
         }
     }
 

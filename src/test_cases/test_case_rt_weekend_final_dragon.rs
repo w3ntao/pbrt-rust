@@ -24,7 +24,7 @@ pub fn test(width: usize, height: usize, samples: u32) {
     let glass = Arc::new(Glass::new(1.5));
     let metal = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
 
-    let mut scaled_dragon = TransformedPrimitive::new(Arc::new(load_dragon()));
+    let mut scaled_dragon = TransformedPrimitive::new(Arc::new(load_dragon(lambertian.clone())));
     scaled_dragon.rotate(Vector3::new(0.0, 1.0, 0.0), PI);
     scaled_dragon.scale_by_scalar(2.5);
     scaled_dragon.translate(Vector3::new(0.0, -scaled_dragon.get_bounds().p_min.y, 0.0));

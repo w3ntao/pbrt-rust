@@ -1,6 +1,5 @@
 pub mod cornell_box;
 pub mod smallpt;
-pub mod test_case_bvh_building;
 pub mod test_case_cornell_box_metal_dragon_next_event_estimation;
 pub mod test_case_cornell_box_metal_dragon_ray_casting_dot_normal;
 pub mod test_case_cornell_box_metal_dragon_ray_casting_normal;
@@ -12,7 +11,6 @@ pub mod test_case_depth_of_field;
 pub mod test_case_lighting;
 pub mod test_case_material_a;
 pub mod test_case_material_b;
-pub mod test_case_multiple_instances;
 pub mod test_case_perlin_texture;
 pub mod test_case_rt_weekend_final;
 pub mod test_case_rt_weekend_final_dragon;

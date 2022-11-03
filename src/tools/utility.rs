@@ -10,7 +10,7 @@ pub fn get_file_name(full_path: &str) -> String {
     return file_name.to_string();
 }
 
-pub fn load_dragon() -> BVH {
+pub fn load_dragon(material: Arc<dyn Material>) -> BVH {
     let dragon_path = "models/dragon.obj";
 
     if !Path::new(dragon_path).exists() {
@@ -25,7 +25,9 @@ pub fn load_dragon() -> BVH {
     let triangles = obj_to_triangles(dragon_path);
     let mut dragon_model = BVH::default();
     for t in triangles {
-        dragon_model.add(Arc::new(GeometricPrimitive::new(t)));
+        let mut primitive = GeometricPrimitive::new(t);
+        primitive.set_material(material.clone());
+        dragon_model.add(Arc::new(primitive));
     }
     dragon_model.build_index();
 

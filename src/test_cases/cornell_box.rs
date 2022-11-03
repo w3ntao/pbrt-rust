@@ -172,7 +172,7 @@ pub fn cornell_box_metal_dragon() -> World {
     let quad_light = Arc::new(GeometricPrimitive::new(Arc::new(quad_light)));
     world.add_light(quad_light);
 
-    let dragon_model = Arc::new(load_dragon());
+    let dragon_model = Arc::new(load_dragon(metal.clone()));
     let mut dragon_instance = TransformedPrimitive::new(dragon_model.clone());
     dragon_instance.rotate(Vector3::new(0.0, 1.0, 0.0), 1.5 * PI);
     dragon_instance.scale_by_scalar(350.0);
@@ -186,7 +186,7 @@ pub fn cornell_box_metal_dragon() -> World {
         -bounds.p_min.y,
         -center_z + WALL_LENGTH / 2.0,
     ));
-    dragon_instance.set_material(metal.clone());
+
     world.add(Arc::new(dragon_instance));
 
     world.build_index();
