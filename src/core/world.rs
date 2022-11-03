@@ -15,11 +15,11 @@ impl Default for World {
 }
 
 impl World {
-    pub fn add(&mut self, object: Arc<dyn Shape>) {
+    pub fn add(&mut self, object: Arc<Primitive>) {
         self.scene.add(object.clone());
     }
 
-    pub fn add_light(&mut self, light: Arc<dyn Shape>) {
+    pub fn add_light(&mut self, light: Arc<Primitive>) {
         self.lights.push(light.clone());
         self.scene.add(light.clone());
     }

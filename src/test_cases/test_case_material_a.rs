@@ -16,21 +16,25 @@ pub fn test(width: usize, height: usize, samples: u32) {
 
     let mut sphere_ground = Sphere::new(Point::new(0.0, -100.5, -1.0), 100.0);
     sphere_ground.set_material(material_ground);
+    let sphere_ground = Arc::new(Primitive::new(Arc::new(sphere_ground)));
 
     let mut sphere_center = Sphere::new(Point::new(0.0, 0.0, -1.0), 0.5);
     sphere_center.set_material(glass);
+    let sphere_center = Arc::new(Primitive::new(Arc::new(sphere_center)));
 
     let mut sphere_left = Sphere::new(Point::new(-1.0, 0.0, -1.0), 0.5);
     sphere_left.set_material(mirror);
+    let sphere_left = Arc::new(Primitive::new(Arc::new(sphere_left)));
 
     let mut sphere_right = Sphere::new(Point::new(1.0, 0.0, -1.0), 0.5);
     sphere_right.set_material(metal);
+    let sphere_right = Arc::new(Primitive::new(Arc::new(sphere_right)));
 
     let mut world = World::default();
-    world.add(Arc::new(sphere_ground));
-    world.add(Arc::new(sphere_left));
-    world.add(Arc::new(sphere_center));
-    world.add(Arc::new(sphere_right));
+    world.add(sphere_ground);
+    world.add(sphere_left);
+    world.add(sphere_center);
+    world.add(sphere_right);
     world.build_index();
 
     let camera = Perspective::new(

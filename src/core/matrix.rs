@@ -210,6 +210,23 @@ impl Matrix {
         };
     }
 
+    pub fn is_identity(&self) -> bool {
+        for x in 0..4 {
+            for y in 0..4 {
+                if x == y {
+                    if self[y][x] != 1.0 {
+                        return false;
+                    }
+                } else {
+                    if self[y][x] != 0.0 {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
     pub fn zero() -> Matrix {
         Matrix {
             row: [Vector4::zero(); 4],

@@ -15,6 +15,14 @@ impl Transform {
         };
     }
 
+    pub fn is_identity(&self) -> bool {
+        return self.m.is_identity();
+    }
+
+    pub fn determinant(&self) -> f32 {
+        return self.m.determinant();
+    }
+
     pub fn reset(&mut self) {
         *self = Transform::identity();
     }

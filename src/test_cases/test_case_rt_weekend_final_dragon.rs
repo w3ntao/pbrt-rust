@@ -15,7 +15,8 @@ pub fn test(width: usize, height: usize, samples: u32) {
     let ground_radius = 2000.0;
     let mut sphere_ground = Sphere::new(Point::new(0.0, -ground_radius, 0.0), ground_radius);
     sphere_ground.set_material(material_ground);
-    let ground = Arc::new(sphere_ground);
+    let ground = Arc::new(Primitive::new(Arc::new(sphere_ground)));
+
     scene.add(ground.clone());
 
     let texture_lambertian = Arc::new(SolidColor::new(Color::new(0.4, 0.2, 0.1)));

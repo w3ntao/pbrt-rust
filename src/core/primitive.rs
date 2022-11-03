@@ -6,6 +6,10 @@ pub struct Primitive {
     material: Arc<dyn Material>,
 }
 
+pub trait Aggregate {
+    fn add(&mut self, p: Arc<Primitive>);
+}
+
 impl Shape for Primitive {
     fn intersect(&self, ray: &Ray, surface_interaction: &mut SurfaceInteraction) -> bool {
         let (inverted_ray, inverted_distance) = (self.transform)(ray);
@@ -53,11 +57,21 @@ impl Shape for Primitive {
     }
 
     fn sample(&self) -> (Point, Vector3) {
-        panic!("sample() is not implemented for Instance");
+        let (p, v) = self.shape.sample();
+        return if self.transform.is_identity() {
+            (p, v)
+        } else {
+            ((self.transform)(p), (self.transform)(v))
+        };
     }
 
     fn get_area(&self) -> f32 {
-        panic!("get_area() is not implemented for Instance");
+        let area = self.shape.get_area();
+        return if self.transform.is_identity() {
+            area
+        } else {
+            area * self.transform.determinant()
+        };
     }
 }
 

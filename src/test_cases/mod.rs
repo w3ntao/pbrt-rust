@@ -1,7 +1,6 @@
 pub mod cornell_box;
 pub mod smallpt;
 pub mod test_case_bvh_building;
-pub mod test_case_checker_texture;
 pub mod test_case_cornell_box_metal_dragon_next_event_estimation;
 pub mod test_case_cornell_box_metal_dragon_ray_casting_dot_normal;
 pub mod test_case_cornell_box_metal_dragon_ray_casting_normal;

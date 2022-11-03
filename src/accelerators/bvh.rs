@@ -2,7 +2,7 @@ use crate::accelerators::bvh_node::{Node, PrimitiveInfo};
 use crate::core::pbrt::*;
 
 pub struct BVH {
-    primitives: Vec<Arc<dyn Shape>>,
+    primitives: Vec<Arc<Primitive>>,
     bounds: Bounds,
     root: Option<Box<Node>>,
     index_built: bool,
@@ -20,7 +20,7 @@ impl Default for BVH {
 }
 
 impl Aggregate for BVH {
-    fn add(&mut self, p: Arc<dyn Shape>) {
+    fn add(&mut self, p: Arc<Primitive>) {
         self.bounds += p.get_bounds();
         self.primitives.push(p);
         self.index_built = false;
@@ -67,7 +67,7 @@ impl BVH {
             primitive_infos[idx] = PrimitiveInfo::new(idx, bounds, centroid);
         }
 
-        let mut ordered_primitives = Vec::<Arc<dyn Shape>>::new();
+        let mut ordered_primitives = Vec::<Arc<Primitive>>::new();
         self.root = Some(Box::new(Node::recursive_build(
             &mut ordered_primitives,
             primitive_infos,

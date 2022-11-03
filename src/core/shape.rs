@@ -15,7 +15,3 @@ pub trait Shape: Send + Sync {
         panic!("get_area() not implemented for this Shape");
     }
 }
-
-pub trait Aggregate {
-    fn add(&mut self, p: Arc<dyn Shape>);
-}
