@@ -5,7 +5,7 @@ pub trait Primitive: Send + Sync {
 
     fn set_material(&mut self, material: Arc<dyn Material>);
 
-    fn get_bounds(&self) -> Bounds;
+    fn get_bounds(&self) -> AABBbounds;
 
     fn get_area(&self) -> f32;
 
@@ -41,7 +41,7 @@ impl Primitive for GeometricPrimitive {
         self.material = Some(material);
     }
 
-    fn get_bounds(&self) -> Bounds {
+    fn get_bounds(&self) -> AABBbounds {
         return self.shape.get_bounds();
     }
 
@@ -95,26 +95,26 @@ impl Primitive for TransformedPrimitive {
         self.material = Some(material);
     }
 
-    fn get_bounds(&self) -> Bounds {
+    fn get_bounds(&self) -> AABBbounds {
         // a smarter way to transform bounds:
         // takes roughly 2 transforms instead of 8
         // https://stackoverflow.com/a/58630206
 
-        let mut transformed_bounds = Bounds::empty();
+        let mut transformed_bounds = AABBbounds::empty();
         for idx in 0..3 {
-            transformed_bounds.p_min[idx] = self.transform[idx][3];
+            transformed_bounds.min[idx] = self.transform[idx][3];
         }
-        transformed_bounds.p_max = transformed_bounds.p_min;
+        transformed_bounds.max = transformed_bounds.min;
 
         let bounds = self.primitive.get_bounds();
 
         for i in 0..3 {
             for k in 0..3 {
-                let a = self.transform[i][k] * bounds.p_min[k];
-                let b = self.transform[i][k] * bounds.p_max[k];
+                let a = self.transform[i][k] * bounds.min[k];
+                let b = self.transform[i][k] * bounds.max[k];
 
-                transformed_bounds.p_min[i] += if a < b { a } else { b };
-                transformed_bounds.p_max[i] += if a < b { b } else { a };
+                transformed_bounds.min[i] += if a < b { a } else { b };
+                transformed_bounds.max[i] += if a < b { b } else { a };
             }
         }
 

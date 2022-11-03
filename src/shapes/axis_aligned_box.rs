@@ -3,7 +3,7 @@ use crate::core::pbrt::*;
 pub struct AxisAlignedBox {
     pub axis_min: Point,
     pub axis_max: Point,
-    bounds: Bounds,
+    bounds: AABBbounds,
 }
 
 impl AxisAlignedBox {
@@ -11,7 +11,7 @@ impl AxisAlignedBox {
         return Self {
             axis_min: min_of(&[corner_0, corner_1]),
             axis_max: max_of(&[corner_0, corner_1]),
-            bounds: Bounds::build(&[corner_0, corner_1]),
+            bounds: AABBbounds::build(&[corner_0, corner_1]),
         };
     }
 }
@@ -63,7 +63,7 @@ impl Shape for AxisAlignedBox {
         return true;
     }
 
-    fn get_bounds(&self) -> Bounds {
+    fn get_bounds(&self) -> AABBbounds {
         return self.bounds;
     }
 }

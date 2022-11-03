@@ -3,7 +3,7 @@ use crate::core::pbrt::*;
 
 pub struct BVH {
     primitives: Vec<Arc<dyn Primitive>>,
-    bounds: Bounds,
+    bounds: AABBbounds,
     root: Option<Box<Node>>,
     index_built: bool,
 }
@@ -12,7 +12,7 @@ impl Default for BVH {
     fn default() -> Self {
         BVH {
             primitives: Vec::default(),
-            bounds: Bounds::empty(),
+            bounds: AABBbounds::empty(),
             root: None,
             index_built: false,
         }
@@ -47,7 +47,7 @@ impl Primitive for BVH {
         panic!("You shouldn't invoke function `set_material()` from BVH")
     }
 
-    fn get_bounds(&self) -> Bounds {
+    fn get_bounds(&self) -> AABBbounds {
         return self.bounds;
     }
 
@@ -64,10 +64,10 @@ impl BVH {
     pub fn build_index(&mut self) {
         let start = Instant::now();
         let mut primitive_infos = vec![PrimitiveInfo::default(); self.primitives.len()];
-        let mut total_bounds = Bounds::empty();
+        let mut total_bounds = AABBbounds::empty();
         for idx in 0..self.primitives.len() {
             let bounds = self.primitives[idx].get_bounds();
-            let centroid = 0.5 * (bounds.p_min + bounds.p_max);
+            let centroid = 0.5 * (bounds.min + bounds.max);
             primitive_infos[idx] = PrimitiveInfo::new(idx, bounds, centroid);
             total_bounds += bounds;
         }

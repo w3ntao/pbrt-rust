@@ -3,7 +3,7 @@ use crate::core::pbrt::*;
 pub trait Shape: Send + Sync {
     fn intersect(&self, ray: &Ray, interaction: &mut SurfaceInteraction) -> bool;
 
-    fn get_bounds(&self) -> Bounds;
+    fn get_bounds(&self) -> AABBbounds;
 
     fn sample(&self) -> (Point, Vector3) {
         panic!("sample() not implemented for this Shape");

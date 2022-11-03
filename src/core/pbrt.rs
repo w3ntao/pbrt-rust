@@ -1,5 +1,5 @@
+pub use crate::core::aabb_bounds::*;
 pub use crate::core::accurate_float::*;
-pub use crate::core::bounds::*;
 pub use crate::core::camera::*;
 pub use crate::core::color::*;
 pub use crate::core::integrator::*;

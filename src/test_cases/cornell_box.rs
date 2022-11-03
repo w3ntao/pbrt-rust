@@ -190,12 +190,12 @@ pub fn cornell_box_metal_dragon() -> World {
     dragon_instance.scale_by_scalar(350.0);
 
     let bounds = dragon_instance.get_bounds();
-    let center_x = (bounds.p_min.x + bounds.p_max.x) / 2.0;
-    let center_z = (bounds.p_min.z + bounds.p_max.z) / 2.0;
+    let center_x = (bounds.min.x + bounds.max.x) / 2.0;
+    let center_z = (bounds.min.z + bounds.max.z) / 2.0;
 
     dragon_instance.translate(Vector3::new(
         -center_x + WALL_LENGTH / 2.0,
-        -bounds.p_min.y,
+        -bounds.min.y,
         -center_z + WALL_LENGTH / 2.0,
     ));
 

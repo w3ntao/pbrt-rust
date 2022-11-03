@@ -36,7 +36,7 @@ impl Shape for Quad {
         return false;
     }
 
-    fn get_bounds(&self) -> Bounds {
+    fn get_bounds(&self) -> AABBbounds {
         return self.triangles[0].get_bounds() + self.triangles[1].get_bounds();
     }
 

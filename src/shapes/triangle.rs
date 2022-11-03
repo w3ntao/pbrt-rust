@@ -172,7 +172,7 @@ impl Shape for Triangle {
         return true;
     }
 
-    fn get_bounds(&self) -> Bounds {
+    fn get_bounds(&self) -> AABBbounds {
         let vertex_idx0 = self.mesh_root.indices[self.mesh_index];
         let vertex_idx1 = self.mesh_root.indices[self.mesh_index + 1];
         let vertex_idx2 = self.mesh_root.indices[self.mesh_index + 2];
@@ -180,6 +180,6 @@ impl Shape for Triangle {
         let p1 = self.mesh_root.vertices[vertex_idx1];
         let p2 = self.mesh_root.vertices[vertex_idx2];
 
-        return Bounds::build(&[p0, p1, p2]);
+        return AABBbounds::build(&[p0, p1, p2]);
     }
 }
