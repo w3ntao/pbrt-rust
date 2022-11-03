@@ -95,54 +95,19 @@ impl FnOnce<(Point,)> for Transform {
     }
 }
 
-impl FnOnce<(Vector3,)> for Transform {
-    type Output = Vector3;
-    extern "rust-call" fn call_once(self, _: (Vector3,)) -> Vector3 {
-        panic!("FnOnce<(Vector3,)> not implemented for Transform");
-    }
-}
-
-impl FnOnce<(Normal,)> for Transform {
-    type Output = Normal;
-    extern "rust-call" fn call_once(self, _: (Normal,)) -> Normal {
-        panic!("FnOnce<(Normal,)> not implemented for Transform");
-    }
-}
-
-impl FnOnce<(&Ray,)> for Transform {
-    type Output = (Ray, f32);
-    extern "rust-call" fn call_once(self, _: (&Ray,)) -> (Ray, f32) {
-        panic!("FnOnce<(&Ray,)> not implemented for Transform");
-    }
-}
-
 impl FnMut<(Point,)> for Transform {
     extern "rust-call" fn call_mut(&mut self, _: (Point,)) -> Point {
         panic!("FnMut<(Point,)> not implemented for Transform");
     }
 }
 
-impl FnMut<(Vector3,)> for Transform {
-    extern "rust-call" fn call_mut(&mut self, _: (Vector3,)) -> Vector3 {
-        panic!("FnMut<(Vector3,)> not implemented for Transform");
-    }
-}
-
-impl FnMut<(Normal,)> for Transform {
-    extern "rust-call" fn call_mut(&mut self, _: (Normal,)) -> Normal {
-        panic!("FnMut<(Normal,)> not implemented for Transform");
-    }
-}
-
-impl FnMut<(&Ray,)> for Transform {
-    extern "rust-call" fn call_mut(&mut self, _: (&Ray,)) -> (Ray, f32) {
-        panic!("FnMut<(&Ray,)> not implemented for Transform");
-    }
-}
-
 impl Fn<(Point,)> for Transform {
     extern "rust-call" fn call(&self, p: (Point,)) -> Point {
         let p = p.0;
+
+        if self.is_identity() {
+            return p;
+        }
 
         // PBRT: Managing Rounding Error
         // https://www.pbr-book.org/3ed-2018/Shapes/Managing_Rounding_Error#x4-EffectofTransformations
@@ -181,17 +146,107 @@ impl Fn<(Point,)> for Transform {
     }
 }
 
+impl FnOnce<(Vector3,)> for Transform {
+    type Output = Vector3;
+    extern "rust-call" fn call_once(self, _: (Vector3,)) -> Vector3 {
+        panic!("FnOnce<(Vector3,)> not implemented for Transform");
+    }
+}
+
+impl FnMut<(Vector3,)> for Transform {
+    extern "rust-call" fn call_mut(&mut self, _: (Vector3,)) -> Vector3 {
+        panic!("FnMut<(Vector3,)> not implemented for Transform");
+    }
+}
+
 impl Fn<(Vector3,)> for Transform {
     extern "rust-call" fn call(&self, v: (Vector3,)) -> Vector3 {
         let v = v.0;
+        if self.is_identity() {
+            return v;
+        }
         return Vector3::from(&self.m * Vector4::from(v));
+    }
+}
+
+impl FnOnce<(Normal,)> for Transform {
+    type Output = Normal;
+    extern "rust-call" fn call_once(self, _: (Normal,)) -> Normal {
+        panic!("FnOnce<(Normal,)> not implemented for Transform");
+    }
+}
+
+impl FnMut<(Normal,)> for Transform {
+    extern "rust-call" fn call_mut(&mut self, _: (Normal,)) -> Normal {
+        panic!("FnMut<(Normal,)> not implemented for Transform");
     }
 }
 
 impl Fn<(Normal,)> for Transform {
     extern "rust-call" fn call(&self, n: (Normal,)) -> Normal {
         let n = n.0;
+        if self.is_identity() {
+            return n;
+        }
         return Normal::from(&self.inv_m.transpose() * Vector3::from(n)).normalize();
+    }
+}
+
+impl FnOnce<(AABBbounds,)> for Transform {
+    type Output = AABBbounds;
+    extern "rust-call" fn call_once(self, _: (AABBbounds,)) -> AABBbounds {
+        panic!("FnOnce<(AABBbounds,)> not implemented for Transform");
+    }
+}
+
+impl FnMut<(AABBbounds,)> for Transform {
+    extern "rust-call" fn call_mut(&mut self, _: (AABBbounds,)) -> AABBbounds {
+        panic!("FnMut<(AABBbounds,)> not implemented for Transform");
+    }
+}
+
+impl Fn<(AABBbounds,)> for Transform {
+    extern "rust-call" fn call(&self, bounds: (AABBbounds,)) -> AABBbounds {
+        let bounds = bounds.0;
+
+        if self.is_identity() {
+            return bounds;
+        }
+
+        // a smarter way to transform bounds:
+        // takes roughly 2 transforms instead of 8
+        // https://stackoverflow.com/a/58630206
+
+        let mut transformed_bounds = AABBbounds::empty();
+        for idx in 0..3 {
+            transformed_bounds.min[idx] = self.m[idx][3];
+        }
+        transformed_bounds.max = transformed_bounds.min;
+
+        for i in 0..3 {
+            for k in 0..3 {
+                let a = self.m[i][k] * bounds.min[k];
+                let b = self.m[i][k] * bounds.max[k];
+
+                transformed_bounds.min[i] += if a < b { a } else { b };
+                transformed_bounds.max[i] += if a < b { b } else { a };
+            }
+        }
+
+        return transformed_bounds;
+    }
+}
+
+impl FnOnce<(&Ray,)> for Transform {
+    type Output = (Ray, f32);
+    extern "rust-call" fn call_once(self, _: (&Ray,)) -> (Ray, f32) {
+        panic!("FnOnce<(&Ray,)> not implemented for Transform");
+    }
+}
+
+impl FnMut<(&Ray,)> for Transform {
+    extern "rust-call" fn call_mut(&mut self, _: (&Ray,)) -> (Ray, f32) {
+        panic!("FnMut<(&Ray,)> not implemented for Transform");
     }
 }
 

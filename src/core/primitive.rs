@@ -96,47 +96,20 @@ impl Primitive for TransformedPrimitive {
     }
 
     fn get_bounds(&self) -> AABBbounds {
-        // a smarter way to transform bounds:
-        // takes roughly 2 transforms instead of 8
-        // https://stackoverflow.com/a/58630206
-
-        let mut transformed_bounds = AABBbounds::empty();
-        for idx in 0..3 {
-            transformed_bounds.min[idx] = self.transform[idx][3];
-        }
-        transformed_bounds.max = transformed_bounds.min;
-
-        let bounds = self.primitive.get_bounds();
-
-        for i in 0..3 {
-            for k in 0..3 {
-                let a = self.transform[i][k] * bounds.min[k];
-                let b = self.transform[i][k] * bounds.max[k];
-
-                transformed_bounds.min[i] += if a < b { a } else { b };
-                transformed_bounds.max[i] += if a < b { b } else { a };
-            }
-        }
-
-        return transformed_bounds;
+        return (self.transform)(self.primitive.get_bounds());
     }
 
     fn get_area(&self) -> f32 {
         let area = self.primitive.get_area();
-        return if self.transform.is_identity() {
-            area
-        } else {
-            area * self.transform.determinant()
-        };
+        if self.transform.is_identity() {
+            return area;
+        }
+        return area * self.transform.determinant();
     }
 
     fn sample(&self) -> (Point, Vector3) {
         let (p, v) = self.primitive.sample();
-        return if self.transform.is_identity() {
-            (p, v)
-        } else {
-            ((self.transform)(p), (self.transform)(v))
-        };
+        return ((self.transform)(p), (self.transform)(v));
     }
 }
 
