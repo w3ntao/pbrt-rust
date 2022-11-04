@@ -29,7 +29,8 @@ impl World {
     }
 
     pub fn intersect(&self, ray: &Ray, interaction: &mut SurfaceInteraction) -> bool {
-        return self.scene.intersect(ray, interaction);
+        let mut ray = *ray;
+        return self.scene.intersect(&mut ray, interaction);
     }
 
     pub fn sample_light(&self) -> (Point, Vector3, f32) {

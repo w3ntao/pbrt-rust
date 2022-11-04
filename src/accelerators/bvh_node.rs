@@ -56,7 +56,7 @@ pub struct Node {
 impl Node {
     pub fn intersect(
         &self,
-        ray: &Ray,
+        ray: &mut Ray,
         primitives: &Vec<Arc<dyn Primitive>>,
         interaction: &mut SurfaceInteraction,
     ) -> bool {
@@ -72,7 +72,7 @@ impl Node {
                 for idx in self.start..self.end {
                     let p = &primitives[idx];
 
-                    if p.intersect(&ray.update_t(closest_t), interaction) {
+                    if p.intersect(&mut ray.update_t(closest_t), interaction) {
                         closest_t = interaction.t;
                         hit = true;
                     }
@@ -85,7 +85,7 @@ impl Node {
                     return right_node.intersect(ray, primitives, interaction);
                 }
 
-                right_node.intersect(&ray.update_t(interaction.t), primitives, interaction);
+                right_node.intersect(&mut ray.update_t(interaction.t), primitives, interaction);
                 return true;
             }
             _ => {

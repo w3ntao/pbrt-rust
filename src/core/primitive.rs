@@ -1,7 +1,7 @@
 use crate::core::pbrt::*;
 
 pub trait Primitive: Send + Sync {
-    fn intersect(&self, ray: &Ray, surface_interaction: &mut SurfaceInteraction) -> bool;
+    fn intersect(&self, ray: &mut Ray, surface_interaction: &mut SurfaceInteraction) -> bool;
 
     fn set_material(&mut self, material: Arc<dyn Material>);
 
@@ -22,7 +22,7 @@ pub struct GeometricPrimitive {
 }
 
 impl Primitive for GeometricPrimitive {
-    fn intersect(&self, ray: &Ray, surface_interaction: &mut SurfaceInteraction) -> bool {
+    fn intersect(&self, ray: &mut Ray, surface_interaction: &mut SurfaceInteraction) -> bool {
         if !self.shape.intersect(&ray, surface_interaction) {
             return false;
         }
@@ -70,10 +70,13 @@ pub struct TransformedPrimitive {
 }
 
 impl Primitive for TransformedPrimitive {
-    fn intersect(&self, ray: &Ray, surface_interaction: &mut SurfaceInteraction) -> bool {
-        let (inverted_ray, inverted_distance) = (self.transform)(ray);
+    fn intersect(&self, ray: &mut Ray, surface_interaction: &mut SurfaceInteraction) -> bool {
+        let (mut inverted_ray, inverted_distance) = (self.transform)(&ray.clone());
 
-        if !self.primitive.intersect(&inverted_ray, surface_interaction) {
+        if !self
+            .primitive
+            .intersect(&mut inverted_ray, surface_interaction)
+        {
             return false;
         }
 
