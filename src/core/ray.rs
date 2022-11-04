@@ -58,3 +58,13 @@ impl Fn<(f32,)> for Ray {
         return self.o + args.0 * self.d;
     }
 }
+
+impl std::fmt::Display for Ray {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "o: {}, d: {}  -- (t_min: {}, t_max: {})",
+            self.o, self.d, self.t_min, self.t_max
+        )
+    }
+}

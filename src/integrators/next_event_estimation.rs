@@ -1,7 +1,5 @@
 use crate::core::pbrt::*;
 
-const SHADOW_EPSILON: f32 = 0.001;
-
 pub struct NextEventEstimation {
     world: Arc<World>,
 }

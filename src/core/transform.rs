@@ -15,6 +15,13 @@ impl Transform {
         };
     }
 
+    pub fn inverse(&self) -> Transform {
+        return Transform {
+            m: self.inv_m,
+            inv_m: self.m,
+        };
+    }
+
     pub fn is_identity(&self) -> bool {
         return self.m.is_identity();
     }
@@ -146,6 +153,64 @@ impl Fn<(Point,)> for Transform {
     }
 }
 
+impl FnOnce<(Point, &mut Vector3)> for Transform {
+    type Output = Point;
+    extern "rust-call" fn call_once(self, _: (Point, &mut Vector3)) -> Point {
+        panic!("FnOnce<(Point, &mut Vector3)> not implemented for Transform");
+    }
+}
+
+impl FnMut<(Point, &mut Vector3)> for Transform {
+    extern "rust-call" fn call_mut(&mut self, _: (Point, &mut Vector3)) -> Point {
+        panic!("FnMut<(Point, &mut Vector3)> not implemented for Transform");
+    }
+}
+
+impl Fn<(Point, &mut Vector3)> for Transform {
+    extern "rust-call" fn call(&self, arg: (Point, &mut Vector3)) -> Point {
+        let (p_in, p_error) = arg;
+
+        if self.is_identity() {
+            return p_in;
+        }
+
+        // PBRT: Managing Rounding Error
+        // https://www.pbr-book.org/3ed-2018/Shapes/Managing_Rounding_Error#x4-EffectofTransformations
+
+        let x = p_in.x;
+        let y = p_in.y;
+        let z = p_in.z;
+
+        // Compute transformed coordinates from point _pt_
+        let xp = (self.m[0][0] * x + self.m[0][1] * y) + (self.m[0][2] * z + self.m[0][3]);
+        let yp = (self.m[1][0] * x + self.m[1][1] * y) + (self.m[1][2] * z + self.m[1][3]);
+        let zp = (self.m[2][0] * x + self.m[2][1] * y) + (self.m[2][2] * z + self.m[2][3]);
+        let wp = (self.m[3][0] * x + self.m[3][1] * y) + (self.m[3][2] * z + self.m[3][3]);
+        assert_ne!(wp, 0.0);
+
+        // Compute absolute error for transformed point
+        let xAbsSum = (self.m[0][0].abs() * x)
+            + (self.m[0][1].abs() * y)
+            + (self.m[0][2].abs() * z)
+            + (self.m[0][3]).abs();
+        let yAbsSum = (self.m[1][0].abs() * x)
+            + (self.m[1][1].abs() * y)
+            + (self.m[1][2].abs() * z)
+            + (self.m[1][3]).abs();
+        let zAbsSum = (self.m[2][0].abs() * x)
+            + (self.m[2][1].abs() * y)
+            + (self.m[2][2].abs() * z)
+            + (self.m[2][3]).abs();
+
+        *p_error = gamma(3) * Vector3::new(xAbsSum, yAbsSum, zAbsSum);
+
+        if wp == 1.0 {
+            return Point::new(xp, yp, zp);
+        }
+        return Point::new(xp, yp, zp) / wp;
+    }
+}
+
 impl FnOnce<(Vector3,)> for Transform {
     type Output = Vector3;
     extern "rust-call" fn call_once(self, _: (Vector3,)) -> Vector3 {
@@ -253,6 +318,23 @@ impl FnMut<(&Ray,)> for Transform {
 impl Fn<(&Ray,)> for Transform {
     extern "rust-call" fn call(&self, ray: (&Ray,)) -> (Ray, f32) {
         let ray = ray.0;
+
+        /*
+        //TODO: unfinished
+        let mut p_error = Vector3::invalid();
+        let mut o = (self)(ray.o, &mut p_error);
+        let d = (self)(ray.d);
+
+        let length_squared = d.length_squared();
+        let mut t_max = ray.t_max;
+        if length_squared > 0.0 {
+            let dt = d.abs().dot(p_error) / length_squared;
+            o += d * dt;
+            t_max -= dt;
+        }
+
+        return (Ray::new(o, d, INTERSECT_EPSILON, t_max), t_max);
+        */
 
         let inverted_matrix = &self.inv_m;
         let inverted_ray_direction = inverted_matrix * ray.d;
