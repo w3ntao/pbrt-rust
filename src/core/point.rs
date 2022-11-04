@@ -116,6 +116,23 @@ impl ops::Div<f32> for Point {
     }
 }
 
+impl ops::Add<Vector3> for Point {
+    type Output = Point;
+    fn add(self, rhs: Vector3) -> Point {
+        return Point {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z,
+        };
+    }
+}
+
+impl ops::AddAssign<Vector3> for Point {
+    fn add_assign(&mut self, rhs: Vector3) {
+        *self = *self + rhs;
+    }
+}
+
 pub fn max_of(points: &[Point]) -> Point {
     let mut _max = points[0];
 
