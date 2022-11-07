@@ -58,35 +58,34 @@ impl Node {
     pub fn intersect(
         &self,
         ray: &mut Ray,
+        t_hit: &mut f32,
         primitives: &Vec<Arc<dyn Primitive>>,
         interaction: &mut SurfaceInteraction,
     ) -> bool {
-        let (t1, t2) = self.bounds.intersect(ray);
-        if t1 > t2 || t1 > ray.t_max || t2 < ray.t_min {
+        let (t_near, t_far) = self.bounds.intersect(ray);
+        if t_near > t_far || t_near > ray.t_max || t_far < ray.t_min {
             return false;
         }
 
         match (&self.left, &self.right) {
             (None, None) => {
-                let mut closest_t = ray.t_max;
                 let mut hit = false;
                 for idx in self.start..self.end {
                     let p = &primitives[idx];
-
-                    if p.intersect(&mut ray.update_t(closest_t), interaction) {
-                        closest_t = interaction.t;
+                    if p.intersect(ray, t_hit, interaction) {
+                        ray.t_max = *t_hit;
                         hit = true;
                     }
                 }
-
                 return hit;
             }
             (Some(left_node), Some(right_node)) => {
-                if !left_node.intersect(ray, primitives, interaction) {
-                    return right_node.intersect(ray, primitives, interaction);
+                if !left_node.intersect(ray, t_hit, primitives, interaction) {
+                    return right_node.intersect(ray, t_hit, primitives, interaction);
                 }
 
-                right_node.intersect(&mut ray.update_t(interaction.t), primitives, interaction);
+                ray.t_max = *t_hit;
+                right_node.intersect(ray, t_hit, primitives, interaction);
                 return true;
             }
             _ => {

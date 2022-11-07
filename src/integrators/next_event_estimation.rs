@@ -46,7 +46,10 @@ impl NextEventEstimation {
         if !self
             .world
             .intersect(&shadow_ray, &mut light_surface_interaction)
-            || light_surface_interaction.t < distance * (1.0 - SHADOW_EPSILON)
+        {
+            return Color::black();
+        }
+        if (light_surface_interaction.p - shadow_ray.o).length() < distance * (1.0 - SHADOW_EPSILON)
         {
             return Color::black();
         }

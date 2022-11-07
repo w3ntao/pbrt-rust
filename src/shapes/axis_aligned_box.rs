@@ -17,7 +17,7 @@ impl AxisAlignedBox {
 }
 
 impl Shape for AxisAlignedBox {
-    fn intersect(&self, ray: &Ray, interaction: &mut SurfaceInteraction) -> bool {
+    fn intersect(&self, ray: &Ray, t_hit: &mut f32, interaction: &mut SurfaceInteraction) -> bool {
         let mut root_in = -f32::INFINITY;
         let mut root_out = f32::INFINITY;
         let mut normal = Normal::invalid();
@@ -56,7 +56,7 @@ impl Shape for AxisAlignedBox {
             return false;
         }
 
-        interaction.t = root_in;
+        *t_hit = root_in;
         interaction.p = ray(root_in);
         interaction.n = normal;
 

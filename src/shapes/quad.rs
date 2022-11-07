@@ -26,9 +26,9 @@ impl Quad {
 }
 
 impl Shape for Quad {
-    fn intersect(&self, ray: &Ray, interaction: &mut SurfaceInteraction) -> bool {
+    fn intersect(&self, ray: &Ray, t_hit: &mut f32, interaction: &mut SurfaceInteraction) -> bool {
         for triangle in &self.triangles {
-            if triangle.intersect(ray, interaction) {
+            if triangle.intersect(ray, t_hit, interaction) {
                 return true;
             }
         }

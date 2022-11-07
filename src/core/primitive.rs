@@ -1,7 +1,12 @@
 use crate::core::pbrt::*;
 
 pub trait Primitive: Send + Sync {
-    fn intersect(&self, ray: &mut Ray, surface_interaction: &mut SurfaceInteraction) -> bool;
+    fn intersect(
+        &self,
+        ray: &mut Ray,
+        t_hit: &mut f32,
+        surface_interaction: &mut SurfaceInteraction,
+    ) -> bool;
 
     fn set_material(&mut self, material: Arc<dyn Material>);
 
@@ -22,8 +27,13 @@ pub struct GeometricPrimitive {
 }
 
 impl Primitive for GeometricPrimitive {
-    fn intersect(&self, ray: &mut Ray, surface_interaction: &mut SurfaceInteraction) -> bool {
-        if !self.shape.intersect(&ray, surface_interaction) {
+    fn intersect(
+        &self,
+        ray: &mut Ray,
+        t_hit: &mut f32,
+        surface_interaction: &mut SurfaceInteraction,
+    ) -> bool {
+        if !self.shape.intersect(&ray, t_hit, surface_interaction) {
             return false;
         }
 
@@ -70,19 +80,24 @@ pub struct TransformedPrimitive {
 }
 
 impl Primitive for TransformedPrimitive {
-    fn intersect(&self, ray: &mut Ray, surface_interaction: &mut SurfaceInteraction) -> bool {
+    fn intersect(
+        &self,
+        ray: &mut Ray,
+        t_hit: &mut f32,
+        surface_interaction: &mut SurfaceInteraction,
+    ) -> bool {
         let (mut inverted_ray, inverted_distance) = (self.transform)(&ray.clone());
 
         if !self
             .primitive
-            .intersect(&mut inverted_ray, surface_interaction)
+            .intersect(&mut inverted_ray, t_hit, surface_interaction)
         {
             return false;
         }
 
         surface_interaction.n = (self.transform)(surface_interaction.n);
-        surface_interaction.t = surface_interaction.t / inverted_distance;
-        surface_interaction.p = ray(surface_interaction.t);
+        *t_hit = *t_hit / inverted_distance;
+        surface_interaction.p = ray(*t_hit);
 
         match &self.material {
             Some(material) => {

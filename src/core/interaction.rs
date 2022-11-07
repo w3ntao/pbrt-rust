@@ -5,7 +5,6 @@ pub const SHADOW_EPSILON: f32 = 0.001;
 
 #[derive(Clone)]
 pub struct SurfaceInteraction {
-    pub t: f32,
     pub p: Point,
     pub p_error: Vector3,
     pub n: Normal,
@@ -19,7 +18,6 @@ pub struct SurfaceInteraction {
 impl Default for SurfaceInteraction {
     fn default() -> Self {
         return Self {
-            t: f32::INFINITY,
             p: Point::invalid(),
             p_error: Vector3::invalid(),
             n: Normal::invalid(),

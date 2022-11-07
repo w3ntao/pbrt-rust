@@ -20,15 +20,6 @@ impl Ray {
         };
     }
 
-    pub fn update_t(&self, new_t: f32) -> Ray {
-        return Ray {
-            o: self.o,
-            d: self.d,
-            t_min: RAY_T_MIN,
-            t_max: new_t,
-        };
-    }
-
     pub fn dummy() -> Self {
         Self {
             o: Point::invalid(),

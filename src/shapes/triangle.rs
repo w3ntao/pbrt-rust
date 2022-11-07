@@ -38,7 +38,7 @@ impl Triangle {
 }
 
 impl Shape for Triangle {
-    fn intersect(&self, ray: &Ray, interaction: &mut SurfaceInteraction) -> bool {
+    fn intersect(&self, ray: &Ray, t_hit: &mut f32, interaction: &mut SurfaceInteraction) -> bool {
         let vertex_idx0 = self.mesh_root.indices[self.mesh_index];
         let vertex_idx1 = self.mesh_root.indices[self.mesh_index + 1];
         let vertex_idx2 = self.mesh_root.indices[self.mesh_index + 2];
@@ -164,7 +164,7 @@ impl Shape for Triangle {
             normal = -normal;
         }
 
-        interaction.t = t;
+        *t_hit = t;
         interaction.p = pHit;
         interaction.n = normal;
         interaction.p_error = pError;

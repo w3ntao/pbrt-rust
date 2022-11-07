@@ -33,7 +33,7 @@ fn get_sphere_uv(p: Point) -> (f32, f32) {
 }
 
 impl Shape for Sphere {
-    fn intersect(&self, ray: &Ray, interaction: &mut SurfaceInteraction) -> bool {
+    fn intersect(&self, ray: &Ray, t_hit: &mut f32, interaction: &mut SurfaceInteraction) -> bool {
         let oc = ray.o - self.center;
         let a = ray.d.length_squared();
         let half_b = oc.dot(ray.d);
@@ -56,7 +56,7 @@ impl Shape for Sphere {
         let hit_point = ray(root);
         let normal = (hit_point - self.center) / self.radius;
 
-        interaction.t = root;
+        *t_hit = root;
         interaction.p = hit_point;
         interaction.n = Normal::from(normal);
 
