@@ -30,8 +30,7 @@ impl World {
 
     pub fn intersect(&self, ray: &Ray, interaction: &mut SurfaceInteraction) -> bool {
         let mut ray = *ray;
-        let mut t_hit = f32::INFINITY;
-        return self.scene.intersect(&mut ray, &mut t_hit, interaction);
+        return self.scene.intersect(&mut ray, interaction);
     }
 
     pub fn sample_light(&self) -> (Point, Vector3, f32) {

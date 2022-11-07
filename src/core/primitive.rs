@@ -1,12 +1,7 @@
 use crate::core::pbrt::*;
 
 pub trait Primitive: Send + Sync {
-    fn intersect(
-        &self,
-        ray: &mut Ray,
-        t_hit: &mut f32,
-        surface_interaction: &mut SurfaceInteraction,
-    ) -> bool;
+    fn intersect(&self, ray: &mut Ray, surface_interaction: &mut SurfaceInteraction) -> bool;
 
     fn set_material(&mut self, material: Arc<dyn Material>);
 
@@ -27,15 +22,12 @@ pub struct GeometricPrimitive {
 }
 
 impl Primitive for GeometricPrimitive {
-    fn intersect(
-        &self,
-        ray: &mut Ray,
-        t_hit: &mut f32,
-        surface_interaction: &mut SurfaceInteraction,
-    ) -> bool {
-        if !self.shape.intersect(&ray, t_hit, surface_interaction) {
+    fn intersect(&self, ray: &mut Ray, surface_interaction: &mut SurfaceInteraction) -> bool {
+        let mut t_hit = f32::INFINITY;
+        if !self.shape.intersect(&ray, &mut t_hit, surface_interaction) {
             return false;
         }
+        ray.t_max = t_hit;
 
         match &self.material {
             Some(material) => {
@@ -80,24 +72,31 @@ pub struct TransformedPrimitive {
 }
 
 impl Primitive for TransformedPrimitive {
-    fn intersect(
-        &self,
-        ray: &mut Ray,
-        t_hit: &mut f32,
-        surface_interaction: &mut SurfaceInteraction,
-    ) -> bool {
-        let (mut inverted_ray, inverted_distance) = (self.transform)(&ray.clone());
+    fn intersect(&self, ray: &mut Ray, surface_interaction: &mut SurfaceInteraction) -> bool {
+        let inverse_transform = self.transform.inverse();
+        let inverse_dir = (inverse_transform)(ray.d);
+        let inverse_t = inverse_dir.length();
+        let mut inverse_ray = Ray::new(
+            (inverse_transform)(ray.o),
+            inverse_dir.normalize(),
+            ray.t_min * inverse_t,
+            ray.t_max * inverse_t,
+        );
 
         if !self
             .primitive
-            .intersect(&mut inverted_ray, t_hit, surface_interaction)
+            .intersect(&mut inverse_ray, surface_interaction)
         {
             return false;
         }
 
-        surface_interaction.n = (self.transform)(surface_interaction.n);
-        *t_hit = *t_hit / inverted_distance;
-        surface_interaction.p = ray(*t_hit);
+        ray.t_min = inverse_ray.t_min / inverse_t;
+        ray.t_max = inverse_ray.t_max / inverse_t;
+
+        if !self.transform.is_identity() {
+            surface_interaction.n = (self.transform)(surface_interaction.n);
+            surface_interaction.p = (self.transform)(surface_interaction.p);
+        }
 
         match &self.material {
             Some(material) => {

@@ -23,10 +23,10 @@ fn all_tests(samples: u32) {
     let width = 1000;
     let height = 1000;
 
+    test_case_cornell_box_metal_dragon_next_event_estimation::test(width, height, samples);
     test_case_cornell_box_next_event_estimation::test(width, height, samples);
     test_case_cornell_box_specular_path_trace::test(width, height, samples);
     test_case_cornell_box_specular_next_event_estimation::test(width, height, samples);
-    test_case_cornell_box_metal_dragon_next_event_estimation::test(width, height, samples);
 
     test_case_smallpt::test(1024, 762, samples);
 }

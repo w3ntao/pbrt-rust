@@ -28,12 +28,7 @@ impl Aggregate for BVH {
 }
 
 impl Primitive for BVH {
-    fn intersect(
-        &self,
-        ray: &mut Ray,
-        t_hit: &mut f32,
-        interaction: &mut SurfaceInteraction,
-    ) -> bool {
+    fn intersect(&self, ray: &mut Ray, interaction: &mut SurfaceInteraction) -> bool {
         if !self.index_built {
             panic!("BVH: You should invoke function `build_index()` before intersect with it")
         }
@@ -43,7 +38,7 @@ impl Primitive for BVH {
                 panic!("BVH::intersect(): no node available");
             }
             Some(node) => {
-                return node.intersect(ray, t_hit, &self.primitives, interaction);
+                return node.intersect(ray, &self.primitives, interaction);
             }
         }
     }
