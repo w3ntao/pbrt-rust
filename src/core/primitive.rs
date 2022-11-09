@@ -93,10 +93,8 @@ impl Primitive for TransformedPrimitive {
         ray.t_min = inverse_ray.t_min / inverse_t;
         ray.t_max = inverse_ray.t_max / inverse_t;
 
-        if !self.transform.is_identity() {
-            surface_interaction.n = (self.transform)(surface_interaction.n);
-            surface_interaction.p = (self.transform)(surface_interaction.p);
-        }
+        surface_interaction.n = (self.transform)(surface_interaction.n);
+        surface_interaction.p = (self.transform)(surface_interaction.p);
 
         match &self.material {
             Some(material) => {

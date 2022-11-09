@@ -35,6 +35,7 @@ impl Transform {
     }
 
     pub fn translate(&mut self, t: Vector3) {
+        // TODO: rewrite to PBRT version?
         for idx in 0..3 {
             self.m[idx][3] += t[idx];
         }
@@ -42,13 +43,14 @@ impl Transform {
     }
 
     pub fn scale_by_scalar(&mut self, scalar: f32) {
-        for row in 0..3 {
-            for col in 0..3 {
-                self.m[row][col] *= scalar;
+        // TODO: rewrite to PBRT version?
+        let inv_scalar = 1.0 / scalar;
+        for y in 0..3 {
+            for x in 0..3 {
+                self.m[y][x] *= scalar;
+                self.inv_m[y][x] *= inv_scalar;
             }
         }
-
-        self.inv_m = self.m.inverse();
     }
 
     pub fn rotate(&mut self, axis: Vector3, angle: f32) {
@@ -60,37 +62,29 @@ impl Transform {
         let y = normalized_axis.y;
         let z = normalized_axis.z;
 
-        let rotate_matrix = Matrix::new(
-            Vector4::new(
-                x * x * (1.0 - cosine) + cosine,
-                x * y * (1.0 - cosine) - z * sine,
-                x * z * (1.0 - cosine) + y * sine,
-                0.0,
-            ),
-            Vector4::new(
-                x * y * (1.0 - cosine) + z * sine,
-                cosine + y * y * (1.0 - cosine),
-                y * z * (1.0 - cosine) - x * sine,
-                0.0,
-            ),
-            Vector4::new(
-                x * z * (1.0 - cosine) - y * sine,
-                y * z * (1.0 - cosine) + x * sine,
-                cosine + z * z * (1.0 - cosine),
-                0.0,
-            ),
-            Vector4::new(0.0, 0.0, 0.0, 1.0),
-        );
+        let mut rotate_matrix = Matrix::zero();
+        rotate_matrix[0] = [
+            x * x * (1.0 - cosine) + cosine,
+            x * y * (1.0 - cosine) - z * sine,
+            x * z * (1.0 - cosine) + y * sine,
+            0.0,
+        ];
+        rotate_matrix[1] = [
+            x * y * (1.0 - cosine) + z * sine,
+            cosine + y * y * (1.0 - cosine),
+            y * z * (1.0 - cosine) - x * sine,
+            0.0,
+        ];
+        rotate_matrix[2] = [
+            x * z * (1.0 - cosine) - y * sine,
+            y * z * (1.0 - cosine) + x * sine,
+            cosine + z * z * (1.0 - cosine),
+            0.0,
+        ];
+        rotate_matrix[3] = [0.0, 0.0, 0.0, 1.0];
 
-        self.m *= rotate_matrix;
+        self.m = rotate_matrix * self.m;
         self.inv_m = self.m.inverse();
-    }
-}
-
-impl ops::Index<usize> for Transform {
-    type Output = Vector4;
-    fn index(&self, idx: usize) -> &Vector4 {
-        &self.m[idx]
     }
 }
 
@@ -230,7 +224,17 @@ impl Fn<(Vector3,)> for Transform {
         if self.is_identity() {
             return v;
         }
-        return Vector3::from(&self.m * Vector4::from(v));
+
+        let x = v.x;
+        let y = v.y;
+        let z = v.z;
+
+        let matrix = self.m;
+        return Vector3::new(
+            matrix[0][0] * x + matrix[0][1] * y + matrix[0][2] * z,
+            matrix[1][0] * x + matrix[1][1] * y + matrix[1][2] * z,
+            matrix[2][0] * x + matrix[2][1] * y + matrix[2][2] * z,
+        );
     }
 }
 
@@ -253,7 +257,18 @@ impl Fn<(Normal,)> for Transform {
         if self.is_identity() {
             return n;
         }
-        return Normal::from(&self.inv_m.transpose() * Vector3::from(n)).normalize();
+
+        let x = n.x;
+        let y = n.y;
+        let z = n.z;
+
+        let inverse_matrix = self.inv_m;
+        return Normal::new(
+            inverse_matrix[0][0] * x + inverse_matrix[1][0] * y + inverse_matrix[2][0] * z,
+            inverse_matrix[0][1] * x + inverse_matrix[1][1] * y + inverse_matrix[2][1] * z,
+            inverse_matrix[0][2] * x + inverse_matrix[1][2] * y + inverse_matrix[2][2] * z,
+        )
+        .normalize();
     }
 }
 

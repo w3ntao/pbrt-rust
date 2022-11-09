@@ -8,8 +8,6 @@ pub struct Ray {
     pub t_max: f32,
 }
 
-const RAY_T_MIN: f32 = 0.001;
-
 impl Ray {
     pub fn new(_o: Point, _d: Vector3, _t_min: f32, _t_max: f32) -> Self {
         return Self {
