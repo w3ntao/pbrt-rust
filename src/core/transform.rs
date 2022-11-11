@@ -35,22 +35,23 @@ impl Transform {
     }
 
     pub fn translate(&mut self, t: Vector3) {
-        // TODO: rewrite to PBRT version?
+        let mut matrix = Matrix::identity();
         for idx in 0..3 {
-            self.m[idx][3] += t[idx];
+            matrix[idx][3] = t[idx];
         }
+
+        self.m = matrix * self.m;
         self.inv_m = self.m.inverse();
     }
 
     pub fn scale_by_scalar(&mut self, scalar: f32) {
-        // TODO: rewrite to PBRT version?
-        let inv_scalar = 1.0 / scalar;
-        for y in 0..3 {
-            for x in 0..3 {
-                self.m[y][x] *= scalar;
-                self.inv_m[y][x] *= inv_scalar;
-            }
+        let mut matrix = Matrix::identity();
+        for idx in 0..3 {
+            matrix[idx][idx] = scalar;
         }
+
+        self.m = matrix * self.m;
+        self.inv_m = self.m.inverse();
     }
 
     pub fn rotate(&mut self, axis: Vector3, angle: f32) {

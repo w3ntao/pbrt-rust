@@ -22,8 +22,6 @@ impl Material for Mirror {
         );
 
         return (true, scattered_ray, Color::new(1.0, 1.0, 1.0));
-        // TODO: I am implementing perfect glass for the time being
-        // TODO: that reflects everything
     }
 
     fn is_specular(&self) -> bool {
