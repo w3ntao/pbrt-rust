@@ -18,6 +18,9 @@ fn all_tests(samples: u32) {
     let width = 1000;
     let height = 750;
 
+    test_case_dragon_bvh::test(width, height);
+    test_case_multiple_dragons::test(width, height);
+
     test_case_rt_weekend_final_dragon::test(width, height, samples);
 
     let width = 1000;
