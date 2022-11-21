@@ -1,7 +1,7 @@
 use crate::core::pbrt::*;
 
-pub fn bug_camera(width: usize, height: usize) -> Perspective {
-    let offset = 800.0;
+pub fn far_camera(width: usize, height: usize) -> Perspective {
+    let offset = 1200.0;
 
     let camera = Perspective::new(
         Point::new(-2.2 - offset, 0.0, 0.0),
@@ -13,7 +13,7 @@ pub fn bug_camera(width: usize, height: usize) -> Perspective {
     return camera;
 }
 
-pub fn bug_dragon() -> World {
+pub fn transformed_dragon() -> World {
     let mut world = World::default();
     let glass = Arc::new(Glass::new(1.0));
     let dragon_model = Arc::new(load_dragon(glass.clone()));
@@ -33,8 +33,8 @@ pub fn test(width: usize, height: usize) {
     let ppm_name = format!("{}.ppm", file_name);
     println!("TESTING: {}", &file_name);
 
-    let integrator = RayCastingDotNormal::new(Arc::new(bug_dragon()));
-    let renderer = Renderer::new(Arc::new(bug_camera(width, height)), Arc::new(integrator), 1);
+    let integrator = RayCastingDotNormal::new(Arc::new(transformed_dragon()));
+    let renderer = Renderer::new(Arc::new(far_camera(width, height)), Arc::new(integrator), 1);
     let image = renderer.render(width, height);
     image.write(&ppm_name);
     println!();
