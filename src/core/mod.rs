@@ -1,4 +1,4 @@
-pub mod aabb_bounds;
+pub mod bounds;
 pub mod accurate_float;
 pub mod camera;
 pub mod color;

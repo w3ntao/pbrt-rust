@@ -1,17 +1,17 @@
 use crate::core::pbrt::*;
 
 pub struct AxisAlignedBox {
-    pub axis_min: Point,
-    pub axis_max: Point,
-    bounds: AABBbounds,
+    pub p_min: Point,
+    pub p_max: Point,
+    bounds: Bounds,
 }
 
 impl AxisAlignedBox {
     pub fn new(corner_0: Point, corner_1: Point) -> Self {
         return Self {
-            axis_min: min_of(&[corner_0, corner_1]),
-            axis_max: max_of(&[corner_0, corner_1]),
-            bounds: AABBbounds::build(&[corner_0, corner_1]),
+            p_min: min_of(&[corner_0, corner_1]),
+            p_max: max_of(&[corner_0, corner_1]),
+            bounds: Bounds::build(&[corner_0, corner_1]),
         };
     }
 }
@@ -24,12 +24,13 @@ impl Shape for AxisAlignedBox {
 
         for axis in 0..3 {
             if ray.d[axis] == 0.0 {
-                if self.axis_min[axis] > ray.o[axis] || self.axis_max[axis] < ray.o[axis] {
+                if self.p_min[axis] > ray.o[axis] || self.p_max[axis] < ray.o[axis] {
                     return false;
                 }
             } else {
-                let t0 = (self.axis_min[axis] - ray.o[axis]) / ray.d[axis];
-                let t1 = (self.axis_max[axis] - ray.o[axis]) / ray.d[axis];
+                let reverse_dir = 1.0 / ray.d[axis];
+                let t0 = (self.p_min[axis] - ray.o[axis]) * reverse_dir;
+                let t1 = (self.p_max[axis] - ray.o[axis]) * reverse_dir;
 
                 if t0 > t1 {
                     if root_in < t1 {
@@ -63,7 +64,7 @@ impl Shape for AxisAlignedBox {
         return true;
     }
 
-    fn get_bounds(&self) -> AABBbounds {
+    fn get_bounds(&self) -> Bounds {
         return self.bounds;
     }
 }

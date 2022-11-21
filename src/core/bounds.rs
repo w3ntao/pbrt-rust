@@ -1,31 +1,31 @@
 use crate::core::pbrt::*;
 
 #[derive(Copy, Clone)]
-pub struct AABBbounds {
-    pub min: Point,
-    pub max: Point,
+pub struct Bounds {
+    pub p_min: Point,
+    pub p_max: Point,
 }
 
-impl AABBbounds {
+impl Bounds {
     pub fn empty() -> Self {
-        return AABBbounds {
-            min: Point::new(f32::INFINITY, f32::INFINITY, f32::INFINITY),
-            max: Point::new(-f32::INFINITY, -f32::INFINITY, -f32::INFINITY),
+        return Bounds {
+            p_min: Point::new(f32::INFINITY, f32::INFINITY, f32::INFINITY),
+            p_max: Point::new(-f32::INFINITY, -f32::INFINITY, -f32::INFINITY),
         };
     }
 
     pub fn build(points: &[Point]) -> Self {
         let _min = min_of(&points);
         let _max = max_of(&points);
-        return AABBbounds {
-            min: _min,
-            max: _max,
+        return Bounds {
+            p_min: _min,
+            p_max: _max,
         };
     }
 
     pub fn is_empty(&self) -> bool {
         for idx in 0..3 {
-            if self.min[idx] > self.max[idx] {
+            if self.p_min[idx] > self.p_max[idx] {
                 return true;
             }
         }
@@ -36,9 +36,9 @@ impl AABBbounds {
         if self.is_empty() {
             return 0.0;
         }
-        let x_extent = self.max.x - self.min.x;
-        let y_extent = self.max.y - self.min.y;
-        let z_extent = self.max.z - self.min.z;
+        let x_extent = self.p_max.x - self.p_min.x;
+        let y_extent = self.p_max.y - self.p_min.y;
+        let z_extent = self.p_max.z - self.p_min.z;
 
         return 2.0 * (x_extent * y_extent + x_extent * z_extent + y_extent * z_extent);
     }
@@ -54,13 +54,13 @@ impl AABBbounds {
 
         for axis in 0..3 {
             if ray.d[axis] == 0.0 {
-                if ray.o[axis] < self.min[axis] || ray.o[axis] > self.max[axis] {
+                if ray.o[axis] < self.p_min[axis] || ray.o[axis] > self.p_max[axis] {
                     return no_hit;
                 }
             } else {
                 let inv_ray_dir = 1.0 / ray.d[axis];
-                let mut t_near = (self.min[axis] - ray.o[axis]) * inv_ray_dir;
-                let mut t_far = (self.max[axis] - ray.o[axis]) * inv_ray_dir;
+                let mut t_near = (self.p_min[axis] - ray.o[axis]) * inv_ray_dir;
+                let mut t_far = (self.p_max[axis] - ray.o[axis]) * inv_ray_dir;
                 if t_near > t_far {
                     mem::swap(&mut t_near, &mut t_far);
                 }
@@ -81,18 +81,18 @@ impl AABBbounds {
     }
 }
 
-impl ops::Add<AABBbounds> for AABBbounds {
-    type Output = AABBbounds;
-    fn add(self, rhs: AABBbounds) -> AABBbounds {
-        return AABBbounds {
-            min: min_of(&[self.min, rhs.min]),
-            max: max_of(&[self.max, rhs.max]),
+impl ops::Add<Bounds> for Bounds {
+    type Output = Bounds;
+    fn add(self, rhs: Bounds) -> Bounds {
+        return Bounds {
+            p_min: min_of(&[self.p_min, rhs.p_min]),
+            p_max: max_of(&[self.p_max, rhs.p_max]),
         };
     }
 }
 
-impl ops::AddAssign<AABBbounds> for AABBbounds {
-    fn add_assign(&mut self, rhs: AABBbounds) {
+impl ops::AddAssign<Bounds> for Bounds {
+    fn add_assign(&mut self, rhs: Bounds) {
         *self = *self + rhs;
     }
 }

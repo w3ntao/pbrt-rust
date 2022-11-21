@@ -6,7 +6,7 @@ const MINIMAL_BOUNDS_AREA: f32 = 1.0e-6;
 #[derive(Copy, Clone)]
 pub struct PrimitiveInfo {
     primitive_id: usize,
-    bounds: AABBbounds,
+    bounds: Bounds,
     centroid: Point,
 }
 
@@ -14,14 +14,14 @@ impl Default for PrimitiveInfo {
     fn default() -> Self {
         Self {
             primitive_id: usize::MAX,
-            bounds: AABBbounds::empty(),
+            bounds: Bounds::empty(),
             centroid: Point::new(f32::NAN, f32::NAN, f32::NAN),
         }
     }
 }
 
 impl PrimitiveInfo {
-    pub fn new(id: usize, _bounds: AABBbounds, _centroid: Point) -> Self {
+    pub fn new(id: usize, _bounds: Bounds, _centroid: Point) -> Self {
         Self {
             primitive_id: id,
             bounds: _bounds,
@@ -32,7 +32,7 @@ impl PrimitiveInfo {
 
 struct Bucket {
     count: i32,
-    bounds: AABBbounds,
+    bounds: Bounds,
     primitive_infos: Vec<PrimitiveInfo>,
 }
 
@@ -40,7 +40,7 @@ impl Bucket {
     fn empty() -> Self {
         Self {
             count: 0,
-            bounds: AABBbounds::empty(),
+            bounds: Bounds::empty(),
             primitive_infos: vec![],
         }
     }
@@ -49,7 +49,7 @@ impl Bucket {
 pub struct Node {
     start: usize,
     end: usize,
-    bounds: AABBbounds,
+    bounds: Bounds,
     left: Option<Box<Node>>,
     right: Option<Box<Node>>,
 }
@@ -98,7 +98,7 @@ impl Node {
     ) -> Self {
         let _start = ordered_primitives.len();
         let _end = _start + infos.len();
-        let mut total_bounds = AABBbounds::empty();
+        let mut total_bounds = Bounds::empty();
         for info in &infos {
             ordered_primitives.push(primitives[info.primitive_id].clone());
             total_bounds += info.bounds;
@@ -118,7 +118,7 @@ impl Node {
         infos: Vec<PrimitiveInfo>,
         primitives: &Vec<Arc<dyn Primitive>>,
     ) -> Self {
-        let mut total_bounds = AABBbounds::empty();
+        let mut total_bounds = Bounds::empty();
         for info in &infos {
             total_bounds += info.bounds;
         }
@@ -144,8 +144,8 @@ impl Node {
 
             let mut left_infos = Vec::new();
             let mut right_infos = Vec::new();
-            let mut left_bounds = AABBbounds::empty();
-            let mut right_bounds = AABBbounds::empty();
+            let mut left_bounds = Bounds::empty();
+            let mut right_bounds = Bounds::empty();
             for info in &infos {
                 if info.centroid[split_axis] < split_val {
                     left_infos.push(*info);
@@ -223,8 +223,8 @@ impl Node {
             }
 
             for idx in 0..BUCKET_NUM - 1 {
-                let mut left_bounds = AABBbounds::empty();
-                let mut right_bounds = AABBbounds::empty();
+                let mut left_bounds = Bounds::empty();
+                let mut right_bounds = Bounds::empty();
 
                 let mut left_count = 0;
                 let mut right_count = 0;

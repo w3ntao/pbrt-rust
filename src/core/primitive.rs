@@ -5,7 +5,7 @@ pub trait Primitive: Send + Sync {
 
     fn set_material(&mut self, material: Arc<dyn Material>);
 
-    fn get_bounds(&self) -> AABBbounds;
+    fn get_bounds(&self) -> Bounds;
 
     fn get_area(&self) -> f32;
 
@@ -43,7 +43,7 @@ impl Primitive for GeometricPrimitive {
         self.material = Some(material);
     }
 
-    fn get_bounds(&self) -> AABBbounds {
+    fn get_bounds(&self) -> Bounds {
         return self.shape.get_bounds();
     }
 
@@ -110,7 +110,7 @@ impl Primitive for TransformedPrimitive {
         self.material = Some(material);
     }
 
-    fn get_bounds(&self) -> AABBbounds {
+    fn get_bounds(&self) -> Bounds {
         return (self.transform)(self.primitive.get_bounds());
     }
 

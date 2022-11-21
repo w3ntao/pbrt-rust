@@ -273,21 +273,21 @@ impl Fn<(Normal,)> for Transform {
     }
 }
 
-impl FnOnce<(AABBbounds,)> for Transform {
-    type Output = AABBbounds;
-    extern "rust-call" fn call_once(self, _: (AABBbounds,)) -> AABBbounds {
+impl FnOnce<(Bounds,)> for Transform {
+    type Output = Bounds;
+    extern "rust-call" fn call_once(self, _: (Bounds,)) -> Bounds {
         panic!("FnOnce<(AABBbounds,)> not implemented for Transform");
     }
 }
 
-impl FnMut<(AABBbounds,)> for Transform {
-    extern "rust-call" fn call_mut(&mut self, _: (AABBbounds,)) -> AABBbounds {
+impl FnMut<(Bounds,)> for Transform {
+    extern "rust-call" fn call_mut(&mut self, _: (Bounds,)) -> Bounds {
         panic!("FnMut<(AABBbounds,)> not implemented for Transform");
     }
 }
 
-impl Fn<(AABBbounds,)> for Transform {
-    extern "rust-call" fn call(&self, bounds: (AABBbounds,)) -> AABBbounds {
+impl Fn<(Bounds,)> for Transform {
+    extern "rust-call" fn call(&self, bounds: (Bounds,)) -> Bounds {
         let bounds = bounds.0;
 
         if self.is_identity() {
@@ -298,19 +298,19 @@ impl Fn<(AABBbounds,)> for Transform {
         // takes roughly 2 transforms instead of 8
         // https://stackoverflow.com/a/58630206
 
-        let mut transformed_bounds = AABBbounds::empty();
+        let mut transformed_bounds = Bounds::empty();
         for idx in 0..3 {
-            transformed_bounds.min[idx] = self.m[idx][3];
+            transformed_bounds.p_min[idx] = self.m[idx][3];
         }
-        transformed_bounds.max = transformed_bounds.min;
+        transformed_bounds.p_max = transformed_bounds.p_min;
 
         for i in 0..3 {
             for k in 0..3 {
-                let a = self.m[i][k] * bounds.min[k];
-                let b = self.m[i][k] * bounds.max[k];
+                let a = self.m[i][k] * bounds.p_min[k];
+                let b = self.m[i][k] * bounds.p_max[k];
 
-                transformed_bounds.min[i] += if a < b { a } else { b };
-                transformed_bounds.max[i] += if a < b { b } else { a };
+                transformed_bounds.p_min[i] += if a < b { a } else { b };
+                transformed_bounds.p_max[i] += if a < b { b } else { a };
             }
         }
 

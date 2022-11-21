@@ -3,7 +3,7 @@ use crate::core::pbrt::*;
 pub struct Sphere {
     pub center: Point,
     pub radius: f32,
-    bounds: AABBbounds,
+    bounds: Bounds,
 }
 
 impl Sphere {
@@ -13,7 +13,7 @@ impl Sphere {
         return Self {
             center: _center,
             radius: _radius,
-            bounds: AABBbounds::build(&[min, max]),
+            bounds: Bounds::build(&[min, max]),
         };
     }
 }
@@ -72,7 +72,7 @@ impl Shape for Sphere {
         return true;
     }
 
-    fn get_bounds(&self) -> AABBbounds {
+    fn get_bounds(&self) -> Bounds {
         return self.bounds;
     }
 }
