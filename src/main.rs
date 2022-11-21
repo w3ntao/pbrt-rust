@@ -17,8 +17,8 @@ fn all_tests(samples: u32, ratio: f32) {
     let width = (1960 as f32 * ratio) as usize;
     let height = (1080 as f32 * ratio) as usize;
 
-    test_case_dragon_bvh::test(width, height);
-    test_case_dragon_transformed::test(width, height);
+    //test_case_dragon_bvh::test(width, height);
+    //test_case_dragon_transformed::test(width, height);
     test_case_many_dragons::test(width, height);
 
     test_case_rt_weekend_final_dragon::test(width, height, samples);
@@ -26,7 +26,8 @@ fn all_tests(samples: u32, ratio: f32) {
     let width = (1080 as f32 * ratio) as usize;
     let height = (1080 as f32 * ratio) as usize;
 
-    test_case_cornell_box_metal_dragon_ray_casting_dot_normal::test(width, height);
+    //test_case_cornell_box_metal_dragon_ray_casting_dot_normal::test(width, height);
+
     test_case_cornell_box_metal_dragon_next_event_estimation::test(width, height, samples);
 
     test_case_cornell_box_next_event_estimation::test(width, height, samples);

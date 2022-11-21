@@ -5,7 +5,6 @@ use crate::cornell_box::{cornell_box_camera, cornell_box_metal_dragon};
 pub fn test(width: usize, height: usize, samples: u32) {
     let samples = ((samples as f32).sqrt() as u32).pow(2);
     let file_name = get_file_name(file!());
-    let ppm_name = format!("{}_{}.ppm", file_name, samples);
     println!("TESTING: {} for {} samples per pixel", &file_name, samples);
 
     let integrator = NextEventEstimation::new(Arc::new(cornell_box_metal_dragon()));
@@ -15,6 +14,6 @@ pub fn test(width: usize, height: usize, samples: u32) {
         samples,
     );
     let image = renderer.render(width, height);
-    image.write(&ppm_name);
+    image.write(&format!("{}_{}", file_name, samples));
     println!();
 }

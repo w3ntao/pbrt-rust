@@ -5,7 +5,6 @@ use crate::smallpt::smallpt;
 pub fn test(width: usize, height: usize, samples: u32) {
     let samples = ((samples as f32).sqrt() as u32).pow(2);
     let file_name = get_file_name(file!());
-    let ppm_name = format!("{}_{}.ppm", file_name, samples);
     println!("TESTING: {} for {} samples per pixel", &file_name, samples);
 
     let camera_center = Point::new(50.0, 52.0, 275.6);
@@ -22,6 +21,6 @@ pub fn test(width: usize, height: usize, samples: u32) {
     let integrator = NextEventEstimation::new(Arc::new(smallpt()));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
     let image = renderer.render(width, height);
-    image.write(&ppm_name);
+    image.write(&format!("{}_{}", file_name, samples));
     println!();
 }

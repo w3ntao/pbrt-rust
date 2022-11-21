@@ -1,4 +1,3 @@
 /target
-*.ppm
-
+test_case_*.png
 models/*

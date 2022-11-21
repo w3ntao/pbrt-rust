@@ -3,7 +3,6 @@ use crate::core::pbrt::*;
 #[allow(dead_code)]
 pub fn test(width: usize, height: usize) {
     let file_name = get_file_name(file!());
-    let ppm_name = format!("{}.ppm", file_name);
     println!("TESTING: {}", &file_name);
 
     let glass = Arc::new(Glass::new(1.5));
@@ -45,6 +44,6 @@ pub fn test(width: usize, height: usize) {
     let integrator = RayCastingDotNormal::new(Arc::new(world));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), 1);
     let image = renderer.render(width, height);
-    image.write(&ppm_name);
+    image.write(&file_name);
     println!();
 }
