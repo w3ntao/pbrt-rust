@@ -136,7 +136,7 @@ impl Renderer {
 
         let mut handles: Vec<JoinHandle<()>> = vec![];
         let arc_self = Arc::new(self);
-        let cpu_num = num_cpus::get();
+        let cpu_num = num_cpus::get_physical();
         for _ in 0..cpu_num {
             let mut image_ptr = Arc::clone(&shared_image);
             let mut job_ptr = Arc::clone(&shared_job_list);
