@@ -36,10 +36,11 @@ fn all_tests(samples: u32, ratio: f32) {
     test_case_cornell_box_specular_path_trace::test(width, height, samples);
 
     test_case_smallpt::test(
-        (1024 as f32 * ratio) as usize,
-        (762 as f32 * ratio) as usize,
+        (2048 as f32 * ratio) as usize,
+        (1524 as f32 * ratio) as usize,
         samples,
     );
+    // original dimension for smallpt is 1024x762
 }
 
 fn main() {

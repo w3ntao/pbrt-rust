@@ -9,20 +9,20 @@ pub struct Renderer {
 }
 
 fn print_time(seconds: i32) {
-    if seconds > 3600 {
-        let hour = seconds / 3600;
-        print!("{}h ", hour);
-        let minute = (seconds - hour * 3600) / 60;
-        if minute > 0 {
-            print!("{}m ", minute);
-        }
+    let hour = seconds / 3600;
+    let minute = (seconds % 3600) / 60;
+    let seconds = seconds % 60;
+
+    if hour > 0 {
+        print!("{}h {}m", hour, minute);
         return;
     }
-    let minute = (seconds) / 60;
+
     if minute > 0 {
-        print!("{}m ", minute);
+        print!("{}m {}s", minute, seconds);
+        return;
     }
-    let seconds = seconds - minute * 60;
+
     print!("{}s", seconds);
 }
 
@@ -45,7 +45,7 @@ impl Renderer {
         let one_second = time::Duration::from_secs(1);
 
         let mut last_length = total_job;
-        print!("time left: estimating...");
+        print!("rendering: 0.00%  (time left: ?)");
         let _ = io::stdout().flush();
         loop {
             thread::sleep(one_second);
@@ -62,13 +62,17 @@ impl Renderer {
             }
             last_length = length;
             let unit_job_time = start.elapsed().as_secs_f32() / (finished_job as f32);
-            print!("\r                          ");
-            print!("\rtime left: ");
+            print!("\r                                        ");
+            print!(
+                "\rrendering: {:.2}%  (time left: ",
+                finished_job as f32 / total_job as f32 * 100.0
+            );
             print_time((unit_job_time * ((length + core) as f32)) as i32);
+            print!(")");
             let _ = io::stdout().flush();
         }
-
-        print!("\nrendering took ");
+        println!("\rrendering: 100.00%  (time left: 0s)");
+        print!("rendering took ");
         print_time(start.elapsed().as_secs_f32() as i32);
         println!();
     }
