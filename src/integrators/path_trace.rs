@@ -72,13 +72,7 @@ impl Integrator for PathTrace {
                 throughput /= russian_roulette_probability;
             }
 
-            let scattered_ray = Ray::new(
-                interaction.p,
-                scattered_direction,
-                INTERSECT_EPSILON,
-                f32::INFINITY,
-            );
-            ray = scattered_ray;
+            ray = interaction.spawn_ray(scattered_direction);
         }
 
         return radiance;

@@ -11,13 +11,16 @@ pub fn test(width: usize, height: usize, samples: u32) {
     let solid_color_ground = Arc::new(SolidColor::new(Color::new(0.5, 0.5, 0.5)));
     let material_ground = Arc::new(Lambertian::new(solid_color_ground.clone()));
 
-    let ground_radius = 2000.0;
-    let sphere_ground = Sphere::new(Point::new(0.0, -ground_radius, 0.0), ground_radius);
+    let length = 40.0;
+    let quad = Quad::new(
+        Point::new(-length / 2.0, 0.0, -length / 2.0),
+        Vector3::new(length, 0.0, 0.0),
+        Vector3::new(0.0, 0.0, length),
+    );
     let ground = Arc::new(GeometricPrimitive::new(
-        Arc::new(sphere_ground),
-        material_ground,
+        Arc::new(quad),
+        material_ground.clone(),
     ));
-
     scene.add(ground.clone());
 
     let texture_lambertian = Arc::new(SolidColor::new(Color::new(0.4, 0.2, 0.1)));

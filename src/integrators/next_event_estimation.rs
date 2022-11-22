@@ -35,12 +35,11 @@ impl NextEventEstimation {
         }
 
         let shadow_ray = surface_interaction.spawn_shadow_ray(light_point);
-        let mut light_surface_interaction = SurfaceInteraction::default();
-        // couldn't reach the sampled light
         if self
             .world
-            .intersect(&shadow_ray, &mut light_surface_interaction)
+            .intersect(&shadow_ray, &mut SurfaceInteraction::default())
         {
+            // The path is occluded if the shadow ray hit something
             return Color::black();
         }
         let mut emission = Color::black();
@@ -129,13 +128,7 @@ impl Integrator for NextEventEstimation {
 
             throughput *= attenuation;
 
-            let scattered_ray = Ray::new(
-                interaction.p,
-                scattered_direction,
-                INTERSECT_EPSILON,
-                f32::INFINITY,
-            );
-            ray = scattered_ray;
+            ray = interaction.spawn_ray(scattered_direction);
         }
 
         return radiance;
