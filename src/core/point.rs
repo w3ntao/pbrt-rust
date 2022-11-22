@@ -127,6 +127,18 @@ impl ops::Add<Vector3> for Point {
     }
 }
 
+impl ops::Sub<Vector3> for Point {
+    type Output = Point;
+
+    fn sub(self, rhs: Vector3) -> Self::Output {
+        return Point {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+            z: self.z - rhs.z,
+        };
+    }
+}
+
 impl ops::AddAssign<Vector3> for Point {
     fn add_assign(&mut self, rhs: Vector3) {
         *self = *self + rhs;

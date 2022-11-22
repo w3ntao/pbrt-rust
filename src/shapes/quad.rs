@@ -1,17 +1,18 @@
 use crate::core::pbrt::*;
 
 pub struct Quad {
-    pub origin: Point,
-    pub span0: Vector3,
-    pub span1: Vector3,
-    pub triangles: Vec<Arc<Triangle>>,
-    // TODO: rewrite Quad, especially intersect()
+    origin: Point,
+    span0: Vector3,
+    span1: Vector3,
+    triangles: Vec<Arc<Triangle>>,
+    // representing Quad with triangles
+    // is not smart yet simple and easy
 }
 
 impl Quad {
     pub fn new(v0: Point, _span0: Vector3, _span1: Vector3) -> Self {
-        let vertices = vec![v0, v0 + _span0, v0 + _span1, v0 + _span0 + _span1];
-        let indices = vec![0, 1, 2, 1, 2, 3];
+        let vertices = vec![v0, v0 + _span0, v0 + _span0 + _span1, v0 + _span1];
+        let indices = vec![0, 2, 1, 0, 2, 3];
 
         let mesh = TriangleMesh::new(vertices, indices);
         let _triangles = mesh.build_triangle();
