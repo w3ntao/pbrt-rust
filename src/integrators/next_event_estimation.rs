@@ -59,7 +59,7 @@ impl NextEventEstimation {
             .material
             .as_ref()
             .expect("material is None")
-            .emit(&mut emission, &light_surface_interaction)
+            .emit(&mut emission)
         {
             return emission;
         }
@@ -98,7 +98,7 @@ impl Integrator for NextEventEstimation {
                 .material
                 .as_ref()
                 .expect("material is None")
-                .emit(&mut emission, &interaction);
+                .emit(&mut emission);
 
             let (scattered, scattered_ray, attenuation) = interaction
                 .material

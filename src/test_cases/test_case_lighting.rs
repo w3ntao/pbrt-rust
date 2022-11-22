@@ -26,7 +26,7 @@ pub fn test(width: usize, height: usize, samples: u32) {
     ));
     scene.add(small_sphere);
 
-    let diffuse_light = DiffuseLight::new(Arc::new(SolidColor::new(Color::new(4.0, 4.0, 4.0))));
+    let diffuse_light = DiffuseLight::new(Color::new(4.0, 4.0, 4.0));
     let quad_light = Quad::new(
         Point::new(3.0, 1.0, -2.0),
         Vector3::new(2.0, 0.0, 0.0),

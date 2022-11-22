@@ -9,7 +9,7 @@ pub trait Material: Send + Sync {
         panic!("scatter() not implemented for this Material");
     }
 
-    fn emit(&self, _emission: &mut Color, _interaction: &SurfaceInteraction) -> bool {
+    fn emit(&self, _emission: &mut Color) -> bool {
         return false;
     }
 

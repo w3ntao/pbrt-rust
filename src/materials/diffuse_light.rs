@@ -1,12 +1,14 @@
 use crate::core::pbrt::*;
 
 pub struct DiffuseLight {
-    emission: Arc<dyn Texture>,
+    emission: Color,
 }
 
 impl DiffuseLight {
-    pub fn new(_texture: Arc<dyn Texture>) -> DiffuseLight {
-        DiffuseLight { emission: _texture }
+    pub fn new(_emission: Color) -> DiffuseLight {
+        DiffuseLight {
+            emission: _emission,
+        }
     }
 }
 
@@ -15,11 +17,8 @@ impl Material for DiffuseLight {
         return (false, Ray::dummy(), Color::black());
     }
 
-    fn emit(&self, _emission: &mut Color, _interaction: &SurfaceInteraction) -> bool {
-        *_emission = self
-            .emission
-            .get_color(_interaction.u, _interaction.v, _interaction.p);
-
+    fn emit(&self, _emission: &mut Color) -> bool {
+        *_emission = self.emission;
         return true;
     }
 }

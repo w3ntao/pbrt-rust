@@ -83,7 +83,7 @@ pub fn smallpt() -> World {
     world.add(sphere_mirror);
 
     let light_len = 40.0;
-    let diffuse_light = DiffuseLight::new(Arc::new(SolidColor::new(Color::new(12.0, 12.0, 12.0))));
+    let diffuse_light = DiffuseLight::new(Color::new(12.0, 12.0, 12.0));
     let quad_light = Quad::new(
         Point::new(50.0 - 0.5 * light_len, 81.6 - 0.2, 81.6 - 0.5 * light_len),
         Vector3::new(light_len, 0.0, 0.0),

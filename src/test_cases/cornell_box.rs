@@ -107,7 +107,7 @@ pub fn cornell_box() -> World {
     let box_small = Arc::new(box_small);
     world.add(box_small.clone());
 
-    let diffuse_light = DiffuseLight::new(Arc::new(SolidColor::new(Color::new(15.0, 15.0, 15.0))));
+    let diffuse_light = DiffuseLight::new(Color::new(15.0, 15.0, 15.0));
     let quad_light = Quad::new(
         Point::new(213.0, WALL_LENGTH - 1.0, 227.0),
         Vector3::new(130.0, 0.0, 0.0),
@@ -144,7 +144,7 @@ pub fn cornell_box_specular() -> World {
     let sphere = Arc::new(GeometricPrimitive::new(Arc::new(sphere), glass.clone()));
     world.add(sphere);
 
-    let diffuse_light = DiffuseLight::new(Arc::new(SolidColor::new(Color::new(15.0, 15.0, 15.0))));
+    let diffuse_light = DiffuseLight::new(Color::new(15.0, 15.0, 15.0));
     let quad_light = Quad::new(
         Point::new(213.0, WALL_LENGTH - 1.0, 227.0),
         Vector3::new(130.0, 0.0, 0.0),
@@ -164,8 +164,7 @@ pub fn cornell_box_specular() -> World {
 pub fn cornell_box_metal_dragon() -> World {
     let mut world = empty_cornell_box();
     let metal = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.5));
-
-    let diffuse_light = DiffuseLight::new(Arc::new(SolidColor::new(Color::new(10.0, 10.0, 10.0))));
+    let diffuse_light = DiffuseLight::new(Color::new(10.0, 10.0, 10.0));
 
     let light_length = 150.0;
     let quad_light = Quad::new(

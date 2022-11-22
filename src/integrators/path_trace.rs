@@ -39,7 +39,7 @@ impl Integrator for PathTrace {
                     .material
                     .as_ref()
                     .expect("material is None")
-                    .emit(&mut emission, &interaction)
+                    .emit(&mut emission)
                 {
                     radiance += throughput * emission;
                 }
