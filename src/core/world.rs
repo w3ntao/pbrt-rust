@@ -33,10 +33,17 @@ impl World {
         return self.scene.intersect(&mut ray, interaction);
     }
 
-    pub fn sample_light(&self) -> (Point, Vector3, f32) {
+    pub fn sample_light(&self) -> (Point, Vector3, f32, Arc<dyn Material>) {
         let idx = thread_rng().gen_range(0..self.lights.len());
-        let (point, normal) = self.lights[idx].sample();
 
-        return (point, normal, self.lights[idx].get_area());
+        let random_light = &(self.lights[idx]);
+        let (point, normal) = random_light.sample();
+
+        return (
+            point,
+            normal,
+            random_light.get_area(),
+            random_light.get_material(),
+        );
     }
 }

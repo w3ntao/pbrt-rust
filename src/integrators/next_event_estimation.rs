@@ -18,7 +18,7 @@ impl NextEventEstimation {
         surface_interaction: &SurfaceInteraction,
         ray: &Ray,
     ) -> Color {
-        let (light_point, light_normal, light_area) = self.world.sample_light();
+        let (light_point, light_normal, light_area, light_material) = self.world.sample_light();
         let towards_light = light_point - surface_interaction.p;
         let distance = towards_light.length();
         let towards_light = towards_light.normalize();
@@ -55,12 +55,7 @@ impl NextEventEstimation {
         }
 
         let mut emission = Color::black();
-        if !light_surface_interaction
-            .material
-            .as_ref()
-            .expect("material is None")
-            .emit(&mut emission)
-        {
+        if !light_material.emit(&mut emission) {
             return emission;
         }
 

@@ -5,6 +5,10 @@ pub trait Primitive: Send + Sync {
 
     fn set_material(&mut self, material: Arc<dyn Material>);
 
+    fn get_material(&self) -> Arc<dyn Material> {
+        panic!("get_material() not implemented for this Primitive");
+    }
+
     fn get_bounds(&self) -> Bounds;
 
     fn get_area(&self) -> f32;
@@ -41,6 +45,17 @@ impl Primitive for GeometricPrimitive {
 
     fn set_material(&mut self, material: Arc<dyn Material>) {
         self.material = Some(material);
+    }
+
+    fn get_material(&self) -> Arc<dyn Material> {
+        match &self.material {
+            Some(material) => {
+                return material.clone();
+            }
+            _ => {
+                panic!("no material available");
+            }
+        }
     }
 
     fn get_bounds(&self) -> Bounds {
@@ -108,6 +123,10 @@ impl Primitive for TransformedPrimitive {
 
     fn set_material(&mut self, material: Arc<dyn Material>) {
         self.material = Some(material);
+    }
+
+    fn get_material(&self) -> Arc<dyn Material> {
+        return self.primitive.get_material();
     }
 
     fn get_bounds(&self) -> Bounds {
