@@ -34,26 +34,15 @@ impl NextEventEstimation {
             return Color::black();
         }
 
-        let shadow_ray = Ray::new(
-            surface_interaction.p,
-            towards_light,
-            INTERSECT_EPSILON,
-            distance * (1.0 + SHADOW_EPSILON),
-        );
-
+        let shadow_ray = surface_interaction.spawn_shadow_ray(light_point);
         let mut light_surface_interaction = SurfaceInteraction::default();
         // couldn't reach the sampled light
-        if !self
+        if self
             .world
             .intersect(&shadow_ray, &mut light_surface_interaction)
         {
             return Color::black();
         }
-        if (light_surface_interaction.p - shadow_ray.o).length() < distance * (1.0 - SHADOW_EPSILON)
-        {
-            return Color::black();
-        }
-
         let mut emission = Color::black();
         if !light_material.emit(&mut emission) {
             return emission;

@@ -29,35 +29,36 @@ impl Default for SurfaceInteraction {
     }
 }
 
-pub fn offset_ray_origin(p: Point, p_error: Vector3, n: Normal, w: Vector3) -> Point {
-    let d = Vector3::from(n).abs().dot(p_error);
-    let mut offset = d * Vector3::from(n);
-    if n.dot(w) < 0.0 {
-        offset = -offset;
-    }
-    let mut po = p + offset;
-    // Round offset point _po_ away from _p_
-
-    for idx in 0..3 {
-        if offset[idx] > 0.0 {
-            po[idx] = next_float_up(po[idx]);
-        } else if offset[idx] < 0.0 {
-            po[idx] = next_float_down(po[idx]);
-        }
-    }
-
-    return po;
-}
-
 impl SurfaceInteraction {
+    pub fn offset_ray_origin(&self, w: Vector3) -> Point {
+        let d = Vector3::from(self.n).abs().dot(self.p_error);
+        let mut offset = d * Vector3::from(self.n);
+        if self.n.dot(w) < 0.0 {
+            offset = -offset;
+        }
+        let mut po = self.p + offset;
+        // Round offset point _po_ away from _p_
+
+        for idx in 0..3 {
+            if offset[idx] > 0.0 {
+                po[idx] = next_float_up(po[idx]);
+            } else if offset[idx] < 0.0 {
+                po[idx] = next_float_down(po[idx]);
+            }
+        }
+
+        return po;
+    }
+
     pub fn spawn_ray(&self, d: Vector3) -> Ray {
-        let o = offset_ray_origin(self.p, self.p_error, self.n, d);
+        let o = self.offset_ray_origin(d);
         return Ray::new(o, d, 0.0, f32::INFINITY);
     }
 
-    pub fn spawn_ray_to(&self, target: Point) -> Ray {
+    pub fn spawn_shadow_ray(&self, target: Point) -> Ray {
         let d = target - self.p;
-        let o = offset_ray_origin(self.p, self.p_error, self.n, d);
+        let o = self.offset_ray_origin(d);
+
         return Ray::new(o, d, 0.0, 1.0 - SHADOW_EPSILON);
     }
 }

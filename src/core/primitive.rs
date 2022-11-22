@@ -48,14 +48,11 @@ impl Primitive for GeometricPrimitive {
     }
 
     fn get_material(&self) -> Arc<dyn Material> {
-        match &self.material {
-            Some(material) => {
-                return material.clone();
-            }
-            _ => {
-                panic!("no material available");
-            }
-        }
+        return self
+            .material
+            .as_ref()
+            .expect("no material available")
+            .clone();
     }
 
     fn get_bounds(&self) -> Bounds {
