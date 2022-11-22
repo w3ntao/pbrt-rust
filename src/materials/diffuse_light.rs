@@ -13,8 +13,14 @@ impl DiffuseLight {
 }
 
 impl Material for DiffuseLight {
-    fn scatter(&self, _: Ray, _: &SurfaceInteraction) -> (bool, Ray, Color) {
-        return (false, Ray::dummy(), Color::black());
+    fn scatter(
+        &self,
+        incoming_ray: Ray,
+        surface_interaction: &SurfaceInteraction,
+        scattered_direction: &mut Vector3,
+        attenuation: &mut Color,
+    ) -> bool {
+        return false;
     }
 
     fn emit(&self, _emission: &mut Color) -> bool {

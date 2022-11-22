@@ -84,12 +84,19 @@ impl Integrator for NextEventEstimation {
                 .expect("material is None")
                 .emit(&mut emission);
 
-            let (scattered, scattered_ray, attenuation) = interaction
+            let mut scattered_direction = Vector3::invalid();
+            let mut attenuation = Color::black();
+            if !interaction
                 .material
                 .as_ref()
                 .expect("material is None")
-                .scatter(ray, &interaction);
-            if !scattered {
+                .scatter(
+                    ray,
+                    &interaction,
+                    &mut scattered_direction,
+                    &mut attenuation,
+                )
+            {
                 if (depth == 0 || last_hit_specular) && emit && interaction.n.dot(ray.d) < 0.0 {
                     radiance += throughput * emission;
                 }
@@ -121,6 +128,13 @@ impl Integrator for NextEventEstimation {
             }
 
             throughput *= attenuation;
+
+            let scattered_ray = Ray::new(
+                interaction.p,
+                scattered_direction,
+                INTERSECT_EPSILON,
+                f32::INFINITY,
+            );
             ray = scattered_ray;
         }
 

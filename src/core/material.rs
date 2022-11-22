@@ -3,9 +3,11 @@ use crate::core::pbrt::*;
 pub trait Material: Send + Sync {
     fn scatter(
         &self,
-        _incoming_ray: Ray,
-        _surface_interaction: &SurfaceInteraction,
-    ) -> (bool, Ray, Color) {
+        incoming_ray: Ray,
+        surface_interaction: &SurfaceInteraction,
+        scattered_direction: &mut Vector3,
+        attenuation: &mut Color,
+    ) -> bool {
         panic!("scatter() not implemented for this Material");
     }
 

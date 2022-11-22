@@ -24,26 +24,24 @@ fn random_cosine_direction() -> Vector3 {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, _: Ray, surface_interaction: &SurfaceInteraction) -> (bool, Ray, Color) {
+    fn scatter(
+        &self,
+        incoming_ray: Ray,
+        surface_interaction: &SurfaceInteraction,
+        scattered_direction: &mut Vector3,
+        attenuation: &mut Color,
+    ) -> bool {
         let uvw = OrthonormalBasis::build_from_w(Vector3::from(surface_interaction.n));
         let random_direction = uvw.local(random_cosine_direction());
 
-        let scattered_ray = Ray::new(
+        *scattered_direction = random_direction.normalize();
+        *attenuation = self.albedo.get_color(
+            surface_interaction.u,
+            surface_interaction.v,
             surface_interaction.p,
-            random_direction.normalize(),
-            INTERSECT_EPSILON,
-            f32::INFINITY,
         );
 
-        return (
-            true,
-            scattered_ray,
-            self.albedo.get_color(
-                surface_interaction.u,
-                surface_interaction.v,
-                surface_interaction.p,
-            ),
-        );
+        return true;
     }
 
     fn scattering_pdf(&self, _: Vector3, normal: Normal, scattered_direction: Vector3) -> f32 {

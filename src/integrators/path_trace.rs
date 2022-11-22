@@ -45,13 +45,19 @@ impl Integrator for PathTrace {
                 }
             }
 
-            let (scattered, scattered_ray, attenuation) = interaction
+            let mut scattered_direction = Vector3::invalid();
+            let mut attenuation = Color::black();
+            if !interaction
                 .material
                 .as_ref()
                 .expect("material is None")
-                .scatter(ray, &interaction);
-
-            if !scattered {
+                .scatter(
+                    ray,
+                    &interaction,
+                    &mut scattered_direction,
+                    &mut attenuation,
+                )
+            {
                 break;
             }
 
@@ -66,6 +72,12 @@ impl Integrator for PathTrace {
                 throughput /= russian_roulette_probability;
             }
 
+            let scattered_ray = Ray::new(
+                interaction.p,
+                scattered_direction,
+                INTERSECT_EPSILON,
+                f32::INFINITY,
+            );
             ray = scattered_ray;
         }
 

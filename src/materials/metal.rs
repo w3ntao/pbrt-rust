@@ -19,22 +19,19 @@ impl Material for Metal {
         &self,
         incoming_ray: Ray,
         surface_interaction: &SurfaceInteraction,
-    ) -> (bool, Ray, Color) {
+        scattered_direction: &mut Vector3,
+        attenuation: &mut Color,
+    ) -> bool {
         let reflected = incoming_ray.d.reflect(surface_interaction.n);
+        let scattered_dir = reflected + self.fuzz * random_in_unit_sphere();
+        if surface_interaction.n.dot(scattered_dir) <= 0.0 {
+            return false;
+        }
 
-        let scattered_ray = Ray::new(
-            surface_interaction.p,
-            reflected + self.fuzz * random_in_unit_sphere(),
-            INTERSECT_EPSILON,
-            f32::INFINITY,
-        );
+        *scattered_direction = scattered_dir;
+        *attenuation = self.albedo;
 
-        return (
-            surface_interaction.n.dot(scattered_ray.d) > 0.0,
-            scattered_ray,
-            self.albedo,
-        );
-        // for those light go beneath the surface, consider them not scattered
+        return true;
     }
 
     fn is_specular(&self) -> bool {

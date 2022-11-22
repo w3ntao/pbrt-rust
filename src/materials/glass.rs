@@ -1,4 +1,5 @@
 use crate::core::pbrt::*;
+use std::iter::Scan;
 
 pub struct Glass {
     index_of_refraction: f32,
@@ -32,7 +33,9 @@ impl Material for Glass {
         &self,
         incoming_ray: Ray,
         surface_interaction: &SurfaceInteraction,
-    ) -> (bool, Ray, Color) {
+        scattered_direction: &mut Vector3,
+        attenuation: &mut Color,
+    ) -> bool {
         let refraction_ratio = {
             if surface_interaction.entering_material {
                 1.0 / self.index_of_refraction
@@ -56,13 +59,10 @@ impl Material for Glass {
             refract(incoming_ray.d, normal, refraction_ratio)
         };
 
-        let scattered_ray = Ray::new(
-            surface_interaction.p,
-            direction,
-            INTERSECT_EPSILON,
-            f32::INFINITY,
-        );
-        return (true, scattered_ray, Color::new(1.0, 1.0, 1.0));
+        *scattered_direction = direction;
+        *attenuation = Color::new(1.0, 1.0, 1.0);
+
+        return true;
     }
 
     fn is_specular(&self) -> bool {
