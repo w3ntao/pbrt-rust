@@ -52,13 +52,15 @@ impl Shape for Sphere {
                 return false;
             }
         }
-        let root = root;
-        let hit_point = ray(root);
-        let normal = (hit_point - self.center) / self.radius;
 
         *t_hit = root;
+        let hit_point = ray(*t_hit);
+        let normal = (hit_point - self.center) / self.radius;
+
         interaction.p = hit_point;
         interaction.n = Normal::from(normal);
+        interaction.p_error = gamma(5) * Vector3::from(hit_point).abs();
+        // taken from PBRT
 
         if ray.d.dot(normal) > 0.0 {
             interaction.entering_material = false;
