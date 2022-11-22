@@ -1,11 +1,17 @@
 use crate::core::pbrt::*;
 
-fn random_color() -> Color {
-    return Color::new(
-        random_f32(0.0, 1.0),
-        random_f32(0.0, 1.0),
-        random_f32(0.0, 1.0),
-    );
+fn random_bright_color() -> Color {
+    loop {
+        let color = Color::new(
+            random_f32(0.0, 1.0),
+            random_f32(0.0, 1.0),
+            random_f32(0.0, 1.0),
+        );
+
+        if color.r > 0.6 || color.g > 0.6 || color.b > 0.6 {
+            return color;
+        }
+    }
 }
 
 pub fn many_random_spheres() -> World {
@@ -42,9 +48,9 @@ pub fn many_random_spheres() -> World {
 
             let mut sphere = GeometricPrimitive::new(Arc::new(sphere), glass.clone());
 
-            if choose_material < 0.4 {
+            if choose_material < 0.5 {
                 //diffuse
-                let albedo = random_color() * random_color();
+                let albedo = random_bright_color();
                 let texture = Arc::new(SolidColor::new(albedo));
                 let lambertian = Lambertian::new(texture.clone());
                 sphere.set_material(Arc::new(lambertian));
