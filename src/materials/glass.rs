@@ -1,5 +1,4 @@
 use crate::core::pbrt::*;
-use std::iter::Scan;
 
 pub struct Glass {
     index_of_refraction: f32,

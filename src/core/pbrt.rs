@@ -1,5 +1,5 @@
-pub use crate::core::bounds::*;
 pub use crate::core::accurate_float::*;
+pub use crate::core::bounds::*;
 pub use crate::core::camera::*;
 pub use crate::core::color::*;
 pub use crate::core::integrator::*;
@@ -54,6 +54,7 @@ pub use rand::seq::SliceRandom;
 pub use rand::{thread_rng, Rng};
 
 pub use rand_distr::num_traits::Pow;
+pub use rand_distr::num_traits::Zero;
 
 use std::any::type_name;
 pub use std::f32::consts::PI;
