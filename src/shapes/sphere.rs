@@ -46,9 +46,9 @@ impl Shape for Sphere {
         let sqrt_d = discriminant.sqrt();
 
         let mut root = (-half_b - sqrt_d) / a;
-        if root < ray.t_min || root > ray.t_max {
+        if root < 0.0 || root > ray.t_max {
             root = (-half_b + sqrt_d) / a;
-            if root < ray.t_min || root > ray.t_max {
+            if root < 0.0 || root > ray.t_max {
                 return false;
             }
         }

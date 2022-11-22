@@ -1,8 +1,5 @@
 use crate::core::pbrt::*;
 
-pub const INTERSECT_EPSILON: f32 = 0.001;
-pub const SHADOW_EPSILON: f32 = 0.001;
-
 #[derive(Clone)]
 pub struct SurfaceInteraction {
     pub p: Point,
@@ -52,13 +49,18 @@ impl SurfaceInteraction {
 
     pub fn spawn_ray(&self, d: Vector3) -> Ray {
         let o = self.offset_ray_origin(d);
-        return Ray::new(o, d, 0.0, f32::INFINITY);
+        return Ray::new(o, d, f32::INFINITY);
     }
 
+    const SHADOW_EPSILON: f32 = 0.001;
     pub fn spawn_shadow_ray(&self, target: Point) -> Ray {
+        // to shoot a ray from interaction point to the light.
+        // this intersection test will fails (because of limited ray.t_max)
+        // if the path is reachable
+
         let d = target - self.p;
         let o = self.offset_ray_origin(d);
 
-        return Ray::new(o, d, 0.0, 1.0 - SHADOW_EPSILON);
+        return Ray::new(o, d, 1.0 - SurfaceInteraction::SHADOW_EPSILON);
     }
 }

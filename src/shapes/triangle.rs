@@ -123,7 +123,7 @@ impl Shape for Triangle {
         let b1 = e1 * invDet;
         let b2 = e2 * invDet;
         let t = tScaled * invDet;
-        if t < ray.t_min || t > ray.t_max {
+        if t < 0.0 || t > ray.t_max {
             return false;
         }
 

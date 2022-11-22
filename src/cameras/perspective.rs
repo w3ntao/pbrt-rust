@@ -50,12 +50,7 @@ impl Camera for Perspective {
             let y = (max_v + min_v) / 2.0 * self.y_pixel_multiplier;
             let direction = self.forward + x * self.horizontal + y * self.image_plane_vertical;
 
-            return vec![Ray::new(
-                self.center,
-                direction.normalize(),
-                0.0,
-                f32::INFINITY,
-            )];
+            return vec![Ray::new(self.center, direction.normalize(), f32::INFINITY)];
         }
 
         let mut generator_u = thread_rng();
@@ -83,12 +78,7 @@ impl Camera for Perspective {
                 let y = v * self.y_pixel_multiplier;
                 let direction = self.forward + x * self.horizontal + y * self.image_plane_vertical;
 
-                rays.push(Ray::new(
-                    self.center,
-                    direction.normalize(),
-                    0.0,
-                    f32::INFINITY,
-                ));
+                rays.push(Ray::new(self.center, direction.normalize(), f32::INFINITY));
             }
         }
 

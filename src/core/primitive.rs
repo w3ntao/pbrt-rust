@@ -91,7 +91,6 @@ impl Primitive for TransformedPrimitive {
         let mut inverse_ray = Ray::new(
             (inverse_transform)(ray.o),
             inverse_dir.normalize(),
-            ray.t_min * inverse_t,
             ray.t_max * inverse_t,
         );
 
@@ -102,7 +101,6 @@ impl Primitive for TransformedPrimitive {
             return false;
         }
 
-        ray.t_min = inverse_ray.t_min / inverse_t;
         ray.t_max = inverse_ray.t_max / inverse_t;
 
         surface_interaction.n = (self.transform)(surface_interaction.n);

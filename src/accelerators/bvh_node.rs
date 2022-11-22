@@ -62,7 +62,7 @@ impl Node {
         interaction: &mut SurfaceInteraction,
     ) -> bool {
         let (t_near, t_far) = self.bounds.intersect(ray);
-        if t_near > t_far || t_near > ray.t_max || t_far < ray.t_min {
+        if t_near > t_far || t_near > ray.t_max || t_far < 0.0 {
             return false;
         }
 
