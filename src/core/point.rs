@@ -20,8 +20,11 @@ impl Point {
         return Point::new(f32::NAN, f32::NAN, f32::NAN);
     }
 
-    pub fn is_valid(&self) -> bool {
-        return !self.x.is_nan() && !self.y.is_nan() && !self.z.is_nan();
+    pub fn check(self) {
+        if self.x.is_finite() && self.y.is_finite() && self.z.is_finite() {
+            return;
+        }
+        panic!("illegal Point: {}", self);
     }
 
     pub fn permute(self, dim_x: usize, dim_y: usize, dim_z: usize) -> Point {

@@ -15,14 +15,6 @@ impl Ray {
             t_max: _t_max,
         };
     }
-
-    pub fn dummy() -> Self {
-        Self {
-            o: Point::invalid(),
-            d: Vector3::invalid(),
-            t_max: f32::NAN,
-        }
-    }
 }
 
 // https://docs.rs/fn_ops/latest/fn_ops/

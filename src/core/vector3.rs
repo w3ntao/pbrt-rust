@@ -20,6 +20,13 @@ impl Vector3 {
         return Vector3::new(f32::NAN, f32::NAN, f32::NAN);
     }
 
+    pub fn check(self) {
+        if self.x.is_finite() && self.y.is_finite() && self.z.is_finite() {
+            return;
+        }
+        panic!("illegal Vector: {}", self);
+    }
+
     pub fn max_dimension(self) -> usize {
         if self.x > self.y && self.x > self.z {
             return 0;
@@ -207,11 +214,12 @@ impl ops::AddAssign<Vector3> for Vector3 {
     }
 }
 
-impl ops::MulAssign<Vector3> for Vector3 {
-    fn mul_assign(&mut self, rhs: Vector3) {
-        self.x *= rhs.x;
-        self.y *= rhs.y;
-        self.z *= rhs.z;
+impl ops::DivAssign<f32> for Vector3 {
+    fn div_assign(&mut self, rhs: f32) {
+        let inv = 1.0 / rhs;
+        self.x *= inv;
+        self.y *= inv;
+        self.z *= inv;
     }
 }
 

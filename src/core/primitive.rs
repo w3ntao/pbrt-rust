@@ -86,13 +86,11 @@ pub struct TransformedPrimitive {
 impl Primitive for TransformedPrimitive {
     fn intersect(&self, ray: &mut Ray, surface_interaction: &mut SurfaceInteraction) -> bool {
         let inverse_transform = self.transform.inverse();
-        let inverse_dir = (inverse_transform)(ray.d);
-        let inverse_t = inverse_dir.length();
-        let mut inverse_ray = Ray::new(
-            (inverse_transform)(ray.o),
-            inverse_dir.normalize(),
-            ray.t_max * inverse_t,
-        );
+        let mut inverse_ray = (inverse_transform)(ray.clone());
+        let inverse_t = (inverse_transform)(ray.d).length();
+
+        inverse_ray.d /= inverse_t;
+        inverse_ray.t_max *= inverse_t;
 
         if !self
             .primitive

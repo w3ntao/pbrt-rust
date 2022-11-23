@@ -150,6 +150,7 @@ impl Fn<(Point, &mut Vector3)> for Transform {
         let (p_in, p_error) = arg;
 
         if self.is_identity() {
+            *p_error = Vector3::new(0.0, 0.0, 0.0);
             return p_in;
         }
 
@@ -341,5 +342,37 @@ impl Fn<(Bounds,)> for Transform {
         }
 
         return transformed_bounds;
+    }
+}
+
+impl FnOnce<(Ray,)> for Transform {
+    type Output = Ray;
+    extern "rust-call" fn call_once(self, _: (Ray,)) -> Ray {
+        panic!("FnOnce<(AABBbounds,)> not implemented for Transform");
+    }
+}
+
+impl FnMut<(Ray,)> for Transform {
+    extern "rust-call" fn call_mut(&mut self, _: (Ray,)) -> Ray {
+        panic!("FnMut<(AABBbounds,)> not implemented for Transform");
+    }
+}
+
+impl Fn<(Ray,)> for Transform {
+    extern "rust-call" fn call(&self, ray: (Ray,)) -> Ray {
+        let ray = ray.0;
+
+        if self.is_identity() {
+            return ray;
+        }
+
+        let mut o_error = Vector3::invalid();
+        let o = (self)(ray.o, &mut o_error);
+        let d = (self)(ray.d);
+
+        let length_squared = d.length_squared();
+        let dt = d.abs().dot(o_error) / length_squared;
+
+        return Ray::new(o + d * dt, d, ray.t_max - dt);
     }
 }
