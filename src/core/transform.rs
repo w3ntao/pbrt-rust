@@ -125,22 +125,6 @@ impl Fn<(Point,)> for Transform {
         let wp = (self.m[3][0] * x + self.m[3][1] * y) + (self.m[3][2] * z + self.m[3][3]);
         assert_ne!(wp, 0.0);
 
-        // Compute absolute error for transformed point
-        let xAbsSum = (self.m[0][0].abs() * x)
-            + (self.m[0][1].abs() * y)
-            + (self.m[0][2].abs() * z)
-            + (self.m[0][3]).abs();
-        let yAbsSum = (self.m[1][0].abs() * x)
-            + (self.m[1][1].abs() * y)
-            + (self.m[1][2].abs() * z)
-            + (self.m[1][3]).abs();
-        let zAbsSum = (self.m[2][0].abs() * x)
-            + (self.m[2][1].abs() * y)
-            + (self.m[2][2].abs() * z)
-            + (self.m[2][3]).abs();
-
-        let pError = gamma(3) * Vector3::new(xAbsSum, yAbsSum, zAbsSum);
-
         if wp == 1.0 {
             return Point::new(xp, yp, zp);
         }
@@ -235,6 +219,48 @@ impl Fn<(Vector3,)> for Transform {
             matrix[0][0] * x + matrix[0][1] * y + matrix[0][2] * z,
             matrix[1][0] * x + matrix[1][1] * y + matrix[1][2] * z,
             matrix[2][0] * x + matrix[2][1] * y + matrix[2][2] * z,
+        );
+    }
+}
+
+impl FnOnce<(Vector3, &mut Vector3)> for Transform {
+    type Output = Vector3;
+    extern "rust-call" fn call_once(self, _: (Vector3, &mut Vector3)) -> Vector3 {
+        panic!("FnOnce<(Vector3, &mut Vector3)> not implemented for Transform");
+    }
+}
+
+impl FnMut<(Vector3, &mut Vector3)> for Transform {
+    extern "rust-call" fn call_mut(&mut self, _: (Vector3, &mut Vector3)) -> Vector3 {
+        panic!("FnMut<(Vector3, &mut Vector3)> not implemented for Transform");
+    }
+}
+
+impl Fn<(Vector3, &mut Vector3)> for Transform {
+    extern "rust-call" fn call(&self, v3: (Vector3, &mut Vector3)) -> Vector3 {
+        let (v, abs_error) = v3;
+
+        let x = v.x;
+        let y = v.y;
+        let z = v.z;
+
+        abs_error.x = gamma(3)
+            * ((self.m[0][0] * v.x).abs()
+                + (self.m[0][1] * v.y).abs()
+                + (self.m[0][2] * v.z).abs());
+        abs_error.y = gamma(3)
+            * ((self.m[1][0] * v.x).abs()
+                + (self.m[1][1] * v.y).abs()
+                + (self.m[1][2] * v.z).abs());
+        abs_error.z = gamma(3)
+            * ((self.m[2][0] * v.x).abs()
+                + (self.m[2][1] * v.y).abs()
+                + (self.m[2][2] * v.z).abs());
+
+        return Vector3::new(
+            self.m[0][0] * x + self.m[0][1] * y + self.m[0][2] * z,
+            self.m[1][0] * x + self.m[1][1] * y + self.m[1][2] * z,
+            self.m[2][0] * x + self.m[2][1] * y + self.m[2][2] * z,
         );
     }
 }
