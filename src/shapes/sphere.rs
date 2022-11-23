@@ -1,19 +1,23 @@
 use crate::core::pbrt::*;
 
 pub struct Sphere {
-    pub center: Point,
-    pub radius: f32,
+    radius: f32,
     bounds: Bounds,
+    object_to_world: Transform,
 }
 
 impl Sphere {
     pub fn new(_center: Point, _radius: f32) -> Self {
         let min = _center + Vector3::new(-_radius, -_radius, -_radius);
         let max = _center + Vector3::new(_radius, _radius, _radius);
+
+        let mut transform = Transform::identity();
+        transform.translate(Vector3::from(_center));
+
         return Self {
-            center: _center,
             radius: _radius,
             bounds: Bounds::build(&[min, max]),
+            object_to_world: transform,
         };
     }
 }
@@ -34,7 +38,9 @@ fn get_sphere_uv(p: Point) -> (f32, f32) {
 
 impl Shape for Sphere {
     fn intersect(&self, ray: &Ray, t_hit: &mut f32, interaction: &mut SurfaceInteraction) -> bool {
-        let oc = ray.o - self.center;
+        let center = (self.object_to_world)(Point::new(0.0, 0.0, 0.0));
+
+        let oc = ray.o - center;
         let a = ray.d.length_squared();
         let half_b = oc.dot(ray.d);
         let c = oc.length_squared() - self.radius * self.radius;
@@ -55,7 +61,7 @@ impl Shape for Sphere {
 
         *t_hit = root;
         let hit_point = ray(*t_hit);
-        let normal = (hit_point - self.center) / self.radius;
+        let normal = (hit_point - center) / self.radius;
 
         interaction.p = hit_point;
         interaction.n = Normal::from(normal);
@@ -67,7 +73,7 @@ impl Shape for Sphere {
             interaction.n = -interaction.n;
         }
 
-        let (u, v) = get_sphere_uv(Point::from((hit_point - self.center).normalize()));
+        let (u, v) = get_sphere_uv(Point::from((hit_point - center).normalize()));
         interaction.u = u;
         interaction.v = v;
 
