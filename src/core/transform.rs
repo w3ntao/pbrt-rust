@@ -241,6 +241,11 @@ impl Fn<(Vector3, &mut Vector3)> for Transform {
     extern "rust-call" fn call(&self, v3: (Vector3, &mut Vector3)) -> Vector3 {
         let (v, abs_error) = v3;
 
+        if self.is_identity() {
+            *abs_error = Vector3::new(0.0, 0.0, 0.0);
+            return v;
+        }
+
         let x = v.x;
         let y = v.y;
         let z = v.z;
@@ -348,13 +353,13 @@ impl Fn<(Bounds,)> for Transform {
 impl FnOnce<(Ray,)> for Transform {
     type Output = Ray;
     extern "rust-call" fn call_once(self, _: (Ray,)) -> Ray {
-        panic!("FnOnce<(AABBbounds,)> not implemented for Transform");
+        panic!("FnOnce<(Ray,)> not implemented for Transform");
     }
 }
 
 impl FnMut<(Ray,)> for Transform {
     extern "rust-call" fn call_mut(&mut self, _: (Ray,)) -> Ray {
-        panic!("FnMut<(AABBbounds,)> not implemented for Transform");
+        panic!("FnMut<(Ray,)> not implemented for Transform");
     }
 }
 
@@ -374,5 +379,37 @@ impl Fn<(Ray,)> for Transform {
         let dt = d.abs().dot(o_error) / length_squared;
 
         return Ray::new(o + d * dt, d, ray.t_max - dt);
+    }
+}
+
+impl FnOnce<(Ray, &mut Vector3, &mut Vector3)> for Transform {
+    type Output = Ray;
+    extern "rust-call" fn call_once(self, _: (Ray, &mut Vector3, &mut Vector3)) -> Ray {
+        panic!("FnOnce<(Ray, &mut Vector3, &mut Vector3)> not implemented for Transform");
+    }
+}
+
+impl FnMut<(Ray, &mut Vector3, &mut Vector3)> for Transform {
+    extern "rust-call" fn call_mut(&mut self, _: (Ray, &mut Vector3, &mut Vector3)) -> Ray {
+        panic!("FnMut<(Ray, &mut Vector3, &mut Vector3)> not implemented for Transform");
+    }
+}
+
+impl Fn<(Ray, &mut Vector3, &mut Vector3)> for Transform {
+    extern "rust-call" fn call(&self, ray: (Ray, &mut Vector3, &mut Vector3)) -> Ray {
+        let (ray, o_error, d_error) = ray;
+
+        if self.is_identity() {
+            *o_error = Vector3::new(0.0, 0.0, 0.0);
+            *d_error = Vector3::new(0.0, 0.0, 0.0);
+            return ray;
+        }
+        let o = (self)(ray.o, o_error);
+        let d = (self)(ray.d, d_error);
+
+        let length_squared = d.length_squared();
+        let dt = d.abs().dot(*o_error) / length_squared;
+
+        return Ray::new(o + d * dt, d, ray.t_max);
     }
 }

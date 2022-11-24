@@ -38,6 +38,35 @@ fn get_sphere_uv(p: Point) -> (f32, f32) {
 
 impl Shape for Sphere {
     fn intersect(&self, ray: &Ray, t_hit: &mut f32, interaction: &mut SurfaceInteraction) -> bool {
+        let mut o_error = Vector3::invalid();
+        let mut d_error = Vector3::invalid();
+
+        let ray = (self.object_to_world.inverse())(*ray, &mut o_error, &mut d_error);
+
+        // Compute quadratic sphere coefficients
+
+        // Initialize _EFloat_ ray coordinate values
+        let ox = ErrorFloat::with_error(ray.o.x, o_error.x);
+        let oy = ErrorFloat::with_error(ray.o.y, o_error.y);
+        let oz = ErrorFloat::with_error(ray.o.z, o_error.z);
+
+        let dx = ErrorFloat::with_error(ray.d.x, d_error.x);
+        let dy = ErrorFloat::with_error(ray.d.y, d_error.y);
+        let dz = ErrorFloat::with_error(ray.d.z, d_error.z);
+
+        let a = dx * dx + dy * dy + dz * dz;
+        let b = 2.0 * (dx * ox + dy * oy + dz * oz);
+        let c = ox * ox + oy * oy + oz * oz
+            - ErrorFloat::without_error(self.radius) * ErrorFloat::without_error(self.radius);
+
+        panic!("implementing");
+
+        /*;
+            EFloat a = dx * dx + dy * dy + dz * dz;
+            EFloat b = 2 * (dx * ox + dy * oy + dz * oz);
+            EFloat c = ox * ox + oy * oy + oz * oz - EFloat(radius) * EFloat(radius);
+        */
+
         let center = (self.object_to_world)(Point::new(0.0, 0.0, 0.0));
 
         let oc = ray.o - center;
