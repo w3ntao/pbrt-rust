@@ -59,13 +59,50 @@ impl Shape for Sphere {
         let c = ox * ox + oy * oy + oz * oz
             - ErrorFloat::without_error(self.radius) * ErrorFloat::without_error(self.radius);
 
-        panic!("implementing");
+        let mut t0 = ErrorFloat::without_error(f32::INFINITY);
+        let mut t1 = ErrorFloat::without_error(f32::INFINITY);
 
-        /*;
-            EFloat a = dx * dx + dy * dy + dz * dz;
-            EFloat b = 2 * (dx * ox + dy * oy + dz * oz);
-            EFloat c = ox * ox + oy * oy + oz * oz - EFloat(radius) * EFloat(radius);
-        */
+        if !error_float_quadratic(a, b, c, &mut t0, &mut t1) {
+            return false;
+        }
+
+        if t0.upper_bound() > ray.t_max || t1.lower_bound() <= 0.0 {
+            return false;
+        }
+        let mut t_shape_hit = t0.clone();
+
+        if t_shape_hit.lower_bound() <= 0.0 {
+            t_shape_hit = t1.clone();
+            if t_shape_hit.upper_bound() > ray.t_max {
+                return false;
+            }
+        }
+
+        *t_hit = t_shape_hit.value();
+
+        let mut p_hit = ray(t_shape_hit.value());
+        p_hit *= self.radius / (p_hit - Point::new(0.0, 0.0, 0.0)).length();
+
+        // TODO: make everything easier by rewriting
+        // TODO: Transform(SurfaceInteraction)
+
+        p_hit = (self.object_to_world)(p_hit);
+
+        interaction.p = p_hit;
+
+        let center = (self.object_to_world)(Point::new(0.0, 0.0, 0.0));
+        let normal = (p_hit - center) / self.radius;
+        interaction.p_error = gamma(5) * Vector3::from(p_hit).abs();
+
+        if ray.d.dot(normal) < 0.0 {
+            interaction.entering_material = true;
+            interaction.n = Normal::from(normal);
+        } else {
+            interaction.entering_material = false;
+            interaction.n = -Normal::from(normal);
+        }
+
+        return true;
 
         let center = (self.object_to_world)(Point::new(0.0, 0.0, 0.0));
 

@@ -148,6 +148,12 @@ impl ops::AddAssign<Vector3> for Point {
     }
 }
 
+impl ops::MulAssign<f32> for Point {
+    fn mul_assign(&mut self, rhs: f32) {
+        *self = *self * rhs;
+    }
+}
+
 pub fn max_of(points: &[Point]) -> Point {
     let mut _max = points[0];
 
