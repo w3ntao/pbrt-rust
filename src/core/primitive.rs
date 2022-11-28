@@ -92,17 +92,17 @@ impl Primitive for TransformedPrimitive {
         inverse_ray.d /= inverse_t;
         inverse_ray.t_max *= inverse_t;
 
+        let mut si_primitive = SurfaceInteraction::default();
         if !self
             .primitive
-            .intersect(&mut inverse_ray, surface_interaction)
+            .intersect(&mut inverse_ray, &mut si_primitive)
         {
             return false;
         }
 
         ray.t_max = inverse_ray.t_max / inverse_t;
 
-        surface_interaction.n = (self.transform)(surface_interaction.n);
-        surface_interaction.p = (self.transform)(surface_interaction.p);
+        *surface_interaction = (self.transform)(si_primitive);
 
         match &self.material {
             Some(material) => {

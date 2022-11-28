@@ -146,8 +146,8 @@ impl FnMut<(Point, &mut Vector3)> for Transform {
 }
 
 impl Fn<(Point, &mut Vector3)> for Transform {
-    extern "rust-call" fn call(&self, arg: (Point, &mut Vector3)) -> Point {
-        let (p_in, p_error) = arg;
+    extern "rust-call" fn call(&self, args: (Point, &mut Vector3)) -> Point {
+        let (p_in, p_error) = args;
 
         if self.is_identity() {
             *p_error = Vector3::new(0.0, 0.0, 0.0);
@@ -183,6 +183,71 @@ impl Fn<(Point, &mut Vector3)> for Transform {
             + (self.m[2][3]).abs();
 
         *p_error = gamma(3) * Vector3::new(xAbsSum, yAbsSum, zAbsSum);
+
+        if wp == 1.0 {
+            return Point::new(xp, yp, zp);
+        }
+        return Point::new(xp, yp, zp) / wp;
+    }
+}
+
+impl FnOnce<(Point, Vector3, &mut Vector3)> for Transform {
+    type Output = Point;
+    extern "rust-call" fn call_once(self, _: (Point, Vector3, &mut Vector3)) -> Point {
+        panic!("FnOnce<(Point, Vector3, &mut Vector3)> not implemented for Transform");
+    }
+}
+
+impl FnMut<(Point, Vector3, &mut Vector3)> for Transform {
+    extern "rust-call" fn call_mut(&mut self, _: (Point, Vector3, &mut Vector3)) -> Point {
+        panic!("FnMut<(Point, Vector3, &mut Vector3)> not implemented for Transform");
+    }
+}
+
+impl Fn<(Point, Vector3, &mut Vector3)> for Transform {
+    extern "rust-call" fn call(&self, args: (Point, Vector3, &mut Vector3)) -> Point {
+        let (pt, ptError, absError) = args;
+        let x = pt.x;
+        let y = pt.y;
+        let z = pt.z;
+        let xp = (self.m[0][0] * x + self.m[0][1] * y) + (self.m[0][2] * z + self.m[0][3]);
+        let yp = (self.m[1][0] * x + self.m[1][1] * y) + (self.m[1][2] * z + self.m[1][3]);
+        let zp = (self.m[2][0] * x + self.m[2][1] * y) + (self.m[2][2] * z + self.m[2][3]);
+        let wp = (self.m[3][0] * x + self.m[3][1] * y) + (self.m[3][2] * z + self.m[3][3]);
+
+        absError.x = (gamma(3) + 1.0)
+            * (self.m[0][0].abs() * ptError.x
+                + self.m[0][1].abs() * ptError.y
+                + self.m[0][2].abs() * ptError.z)
+            + gamma(3)
+                * ((self.m[0][0] * x).abs()
+                    + (self.m[0][1] * y).abs()
+                    + (self.m[0][2] * z).abs()
+                    + self.m[0][3].abs());
+
+        absError.y = (gamma(3) + 1.0)
+            * (self.m[1][0].abs() * ptError.x
+                + self.m[1][1].abs() * ptError.y
+                + self.m[1][2].abs() * ptError.z)
+            + gamma(3)
+                * ((self.m[1][0] * x).abs()
+                    + (self.m[1][1] * y).abs()
+                    + (self.m[1][2] * z).abs()
+                    + (self.m[1][3]).abs());
+
+        absError.z = (gamma(3) + 1.0)
+            * (self.m[2][0].abs() * ptError.x
+                + self.m[2][1].abs() * ptError.y
+                + self.m[2][2].abs() * ptError.z)
+            + gamma(3)
+                * ((self.m[2][0] * x).abs()
+                    + (self.m[2][1] * y).abs()
+                    + (self.m[2][2] * z).abs()
+                    + self.m[2][3].abs());
+
+        if wp == 0.0 {
+            panic!("error in transforming Point");
+        }
 
         if wp == 1.0 {
             return Point::new(xp, yp, zp);
@@ -238,8 +303,8 @@ impl FnMut<(Vector3, &mut Vector3)> for Transform {
 }
 
 impl Fn<(Vector3, &mut Vector3)> for Transform {
-    extern "rust-call" fn call(&self, v3: (Vector3, &mut Vector3)) -> Vector3 {
-        let (v, abs_error) = v3;
+    extern "rust-call" fn call(&self, args: (Vector3, &mut Vector3)) -> Vector3 {
+        let (v, abs_error) = args;
 
         if self.is_identity() {
             *abs_error = Vector3::new(0.0, 0.0, 0.0);
@@ -411,5 +476,31 @@ impl Fn<(Ray, &mut Vector3, &mut Vector3)> for Transform {
         let dt = d.abs().dot(*o_error) / length_squared;
 
         return Ray::new(o + d * dt, d, ray.t_max);
+    }
+}
+
+impl FnOnce<(SurfaceInteraction,)> for Transform {
+    type Output = SurfaceInteraction;
+    extern "rust-call" fn call_once(self, _: (SurfaceInteraction,)) -> SurfaceInteraction {
+        panic!("FnOnce<(SurfaceInteraction,)> not implemented for Transform");
+    }
+}
+
+impl FnMut<(SurfaceInteraction,)> for Transform {
+    extern "rust-call" fn call_mut(&mut self, _: (SurfaceInteraction,)) -> SurfaceInteraction {
+        panic!("FnMut<(SurfaceInteraction,)> not implemented for Transform");
+    }
+}
+
+impl Fn<(SurfaceInteraction,)> for Transform {
+    extern "rust-call" fn call(&self, args: (SurfaceInteraction,)) -> SurfaceInteraction {
+        let (si,) = args;
+        let mut ret = SurfaceInteraction::default();
+        ret.p = (self)(si.p, si.p_error, &mut ret.p_error);
+        ret.n = ((self)(si.n)).normalize();
+        ret.entering_material = si.entering_material;
+        ret.material = si.material.clone();
+
+        return ret;
     }
 }
