@@ -78,30 +78,30 @@ impl Shape for Sphere {
             }
         }
 
-        *t_hit = t_shape_hit.value();
-
         let mut p_hit = ray(t_shape_hit.value());
         p_hit *= self.radius / (p_hit - Point::new(0.0, 0.0, 0.0)).length();
-
-        // TODO: make everything easier by rewriting
-        // TODO: Transform(SurfaceInteraction)
-
-        p_hit = (self.object_to_world)(p_hit);
-
-        interaction.p = p_hit;
-
-        let center = (self.object_to_world)(Point::new(0.0, 0.0, 0.0));
-        let normal = (p_hit - center) / self.radius;
-        interaction.p_error = gamma(5) * Vector3::from(p_hit).abs();
-
-        if ray.d.dot(normal) < 0.0 {
-            interaction.entering_material = true;
-            interaction.n = Normal::from(normal);
-        } else {
-            interaction.entering_material = false;
-            interaction.n = -Normal::from(normal);
+        if p_hit.x == 0.0 && p_hit.y == 0.0 {
+            // TODO: what does this code do in PBRT?
+            p_hit.x = 1e-5 * self.radius;
         }
 
+        let p_error = gamma(5) * Vector3::from(p_hit).abs();
+
+        let mut reverse_interaction = SurfaceInteraction::default();
+        reverse_interaction.p = p_hit;
+        reverse_interaction.p_error = p_error;
+
+        let normal = Normal::from(Vector3::from(p_hit));
+        if normal.dot(ray.d) < 0.0 {
+            reverse_interaction.entering_material = true;
+            reverse_interaction.n = normal;
+        } else {
+            reverse_interaction.entering_material = false;
+            reverse_interaction.n = -normal;
+        }
+
+        *interaction = (self.object_to_world)(reverse_interaction);
+        *t_hit = t_shape_hit.value();
         return true;
 
         let center = (self.object_to_world)(Point::new(0.0, 0.0, 0.0));

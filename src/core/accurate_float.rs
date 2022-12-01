@@ -219,8 +219,10 @@ pub fn error_float_quadratic(
     }
 
     let root_discrim = discrim.sqrt();
-    let float_root_discrim =
-        ErrorFloat::with_error(root_discrim as f32, MACHINE_EPSILON * (root_discrim as f32));
+    let float_root_discrim = ErrorFloat::with_error(
+        root_discrim as f32,
+        (root_discrim * MACHINE_EPSILON as f64) as f32,
+    );
 
     let q = if B.v < 0.0 {
         -0.5 * (B - float_root_discrim)
