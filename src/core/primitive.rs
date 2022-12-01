@@ -127,11 +127,7 @@ impl Primitive for TransformedPrimitive {
     }
 
     fn get_area(&self) -> f32 {
-        let area = self.primitive.get_area();
-        if self.transform.is_identity() {
-            return area;
-        }
-        return area * self.transform.determinant();
+        return self.primitive.get_area() * self.transform.determinant();
     }
 
     fn sample(&self) -> (Point, Vector3) {

@@ -22,10 +22,6 @@ impl Transform {
         };
     }
 
-    pub fn is_identity(&self) -> bool {
-        return self.m.is_identity();
-    }
-
     pub fn determinant(&self) -> f32 {
         return self.m.determinant();
     }
@@ -107,10 +103,6 @@ impl Fn<(Point,)> for Transform {
     extern "rust-call" fn call(&self, p: (Point,)) -> Point {
         let p = p.0;
 
-        if self.is_identity() {
-            return p;
-        }
-
         // PBRT: Managing Rounding Error
         // https://www.pbr-book.org/3ed-2018/Shapes/Managing_Rounding_Error#x4-EffectofTransformations
 
@@ -119,10 +111,10 @@ impl Fn<(Point,)> for Transform {
         let z = p.z;
 
         // Compute transformed coordinates from point _pt_
-        let xp = (self.m[0][0] * x + self.m[0][1] * y) + (self.m[0][2] * z + self.m[0][3]);
-        let yp = (self.m[1][0] * x + self.m[1][1] * y) + (self.m[1][2] * z + self.m[1][3]);
-        let zp = (self.m[2][0] * x + self.m[2][1] * y) + (self.m[2][2] * z + self.m[2][3]);
-        let wp = (self.m[3][0] * x + self.m[3][1] * y) + (self.m[3][2] * z + self.m[3][3]);
+        let xp = self.m[0][0] * x + self.m[0][1] * y + self.m[0][2] * z + self.m[0][3];
+        let yp = self.m[1][0] * x + self.m[1][1] * y + self.m[1][2] * z + self.m[1][3];
+        let zp = self.m[2][0] * x + self.m[2][1] * y + self.m[2][2] * z + self.m[2][3];
+        let wp = self.m[3][0] * x + self.m[3][1] * y + self.m[3][2] * z + self.m[3][3];
         assert_ne!(wp, 0.0);
 
         if wp == 1.0 {
@@ -147,42 +139,39 @@ impl FnMut<(Point, &mut Vector3)> for Transform {
 
 impl Fn<(Point, &mut Vector3)> for Transform {
     extern "rust-call" fn call(&self, args: (Point, &mut Vector3)) -> Point {
-        let (p_in, p_error) = args;
-
-        if self.is_identity() {
-            *p_error = Vector3::new(0.0, 0.0, 0.0);
-            return p_in;
-        }
+        let (p, p_error) = args;
 
         // PBRT: Managing Rounding Error
         // https://www.pbr-book.org/3ed-2018/Shapes/Managing_Rounding_Error#x4-EffectofTransformations
 
-        let x = p_in.x;
-        let y = p_in.y;
-        let z = p_in.z;
+        let x = p.x;
+        let y = p.y;
+        let z = p.z;
 
-        // Compute transformed coordinates from point _pt_
-        let xp = (self.m[0][0] * x + self.m[0][1] * y) + (self.m[0][2] * z + self.m[0][3]);
-        let yp = (self.m[1][0] * x + self.m[1][1] * y) + (self.m[1][2] * z + self.m[1][3]);
-        let zp = (self.m[2][0] * x + self.m[2][1] * y) + (self.m[2][2] * z + self.m[2][3]);
-        let wp = (self.m[3][0] * x + self.m[3][1] * y) + (self.m[3][2] * z + self.m[3][3]);
+        // Compute absolute error for transformed point
+        let xp = self.m[0][0] * x + self.m[0][1] * y + self.m[0][2] * z + self.m[0][3];
+        let yp = self.m[1][0] * x + self.m[1][1] * y + self.m[1][2] * z + self.m[1][3];
+        let zp = self.m[2][0] * x + self.m[2][1] * y + self.m[2][2] * z + self.m[2][3];
+        let wp = self.m[3][0] * x + self.m[3][1] * y + self.m[3][2] * z + self.m[3][3];
         assert_ne!(wp, 0.0);
 
         // Compute absolute error for transformed point
-        let xAbsSum = (self.m[0][0].abs() * x)
-            + (self.m[0][1].abs() * y)
-            + (self.m[0][2].abs() * z)
-            + (self.m[0][3]).abs();
-        let yAbsSum = (self.m[1][0].abs() * x)
-            + (self.m[1][1].abs() * y)
-            + (self.m[1][2].abs() * z)
-            + (self.m[1][3]).abs();
-        let zAbsSum = (self.m[2][0].abs() * x)
-            + (self.m[2][1].abs() * y)
-            + (self.m[2][2].abs() * z)
-            + (self.m[2][3]).abs();
+        let x_abs_sum = (self.m[0][0] * x).abs()
+            + (self.m[0][1] * y).abs()
+            + (self.m[0][2] * z).abs()
+            + self.m[0][3].abs();
 
-        *p_error = gamma(3) * Vector3::new(xAbsSum, yAbsSum, zAbsSum);
+        let y_abs_sum = (self.m[1][0] * x).abs()
+            + (self.m[1][1] * y).abs()
+            + (self.m[1][2] * z).abs()
+            + self.m[1][3].abs();
+
+        let z_abs_sum = (self.m[2][0] * x).abs()
+            + (self.m[2][1] * y).abs()
+            + (self.m[2][2] * z).abs()
+            + self.m[2][3].abs();
+
+        *p_error = gamma(3) * Vector3::new(x_abs_sum, y_abs_sum, z_abs_sum);
 
         if wp == 1.0 {
             return Point::new(xp, yp, zp);
@@ -206,48 +195,46 @@ impl FnMut<(Point, Vector3, &mut Vector3)> for Transform {
 
 impl Fn<(Point, Vector3, &mut Vector3)> for Transform {
     extern "rust-call" fn call(&self, args: (Point, Vector3, &mut Vector3)) -> Point {
-        let (pt, ptError, absError) = args;
+        let (pt, pt_error, abs_error) = args;
         let x = pt.x;
         let y = pt.y;
         let z = pt.z;
-        let xp = (self.m[0][0] * x + self.m[0][1] * y) + (self.m[0][2] * z + self.m[0][3]);
-        let yp = (self.m[1][0] * x + self.m[1][1] * y) + (self.m[1][2] * z + self.m[1][3]);
-        let zp = (self.m[2][0] * x + self.m[2][1] * y) + (self.m[2][2] * z + self.m[2][3]);
-        let wp = (self.m[3][0] * x + self.m[3][1] * y) + (self.m[3][2] * z + self.m[3][3]);
+        let xp = self.m[0][0] * x + self.m[0][1] * y + self.m[0][2] * z + self.m[0][3];
+        let yp = self.m[1][0] * x + self.m[1][1] * y + self.m[1][2] * z + self.m[1][3];
+        let zp = self.m[2][0] * x + self.m[2][1] * y + self.m[2][2] * z + self.m[2][3];
+        let wp = self.m[3][0] * x + self.m[3][1] * y + self.m[3][2] * z + self.m[3][3];
 
-        absError.x = (gamma(3) + 1.0)
-            * (self.m[0][0].abs() * ptError.x
-                + self.m[0][1].abs() * ptError.y
-                + self.m[0][2].abs() * ptError.z)
+        abs_error.x = (gamma(3) + 1.0)
+            * (self.m[0][0].abs() * pt_error.x
+                + self.m[0][1].abs() * pt_error.y
+                + self.m[0][2].abs() * pt_error.z)
             + gamma(3)
                 * ((self.m[0][0] * x).abs()
                     + (self.m[0][1] * y).abs()
                     + (self.m[0][2] * z).abs()
                     + self.m[0][3].abs());
 
-        absError.y = (gamma(3) + 1.0)
-            * (self.m[1][0].abs() * ptError.x
-                + self.m[1][1].abs() * ptError.y
-                + self.m[1][2].abs() * ptError.z)
+        abs_error.y = (gamma(3) + 1.0)
+            * (self.m[1][0].abs() * pt_error.x
+                + self.m[1][1].abs() * pt_error.y
+                + self.m[1][2].abs() * pt_error.z)
             + gamma(3)
                 * ((self.m[1][0] * x).abs()
                     + (self.m[1][1] * y).abs()
                     + (self.m[1][2] * z).abs()
-                    + (self.m[1][3]).abs());
+                    + self.m[1][3].abs());
 
-        absError.z = (gamma(3) + 1.0)
-            * (self.m[2][0].abs() * ptError.x
-                + self.m[2][1].abs() * ptError.y
-                + self.m[2][2].abs() * ptError.z)
+        abs_error.z = (gamma(3) + 1.0)
+            * (self.m[2][0].abs() * pt_error.x
+                + self.m[2][1].abs() * pt_error.y
+                + self.m[2][2].abs() * pt_error.z)
             + gamma(3)
                 * ((self.m[2][0] * x).abs()
                     + (self.m[2][1] * y).abs()
                     + (self.m[2][2] * z).abs()
                     + self.m[2][3].abs());
 
-        if wp == 0.0 {
-            panic!("error in transforming Point");
-        }
+        assert_ne!(wp, 0.0);
 
         if wp == 1.0 {
             return Point::new(xp, yp, zp);
@@ -270,21 +257,17 @@ impl FnMut<(Vector3,)> for Transform {
 }
 
 impl Fn<(Vector3,)> for Transform {
-    extern "rust-call" fn call(&self, v: (Vector3,)) -> Vector3 {
-        let v = v.0;
-        if self.is_identity() {
-            return v;
-        }
+    extern "rust-call" fn call(&self, args: (Vector3,)) -> Vector3 {
+        let (v,) = args;
 
         let x = v.x;
         let y = v.y;
         let z = v.z;
 
-        let matrix = self.m;
         return Vector3::new(
-            matrix[0][0] * x + matrix[0][1] * y + matrix[0][2] * z,
-            matrix[1][0] * x + matrix[1][1] * y + matrix[1][2] * z,
-            matrix[2][0] * x + matrix[2][1] * y + matrix[2][2] * z,
+            self.m[0][0] * x + self.m[0][1] * y + self.m[0][2] * z,
+            self.m[1][0] * x + self.m[1][1] * y + self.m[1][2] * z,
+            self.m[2][0] * x + self.m[2][1] * y + self.m[2][2] * z,
         );
     }
 }
@@ -306,11 +289,6 @@ impl Fn<(Vector3, &mut Vector3)> for Transform {
     extern "rust-call" fn call(&self, args: (Vector3, &mut Vector3)) -> Vector3 {
         let (v, abs_error) = args;
 
-        if self.is_identity() {
-            *abs_error = Vector3::new(0.0, 0.0, 0.0);
-            return v;
-        }
-
         let x = v.x;
         let y = v.y;
         let z = v.z;
@@ -319,10 +297,12 @@ impl Fn<(Vector3, &mut Vector3)> for Transform {
             * ((self.m[0][0] * v.x).abs()
                 + (self.m[0][1] * v.y).abs()
                 + (self.m[0][2] * v.z).abs());
+
         abs_error.y = gamma(3)
             * ((self.m[1][0] * v.x).abs()
                 + (self.m[1][1] * v.y).abs()
                 + (self.m[1][2] * v.z).abs());
+
         abs_error.z = gamma(3)
             * ((self.m[2][0] * v.x).abs()
                 + (self.m[2][1] * v.y).abs()
@@ -352,9 +332,6 @@ impl FnMut<(Normal,)> for Transform {
 impl Fn<(Normal,)> for Transform {
     extern "rust-call" fn call(&self, n: (Normal,)) -> Normal {
         let n = n.0;
-        if self.is_identity() {
-            return n;
-        }
 
         let x = n.x;
         let y = n.y;
@@ -384,12 +361,8 @@ impl FnMut<(Bounds,)> for Transform {
 }
 
 impl Fn<(Bounds,)> for Transform {
-    extern "rust-call" fn call(&self, bounds: (Bounds,)) -> Bounds {
-        let bounds = bounds.0;
-
-        if self.is_identity() {
-            return bounds;
-        }
+    extern "rust-call" fn call(&self, args: (Bounds,)) -> Bounds {
+        let (bounds,) = args;
 
         // a smarter way to transform bounds:
         // takes roughly 2 transforms instead of 8
@@ -429,12 +402,8 @@ impl FnMut<(Ray,)> for Transform {
 }
 
 impl Fn<(Ray,)> for Transform {
-    extern "rust-call" fn call(&self, ray: (Ray,)) -> Ray {
-        let ray = ray.0;
-
-        if self.is_identity() {
-            return ray;
-        }
+    extern "rust-call" fn call(&self, args: (Ray,)) -> Ray {
+        let (ray,) = args;
 
         let mut o_error = Vector3::invalid();
         let o = (self)(ray.o, &mut o_error);
@@ -461,14 +430,9 @@ impl FnMut<(Ray, &mut Vector3, &mut Vector3)> for Transform {
 }
 
 impl Fn<(Ray, &mut Vector3, &mut Vector3)> for Transform {
-    extern "rust-call" fn call(&self, ray: (Ray, &mut Vector3, &mut Vector3)) -> Ray {
-        let (ray, o_error, d_error) = ray;
+    extern "rust-call" fn call(&self, args: (Ray, &mut Vector3, &mut Vector3)) -> Ray {
+        let (ray, o_error, d_error) = args;
 
-        if self.is_identity() {
-            *o_error = Vector3::new(0.0, 0.0, 0.0);
-            *d_error = Vector3::new(0.0, 0.0, 0.0);
-            return ray;
-        }
         let o = (self)(ray.o, o_error);
         let d = (self)(ray.d, d_error);
 
