@@ -15,11 +15,11 @@ impl OrthonormalBasis {
         } else {
             Vector3::new(1.0, 0.0, 0.0)
         };
-
-        let _v = cross(_w, a);
+        let _v = cross(_w, a).normalize();
+        let _u = cross(_w, _v);
 
         return OrthonormalBasis {
-            u: cross(_w, _v),
+            u: _u,
             v: _v,
             w: _w,
         };
