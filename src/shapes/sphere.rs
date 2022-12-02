@@ -37,11 +37,11 @@ fn get_sphere_uv(p: Point) -> (f32, f32) {
 }
 
 impl Shape for Sphere {
-    fn intersect(&self, ray: &Ray, t_hit: &mut f32, interaction: &mut SurfaceInteraction) -> bool {
+    fn intersect(&self, r: &Ray, t_hit: &mut f32, interaction: &mut SurfaceInteraction) -> bool {
         let mut o_error = Vector3::invalid();
         let mut d_error = Vector3::invalid();
 
-        let ray = (self.object_to_world.inverse())(*ray, &mut o_error, &mut d_error);
+        let ray = (self.object_to_world.inverse())(*r, &mut o_error, &mut d_error);
 
         // Compute quadratic sphere coefficients
 
@@ -60,7 +60,7 @@ impl Shape for Sphere {
             - ErrorFloat::without_error(self.radius) * ErrorFloat::without_error(self.radius);
 
         let mut t0 = ErrorFloat::without_error(f32::INFINITY);
-        let mut t1 = ErrorFloat::without_error(f32::INFINITY);
+        let mut t1 = ErrorFloat::without_error(-f32::INFINITY);
 
         if !error_float_quadratic(a, b, c, &mut t0, &mut t1) {
             return false;
@@ -69,8 +69,8 @@ impl Shape for Sphere {
         if t0.upper_bound() > ray.t_max || t1.lower_bound() <= 0.0 {
             return false;
         }
-        let mut t_shape_hit = t0.clone();
 
+        let mut t_shape_hit = t0.clone();
         if t_shape_hit.lower_bound() <= 0.0 {
             t_shape_hit = t1.clone();
             if t_shape_hit.upper_bound() > ray.t_max {
@@ -81,7 +81,7 @@ impl Shape for Sphere {
         let mut p_hit = ray(t_shape_hit.value());
         p_hit *= self.radius / (p_hit - Point::new(0.0, 0.0, 0.0)).length();
         if p_hit.x == 0.0 && p_hit.y == 0.0 {
-            // TODO: what does this code do in PBRT?
+            // TODO: what does it do (in PBRT)?
             p_hit.x = 1e-5 * self.radius;
         }
 
@@ -102,47 +102,6 @@ impl Shape for Sphere {
 
         *interaction = (self.object_to_world)(reverse_interaction);
         *t_hit = t_shape_hit.value();
-        return true;
-
-        let center = (self.object_to_world)(Point::new(0.0, 0.0, 0.0));
-
-        let oc = ray.o - center;
-        let a = ray.d.length_squared();
-        let half_b = oc.dot(ray.d);
-        let c = oc.length_squared() - self.radius * self.radius;
-
-        let discriminant = half_b * half_b - a * c;
-        if discriminant < 0.0 {
-            return false;
-        }
-        let sqrt_d = discriminant.sqrt();
-
-        let mut root = (-half_b - sqrt_d) / a;
-        if root < 0.0 || root > ray.t_max {
-            root = (-half_b + sqrt_d) / a;
-            if root < 0.0 || root > ray.t_max {
-                return false;
-            }
-        }
-
-        *t_hit = root;
-        let hit_point = ray(*t_hit);
-        let normal = (hit_point - center) / self.radius;
-
-        interaction.p = hit_point;
-        interaction.n = Normal::from(normal);
-        interaction.p_error = gamma(5) * Vector3::from(hit_point).abs();
-        // taken from PBRT
-
-        if ray.d.dot(normal) > 0.0 {
-            interaction.entering_material = false;
-            interaction.n = -interaction.n;
-        }
-
-        let (u, v) = get_sphere_uv(Point::from((hit_point - center).normalize()));
-        interaction.u = u;
-        interaction.v = v;
-
         return true;
     }
 
