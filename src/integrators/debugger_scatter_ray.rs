@@ -5,6 +5,7 @@ pub struct DebuggerScatterRay {
 }
 
 impl DebuggerScatterRay {
+    #[allow(dead_code)]
     pub fn new(_world: Arc<World>) -> Self {
         return Self { world: _world };
     }
@@ -13,7 +14,6 @@ impl DebuggerScatterRay {
 impl Integrator for DebuggerScatterRay {
     fn get_radiance(&self, ray: Ray) -> Color {
         let background = Color::new(0.7, 0.8, 1.0);
-        let mut ray = ray;
         let mut interaction = SurfaceInteraction::default();
         if !self.world.intersect(&ray, &mut interaction) {
             return background;

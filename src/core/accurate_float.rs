@@ -182,6 +182,7 @@ impl ops::Div<ErrorFloat> for ErrorFloat {
     }
 }
 
+#[allow(dead_code)]
 pub fn quadratic(a: f32, b: f32, c: f32, t0: &mut f32, t1: &mut f32) -> bool {
     let discrim = b as f64 * b as f64 - 4.0 * a as f64 * c as f64;
 
@@ -206,13 +207,13 @@ pub fn quadratic(a: f32, b: f32, c: f32, t0: &mut f32, t1: &mut f32) -> bool {
 }
 
 pub fn error_float_quadratic(
-    A: ErrorFloat,
-    B: ErrorFloat,
-    C: ErrorFloat,
+    a: ErrorFloat,
+    b: ErrorFloat,
+    c: ErrorFloat,
     t0: &mut ErrorFloat,
     t1: &mut ErrorFloat,
 ) -> bool {
-    let discrim = B.v as f64 * B.v as f64 - 4.0 * A.v as f64 * C.v as f64;
+    let discrim = b.v as f64 * b.v as f64 - 4.0 * a.v as f64 * c.v as f64;
 
     if discrim < 0.0 {
         return false;
@@ -224,14 +225,14 @@ pub fn error_float_quadratic(
         (root_discrim * MACHINE_EPSILON as f64) as f32,
     );
 
-    let q = if B.v < 0.0 {
-        -0.5 * (B - float_root_discrim)
+    let q = if b.v < 0.0 {
+        -0.5 * (b - float_root_discrim)
     } else {
-        -0.5 * (B + float_root_discrim)
+        -0.5 * (b + float_root_discrim)
     };
 
-    *t0 = q / A;
-    *t1 = C / q;
+    *t0 = q / a;
+    *t1 = c / q;
 
     if t0.v > t1.v {
         mem::swap(t0, t1);

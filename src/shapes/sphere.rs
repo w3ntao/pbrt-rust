@@ -22,20 +22,6 @@ impl Sphere {
     }
 }
 
-fn get_sphere_uv(p: Point) -> (f32, f32) {
-    // p: a given point on the sphere of radius one, centered at the origin.
-    // u: returned value [0,1] of angle around the Y axis from X=-1.
-    // v: returned value [0,1] of angle from Y=-1 to Y=+1.
-    //     <1 0 0> yields <0.50 0.50>       <-1  0  0> yields <0.00 0.50>
-    //     <0 1 0> yields <0.50 1.00>       < 0 -1  0> yields <0.50 0.00>
-    //     <0 0 1> yields <0.25 0.50>       < 0  0 -1> yields <0.75 0.50>
-
-    let theta = (-p.y).acos();
-    let phi = (-p.z / p.x).atan() + PI;
-
-    return (phi / (2.0 * PI), theta / PI);
-}
-
 impl Shape for Sphere {
     fn intersect(&self, r: &Ray, t_hit: &mut f32, interaction: &mut SurfaceInteraction) -> bool {
         let mut o_error = Vector3::invalid();

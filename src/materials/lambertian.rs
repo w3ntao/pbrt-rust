@@ -26,7 +26,7 @@ fn random_cosine_direction() -> Vector3 {
 impl Material for Lambertian {
     fn scatter(
         &self,
-        incoming_ray: Ray,
+        _incoming_ray: Ray,
         surface_interaction: &SurfaceInteraction,
         scattered_direction: &mut Vector3,
         attenuation: &mut Color,

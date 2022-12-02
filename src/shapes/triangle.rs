@@ -66,16 +66,16 @@ impl Shape for Triangle {
 
         // Apply shear transformation to translated vertex positions
 
-        let Sx = -d.x / d.z;
-        let Sy = -d.y / d.z;
-        let Sz = 1.0 / d.z;
+        let s_x = -d.x / d.z;
+        let s_y = -d.y / d.z;
+        let s_z = 1.0 / d.z;
 
-        p0t.x += Sx * p0t.z;
-        p0t.y += Sy * p0t.z;
-        p1t.x += Sx * p1t.z;
-        p1t.y += Sy * p1t.z;
-        p2t.x += Sx * p2t.z;
-        p2t.y += Sy * p2t.z;
+        p0t.x += s_x * p0t.z;
+        p0t.y += s_y * p0t.z;
+        p1t.x += s_x * p1t.z;
+        p1t.y += s_y * p1t.z;
+        p2t.x += s_x * p2t.z;
+        p2t.y += s_y * p2t.z;
 
         // Compute edge function coefficients _e0_, _e1_, and _e2_
         let mut e0 = p1t.x * p2t.y - p1t.y * p2t.x;
@@ -105,24 +105,24 @@ impl Shape for Triangle {
         }
 
         // Compute scaled hit distance to triangle and test against ray $t$ range
-        p0t.z *= Sz;
-        p1t.z *= Sz;
-        p2t.z *= Sz;
+        p0t.z *= s_z;
+        p1t.z *= s_z;
+        p2t.z *= s_z;
 
-        let tScaled = e0 * p0t.z + e1 * p1t.z + e2 * p2t.z;
-        if det < 0.0 && (tScaled >= 0.0 || tScaled < ray.t_max * det) {
+        let t_scaled = e0 * p0t.z + e1 * p1t.z + e2 * p2t.z;
+        if det < 0.0 && (t_scaled >= 0.0 || t_scaled < ray.t_max * det) {
             return false;
         }
-        if det > 0.0 && (tScaled <= 0.0 || tScaled > ray.t_max * det) {
+        if det > 0.0 && (t_scaled <= 0.0 || t_scaled > ray.t_max * det) {
             return false;
         }
 
         // Compute barycentric coordinates and $t$ value for triangle intersection
-        let invDet = 1.0 / det;
-        let b0 = e0 * invDet;
-        let b1 = e1 * invDet;
-        let b2 = e2 * invDet;
-        let t = tScaled * invDet;
+        let inv_det = 1.0 / det;
+        let b0 = e0 * inv_det;
+        let b1 = e1 * inv_det;
+        let b2 = e2 * inv_det;
+        let t = t_scaled * inv_det;
         if t < 0.0 || t > ray.t_max {
             return false;
         }
@@ -130,34 +130,34 @@ impl Shape for Triangle {
         // Ensure that computed triangle $t$ is conservatively greater than zero
 
         // Compute $\delta_z$ term for triangle $t$ error bounds
-        let maxZt = Vector3::new(p0t.z, p1t.z, p2t.z).abs().max_component();
-        let deltaZ = gamma(3) * maxZt;
+        let max_zt = Vector3::new(p0t.z, p1t.z, p2t.z).abs().max_component();
+        let delta_z = gamma(3) * max_zt;
 
         // Compute $\delta_x$ and $\delta_y$ terms for triangle $t$ error bounds
-        let maxXt = Vector3::new(p0t.x, p1t.x, p2t.x).abs().max_component();
-        let maxYt = Vector3::new(p0t.y, p1t.y, p2t.y).abs().max_component();
-        let deltaX = gamma(5) * (maxXt + maxZt);
-        let deltaY = gamma(5) * (maxYt + maxZt);
+        let max_xt = Vector3::new(p0t.x, p1t.x, p2t.x).abs().max_component();
+        let max_yt = Vector3::new(p0t.y, p1t.y, p2t.y).abs().max_component();
+        let delta_x = gamma(5) * (max_xt + max_zt);
+        let delta_y = gamma(5) * (max_yt + max_zt);
 
         // Compute $\delta_e$ term for triangle $t$ error bounds
-        let deltaE = 2.0 * (gamma(2) * maxXt * maxYt + deltaY * maxXt + deltaX * maxYt);
+        let delta_e = 2.0 * (gamma(2) * max_xt * max_yt + delta_y * max_xt + delta_x * max_yt);
 
         // Compute $\delta_t$ term for triangle $t$ error bounds and check _t_
-        let maxE = Vector3::new(e0, e1, e2).abs().max_component();
-        let deltaT =
-            3.0 * (gamma(3) * maxE * maxZt + deltaE * maxZt + deltaZ * maxE) * invDet.abs();
+        let max_e = Vector3::new(e0, e1, e2).abs().max_component();
+        let delta_t =
+            3.0 * (gamma(3) * max_e * max_zt + delta_e * max_zt + delta_z * max_e) * inv_det.abs();
 
-        if t <= deltaT {
+        if t <= delta_t {
             return false;
         };
 
         // Compute error bounds for triangle intersection
-        let xAbsSum = (b0 * p0.x).abs() + (b1 * p1.x).abs() + (b2 * p2.x).abs();
-        let yAbsSum = (b0 * p0.y).abs() + (b1 * p1.y).abs() + (b2 * p2.y).abs();
-        let zAbsSum = (b0 * p0.z).abs() + (b1 * p1.z).abs() + (b2 * p2.z).abs();
-        let pError = gamma(7) * Vector3::new(xAbsSum, yAbsSum, zAbsSum);
+        let x_abs_sum = (b0 * p0.x).abs() + (b1 * p1.x).abs() + (b2 * p2.x).abs();
+        let y_abs_sum = (b0 * p0.y).abs() + (b1 * p1.y).abs() + (b2 * p2.y).abs();
+        let z_abs_sum = (b0 * p0.z).abs() + (b1 * p1.z).abs() + (b2 * p2.z).abs();
+        let p_error = gamma(7) * Vector3::new(x_abs_sum, y_abs_sum, z_abs_sum);
 
-        let pHit = b0 * p0 + b1 * p1 + b2 * p2;
+        let p_hit = b0 * p0 + b1 * p1 + b2 * p2;
 
         let mut normal = Normal::from(cross(p1 - p0, p2 - p0).normalize());
         if normal.dot(ray.d) > 0.0 {
@@ -165,9 +165,9 @@ impl Shape for Triangle {
         }
 
         *t_hit = t;
-        interaction.p = pHit;
+        interaction.p = p_hit;
         interaction.n = normal;
-        interaction.p_error = pError;
+        interaction.p_error = p_error;
 
         return true;
     }

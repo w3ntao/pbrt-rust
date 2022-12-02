@@ -15,10 +15,10 @@ impl DiffuseLight {
 impl Material for DiffuseLight {
     fn scatter(
         &self,
-        incoming_ray: Ray,
-        surface_interaction: &SurfaceInteraction,
-        scattered_direction: &mut Vector3,
-        attenuation: &mut Color,
+        _incoming_ray: Ray,
+        _surface_interaction: &SurfaceInteraction,
+        _scattered_direction: &mut Vector3,
+        _attenuation: &mut Color,
     ) -> bool {
         return false;
     }
