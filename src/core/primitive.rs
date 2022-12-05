@@ -89,8 +89,11 @@ impl Primitive for TransformedPrimitive {
         let mut inverse_ray = (inverse_transform)(ray.clone());
         let inverse_t = (inverse_transform)(ray.d).length();
 
-        inverse_ray.d /= inverse_t;
-        inverse_ray.t_max *= inverse_t;
+        if inverse_t < 0.5 || inverse_t > 2.0 {
+            // to avoid normalizing transformed ray too frequently
+            inverse_ray.d /= inverse_t;
+            inverse_ray.t_max *= inverse_t;
+        }
 
         let mut si_primitive = SurfaceInteraction::default();
         if !self
