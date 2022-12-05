@@ -12,7 +12,7 @@ pub fn test(width: usize, height: usize) {
     let ratio: f32 = 20000.0;
     let delta = 0.2;
 
-    let mut world = World::default();
+    let mut world = Scene::default();
     for idx in 0..num {
         let theta = (idx as f32) * delta;
         let mut dragon_instance = TransformedPrimitive::new(dragon_model.clone());

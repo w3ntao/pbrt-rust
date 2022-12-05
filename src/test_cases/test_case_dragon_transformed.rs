@@ -13,8 +13,8 @@ pub fn far_camera(width: usize, height: usize) -> Perspective {
     return camera;
 }
 
-pub fn transformed_dragon() -> World {
-    let mut world = World::default();
+pub fn transformed_dragon() -> Scene {
+    let mut world = Scene::default();
     let glass = Arc::new(Glass::new(1.0));
     let dragon_model = Arc::new(load_dragon(glass.clone()));
     let mut dragon_instance = TransformedPrimitive::new(dragon_model.clone());

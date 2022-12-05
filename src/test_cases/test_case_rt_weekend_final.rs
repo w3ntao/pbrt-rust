@@ -14,8 +14,8 @@ fn random_bright_color() -> Color {
     }
 }
 
-pub fn many_random_spheres() -> World {
-    let mut scene = World::default();
+pub fn many_random_spheres() -> Scene {
+    let mut scene = Scene::default();
     for a in -11..11 {
         let a = a as f32;
         for b in -11..11 {

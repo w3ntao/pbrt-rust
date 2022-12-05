@@ -2,8 +2,8 @@ use crate::core::pbrt::*;
 
 const WALL_LENGTH: f32 = 555.0;
 
-fn empty_cornell_box() -> World {
-    let mut world = World::default();
+fn empty_cornell_box() -> Scene {
+    let mut world = Scene::default();
 
     let solid_color_red = Color::new(0.65, 0.05, 0.05);
     let solid_color_green = Color::new(0.12, 0.45, 0.15);
@@ -85,7 +85,7 @@ pub fn cornell_box_camera(width: usize, height: usize) -> Perspective {
     );
 }
 
-pub fn cornell_box() -> World {
+pub fn cornell_box() -> Scene {
     let solid_color_white = Color::new(0.73, 0.73, 0.73);
     let lambertian_white = Arc::new(Lambertian::new(solid_color_white));
 
@@ -124,7 +124,7 @@ pub fn cornell_box() -> World {
     return world;
 }
 
-pub fn cornell_box_specular() -> World {
+pub fn cornell_box_specular() -> Scene {
     let mut world = empty_cornell_box();
 
     let aluminum = Arc::new(Metal::new(Color::new(0.8, 0.85, 0.88), 0.0));
@@ -161,7 +161,7 @@ pub fn cornell_box_specular() -> World {
     return world;
 }
 
-pub fn cornell_box_metal_dragon() -> World {
+pub fn cornell_box_metal_dragon() -> Scene {
     let mut world = empty_cornell_box();
     let metal = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.5));
     let diffuse_light = DiffuseLight::new(Color::new(10.0, 10.0, 10.0));

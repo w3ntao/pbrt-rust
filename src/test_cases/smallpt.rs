@@ -1,7 +1,7 @@
 use crate::core::pbrt::*;
 
-pub fn smallpt() -> World {
-    let mut world = World::default();
+pub fn smallpt() -> Scene {
+    let mut world = Scene::default();
 
     let solid_color_red = Color::new(0.75, 0.25, 0.25);
     let solid_color_blue = Color::new(0.25, 0.25, 0.75);

@@ -1,12 +1,12 @@
 use crate::core::pbrt::*;
 
 pub struct PathTrace {
-    world: Arc<World>,
+    world: Arc<Scene>,
     background: Color,
 }
 
 impl PathTrace {
-    pub fn new(_world: Arc<World>, _background: Color) -> Self {
+    pub fn new(_world: Arc<Scene>, _background: Color) -> Self {
         return Self {
             world: _world,
             background: _background,

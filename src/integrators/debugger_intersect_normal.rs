@@ -1,12 +1,12 @@
 use crate::core::pbrt::*;
 
 pub struct DebuggerIntersectNormal {
-    world: Arc<World>,
+    world: Arc<Scene>,
 }
 
 impl DebuggerIntersectNormal {
     #[allow(dead_code)]
-    pub fn new(_world: Arc<World>) -> Self {
+    pub fn new(_world: Arc<Scene>) -> Self {
         return Self { world: _world };
     }
 }

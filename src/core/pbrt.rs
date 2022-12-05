@@ -13,11 +13,10 @@ pub use crate::core::primitive::*;
 pub use crate::core::random::*;
 pub use crate::core::ray::*;
 pub use crate::core::renderer::*;
+pub use crate::core::scene::*;
 pub use crate::core::shape::*;
-pub use crate::core::texture::*;
 pub use crate::core::transform::*;
 pub use crate::core::vector3::*;
-pub use crate::core::world::*;
 
 pub use crate::accelerators::bvh::*;
 

@@ -1,36 +1,36 @@
 use crate::core::pbrt::*;
 
-pub struct World {
+pub struct Scene {
     lights: Vec<Arc<dyn Primitive>>,
-    scene: BVH,
+    objects: BVH,
 }
 
-impl Default for World {
+impl Default for Scene {
     fn default() -> Self {
         return Self {
             lights: vec![],
-            scene: BVH::default(),
+            objects: BVH::default(),
         };
     }
 }
 
-impl World {
+impl Scene {
     pub fn add(&mut self, object: Arc<dyn Primitive>) {
-        self.scene.add(object);
+        self.objects.add(object);
     }
 
     pub fn add_light(&mut self, light: Arc<dyn Primitive>) {
         self.lights.push(light.clone());
-        self.scene.add(light);
+        self.objects.add(light);
     }
 
     pub fn build_index(&mut self) {
-        self.scene.build_index();
+        self.objects.build_index();
     }
 
     pub fn intersect(&self, ray: &Ray, interaction: &mut SurfaceInteraction) -> bool {
         let mut ray = *ray;
-        return self.scene.intersect(&mut ray, interaction);
+        return self.objects.intersect(&mut ray, interaction);
     }
 
     pub fn sample_light(&self) -> (Point, Vector3, f32, Arc<dyn Material>) {

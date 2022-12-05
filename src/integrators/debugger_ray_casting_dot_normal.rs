@@ -1,11 +1,11 @@
 use crate::core::pbrt::*;
 
 pub struct DebuggerRayCastingDotNormal {
-    world: Arc<World>,
+    world: Arc<Scene>,
 }
 
 impl DebuggerRayCastingDotNormal {
-    pub fn new(_world: Arc<World>) -> Self {
+    pub fn new(_world: Arc<Scene>) -> Self {
         return Self { world: _world };
     }
 }

@@ -1,12 +1,12 @@
 use crate::core::pbrt::*;
 
 pub struct DebuggerScatterRay {
-    world: Arc<World>,
+    world: Arc<Scene>,
 }
 
 impl DebuggerScatterRay {
     #[allow(dead_code)]
-    pub fn new(_world: Arc<World>) -> Self {
+    pub fn new(_world: Arc<Scene>) -> Self {
         return Self { world: _world };
     }
 }
