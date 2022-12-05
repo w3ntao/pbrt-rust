@@ -1,8 +1,8 @@
 pub mod cornell_box;
 pub mod smallpt;
+pub mod test_case_cornell_box_metal_dragon_intersect_normal;
 pub mod test_case_cornell_box_metal_dragon_next_event_estimation;
 pub mod test_case_cornell_box_metal_dragon_ray_casting_dot_normal;
-pub mod test_case_cornell_box_metal_dragon_ray_casting_normal;
 pub mod test_case_cornell_box_next_event_estimation;
 pub mod test_case_cornell_box_path_trace;
 pub mod test_case_cornell_box_specular_next_event_estimation;

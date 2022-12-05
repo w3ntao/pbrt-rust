@@ -24,10 +24,10 @@ pub use crate::accelerators::bvh::*;
 pub use crate::cameras::depth_of_field::*;
 pub use crate::cameras::perspective::*;
 
+pub use crate::integrators::debugger_intersect_normal::*;
+pub use crate::integrators::debugger_ray_casting_dot_normal::*;
 pub use crate::integrators::next_event_estimation::*;
 pub use crate::integrators::path_trace::*;
-pub use crate::integrators::ray_casting_dot_normal::*;
-pub use crate::integrators::ray_casting_normal::*;
 
 pub use crate::materials::diffuse_light::*;
 pub use crate::materials::glass::*;

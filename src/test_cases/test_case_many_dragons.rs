@@ -41,7 +41,7 @@ pub fn test(width: usize, height: usize) {
         (height as f32) / (width as f32),
     );
 
-    let integrator = RayCastingDotNormal::new(Arc::new(world));
+    let integrator = DebuggerRayCastingDotNormal::new(Arc::new(world));
     let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), 1);
     let image = renderer.render(width, height);
     image.write(&file_name);

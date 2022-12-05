@@ -32,7 +32,7 @@ pub fn test(width: usize, height: usize) {
     let file_name = get_file_name(file!());
     println!("TESTING: {}", &file_name);
 
-    let integrator = RayCastingDotNormal::new(Arc::new(transformed_dragon()));
+    let integrator = DebuggerRayCastingDotNormal::new(Arc::new(transformed_dragon()));
     let renderer = Renderer::new(Arc::new(far_camera(width, height)), Arc::new(integrator), 1);
     let image = renderer.render(width, height);
     image.write(&file_name);

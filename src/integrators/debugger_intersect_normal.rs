@@ -1,17 +1,17 @@
 use crate::core::pbrt::*;
 
-pub struct RayCastingNormal {
+pub struct DebuggerIntersectNormal {
     world: Arc<World>,
 }
 
-impl RayCastingNormal {
+impl DebuggerIntersectNormal {
     #[allow(dead_code)]
     pub fn new(_world: Arc<World>) -> Self {
         return Self { world: _world };
     }
 }
 
-impl Integrator for RayCastingNormal {
+impl Integrator for DebuggerIntersectNormal {
     fn get_radiance(&self, ray: Ray) -> Color {
         let mut interaction = SurfaceInteraction::default();
         if !self.world.intersect(&ray, &mut interaction) {
