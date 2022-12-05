@@ -5,13 +5,13 @@ const WALL_LENGTH: f32 = 555.0;
 fn empty_cornell_box() -> World {
     let mut world = World::default();
 
-    let solid_color_red = Arc::new(SolidColor::new(Color::new(0.65, 0.05, 0.05)));
-    let solid_color_green = Arc::new(SolidColor::new(Color::new(0.12, 0.45, 0.15)));
-    let solid_color_white = Arc::new(SolidColor::new(Color::new(0.73, 0.73, 0.73)));
+    let solid_color_red = Color::new(0.65, 0.05, 0.05);
+    let solid_color_green = Color::new(0.12, 0.45, 0.15);
+    let solid_color_white = Color::new(0.73, 0.73, 0.73);
 
-    let lambertian_red = Arc::new(Lambertian::new(solid_color_red.clone()));
-    let lambertian_green = Arc::new(Lambertian::new(solid_color_green.clone()));
-    let lambertian_white = Arc::new(Lambertian::new(solid_color_white.clone()));
+    let lambertian_red = Arc::new(Lambertian::new(solid_color_red));
+    let lambertian_green = Arc::new(Lambertian::new(solid_color_green));
+    let lambertian_white = Arc::new(Lambertian::new(solid_color_white));
 
     let wall_left = Quad::new(
         Point::new(WALL_LENGTH, 0.0, 0.0),
@@ -86,8 +86,8 @@ pub fn cornell_box_camera(width: usize, height: usize) -> Perspective {
 }
 
 pub fn cornell_box() -> World {
-    let solid_color_white = Arc::new(SolidColor::new(Color::new(0.73, 0.73, 0.73)));
-    let lambertian_white = Arc::new(Lambertian::new(solid_color_white.clone()));
+    let solid_color_white = Color::new(0.73, 0.73, 0.73);
+    let lambertian_white = Arc::new(Lambertian::new(solid_color_white));
 
     let mut world = empty_cornell_box();
 

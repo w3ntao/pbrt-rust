@@ -50,9 +50,7 @@ pub fn many_random_spheres() -> World {
 
             if choose_material < 0.5 {
                 //diffuse
-                let albedo = random_bright_color();
-                let texture = Arc::new(SolidColor::new(albedo));
-                let lambertian = Lambertian::new(texture.clone());
+                let lambertian = Lambertian::new(random_bright_color());
                 sphere.set_material(Arc::new(lambertian));
             } else if choose_material < 0.7 {
                 // metal
@@ -79,8 +77,8 @@ pub fn test(width: usize, height: usize, samples: u32) {
     println!("TESTING: {} for {} samples per pixel", &file_name, samples);
 
     let mut scene = many_random_spheres();
-    let solid_color_ground = Arc::new(SolidColor::new(Color::new(0.5, 0.5, 0.5)));
-    let material_ground = Arc::new(Lambertian::new(solid_color_ground.clone()));
+    let solid_color_ground = Color::new(0.5, 0.5, 0.5);
+    let material_ground = Arc::new(Lambertian::new(solid_color_ground));
 
     let ground_radius = 2000.0;
     let sphere_ground = Sphere::new(Point::new(0.0, -ground_radius, 0.0), ground_radius);
@@ -91,8 +89,8 @@ pub fn test(width: usize, height: usize, samples: u32) {
 
     scene.add(ground.clone());
 
-    let texture_lambertian = Arc::new(SolidColor::new(Color::new(0.4, 0.2, 0.1)));
-    let lambertian = Arc::new(Lambertian::new(texture_lambertian.clone()));
+    let texture_lambertian = Color::new(0.4, 0.2, 0.1);
+    let lambertian = Arc::new(Lambertian::new(texture_lambertian));
     let glass = Arc::new(Glass::new(1.5));
     let metal = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
 

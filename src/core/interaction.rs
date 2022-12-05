@@ -7,9 +7,6 @@ pub struct SurfaceInteraction {
     pub n: Normal,
     pub material: Option<Arc<dyn Material>>,
     pub entering_material: bool,
-    pub u: f32,
-    pub v: f32,
-    // uv coordinate is for texture
 }
 
 impl Default for SurfaceInteraction {
@@ -20,8 +17,6 @@ impl Default for SurfaceInteraction {
             n: Normal::invalid(),
             material: None,
             entering_material: true,
-            u: f32::NAN,
-            v: f32::NAN,
         };
     }
 }

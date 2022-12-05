@@ -1,12 +1,12 @@
 use crate::core::pbrt::*;
 
 pub struct Lambertian {
-    albedo: Arc<dyn Texture>,
+    albedo: Color,
 }
 
 impl Lambertian {
-    pub fn new(texture: Arc<dyn Texture>) -> Lambertian {
-        Lambertian { albedo: texture }
+    pub fn new(color: Color) -> Lambertian {
+        Lambertian { albedo: color }
     }
 }
 
@@ -35,11 +35,7 @@ impl Material for Lambertian {
         let random_direction = uvw.local(random_cosine_direction());
 
         *scattered_direction = random_direction.normalize();
-        *attenuation = self.albedo.get_color(
-            surface_interaction.u,
-            surface_interaction.v,
-            surface_interaction.p,
-        );
+        *attenuation = self.albedo;
 
         return true;
     }

@@ -8,8 +8,8 @@ pub fn test(width: usize, height: usize, samples: u32) {
     println!("TESTING: {} for {} samples per pixel", &file_name, samples);
 
     let mut scene = many_random_spheres();
-    let solid_color_ground = Arc::new(SolidColor::new(Color::new(0.5, 0.5, 0.5)));
-    let material_ground = Arc::new(Lambertian::new(solid_color_ground.clone()));
+    let solid_color_ground = Color::new(0.5, 0.5, 0.5);
+    let material_ground = Arc::new(Lambertian::new(solid_color_ground));
 
     let length = 40.0;
     let quad = Quad::new(
@@ -23,8 +23,8 @@ pub fn test(width: usize, height: usize, samples: u32) {
     ));
     scene.add(ground.clone());
 
-    let texture_lambertian = Arc::new(SolidColor::new(Color::new(0.4, 0.2, 0.1)));
-    let lambertian = Arc::new(Lambertian::new(texture_lambertian.clone()));
+    let texture_lambertian = Color::new(0.4, 0.2, 0.1);
+    let lambertian = Arc::new(Lambertian::new(texture_lambertian));
     let glass = Arc::new(Glass::new(1.5));
     let metal = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
 

@@ -3,13 +3,13 @@ use crate::core::pbrt::*;
 pub fn smallpt() -> World {
     let mut world = World::default();
 
-    let solid_color_red = Arc::new(SolidColor::new(Color::new(0.75, 0.25, 0.25)));
-    let solid_color_blue = Arc::new(SolidColor::new(Color::new(0.25, 0.25, 0.75)));
-    let solid_color_white = Arc::new(SolidColor::new(Color::new(0.75, 0.75, 0.75)));
+    let solid_color_red = Color::new(0.75, 0.25, 0.25);
+    let solid_color_blue = Color::new(0.25, 0.25, 0.75);
+    let solid_color_white = Color::new(0.75, 0.75, 0.75);
 
-    let lambertian_red = Arc::new(Lambertian::new(solid_color_red.clone()));
-    let lambertian_blue = Arc::new(Lambertian::new(solid_color_blue.clone()));
-    let lambertian_white = Arc::new(Lambertian::new(solid_color_white.clone()));
+    let lambertian_red = Arc::new(Lambertian::new(solid_color_red));
+    let lambertian_blue = Arc::new(Lambertian::new(solid_color_blue));
+    let lambertian_white = Arc::new(Lambertian::new(solid_color_white));
 
     let wall_length = 150.0;
 

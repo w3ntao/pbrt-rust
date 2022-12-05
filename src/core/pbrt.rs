@@ -40,10 +40,6 @@ pub use crate::shapes::quad::*;
 pub use crate::shapes::sphere::*;
 pub use crate::shapes::triangle::*;
 
-pub use crate::textures::checker_texture::*;
-pub use crate::textures::noise_texture::*;
-pub use crate::textures::solid_color::*;
-
 pub use crate::tools::image::*;
 pub use crate::tools::obj_loader::*;
 pub use crate::tools::utility::*;

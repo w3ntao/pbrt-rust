@@ -9,7 +9,6 @@ mod integrators;
 mod materials;
 mod shapes;
 mod test_cases;
-mod textures;
 mod tools;
 
 fn all_tests(samples: u32, ratio: f32) {
