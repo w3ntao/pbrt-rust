@@ -10,6 +10,5 @@ pub mod test_case_cornell_box_specular_path_trace;
 pub mod test_case_dragon_bvh;
 pub mod test_case_dragon_transformed;
 pub mod test_case_many_dragons;
-pub mod test_case_rt_weekend_final;
 pub mod test_case_rt_weekend_final_dragon;
 pub mod test_case_smallpt;
