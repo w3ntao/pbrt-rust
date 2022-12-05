@@ -13,10 +13,9 @@ impl DebuggerScatterRay {
 
 impl Integrator for DebuggerScatterRay {
     fn get_radiance(&self, ray: Ray) -> Color {
-        let background = Color::new(0.7, 0.8, 1.0);
         let mut interaction = SurfaceInteraction::default();
         if !self.world.intersect(&ray, &mut interaction) {
-            return background;
+            return Color::black();
         }
 
         let mut scattered_direction = Vector3::invalid();
@@ -32,7 +31,7 @@ impl Integrator for DebuggerScatterRay {
                 &mut attenuation,
             )
         {
-            return background;
+            return Color::black();
         }
 
         let direction = scattered_direction.normalize();
