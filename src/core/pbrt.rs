@@ -25,6 +25,7 @@ pub use crate::cameras::perspective::*;
 
 pub use crate::integrators::debugger_intersect_normal::*;
 pub use crate::integrators::debugger_ray_casting_dot_normal::*;
+pub use crate::integrators::debugger_scatter_ray::*;
 pub use crate::integrators::next_event_estimation::*;
 pub use crate::integrators::path_trace::*;
 

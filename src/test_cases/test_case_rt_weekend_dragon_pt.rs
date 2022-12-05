@@ -14,7 +14,7 @@ fn random_bright_color() -> Color {
     }
 }
 
-fn many_random_spheres_with_dragons() -> Scene {
+pub fn many_random_spheres_with_dragons() -> Scene {
     let mut scene = Scene::default();
     for a in -11..11 {
         let a = a as f32;
@@ -112,12 +112,7 @@ fn many_random_spheres_with_dragons() -> Scene {
     return scene;
 }
 
-#[allow(dead_code)]
-pub fn test(width: usize, height: usize, samples: u32) {
-    let samples = ((samples as f32).sqrt() as u32).pow(2);
-    let file_name = get_file_name(file!());
-    println!("TESTING: {} for {} samples per pixel", &file_name, samples);
-
+pub fn rt_weekend_camera(width: usize, height: usize) -> Arc<dyn Camera> {
     let camera_center = Point::new(13.0, 2.0, 3.0);
     let look_at = Point::new(0.0, 0.0, 0.0);
     let direction = look_at - camera_center;
@@ -133,10 +128,19 @@ pub fn test(width: usize, height: usize, samples: u32) {
         (camera_center - middle_dragon_center).length(),
     );
 
+    return Arc::new(camera);
+}
+
+#[allow(dead_code)]
+pub fn test(width: usize, height: usize, samples: u32) {
+    let samples = ((samples as f32).sqrt() as u32).pow(2);
+    let file_name = get_file_name(file!());
+    println!("TESTING: {} for {} samples per pixel", &file_name, samples);
+
     let integrator = PathTrace::new(Color::new(0.7, 0.8, 1.0));
     let renderer = Renderer::new(
         Arc::new(many_random_spheres_with_dragons()),
-        Arc::new(camera),
+        rt_weekend_camera(width, height),
         Arc::new(integrator),
         samples,
     );

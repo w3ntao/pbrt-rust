@@ -1,8 +1,8 @@
 pub mod cornell_box;
 pub mod smallpt;
+pub mod test_case_cornell_box_metal_dragon_debug;
 pub mod test_case_cornell_box_metal_dragon_intersect_normal;
 pub mod test_case_cornell_box_metal_dragon_next_event_estimation;
-pub mod test_case_cornell_box_metal_dragon_ray_casting_dot_normal;
 pub mod test_case_cornell_box_next_event_estimation;
 pub mod test_case_cornell_box_path_trace;
 pub mod test_case_cornell_box_specular_next_event_estimation;
@@ -10,5 +10,6 @@ pub mod test_case_cornell_box_specular_path_trace;
 pub mod test_case_dragon_bvh;
 pub mod test_case_dragon_transformed;
 pub mod test_case_many_dragons;
-pub mod test_case_rt_weekend_final_dragon;
+pub mod test_case_rt_weekend_dragon_debug;
+pub mod test_case_rt_weekend_dragon_pt;
 pub mod test_case_smallpt;
