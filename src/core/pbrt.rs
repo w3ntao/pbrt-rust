@@ -1,7 +1,7 @@
-pub use crate::core::accurate_float::*;
 pub use crate::core::bounds::*;
 pub use crate::core::camera::*;
 pub use crate::core::color::*;
+pub use crate::core::error_float::*;
 pub use crate::core::integrator::*;
 pub use crate::core::interaction::*;
 pub use crate::core::material::*;
