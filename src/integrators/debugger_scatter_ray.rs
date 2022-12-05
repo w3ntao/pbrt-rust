@@ -35,11 +35,19 @@ impl Integrator for DebuggerScatterRay {
             return background;
         }
 
-        scattered_direction = scattered_direction.normalize();
+        let direction = scattered_direction.normalize();
+        let base: f32 = 10.0;
+        let soft_max_direction = Vector3::new(
+            base.powf(direction.x),
+            base.powf(direction.y),
+            base.powf(direction.z),
+        )
+        .normalize();
+
         return Color::new(
-            scattered_direction.x,
-            scattered_direction.y,
-            scattered_direction.z,
+            soft_max_direction.x,
+            soft_max_direction.y,
+            soft_max_direction.z,
         );
     }
 }
