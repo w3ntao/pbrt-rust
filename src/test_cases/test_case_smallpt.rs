@@ -18,8 +18,13 @@ pub fn test(width: usize, height: usize, samples: u32) {
         (height as f32) / (width as f32),
     );
 
-    let integrator = NextEventEstimation::new(Arc::new(smallpt()));
-    let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
+    let integrator = NextEventEstimation::default();
+    let renderer = Renderer::new(
+        Arc::new(smallpt()),
+        Arc::new(camera),
+        Arc::new(integrator),
+        samples,
+    );
     let image = renderer.render(width, height);
     image.write(&format!("{}_{}", file_name, samples));
     println!();

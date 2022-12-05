@@ -12,7 +12,7 @@ pub fn test(width: usize, height: usize) {
     let ratio: f32 = 20000.0;
     let delta = 0.2;
 
-    let mut world = Scene::default();
+    let mut scene = Scene::default();
     for idx in 0..num {
         let theta = (idx as f32) * delta;
         let mut dragon_instance = TransformedPrimitive::new(dragon_model.clone());
@@ -25,9 +25,10 @@ pub fn test(width: usize, height: usize) {
             radius * theta.cos(),
         ));
 
-        world.add(Arc::new(dragon_instance));
+        scene.add(Arc::new(dragon_instance));
     }
-    world.build_index();
+    scene.build_index();
+    let scene = Arc::new(scene);
 
     let origin = Point::new(-7.0, 4.0, 0.0);
     let focus = Point::new(0.0, 0.0, 0.0);
@@ -41,8 +42,8 @@ pub fn test(width: usize, height: usize) {
         (height as f32) / (width as f32),
     );
 
-    let integrator = DebuggerRayCastingDotNormal::new(Arc::new(world));
-    let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), 1);
+    let integrator = DebuggerRayCastingDotNormal::default();
+    let renderer = Renderer::new(scene.clone(), Arc::new(camera), Arc::new(integrator), 1);
     let image = renderer.render(width, height);
     image.write(&file_name);
     println!();

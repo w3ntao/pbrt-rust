@@ -11,6 +11,7 @@ pub fn test(width: usize, height: usize) {
     let dragon_instance = TransformedPrimitive::new(dragon_model.clone());
     world.add(Arc::new(dragon_instance));
     world.build_index();
+    let world = Arc::new(world);
 
     let camera = Perspective::new(
         Point::new(-2.9, 0.0, 0.0),
@@ -20,8 +21,8 @@ pub fn test(width: usize, height: usize) {
         (height as f32) / (width as f32),
     );
 
-    let integrator = DebuggerRayCastingDotNormal::new(Arc::new(world));
-    let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), 1);
+    let integrator = DebuggerRayCastingDotNormal::default();
+    let renderer = Renderer::new(world.clone(), Arc::new(camera), Arc::new(integrator), 1);
     let image = renderer.render(width, height);
     image.write(&file_name);
     println!();

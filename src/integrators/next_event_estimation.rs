@@ -1,12 +1,10 @@
 use crate::core::pbrt::*;
 
-pub struct NextEventEstimation {
-    world: Arc<Scene>,
-}
+pub struct NextEventEstimation {}
 
-impl NextEventEstimation {
-    pub fn new(_world: Arc<Scene>) -> Self {
-        return Self { world: _world };
+impl Default for NextEventEstimation {
+    fn default() -> Self {
+        return Self {};
     }
 }
 
@@ -17,8 +15,9 @@ impl NextEventEstimation {
         &self,
         surface_interaction: &SurfaceInteraction,
         ray: &Ray,
+        scene: Arc<Scene>,
     ) -> Color {
-        let (light_point, light_normal, light_area, light_material) = self.world.sample_light();
+        let (light_point, light_normal, light_area, light_material) = scene.sample_light();
         let towards_light = light_point - surface_interaction.p;
         let distance = towards_light.length();
         let towards_light = towards_light.normalize();
@@ -35,10 +34,7 @@ impl NextEventEstimation {
         }
 
         let shadow_ray = surface_interaction.spawn_shadow_ray(light_point);
-        if self
-            .world
-            .intersect(&shadow_ray, &mut SurfaceInteraction::default())
-        {
+        if scene.intersect(&shadow_ray, &mut SurfaceInteraction::default()) {
             // The path is occluded if the shadow ray hit something
             return Color::black();
         }
@@ -59,7 +55,7 @@ impl NextEventEstimation {
 }
 
 impl Integrator for NextEventEstimation {
-    fn get_radiance(&self, ray: Ray) -> Color {
+    fn get_radiance(&self, ray: Ray, scene: Arc<Scene>) -> Color {
         let mut radiance = Color::black();
         let mut throughput = Color::new(1.0, 1.0, 1.0);
         let mut ray = ray;
@@ -72,7 +68,7 @@ impl Integrator for NextEventEstimation {
             // with INTERSECT_OFFSET, we can avoid the situation when the ray
             // re-hit the surface it just leave
 
-            if !self.world.intersect(&ray, &mut interaction) {
+            if !scene.intersect(&ray, &mut interaction) {
                 break;
             }
 
@@ -113,8 +109,9 @@ impl Integrator for NextEventEstimation {
                 .expect("material is None")
                 .is_specular();
             if !last_hit_specular {
-                radiance +=
-                    throughput * attenuation * self.get_direct_illumination(&interaction, &ray);
+                radiance += throughput
+                    * attenuation
+                    * self.get_direct_illumination(&interaction, &ray, scene.clone());
             }
 
             if depth > 5 {

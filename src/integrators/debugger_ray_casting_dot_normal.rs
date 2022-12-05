@@ -1,20 +1,18 @@
 use crate::core::pbrt::*;
 
-pub struct DebuggerRayCastingDotNormal {
-    world: Arc<Scene>,
-}
+pub struct DebuggerRayCastingDotNormal {}
 
-impl DebuggerRayCastingDotNormal {
-    pub fn new(_world: Arc<Scene>) -> Self {
-        return Self { world: _world };
+impl Default for DebuggerRayCastingDotNormal {
+    fn default() -> Self {
+        return Self {};
     }
 }
 
 impl Integrator for DebuggerRayCastingDotNormal {
-    fn get_radiance(&self, ray: Ray) -> Color {
+    fn get_radiance(&self, ray: Ray, scene: Arc<Scene>) -> Color {
         let mut interaction = SurfaceInteraction::default();
 
-        if !self.world.intersect(&ray, &mut interaction) {
+        if !scene.intersect(&ray, &mut interaction) {
             return Color::black();
         }
 

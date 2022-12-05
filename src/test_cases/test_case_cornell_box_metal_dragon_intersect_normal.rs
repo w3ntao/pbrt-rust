@@ -6,8 +6,9 @@ pub fn test(width: usize, height: usize) {
     let file_name = get_file_name(file!());
     println!("TESTING: {}", &file_name);
 
-    let integrator = DebuggerIntersectNormal::new(Arc::new(cornell_box_metal_dragon()));
+    let integrator = DebuggerIntersectNormal::default();
     let renderer = Renderer::new(
+        Arc::new(cornell_box_metal_dragon()),
         Arc::new(cornell_box_camera(width, height)),
         Arc::new(integrator),
         1,

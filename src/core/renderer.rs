@@ -3,6 +3,7 @@ extern crate num_cpus;
 use crate::core::pbrt::*;
 
 pub struct Renderer {
+    scene: Arc<Scene>,
     camera: Arc<dyn Camera>,
     integrator: Arc<dyn Integrator>,
     samples: u32,
@@ -27,8 +28,14 @@ fn print_time(seconds: i32) {
 }
 
 impl Renderer {
-    pub fn new(_camera: Arc<dyn Camera>, _integrator: Arc<dyn Integrator>, _samples: u32) -> Self {
+    pub fn new(
+        _scene: Arc<Scene>,
+        _camera: Arc<dyn Camera>,
+        _integrator: Arc<dyn Integrator>,
+        _samples: u32,
+    ) -> Self {
         return Self {
+            scene: _scene,
             camera: _camera,
             integrator: _integrator,
             samples: _samples,
@@ -107,7 +114,7 @@ impl Renderer {
                             ndc_y - 2.0 / (height as f32),
                             ndc_y,
                         ) {
-                            total += self.integrator.get_radiance(ray);
+                            total += self.integrator.get_radiance(ray, self.scene.clone());
                         }
 
                         let color = total / (self.samples as f32);

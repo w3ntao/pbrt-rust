@@ -52,6 +52,7 @@ pub fn test(width: usize, height: usize, samples: u32) {
     let middle_dragon_center = Point::new(0.0, 1.0, 0.0);
 
     scene.build_index();
+    let scene = Arc::new(scene);
 
     let camera_center = Point::new(13.0, 2.0, 3.0);
     let look_at = Point::new(0.0, 0.0, 0.0);
@@ -67,8 +68,13 @@ pub fn test(width: usize, height: usize, samples: u32) {
         (camera_center - middle_dragon_center).length(),
     );
 
-    let integrator = PathTrace::new(Arc::new(scene), Color::new(0.7, 0.8, 1.0));
-    let renderer = Renderer::new(Arc::new(camera), Arc::new(integrator), samples);
+    let integrator = PathTrace::new(Color::new(0.7, 0.8, 1.0));
+    let renderer = Renderer::new(
+        scene.clone(),
+        Arc::new(camera),
+        Arc::new(integrator),
+        samples,
+    );
     let image = renderer.render(width, height);
     image.write(&format!("{}_{}", file_name, samples));
     println!();

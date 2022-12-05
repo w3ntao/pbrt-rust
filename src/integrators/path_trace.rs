@@ -1,14 +1,12 @@
 use crate::core::pbrt::*;
 
 pub struct PathTrace {
-    world: Arc<Scene>,
     background: Color,
 }
 
 impl PathTrace {
-    pub fn new(_world: Arc<Scene>, _background: Color) -> Self {
+    pub fn new(_background: Color) -> Self {
         return Self {
-            world: _world,
             background: _background,
         };
     }
@@ -17,7 +15,7 @@ impl PathTrace {
 const RUSSIAN_ROULETTE_THRESHOLD: f32 = 0.8;
 
 impl Integrator for PathTrace {
-    fn get_radiance(&self, ray: Ray) -> Color {
+    fn get_radiance(&self, ray: Ray, scene: Arc<Scene>) -> Color {
         let mut radiance = Color::black();
         let mut throughput = Color::new(1.0, 1.0, 1.0);
         let mut ray = ray;
@@ -26,7 +24,7 @@ impl Integrator for PathTrace {
 
         for depth in 0..u32::MAX {
             let mut interaction = SurfaceInteraction::default();
-            if !self.world.intersect(&ray, &mut interaction) {
+            if !scene.intersect(&ray, &mut interaction) {
                 radiance += throughput * self.background;
                 break;
             }

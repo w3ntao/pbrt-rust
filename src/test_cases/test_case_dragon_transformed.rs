@@ -14,17 +14,17 @@ pub fn far_camera(width: usize, height: usize) -> Perspective {
 }
 
 pub fn transformed_dragon() -> Scene {
-    let mut world = Scene::default();
+    let mut scene = Scene::default();
     let glass = Arc::new(Glass::new(1.0));
     let dragon_model = Arc::new(load_dragon(glass.clone()));
     let mut dragon_instance = TransformedPrimitive::new(dragon_model.clone());
 
     dragon_instance.scale_by_scalar(400.0);
 
-    world.add(Arc::new(dragon_instance));
-    world.build_index();
+    scene.add(Arc::new(dragon_instance));
+    scene.build_index();
 
-    return world;
+    return scene;
 }
 
 #[allow(dead_code)]
@@ -32,8 +32,13 @@ pub fn test(width: usize, height: usize) {
     let file_name = get_file_name(file!());
     println!("TESTING: {}", &file_name);
 
-    let integrator = DebuggerRayCastingDotNormal::new(Arc::new(transformed_dragon()));
-    let renderer = Renderer::new(Arc::new(far_camera(width, height)), Arc::new(integrator), 1);
+    let integrator = DebuggerRayCastingDotNormal::default();
+    let renderer = Renderer::new(
+        Arc::new(transformed_dragon()),
+        Arc::new(far_camera(width, height)),
+        Arc::new(integrator),
+        1,
+    );
     let image = renderer.render(width, height);
     image.write(&file_name);
     println!();
