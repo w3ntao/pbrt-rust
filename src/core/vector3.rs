@@ -77,6 +77,23 @@ impl Vector3 {
     pub fn reflect(&self, normal: Normal) -> Vector3 {
         return *self - 2.0 * normal.dot(*self) * Vector3::from(normal);
     }
+
+    pub fn softmax_color(&self) -> Color {
+        let direction = self.normalize();
+        let base: f32 = 10.0;
+        let soft_max_direction = Vector3::new(
+            base.powf(direction.x),
+            base.powf(direction.y),
+            base.powf(direction.z),
+        )
+        .normalize();
+
+        return Color::new(
+            soft_max_direction.x,
+            soft_max_direction.y,
+            soft_max_direction.z,
+        );
+    }
 }
 
 impl std::fmt::Display for Vector3 {

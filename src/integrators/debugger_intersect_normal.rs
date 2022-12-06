@@ -15,7 +15,6 @@ impl Integrator for DebuggerIntersectNormal {
             return Color::black();
         }
 
-        let normal = interaction.n.normalize();
-        return Color::new(normal.x.abs(), normal.y.abs(), normal.z.abs());
+        return Vector3::from(interaction.n).softmax_color();
     }
 }
