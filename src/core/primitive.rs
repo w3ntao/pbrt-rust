@@ -87,25 +87,25 @@ impl Primitive for TransformedPrimitive {
     fn intersect(&self, ray: &mut Ray, surface_interaction: &mut SurfaceInteraction) -> bool {
         let inverse_transform = self.transform.inverse();
         let mut inverse_ray = (inverse_transform)(ray.clone());
-        let inverse_t = (inverse_transform)(ray.d).length();
 
-        if inverse_t < 0.5 || inverse_t > 2.0 {
-            // to avoid normalizing transformed ray too frequently
-            inverse_ray.d /= inverse_t;
-            inverse_ray.t_max *= inverse_t;
-        }
+        let rescaling = {
+            let direction_length = (inverse_transform)(ray.d).length();
+            2.0_f32.powi(direction_length.log2().round() as i32)
+        };
+        // rescaling with 2^x to minimise computational errors
+        // introduced by division and multiplication
 
-        let mut si_primitive = SurfaceInteraction::default();
-        if !self
-            .primitive
-            .intersect(&mut inverse_ray, &mut si_primitive)
-        {
+        inverse_ray.d /= rescaling;
+        inverse_ray.t_max *= rescaling;
+
+        let mut inverse_si = SurfaceInteraction::default();
+        if !self.primitive.intersect(&mut inverse_ray, &mut inverse_si) {
             return false;
         }
 
-        ray.t_max = inverse_ray.t_max / inverse_t;
+        ray.t_max = inverse_ray.t_max / rescaling;
 
-        *surface_interaction = (self.transform)(si_primitive);
+        *surface_interaction = (self.transform)(inverse_si);
 
         match &self.material {
             Some(material) => {
