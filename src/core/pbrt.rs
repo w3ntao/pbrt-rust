@@ -49,6 +49,8 @@ pub use rand::rngs::ThreadRng;
 pub use rand::seq::SliceRandom;
 pub use rand::{thread_rng, Rng};
 
+pub use rand::rngs::StdRng;
+pub use rand::SeedableRng;
 pub use rand_distr::num_traits::Pow;
 pub use rand_distr::num_traits::Zero;
 

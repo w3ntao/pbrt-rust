@@ -1,11 +1,15 @@
 use crate::core::pbrt::*;
 
-fn random_bright_color() -> Color {
+const RANDOM_SEED: u64 = 11;
+
+fn random_color(random_generator: &mut StdRng) -> Color {
+    let uniform_distribution = Uniform::new(0.0, 1.0);
+
     loop {
         let color = Color::new(
-            random_f32(0.0, 1.0),
-            random_f32(0.0, 1.0),
-            random_f32(0.0, 1.0),
+            uniform_distribution.sample(random_generator),
+            uniform_distribution.sample(random_generator),
+            uniform_distribution.sample(random_generator),
         );
 
         if color.r > 0.6 || color.g > 0.6 || color.b > 0.6 {
@@ -15,47 +19,58 @@ fn random_bright_color() -> Color {
 }
 
 pub fn many_random_spheres_with_dragons() -> Scene {
+    let mut random_generator = StdRng::seed_from_u64(RANDOM_SEED);
+    let uniform_distribution = Uniform::new(0.0, 1.0);
+
     let mut scene = Scene::default();
+
+    let dragon_center_list = [
+        Point::new(-4.0, 0.2, 0.0),
+        Point::new(0.0, 0.2, 0.0),
+        Point::new(4.0, 0.2, 0.0),
+    ];
+    let mut sphere_center_list: Vec<Point> = vec![];
+
+    let radius = 0.2;
+
     for a in -11..11 {
         let a = a as f32;
         for b in -11..11 {
             let b = b as f32;
-            let choose_material = random_f32(0.0, 1.0);
+            let choose_material = uniform_distribution.sample(&mut random_generator);
             let center = Point::new(
-                a + 0.9 * random_f32(0.0, 1.0),
-                0.2,
-                b + 0.9 * random_f32(0.0, 1.0),
+                a + 0.9 * uniform_distribution.sample(&mut random_generator),
+                radius,
+                b + 0.9 * uniform_distribution.sample(&mut random_generator),
             );
 
             let mut too_close = false;
-            for point in [
-                Point::new(-4.0, 0.2, 0.0),
-                Point::new(0.0, 0.2, 0.0),
-                Point::new(4.0, 0.2, 0.0),
-            ] {
-                if (center - point).length() <= 1.2 {
-                    too_close = true;
-                    break;
-                }
+            for point in &dragon_center_list {
+                too_close |= (center - *point).length() <= 1.5;
             }
-
+            for point in &sphere_center_list {
+                too_close |= (center - *point).length() <= radius * 2.3;
+            }
             if too_close {
                 continue;
             }
+            sphere_center_list.push(center);
 
-            let sphere = Sphere::new(center, 0.2);
+            let sphere = Sphere::new(center, radius);
             let glass = Arc::new(Glass::new(1.5));
 
             let mut sphere = GeometricPrimitive::new(Arc::new(sphere), glass.clone());
 
             if choose_material < 0.5 {
                 //diffuse
-                let lambertian = Lambertian::new(random_bright_color());
+                let lambertian = Lambertian::new(random_color(&mut random_generator));
                 sphere.set_material(Arc::new(lambertian));
             } else if choose_material < 0.7 {
                 // metal
-                let albedo = random_f32(0.5, 1.0) * Color::new(1.0, 1.0, 1.0);
-                let fuzz = random_f32(0.0, 0.5);
+                let albedo = (uniform_distribution.sample(&mut random_generator) * 0.5 + 0.5)
+                    * Color::new(1.0, 1.0, 1.0);
+                let fuzz = uniform_distribution.sample(&mut random_generator) * 0.5;
+
                 let metal = Metal::new(albedo, fuzz);
                 sphere.set_material(Arc::new(metal));
             } else {
