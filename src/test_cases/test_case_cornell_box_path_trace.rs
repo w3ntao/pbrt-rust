@@ -7,7 +7,7 @@ pub fn test(width: usize, height: usize, samples: u32) {
     let file_name = get_file_name(file!());
     println!("TESTING: {} for {} samples per pixel", &file_name, samples);
 
-    let integrator = PathTrace::new(Color::black());
+    let integrator = PathTrace::default();
     let renderer = Renderer::new(
         Arc::new(cornell_box()),
         Arc::new(cornell_box_camera(width, height)),

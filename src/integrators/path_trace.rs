@@ -4,6 +4,14 @@ pub struct PathTrace {
     background: Color,
 }
 
+impl Default for PathTrace {
+    fn default() -> Self {
+        return Self {
+            background: Color::black(),
+        };
+    }
+}
+
 impl PathTrace {
     pub fn new(_background: Color) -> Self {
         return Self {
