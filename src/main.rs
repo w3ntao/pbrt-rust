@@ -13,7 +13,7 @@ mod tools;
 
 fn all_tests(samples: u32, ratio: f32) {
     println!();
-    let width = (1960 as f32 * ratio) as usize;
+    let width = (1920 as f32 * ratio) as usize;
     let height = (1080 as f32 * ratio) as usize;
 
     //test_case_dragon_bvh::test(width, height);
