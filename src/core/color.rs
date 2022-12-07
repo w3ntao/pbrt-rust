@@ -21,8 +21,7 @@ impl Color {
     }
 
     pub fn is_finite(&self) -> bool {
-        let finite = |x: f32| -> bool { x.is_finite() };
-        return finite(self.b) && finite(self.g) && finite(self.b);
+        return self.r.is_finite() && self.g.is_finite() && self.b.is_finite();
     }
 
     pub fn max_component(&self) -> f32 {
