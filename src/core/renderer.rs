@@ -6,7 +6,8 @@ pub struct Renderer {
     scene: Arc<Scene>,
     camera: Arc<dyn Camera>,
     integrator: Arc<dyn Integrator>,
-    samples: u32,
+    sampler: Arc<dyn Sampler>,
+    num_samples: u32,
 }
 
 fn print_time(seconds: i32) {
@@ -32,13 +33,15 @@ impl Renderer {
         _scene: Arc<Scene>,
         _camera: Arc<dyn Camera>,
         _integrator: Arc<dyn Integrator>,
-        _samples: u32,
+        _sampler: Arc<dyn Sampler>,
+        _num_samples: u32,
     ) -> Self {
         return Self {
             scene: _scene,
             camera: _camera,
             integrator: _integrator,
-            samples: _samples,
+            sampler: _sampler,
+            num_samples: _num_samples,
         };
     }
 
@@ -95,6 +98,9 @@ impl Renderer {
         drop(locked_image);
 
         let mut rendered_pixels: Vec<(usize, usize, Color)> = vec![];
+
+        let mut forked_sampler = self.sampler.fork();
+        let mutated_sampler = forked_sampler.as_mut();
         loop {
             let mut locked_job = shared_job_list.lock().unwrap();
             let maybe_x = locked_job.pop();
@@ -107,23 +113,26 @@ impl Renderer {
                         let ndc_x = 2.0 * (x as f32) / (width as f32) - 1.0;
                         let mut total = Color::black();
 
-                        for ray in self.camera.get_stratified_rays(
-                            self.samples,
-                            ndc_x,
-                            ndc_x + 2.0 / (width as f32),
-                            ndc_y - 2.0 / (height as f32),
-                            ndc_y,
-                        ) {
-                            total += self.integrator.get_radiance(ray, self.scene.clone());
-                        }
+                        mutated_sampler.prepare(self.num_samples as usize, 100);
+                        // reset the sampler after sampling for every pixel
+                        // hard coded dimensions to 100
 
-                        let color = total / (self.samples as f32);
-                        if !color.is_finite() {
-                            panic!(
-                                "\n\ninfinite color rendered: {}\nat position (x={}, y={})\n\n",
-                                color, x, y
+                        for _ in 0..self.num_samples {
+                            let ray = self.camera.get_ray(
+                                ndc_x,
+                                ndc_x + 2.0 / (width as f32),
+                                ndc_y - 2.0 / (height as f32),
+                                ndc_y,
+                                mutated_sampler,
                             );
+                            total += self.integrator.get_radiance(
+                                ray,
+                                self.scene.clone(),
+                                mutated_sampler,
+                            );
+                            mutated_sampler.update_round();
                         }
+                        let color = total / (self.num_samples as f32);
                         rendered_pixels.push((y, x, color));
                     }
                 }

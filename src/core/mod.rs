@@ -14,6 +14,7 @@ pub mod primitive;
 pub mod random;
 pub mod ray;
 pub mod renderer;
+pub mod sampler;
 pub mod scene;
 pub mod shape;
 pub mod transform;

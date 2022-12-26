@@ -12,6 +12,7 @@ pub fn test(width: usize, height: usize, samples: u32) {
         Arc::new(many_random_spheres_with_dragons()),
         rt_weekend_camera(width, height),
         Arc::new(integrator),
+        Arc::new(StratifiedSampler::default()),
         samples,
     );
     let image = renderer.render(width, height);

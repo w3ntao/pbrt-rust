@@ -23,6 +23,7 @@ pub fn test(width: usize, height: usize, samples: u32) {
         Arc::new(smallpt()),
         Arc::new(camera),
         Arc::new(integrator),
+        Arc::new(StratifiedSampler::default()),
         samples,
     );
     let image = renderer.render(width, height);

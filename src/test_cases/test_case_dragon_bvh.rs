@@ -22,7 +22,13 @@ pub fn test(width: usize, height: usize) {
     );
 
     let integrator = DebuggerRayCastingDotNormal::default();
-    let renderer = Renderer::new(world.clone(), Arc::new(camera), Arc::new(integrator), 1);
+    let renderer = Renderer::new(
+        world.clone(),
+        Arc::new(camera),
+        Arc::new(integrator),
+        Arc::new(StratifiedSampler::default()),
+        1,
+    );
     let image = renderer.render(width, height);
     image.write(&file_name);
     println!();

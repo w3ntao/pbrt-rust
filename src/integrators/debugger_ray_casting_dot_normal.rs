@@ -9,7 +9,7 @@ impl Default for DebuggerRayCastingDotNormal {
 }
 
 impl Integrator for DebuggerRayCastingDotNormal {
-    fn get_radiance(&self, ray: Ray, scene: Arc<Scene>) -> Color {
+    fn get_radiance(&self, ray: Ray, scene: Arc<Scene>, sampler: &mut dyn Sampler) -> Color {
         let mut interaction = SurfaceInteraction::default();
 
         if !scene.intersect(&ray, &mut interaction) {

@@ -133,6 +133,14 @@ pub fn rt_weekend_camera(width: usize, height: usize) -> Arc<dyn Camera> {
     let direction = look_at - camera_center;
 
     let middle_dragon_center = Point::new(0.0, 1.0, 0.0);
+    let camera = Perspective::new(
+        camera_center,
+        direction,
+        Vector3::new(0.0, 1.0, 0.0),
+        PI / 6.0,
+        (height as f32) / (width as f32),
+    );
+    /*
     let camera = DepthOfField::new(
         camera_center,
         direction,
@@ -142,6 +150,7 @@ pub fn rt_weekend_camera(width: usize, height: usize) -> Arc<dyn Camera> {
         0.15,
         (camera_center - middle_dragon_center).length(),
     );
+     */
 
     return Arc::new(camera);
 }
@@ -157,6 +166,7 @@ pub fn test(width: usize, height: usize, samples: u32) {
         Arc::new(many_random_spheres_with_dragons()),
         rt_weekend_camera(width, height),
         Arc::new(integrator),
+        Arc::new(StratifiedSampler::default()),
         samples,
     );
     let image = renderer.render(width, height);

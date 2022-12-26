@@ -37,6 +37,7 @@ pub fn test(width: usize, height: usize) {
         Arc::new(transformed_dragon()),
         Arc::new(far_camera(width, height)),
         Arc::new(integrator),
+        Arc::new(StratifiedSampler::default()),
         1,
     );
     let image = renderer.render(width, height);

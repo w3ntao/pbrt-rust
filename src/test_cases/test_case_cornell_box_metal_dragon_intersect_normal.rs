@@ -11,6 +11,7 @@ pub fn test(width: usize, height: usize) {
         Arc::new(cornell_box_metal_dragon()),
         Arc::new(cornell_box_camera(width, height)),
         Arc::new(integrator),
+        Arc::new(StratifiedSampler::default()),
         1,
     );
     let image = renderer.render(width, height);

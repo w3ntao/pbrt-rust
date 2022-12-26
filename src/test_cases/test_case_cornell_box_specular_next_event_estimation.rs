@@ -12,6 +12,7 @@ pub fn test(width: usize, height: usize, samples: u32) {
         Arc::new(cornell_box_specular()),
         Arc::new(cornell_box_camera(width, height)),
         Arc::new(integrator),
+        Arc::new(StratifiedSampler::default()),
         samples,
     );
     let image = renderer.render(width, height);

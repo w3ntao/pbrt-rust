@@ -23,7 +23,7 @@ impl PathTrace {
 const RUSSIAN_ROULETTE_THRESHOLD: f32 = 0.8;
 
 impl Integrator for PathTrace {
-    fn get_radiance(&self, ray: Ray, scene: Arc<Scene>) -> Color {
+    fn get_radiance(&self, ray: Ray, scene: Arc<Scene>, sampler: &mut dyn Sampler) -> Color {
         let mut radiance = Color::black();
         let mut throughput = Color::new(1.0, 1.0, 1.0);
         let mut ray = ray;

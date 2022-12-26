@@ -84,4 +84,23 @@ impl Camera for Perspective {
 
         return rays;
     }
+
+    fn get_ray(
+        &self,
+        min_u: f32,
+        max_u: f32,
+        min_v: f32,
+        max_v: f32,
+        sampler: &mut dyn Sampler,
+    ) -> Ray {
+        let (random_u, random_v) = sampler.get_camera_ray_sample();
+        let u = min_u + random_u * (max_u - min_u);
+        let v = min_v + random_v * (max_v - min_v);
+
+        let x = u * self.x_pixel_multiplier;
+        let y = v * self.y_pixel_multiplier;
+        let direction = self.forward + x * self.horizontal + y * self.image_plane_vertical;
+
+        return Ray::new(self.center, direction.normalize(), f32::INFINITY);
+    }
 }

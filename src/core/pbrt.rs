@@ -13,6 +13,7 @@ pub use crate::core::primitive::*;
 pub use crate::core::random::*;
 pub use crate::core::ray::*;
 pub use crate::core::renderer::*;
+pub use crate::core::sampler::*;
 pub use crate::core::scene::*;
 pub use crate::core::shape::*;
 pub use crate::core::transform::*;
@@ -34,6 +35,9 @@ pub use crate::materials::glass::*;
 pub use crate::materials::lambertian::*;
 pub use crate::materials::metal::*;
 pub use crate::materials::mirror::*;
+
+pub use crate::samplers::random::*;
+pub use crate::samplers::stratified::*;
 
 pub use crate::shapes::axis_aligned_box::*;
 pub use crate::shapes::quad::*;
