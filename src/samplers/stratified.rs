@@ -7,6 +7,11 @@ pub struct StratifiedSampler {
     camera_ray_samples: Vec<Sample2D>,
     brdf_sample_idx: usize,
     brdf_samples: Vec<Vec<Sample2D>>,
+    light_num: usize,
+    light_id_sample_idx: usize,
+    light_id_samples: Vec<Vec<usize>>,
+    light_area_sample_idx: usize,
+    light_area_samples: Vec<Vec<Sample2D>>,
     prepared: bool,
 }
 
@@ -14,11 +19,16 @@ impl Default for StratifiedSampler {
     fn default() -> Self {
         return Self {
             rng: StdRng::from_entropy(),
-            round: 0,
-            camera_ray_sample_idx: 0,
+            round: usize::MAX,
+            camera_ray_sample_idx: usize::MAX,
             camera_ray_samples: vec![],
-            brdf_sample_idx: 0,
+            brdf_sample_idx: usize::MAX,
             brdf_samples: vec![vec![]],
+            light_num: usize::MAX,
+            light_id_sample_idx: usize::MAX,
+            light_id_samples: vec![vec![]],
+            light_area_sample_idx: usize::MAX,
+            light_area_samples: vec![vec![]],
             prepared: false,
         };
     }
@@ -53,23 +63,39 @@ impl Sampler for StratifiedSampler {
         return Box::new(StratifiedSampler::default());
     }
 
-    fn preprocess(&mut self, samples_per_pixel: usize, dimensions: usize) {
+    fn preprocess(&mut self, samples_per_pixel: usize, dimensions: usize, _light_num: usize) {
         // round == samples_per_pixel
         self.prepared = true;
         self.rng = StdRng::from_entropy();
 
         self.round = 0;
+        self.light_num = _light_num;
         self.camera_ray_sample_idx = 0;
         self.brdf_sample_idx = 0;
+        self.light_area_sample_idx = 0;
+        self.light_id_sample_idx = 0;
 
         self.camera_ray_samples = generate_stratified_2d_samples(samples_per_pixel, &mut self.rng);
 
-        self.brdf_samples = vec![vec![(0.0, 0.0); dimensions]; samples_per_pixel];
+        self.brdf_samples = vec![vec![(f32::NAN, f32::NAN); dimensions]; samples_per_pixel];
+        self.light_area_samples = vec![vec![(f32::NAN, f32::NAN); dimensions]; samples_per_pixel];
+        self.light_id_samples = vec![vec![usize::MAX; dimensions]; samples_per_pixel];
+
         for d in 0..dimensions {
-            let stratified_2d_samples =
+            let brdf_samples = generate_stratified_2d_samples(samples_per_pixel, &mut self.rng);
+            let light_area_samples =
                 generate_stratified_2d_samples(samples_per_pixel, &mut self.rng);
+
+            let mut light_id_samples: Vec<usize> = (0.._light_num).collect();
+            while light_id_samples.len() < samples_per_pixel {
+                light_id_samples.append(&mut (0.._light_num).collect());
+            }
+            light_id_samples.shuffle(&mut self.rng);
+
             for round in 0..samples_per_pixel {
-                self.brdf_samples[round][d] = stratified_2d_samples[round];
+                self.brdf_samples[round][d] = brdf_samples[round];
+                self.light_id_samples[round][d] = light_id_samples[round];
+                self.light_area_samples[round][d] = light_area_samples[round];
             }
         }
     }
@@ -78,6 +104,8 @@ impl Sampler for StratifiedSampler {
         self.round += 1;
         self.camera_ray_sample_idx = 0;
         self.brdf_sample_idx = 0;
+        self.light_id_sample_idx = 0;
+        self.light_area_sample_idx = 0;
     }
 
     fn get_camera_ray_sample(&mut self) -> Sample2D {
@@ -107,6 +135,36 @@ impl Sampler for StratifiedSampler {
 
         let sample = self.brdf_samples[self.round][self.brdf_sample_idx];
         self.brdf_sample_idx += 1;
+        return sample;
+    }
+
+    fn get_light_id_sample(&mut self) -> usize {
+        if !self.prepared {
+            panic!("StratifiedSampler not prepared");
+        }
+
+        if self.round >= self.light_id_samples.len()
+            || self.light_id_sample_idx >= self.light_id_samples[self.round].len()
+        {
+            return self.rng.gen_range(0..self.light_num);
+        }
+
+        let sample = self.light_id_samples[self.round][self.light_id_sample_idx];
+        self.light_id_sample_idx += 1;
+        return sample;
+    }
+
+    fn get_light_area_sample(&mut self) -> Sample2D {
+        if !self.prepared {
+            panic!("StratifiedSampler not prepared");
+        }
+        if self.round >= self.light_area_samples.len()
+            || self.light_area_sample_idx >= self.light_area_samples[self.round].len()
+        {
+            return (self.rng.gen::<f32>(), self.rng.gen::<f32>());
+        }
+        let sample = self.light_area_samples[self.round][self.light_area_sample_idx];
+        self.light_area_sample_idx += 1;
         return sample;
     }
 }

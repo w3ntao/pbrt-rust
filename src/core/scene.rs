@@ -28,21 +28,27 @@ impl Scene {
         self.objects.build_index();
     }
 
+    pub fn get_light_num(&self) -> usize {
+        return self.lights.len();
+    }
+
     pub fn intersect(
         &self,
         ray: &Ray,
         interaction: &mut SurfaceInteraction,
         sampler: &mut dyn Sampler,
     ) -> bool {
+        // TODO: fix me here
         let mut ray = *ray;
         return self.objects.intersect(&mut ray, interaction);
     }
 
-    pub fn sample_light(&self) -> (Point, Vector3, f32, Arc<dyn Material>) {
-        let idx = thread_rng().gen_range(0..self.lights.len());
-
-        let random_light = &(self.lights[idx]);
-        let (point, normal) = random_light.sample();
+    pub fn sample_light(
+        &self,
+        sampler: &mut dyn Sampler,
+    ) -> (Point, Vector3, f32, Arc<dyn Material>) {
+        let random_light = &(self.lights[sampler.get_light_id_sample()]);
+        let (point, normal) = random_light.sample(sampler);
 
         return (
             point,

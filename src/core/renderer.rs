@@ -113,7 +113,11 @@ impl Renderer {
                         let ndc_x = 2.0 * (x as f32) / (width as f32) - 1.0;
                         let mut total = Color::black();
 
-                        mutated_sampler.preprocess(self.num_samples as usize, 16);
+                        mutated_sampler.preprocess(
+                            self.num_samples as usize,
+                            16,
+                            self.scene.get_light_num(),
+                        );
                         // reset the sampler after sampling for every pixel
                         // hard code dimensions to 16: we prepare samples only for the first 16 bounces
                         // which should be enough for most cases

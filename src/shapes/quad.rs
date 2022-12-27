@@ -41,9 +41,8 @@ impl Shape for Quad {
         return self.triangles[0].get_bounds() + self.triangles[1].get_bounds();
     }
 
-    fn sample(&self) -> (Point, Vector3) {
-        let alpha = random_f32(0.0, 1.0);
-        let beta = random_f32(0.0, 1.0);
+    fn sample(&self, sampler: &mut dyn Sampler) -> (Point, Vector3) {
+        let (alpha, beta) = sampler.get_light_area_sample();
 
         return (
             self.origin + alpha * self.span0 + beta * self.span1,

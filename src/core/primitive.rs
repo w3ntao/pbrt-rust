@@ -13,7 +13,9 @@ pub trait Primitive: Send + Sync {
 
     fn get_area(&self) -> f32;
 
-    fn sample(&self) -> (Point, Vector3);
+    fn sample(&self, sampler: &mut dyn Sampler) -> (Point, Vector3) {
+        panic!("sample() is not implemented for this Primitive");
+    }
 }
 
 pub trait Aggregate {
@@ -63,8 +65,8 @@ impl Primitive for GeometricPrimitive {
         return self.shape.get_area();
     }
 
-    fn sample(&self) -> (Point, Vector3) {
-        return self.shape.sample();
+    fn sample(&self, sampler: &mut dyn Sampler) -> (Point, Vector3) {
+        return self.shape.sample(sampler);
     }
 }
 
@@ -133,8 +135,8 @@ impl Primitive for TransformedPrimitive {
         return self.primitive.get_area() * self.transform.determinant();
     }
 
-    fn sample(&self) -> (Point, Vector3) {
-        let (p, v) = self.primitive.sample();
+    fn sample(&self, sampler: &mut dyn Sampler) -> (Point, Vector3) {
+        let (p, v) = self.primitive.sample(sampler);
         return ((self.transform)(p), (self.transform)(v));
     }
 }

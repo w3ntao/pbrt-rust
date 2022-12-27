@@ -5,7 +5,7 @@ pub trait Shape: Send + Sync {
 
     fn get_bounds(&self) -> Bounds;
 
-    fn sample(&self) -> (Point, Vector3) {
+    fn sample(&self, sampler: &mut dyn Sampler) -> (Point, Vector3) {
         panic!("sample() not implemented for this Shape");
     }
 

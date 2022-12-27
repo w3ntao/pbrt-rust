@@ -18,7 +18,7 @@ impl NextEventEstimation {
         scene: Arc<Scene>,
         sampler: &mut dyn Sampler,
     ) -> Color {
-        let (light_point, light_normal, light_area, light_material) = scene.sample_light();
+        let (light_point, light_normal, light_area, light_material) = scene.sample_light(sampler);
         let towards_light = light_point - surface_interaction.p;
         let distance = towards_light.length();
         let towards_light = towards_light.normalize();

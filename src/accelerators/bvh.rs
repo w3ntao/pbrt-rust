@@ -54,10 +54,6 @@ impl Primitive for BVH {
     fn get_area(&self) -> f32 {
         panic!("get_area() is not implemented for BVH");
     }
-
-    fn sample(&self) -> (Point, Vector3) {
-        panic!("sample() is not implemented for BVH");
-    }
 }
 
 impl BVH {
