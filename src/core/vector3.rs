@@ -248,16 +248,6 @@ pub fn cross(a: Vector3, b: Vector3) -> Vector3 {
     };
 }
 
-pub fn random_in_unit_sphere() -> Vector3 {
-    let phi = random_f32(0.0, 2.0 * PI);
-    let sin_phi = phi.sin();
-    let cos_phi = phi.cos();
-    let cos_theta = random_f32(-1.0, 1.0);
-    let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
-
-    return Vector3::new(sin_phi * sin_theta, cos_phi * sin_theta, cos_theta);
-}
-
 pub fn random_vector_in_disk() -> (f32, f32) {
     let r = random_f32(0.0, 1.0).sqrt();
     let theta = random_f32(0.0, 2.0 * PI);

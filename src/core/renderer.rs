@@ -113,9 +113,10 @@ impl Renderer {
                         let ndc_x = 2.0 * (x as f32) / (width as f32) - 1.0;
                         let mut total = Color::black();
 
-                        mutated_sampler.prepare(self.num_samples as usize, 100);
+                        mutated_sampler.preprocess(self.num_samples as usize, 16);
                         // reset the sampler after sampling for every pixel
-                        // hard coded dimensions to 100
+                        // hard code dimensions to 16: we prepare samples only for the first 16 bounces
+                        // which should be enough for most cases
 
                         for _ in 0..self.num_samples {
                             let ray = self.camera.get_ray(
@@ -132,6 +133,7 @@ impl Renderer {
                             );
                             mutated_sampler.update_round();
                         }
+
                         let color = total / (self.num_samples as f32);
                         rendered_pixels.push((y, x, color));
                     }

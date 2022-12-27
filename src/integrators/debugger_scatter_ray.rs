@@ -11,7 +11,7 @@ impl Default for DebuggerScatterRay {
 impl Integrator for DebuggerScatterRay {
     fn get_radiance(&self, ray: Ray, scene: Arc<Scene>, sampler: &mut dyn Sampler) -> Color {
         let mut interaction = SurfaceInteraction::default();
-        if !scene.intersect(&ray, &mut interaction) {
+        if !scene.intersect(&ray, &mut interaction, sampler) {
             return Color::black();
         }
 
@@ -26,6 +26,7 @@ impl Integrator for DebuggerScatterRay {
                 &interaction,
                 &mut scattered_direction,
                 &mut attenuation,
+                sampler,
             )
         {
             return Color::black();

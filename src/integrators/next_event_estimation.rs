@@ -16,6 +16,7 @@ impl NextEventEstimation {
         surface_interaction: &SurfaceInteraction,
         ray: &Ray,
         scene: Arc<Scene>,
+        sampler: &mut dyn Sampler,
     ) -> Color {
         let (light_point, light_normal, light_area, light_material) = scene.sample_light();
         let towards_light = light_point - surface_interaction.p;
@@ -34,7 +35,7 @@ impl NextEventEstimation {
         }
 
         let shadow_ray = surface_interaction.spawn_shadow_ray(light_point);
-        if scene.intersect(&shadow_ray, &mut SurfaceInteraction::default()) {
+        if scene.intersect(&shadow_ray, &mut SurfaceInteraction::default(), sampler) {
             // The path is occluded if the shadow ray hit something
             return Color::black();
         }
@@ -68,7 +69,7 @@ impl Integrator for NextEventEstimation {
             // with INTERSECT_OFFSET, we can avoid the situation when the ray
             // re-hit the surface it just leave
 
-            if !scene.intersect(&ray, &mut interaction) {
+            if !scene.intersect(&ray, &mut interaction, sampler) {
                 break;
             }
 
@@ -90,6 +91,7 @@ impl Integrator for NextEventEstimation {
                     &interaction,
                     &mut scattered_direction,
                     &mut attenuation,
+                    sampler,
                 )
             {
                 if (depth == 0 || last_hit_specular) && emit && interaction.n.dot(ray.d) < 0.0 {
@@ -111,7 +113,7 @@ impl Integrator for NextEventEstimation {
             if !last_hit_specular {
                 radiance += throughput
                     * attenuation
-                    * self.get_direct_illumination(&interaction, &ray, scene.clone());
+                    * self.get_direct_illumination(&interaction, &ray, scene.clone(), sampler);
             }
 
             if depth > 5 {

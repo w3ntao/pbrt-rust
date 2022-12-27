@@ -7,6 +7,7 @@ pub trait Material: Send + Sync {
         _surface_interaction: &SurfaceInteraction,
         _scattered_direction: &mut Vector3,
         _attenuation: &mut Color,
+        _sampler: &mut dyn Sampler,
     ) -> bool {
         panic!("scatter() not implemented for this Material");
     }

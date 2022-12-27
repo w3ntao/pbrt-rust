@@ -15,6 +15,7 @@ impl Material for Mirror {
         surface_interaction: &SurfaceInteraction,
         scattered_direction: &mut Vector3,
         attenuation: &mut Color,
+        _sampler: &mut dyn Sampler,
     ) -> bool {
         *scattered_direction = incoming_ray.d.reflect(surface_interaction.n);
         *attenuation = Color::new(1.0, 1.0, 1.0);

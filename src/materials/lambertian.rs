@@ -10,11 +10,12 @@ impl Lambertian {
     }
 }
 
-fn random_cosine_direction() -> Vector3 {
-    let sin2_theta = random_f32(0.0, 1.0);
+fn random_cosine_direction(sample: Sample2D) -> Vector3 {
+    let (random_u, random_v) = sample;
+    let sin2_theta = random_u;
     let cos2_theta = 1.0 - sin2_theta;
 
-    let phi = random_f32(0.0, 2.0 * PI);
+    let phi = random_v * 2.0 * PI;
     let sin_phi = phi.sin();
     let cos_phi = phi.cos();
 
@@ -30,9 +31,10 @@ impl Material for Lambertian {
         surface_interaction: &SurfaceInteraction,
         scattered_direction: &mut Vector3,
         attenuation: &mut Color,
+        sampler: &mut dyn Sampler,
     ) -> bool {
         let uvw = OrthonormalBasis::build_from_w(Vector3::from(surface_interaction.n));
-        let random_direction = uvw.local(random_cosine_direction());
+        let random_direction = uvw.local(random_cosine_direction(sampler.get_brdf_sample()));
 
         *scattered_direction = random_direction.normalize();
         *attenuation = self.albedo;

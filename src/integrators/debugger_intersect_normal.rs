@@ -11,7 +11,7 @@ impl Default for DebuggerIntersectNormal {
 impl Integrator for DebuggerIntersectNormal {
     fn get_radiance(&self, ray: Ray, scene: Arc<Scene>, sampler: &mut dyn Sampler) -> Color {
         let mut interaction = SurfaceInteraction::default();
-        if !scene.intersect(&ray, &mut interaction) {
+        if !scene.intersect(&ray, &mut interaction, sampler) {
             return Color::black();
         }
 

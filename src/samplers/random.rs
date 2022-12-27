@@ -17,7 +17,7 @@ impl Sampler for RandomSampler {
         return Box::new(RandomSampler::default());
     }
 
-    fn prepare(&mut self, samples_per_pixel: usize, dimensions: usize) {
+    fn preprocess(&mut self, samples_per_pixel: usize, dimensions: usize) {
         *self = RandomSampler::default();
     }
 

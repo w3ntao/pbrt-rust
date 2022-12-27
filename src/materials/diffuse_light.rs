@@ -19,6 +19,7 @@ impl Material for DiffuseLight {
         _surface_interaction: &SurfaceInteraction,
         _scattered_direction: &mut Vector3,
         _attenuation: &mut Color,
+        _sampler: &mut dyn Sampler,
     ) -> bool {
         return false;
     }

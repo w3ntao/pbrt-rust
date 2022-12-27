@@ -28,7 +28,12 @@ impl Scene {
         self.objects.build_index();
     }
 
-    pub fn intersect(&self, ray: &Ray, interaction: &mut SurfaceInteraction) -> bool {
+    pub fn intersect(
+        &self,
+        ray: &Ray,
+        interaction: &mut SurfaceInteraction,
+        sampler: &mut dyn Sampler,
+    ) -> bool {
         let mut ray = *ray;
         return self.objects.intersect(&mut ray, interaction);
     }

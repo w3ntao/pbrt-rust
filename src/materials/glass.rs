@@ -34,6 +34,7 @@ impl Material for Glass {
         surface_interaction: &SurfaceInteraction,
         scattered_direction: &mut Vector3,
         attenuation: &mut Color,
+        sampler: &mut dyn Sampler,
     ) -> bool {
         let refraction_ratio = {
             if surface_interaction.entering_material {
@@ -51,7 +52,7 @@ impl Material for Glass {
 
         let cannot_refract = refraction_ratio * sine_theta > 1.0;
         let direction = if cannot_refract
-            || reflectance(cosine_theta, refraction_ratio) > random_f32(0.0, 1.0)
+            || reflectance(cosine_theta, refraction_ratio) > sampler.get_brdf_sample().0
         {
             incoming_ray.d.reflect(normal)
         } else {
