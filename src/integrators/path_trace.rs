@@ -32,7 +32,7 @@ impl Integrator for PathTrace {
 
         for depth in 0..u32::MAX {
             let mut interaction = SurfaceInteraction::default();
-            if !scene.intersect(&ray, &mut interaction, sampler) {
+            if !scene.intersect(&ray, &mut interaction) {
                 radiance += throughput * self.background;
                 break;
             }

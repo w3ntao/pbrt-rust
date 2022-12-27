@@ -32,15 +32,9 @@ impl Scene {
         return self.lights.len();
     }
 
-    pub fn intersect(
-        &self,
-        ray: &Ray,
-        interaction: &mut SurfaceInteraction,
-        sampler: &mut dyn Sampler,
-    ) -> bool {
-        // TODO: fix me here
-        let mut ray = *ray;
-        return self.objects.intersect(&mut ray, interaction);
+    pub fn intersect(&self, ray: &Ray, interaction: &mut SurfaceInteraction) -> bool {
+        let mut mut_ray = *ray;
+        return self.objects.intersect(&mut mut_ray, interaction);
     }
 
     pub fn sample_light(

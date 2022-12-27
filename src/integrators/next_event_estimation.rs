@@ -35,7 +35,7 @@ impl NextEventEstimation {
         }
 
         let shadow_ray = surface_interaction.spawn_shadow_ray(light_point);
-        if scene.intersect(&shadow_ray, &mut SurfaceInteraction::default(), sampler) {
+        if scene.intersect(&shadow_ray, &mut SurfaceInteraction::default()) {
             // The path is occluded if the shadow ray hit something
             return Color::black();
         }
@@ -69,7 +69,7 @@ impl Integrator for NextEventEstimation {
             // with INTERSECT_OFFSET, we can avoid the situation when the ray
             // re-hit the surface it just leave
 
-            if !scene.intersect(&ray, &mut interaction, sampler) {
+            if !scene.intersect(&ray, &mut interaction) {
                 break;
             }
 
