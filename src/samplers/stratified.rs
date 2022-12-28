@@ -61,7 +61,7 @@ impl Sampler for StratifiedSampler {
         return Box::new(StratifiedSampler::default());
     }
 
-    fn preprocess(&mut self, samples_per_pixel: usize, dimensions: usize) {
+    fn preprocess(&mut self, samples_per_pixel: usize) {
         // round == samples_per_pixel
         self.rng = StdRng::from_entropy();
         self.round = 0;
@@ -69,10 +69,10 @@ impl Sampler for StratifiedSampler {
         self.dimension_1d = 0;
         self.dimension_2d = 0;
 
-        self.samples_1d = vec![vec![f32::NAN; dimensions]; samples_per_pixel];
-        self.samples_2d = vec![vec![(f32::NAN, f32::NAN); dimensions]; samples_per_pixel];
+        self.samples_1d = vec![vec![f32::NAN; SAMPLES_DIMENSIONS]; samples_per_pixel];
+        self.samples_2d = vec![vec![(f32::NAN, f32::NAN); SAMPLES_DIMENSIONS]; samples_per_pixel];
 
-        for d in 0..dimensions {
+        for d in 0..SAMPLES_DIMENSIONS {
             let samples_1d = generate_stratified_1d_samples(samples_per_pixel, &mut self.rng);
             let samples_2d = generate_stratified_2d_samples(samples_per_pixel, &mut self.rng);
             for round in 0..samples_per_pixel {

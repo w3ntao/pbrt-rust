@@ -17,7 +17,7 @@ impl Sampler for RandomSampler {
         return Box::new(RandomSampler::default());
     }
 
-    fn preprocess(&mut self, _samples_per_pixel: usize, _dimensions: usize) {
+    fn preprocess(&mut self, _samples_per_pixel: usize) {
         self.rng = StdRng::from_entropy();
     }
 

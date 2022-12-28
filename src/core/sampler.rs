@@ -3,7 +3,7 @@ pub type Sample2D = (f32, f32);
 pub trait Sampler: Send + Sync {
     fn fork(&self) -> Box<dyn Sampler>;
 
-    fn preprocess(&mut self, samples_per_pixel: usize, dimensions: usize);
+    fn preprocess(&mut self, samples_per_pixel: usize);
 
     fn update_round(&mut self);
     // 1 round = 1 ray
@@ -12,3 +12,5 @@ pub trait Sampler: Send + Sync {
 
     fn get_2d_sample(&mut self) -> Sample2D;
 }
+
+pub const SAMPLES_DIMENSIONS: usize = 32;
