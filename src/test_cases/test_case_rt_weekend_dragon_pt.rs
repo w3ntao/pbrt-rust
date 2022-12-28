@@ -139,7 +139,7 @@ pub fn rt_weekend_camera(width: usize, height: usize) -> Arc<dyn Camera> {
         Vector3::new(0.0, 1.0, 0.0),
         PI / 6.0,
         (height as f32) / (width as f32),
-        0.15,
+        0.1,
         (camera_center - middle_dragon_center).length(),
     );
 

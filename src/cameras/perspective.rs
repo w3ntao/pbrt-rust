@@ -96,17 +96,17 @@ impl Camera for Perspective {
         let y = v * self.y_pixel_multiplier;
         let direction = self.forward + x * self.horizontal + y * self.vertical;
 
-        if self.lens_radius > 0.0 {
-            let target = self.center + direction.normalize() * self.focus_distance;
-
-            let (rd_x, rd_y) = random_vector_in_disk(sampler.get_2d_sample());
-            let rd_x = rd_x * self.lens_radius / 2.0;
-            let rd_y = rd_y * self.lens_radius / 2.0;
-            let origin = self.center + self.horizontal * rd_x + self.vertical * rd_y;
-
-            return Ray::new(origin, (target - origin).normalize(), f32::INFINITY);
+        if self.lens_radius <= 0.0 {
+            return Ray::new(self.center, direction.normalize(), f32::INFINITY);
         }
 
-        return Ray::new(self.center, direction.normalize(), f32::INFINITY);
+        let target = self.center + direction.normalize() * self.focus_distance;
+
+        let (rd_x, rd_y) = random_vector_in_disk(sampler.get_2d_sample());
+        let origin = self.center
+            + rd_x * self.lens_radius * self.horizontal
+            + rd_y * self.lens_radius * self.vertical;
+
+        return Ray::new(origin, (target - origin).normalize(), f32::INFINITY);
     }
 }
