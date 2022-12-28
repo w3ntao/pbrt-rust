@@ -34,7 +34,7 @@ pub fn test(width: usize, height: usize) {
     let focus = Point::new(0.0, 0.0, 0.0);
     let look_at = focus - origin;
 
-    let camera = Perspective::new(
+    let camera = Perspective::without_lens(
         origin + (-ratio * look_at * 10.0),
         look_at,
         Vector3::new(0.0, 1.0, 0.0),

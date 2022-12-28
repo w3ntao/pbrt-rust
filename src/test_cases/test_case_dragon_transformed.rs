@@ -3,7 +3,7 @@ use crate::core::pbrt::*;
 pub fn far_camera(width: usize, height: usize) -> Perspective {
     let offset = 1200.0;
 
-    let camera = Perspective::new(
+    let camera = Perspective::without_lens(
         Point::new(-2.2 - offset, 0.0, 0.0),
         Vector3::new(1.0, 0.0, 0.0),
         Vector3::new(0.0, 1.0, 0.0),

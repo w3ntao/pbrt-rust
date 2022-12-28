@@ -10,7 +10,7 @@ pub fn test(width: usize, height: usize, samples: u32) {
     let camera_center = Point::new(50.0, 52.0, 275.6);
     let direction = Vector3::new(0.0, -0.042612, -1.0);
 
-    let camera = Perspective::new(
+    let camera = Perspective::without_lens(
         camera_center,
         direction,
         Vector3::new(0.0, 1.0, 0.0),
