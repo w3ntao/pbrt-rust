@@ -81,6 +81,15 @@ impl Bounds {
     }
 }
 
+impl Sum for Bounds {
+    fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
+        return match iter.into_iter().reduce(|x, y| x + y) {
+            None => Bounds::empty(),
+            Some(val) => val,
+        };
+    }
+}
+
 impl ops::Add<Bounds> for Bounds {
     type Output = Bounds;
     fn add(self, rhs: Bounds) -> Bounds {

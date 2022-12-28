@@ -63,6 +63,7 @@ pub use std::f32::consts::PI;
 pub use std::fmt::Formatter;
 pub use std::fs;
 pub use std::io::{BufWriter, Write};
+pub use std::iter::Sum;
 pub use std::path::Path;
 pub use std::process;
 pub use std::sync::{Arc, Mutex};

@@ -1,7 +1,6 @@
 use crate::core::pbrt::*;
 
 const BUCKET_NUM: usize = 12;
-const MINIMAL_BOUNDS_AREA: f32 = 1.0e-6;
 
 #[derive(Copy, Clone)]
 pub struct PrimitiveInfo {
@@ -118,17 +117,16 @@ impl Node {
         infos: Vec<PrimitiveInfo>,
         primitives: &Vec<Arc<dyn Primitive>>,
     ) -> Self {
-        let mut total_bounds = Bounds::empty();
-        for info in &infos {
-            total_bounds += info.bounds;
-        }
-        let total_bounds = total_bounds;
-
-        if total_bounds.get_area() <= MINIMAL_BOUNDS_AREA {
-            // when all primitives are accumulated close enough that
-            // the bounding box is too small
+        if infos.len() <= 1 {
             return Node::build_leaf(ordered_primitives, infos, primitives);
         }
+
+        let total_bounds: Bounds = (&infos)
+            .into_iter()
+            .map(|info| info.bounds)
+            .collect::<Vec<Bounds>>()
+            .into_iter()
+            .sum();
 
         let centroids: Vec<Point> = (&infos).into_iter().map(|info| info.centroid).collect();
         let axis_min = min_of(&centroids);
