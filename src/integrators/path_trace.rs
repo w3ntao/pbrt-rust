@@ -20,15 +20,11 @@ impl PathTrace {
     }
 }
 
-const RUSSIAN_ROULETTE_THRESHOLD: f32 = 0.8;
-
 impl Integrator for PathTrace {
     fn get_radiance(&self, ray: Ray, scene: Arc<Scene>, sampler: &mut dyn Sampler) -> Color {
         let mut radiance = Color::black();
         let mut throughput = Color::new(1.0, 1.0, 1.0);
         let mut ray = ray;
-
-        let mut random_generator = RandomF32Generator::new(0.0, 1.0);
 
         for depth in 0..u32::MAX {
             let mut interaction = SurfaceInteraction::default();
@@ -70,12 +66,14 @@ impl Integrator for PathTrace {
 
             throughput *= attenuation;
 
-            if depth > 5 {
+            if depth > DEPTH_START_RUSSIAN_ROULETTE {
                 let russian_roulette_probability =
                     throughput.max_component().min(RUSSIAN_ROULETTE_THRESHOLD);
-                if random_generator.generate() > russian_roulette_probability {
+
+                if sampler.get_1d_sample() > russian_roulette_probability {
                     break;
                 }
+
                 throughput /= russian_roulette_probability;
             }
 

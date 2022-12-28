@@ -8,8 +8,6 @@ impl Default for NextEventEstimation {
     }
 }
 
-const RUSSIAN_ROULETTE_THRESHOLD: f32 = 0.8;
-
 impl NextEventEstimation {
     fn get_direct_illumination(
         &self,
@@ -61,8 +59,6 @@ impl Integrator for NextEventEstimation {
         let mut throughput = Color::new(1.0, 1.0, 1.0);
         let mut ray = ray;
         let mut last_hit_specular = false;
-
-        let mut random_generator = RandomF32Generator::new(0.0, 1.0);
 
         for depth in 0..u32::MAX {
             let mut interaction = SurfaceInteraction::default();
@@ -116,10 +112,10 @@ impl Integrator for NextEventEstimation {
                     * self.get_direct_illumination(&interaction, &ray, scene.clone(), sampler);
             }
 
-            if depth > 5 {
+            if depth > DEPTH_START_RUSSIAN_ROULETTE {
                 let russian_roulette_probability =
                     throughput.max_component().min(RUSSIAN_ROULETTE_THRESHOLD);
-                if random_generator.generate() > russian_roulette_probability {
+                if sampler.get_1d_sample() > russian_roulette_probability {
                     break;
                 }
                 throughput /= russian_roulette_probability;

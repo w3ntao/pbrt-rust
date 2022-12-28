@@ -11,7 +11,6 @@ pub mod orthonormal_basis;
 pub mod pbrt;
 pub mod point;
 pub mod primitive;
-pub mod random;
 pub mod ray;
 pub mod renderer;
 pub mod sampler;
