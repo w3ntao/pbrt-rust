@@ -28,10 +28,6 @@ impl Scene {
         self.objects.build_index();
     }
 
-    pub fn get_light_num(&self) -> usize {
-        return self.lights.len();
-    }
-
     pub fn intersect(&self, ray: &Ray, interaction: &mut SurfaceInteraction) -> bool {
         let mut mut_ray = *ray;
         return self.objects.intersect(&mut mut_ray, interaction);
@@ -41,7 +37,8 @@ impl Scene {
         &self,
         sampler: &mut dyn Sampler,
     ) -> (Point, Vector3, f32, Arc<dyn Material>) {
-        let random_light = &(self.lights[sampler.get_light_id_sample()]);
+        let light_idx = sampler.get_1d_sample() * ((self.lights.len() as f32) - f32::EPSILON);
+        let random_light = &(self.lights[light_idx as usize]);
         let (point, normal) = random_light.sample(sampler);
 
         return (

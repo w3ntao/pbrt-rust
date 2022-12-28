@@ -38,8 +38,7 @@ impl Material for Metal {
         sampler: &mut dyn Sampler,
     ) -> bool {
         let reflected = incoming_ray.d.reflect(surface_interaction.n);
-        let scattered_dir =
-            reflected + self.fuzz * random_in_unit_sphere(sampler.get_brdf_sample());
+        let scattered_dir = reflected + self.fuzz * random_in_unit_sphere(sampler.get_2d_sample());
         if surface_interaction.n.dot(scattered_dir) <= 0.0 {
             return false;
         }

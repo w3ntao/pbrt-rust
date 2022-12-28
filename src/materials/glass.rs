@@ -52,7 +52,7 @@ impl Material for Glass {
 
         let cannot_refract = refraction_ratio * sine_theta > 1.0;
         let direction = if cannot_refract
-            || reflectance(cosine_theta, refraction_ratio) > sampler.get_brdf_sample().0
+            || reflectance(cosine_theta, refraction_ratio) > sampler.get_1d_sample()
         {
             incoming_ray.d.reflect(normal)
         } else {

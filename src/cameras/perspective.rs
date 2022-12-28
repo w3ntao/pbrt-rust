@@ -5,7 +5,7 @@ pub struct Perspective {
     forward: Vector3,
     horizontal: Vector3,
 
-    image_plane_vertical: Vector3,
+    vertical: Vector3,
     x_pixel_multiplier: f32,
     y_pixel_multiplier: f32,
 }
@@ -28,7 +28,7 @@ impl Perspective {
             center: _center,
             forward: _forward,
             horizontal: _horizontal,
-            image_plane_vertical: cross(_horizontal, _forward),
+            vertical: cross(_horizontal, _forward),
 
             x_pixel_multiplier: _x_pixel_multiplier,
             y_pixel_multiplier: _x_pixel_multiplier * height_to_width_ratio,
@@ -48,7 +48,7 @@ impl Camera for Perspective {
         if num_samples == 1 {
             let x = (max_u + min_u) / 2.0 * self.x_pixel_multiplier;
             let y = (max_v + min_v) / 2.0 * self.y_pixel_multiplier;
-            let direction = self.forward + x * self.horizontal + y * self.image_plane_vertical;
+            let direction = self.forward + x * self.horizontal + y * self.vertical;
 
             return vec![Ray::new(self.center, direction.normalize(), f32::INFINITY)];
         }
@@ -76,7 +76,7 @@ impl Camera for Perspective {
 
                 let x = u * self.x_pixel_multiplier;
                 let y = v * self.y_pixel_multiplier;
-                let direction = self.forward + x * self.horizontal + y * self.image_plane_vertical;
+                let direction = self.forward + x * self.horizontal + y * self.vertical;
 
                 rays.push(Ray::new(self.center, direction.normalize(), f32::INFINITY));
             }
@@ -93,13 +93,13 @@ impl Camera for Perspective {
         max_v: f32,
         sampler: &mut dyn Sampler,
     ) -> Ray {
-        let (random_u, random_v) = sampler.get_camera_ray_sample();
+        let (random_u, random_v) = sampler.get_2d_sample();
         let u = min_u + random_u * (max_u - min_u);
         let v = min_v + random_v * (max_v - min_v);
 
         let x = u * self.x_pixel_multiplier;
         let y = v * self.y_pixel_multiplier;
-        let direction = self.forward + x * self.horizontal + y * self.image_plane_vertical;
+        let direction = self.forward + x * self.horizontal + y * self.vertical;
 
         return Ray::new(self.center, direction.normalize(), f32::INFINITY);
     }

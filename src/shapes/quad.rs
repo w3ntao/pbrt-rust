@@ -42,7 +42,7 @@ impl Shape for Quad {
     }
 
     fn sample(&self, sampler: &mut dyn Sampler) -> (Point, Vector3) {
-        let (alpha, beta) = sampler.get_light_area_sample();
+        let (alpha, beta) = sampler.get_2d_sample();
 
         return (
             self.origin + alpha * self.span0 + beta * self.span1,

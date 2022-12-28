@@ -34,7 +34,7 @@ impl Material for Lambertian {
         sampler: &mut dyn Sampler,
     ) -> bool {
         let uvw = OrthonormalBasis::build_from_w(Vector3::from(surface_interaction.n));
-        let random_direction = uvw.local(random_cosine_direction(sampler.get_brdf_sample()));
+        let random_direction = uvw.local(random_cosine_direction(sampler.get_2d_sample()));
 
         *scattered_direction = random_direction.normalize();
         *attenuation = self.albedo;
