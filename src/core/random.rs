@@ -16,9 +16,3 @@ impl RandomF32Generator {
         return self.distribution.sample(&mut self.generator);
     }
 }
-
-pub fn random_f32(low: f32, high: f32) -> f32 {
-    let mut rng = thread_rng();
-    let uniform_distribution = Uniform::new(low, high);
-    return uniform_distribution.sample(&mut rng);
-}

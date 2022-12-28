@@ -21,7 +21,6 @@ pub use crate::core::vector3::*;
 
 pub use crate::accelerators::bvh::*;
 
-pub use crate::cameras::depth_of_field::*;
 pub use crate::cameras::perspective::*;
 
 pub use crate::integrators::debugger_intersect_normal::*;

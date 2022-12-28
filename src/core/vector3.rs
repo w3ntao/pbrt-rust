@@ -247,10 +247,3 @@ pub fn cross(a: Vector3, b: Vector3) -> Vector3 {
         z: a.x * b.y - a.y * b.x,
     };
 }
-
-pub fn random_vector_in_disk() -> (f32, f32) {
-    let r = random_f32(0.0, 1.0).sqrt();
-    let theta = random_f32(0.0, 2.0 * PI);
-
-    return (r * theta.sin(), r * theta.cos());
-}

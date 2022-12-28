@@ -80,54 +80,6 @@ fn random_vector_in_disk(sample: Sample2D) -> (f32, f32) {
 }
 
 impl Camera for Perspective {
-    fn get_stratified_rays(
-        &self,
-        num_samples: u32,
-        min_u: f32,
-        max_u: f32,
-        min_v: f32,
-        max_v: f32,
-    ) -> Vec<Ray> {
-        if num_samples == 1 {
-            let x = (max_u + min_u) / 2.0 * self.x_pixel_multiplier;
-            let y = (max_v + min_v) / 2.0 * self.y_pixel_multiplier;
-            let direction = self.forward + x * self.horizontal + y * self.vertical;
-
-            return vec![Ray::new(self.center, direction.normalize(), f32::INFINITY)];
-        }
-
-        let mut generator_u = thread_rng();
-        let mut generator_v = thread_rng();
-
-        let samples_per_dimension = (num_samples as f32).sqrt() as u32;
-
-        let mut rays = vec![];
-
-        let u_unit = (max_u - min_u) / (samples_per_dimension as f32);
-        let v_unit = (max_v - min_v) / (samples_per_dimension as f32);
-
-        for u_idx in 0..samples_per_dimension {
-            let u_idx = u_idx as f32;
-            let range_u = Uniform::new(min_u + u_unit * u_idx, min_u + u_unit * (u_idx + 1.0));
-
-            for v_idx in 0..samples_per_dimension {
-                let v_idx = v_idx as f32;
-                let range_v = Uniform::new(min_v + v_unit * v_idx, min_v + v_unit * (v_idx + 1.0));
-
-                let u = generator_u.sample(range_u);
-                let v = generator_v.sample(range_v);
-
-                let x = u * self.x_pixel_multiplier;
-                let y = v * self.y_pixel_multiplier;
-                let direction = self.forward + x * self.horizontal + y * self.vertical;
-
-                rays.push(Ray::new(self.center, direction.normalize(), f32::INFINITY));
-            }
-        }
-
-        return rays;
-    }
-
     fn get_ray(
         &self,
         min_u: f32,

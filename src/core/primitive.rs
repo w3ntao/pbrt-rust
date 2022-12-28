@@ -13,7 +13,7 @@ pub trait Primitive: Send + Sync {
 
     fn get_area(&self) -> f32;
 
-    fn sample(&self, sampler: &mut dyn Sampler) -> (Point, Vector3) {
+    fn sample(&self, _sampler: &mut dyn Sampler) -> (Point, Vector3) {
         panic!("sample() is not implemented for this Primitive");
     }
 }

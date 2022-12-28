@@ -1,5 +1,3 @@
-use crate::core::pbrt::*;
-
 pub type Sample2D = (f32, f32);
 
 pub trait Sampler: Send + Sync {
