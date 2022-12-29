@@ -121,12 +121,7 @@ impl Node {
             return Node::build_leaf(ordered_primitives, infos, primitives);
         }
 
-        let total_bounds: Bounds = (&infos)
-            .into_iter()
-            .map(|info| info.bounds)
-            .collect::<Vec<Bounds>>()
-            .into_iter()
-            .sum();
+        let total_bounds = (&infos).iter().map(|info| info.bounds).sum::<Bounds>();
 
         let centroids: Vec<Point> = (&infos).into_iter().map(|info| info.centroid).collect();
         let axis_min = min_of(&centroids);
