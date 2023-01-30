@@ -1,6 +1,5 @@
 #![feature(unboxed_closures, fn_traits)]
-
-use crate::test_cases::*;
+#![feature(const_trait_impl)]
 
 mod accelerators;
 mod cameras;
@@ -12,37 +11,137 @@ mod shapes;
 mod test_cases;
 mod tools;
 
-fn all_tests(samples: u32, ratio: f32) {
+use crate::core::pbrt::*;
+use crate::core::renderer::*;
+use crate::test_cases::configurations::*;
+
+fn test(num_samples: u32, ratio: f32) {
     println!();
+
     let width = (1920 as f32 * ratio) as usize;
     let height = (1080 as f32 * ratio) as usize;
 
-    //test_case_dragon_bvh::test(width, height);
-    //test_case_dragon_transformed::test(width, height);
-    test_case_many_dragons::test(width, height);
+    render(
+        create_dragon_in_the_air(width, height),
+        1,
+        width,
+        height,
+        &format!("bvh_dragon"),
+    );
 
-    test_case_rt_weekend_dragon_pt::test(width, height, samples);
-    test_case_rt_weekend_dragon_debug::test(width, height, samples);
+    render(
+        create_transformed_dragon_in_the_air(width, height),
+        1,
+        width,
+        height,
+        &format!("bvh_dragon_transformed"),
+    );
+
+    render(
+        create_bvh_many_dragons(width, height),
+        1,
+        width,
+        height,
+        &format!("many_dragons"),
+    );
+
+    let config_rt_weekend = create_rt_weekend(width, height);
+    render(
+        config_rt_weekend
+            .update_integrator(Arc::new(DebuggerScatterRay::default()))
+            .update_camera(config_rt_weekend.camera.remove_lens()),
+        4,
+        width,
+        height,
+        &format!("rt_weekend_scatter_ray"),
+    );
+
+    render(
+        config_rt_weekend,
+        num_samples,
+        width,
+        height,
+        &format!("rt_weekend"),
+    );
 
     let width = (1080 as f32 * ratio) as usize;
     let height = (1080 as f32 * ratio) as usize;
 
-    test_case_cornell_box_metal_dragon_debug::test(width, height);
-    test_case_cornell_box_metal_dragon_next_event_estimation::test(width, height, samples);
+    let integrator_nee = Arc::new(NextEventEstimation::default());
+    let integrator_normal = Arc::new(DebuggerIntersectNormal::default());
 
-    test_case_cornell_box_next_event_estimation::test(width, height, samples);
-    test_case_cornell_box_specular_next_event_estimation::test(width, height, samples);
-
-    test_case_cornell_box_specular_path_trace::test(width, height, samples);
-
-    test_case_smallpt::test(
-        (2048 as f32 * ratio) as usize,
-        (1524 as f32 * ratio) as usize,
-        samples,
+    let cornell_box_lambertian = create_cornell_box_lambertian(width, height);
+    render(
+        cornell_box_lambertian.clone(),
+        num_samples,
+        width,
+        height,
+        &format!("cornell_box_lambertian_pt_{}", num_samples),
     );
-    // original dimension for smallpt is 1024x762
+
+    render(
+        cornell_box_lambertian.update_integrator(integrator_nee.clone()),
+        num_samples,
+        width,
+        height,
+        &format!("cornell_box_lambertian_nee_{}", num_samples),
+    );
+
+    let cornell_box_specular = create_cornell_box_specular(width, height);
+    render(
+        cornell_box_specular.clone(),
+        num_samples,
+        width,
+        height,
+        &format!("cornell_box_specular_pt_{}", num_samples),
+    );
+
+    render(
+        cornell_box_specular.update_integrator(integrator_nee.clone()),
+        num_samples,
+        width,
+        height,
+        &format!("cornell_box_specular_nee_{}", num_samples),
+    );
+
+    let cornell_box_dragon = create_cornell_box_dragon(width, height);
+    render(
+        cornell_box_dragon.update_integrator(integrator_normal.clone()),
+        4,
+        width,
+        height,
+        &format!("cornell_box_dragon_normal"),
+    );
+
+    render(
+        cornell_box_dragon.update_integrator(integrator_nee.clone()),
+        num_samples,
+        width,
+        height,
+        &format!("cornell_box_dragon_nee_{}", num_samples),
+    );
+
+    {
+        let width = (2048 as f32 * ratio) as usize;
+        let height = (1524 as f32 * ratio) as usize;
+        let smallpt = create_smallpt(width, height);
+        render(
+            smallpt.clone(),
+            num_samples,
+            width,
+            height,
+            &format!("smallpt_pt_{}", num_samples),
+        );
+        render(
+            smallpt.update_integrator(integrator_nee.clone()),
+            num_samples,
+            width,
+            height,
+            &format!("smallpt_nee_{}", num_samples),
+        );
+    }
 }
 
 fn main() {
-    all_tests(10, 1.0);
+    test(16, 1.0);
 }

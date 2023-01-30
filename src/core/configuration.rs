@@ -21,4 +21,22 @@ impl Configuration {
             sampler: _sampler,
         };
     }
+
+    pub fn update_camera(&self, _camera: Arc<dyn Camera>) -> Arc<Configuration> {
+        return Arc::new(Configuration {
+            scene: self.scene.clone(),
+            camera: _camera,
+            integrator: self.integrator.clone(),
+            sampler: self.sampler.clone(),
+        });
+    }
+
+    pub fn update_integrator(&self, _integrator: Arc<dyn Integrator>) -> Arc<Configuration> {
+        return Arc::new(Configuration {
+            scene: self.scene.clone(),
+            camera: self.camera.clone(),
+            integrator: _integrator,
+            sampler: self.sampler.clone(),
+        });
+    }
 }

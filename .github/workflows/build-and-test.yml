@@ -31,4 +31,4 @@ jobs:
     - name: build and run tests
       run:
         rustup default nightly;
-        cargo run --release --verbose;
+        cargo run --release;

@@ -9,4 +9,6 @@ pub trait Camera: Send + Sync {
         max_v: f32,
         sampler: &mut dyn Sampler,
     ) -> Ray;
+
+    fn remove_lens(&self) -> Arc<Perspective>;
 }

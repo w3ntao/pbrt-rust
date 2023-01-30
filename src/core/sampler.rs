@@ -14,3 +14,5 @@ pub trait Sampler: Send + Sync {
 }
 
 pub const SAMPLES_DIMENSIONS: usize = 32;
+// hard code dimensions to 32: we prepare samples only for the first 32 dimensions
+// which should be enough for most cases

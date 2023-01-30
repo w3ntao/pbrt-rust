@@ -1,5 +1,6 @@
 use crate::core::pbrt::*;
 
+#[derive(Copy, Clone)]
 pub struct Perspective {
     center: Point,
     forward: Vector3,
@@ -108,5 +109,13 @@ impl Camera for Perspective {
             + rd_y * self.lens_radius * self.vertical;
 
         return Ray::new(origin, (target - origin).normalize(), f32::INFINITY);
+    }
+
+    fn remove_lens(&self) -> Arc<Perspective> {
+        let mut new_camera = *self;
+        new_camera.lens_radius = 0.0;
+        new_camera.focus_distance = f32::NAN;
+
+        return Arc::new(new_camera);
     }
 }

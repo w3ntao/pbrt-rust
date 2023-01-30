@@ -12,7 +12,6 @@ pub use crate::core::orthonormal_basis::*;
 pub use crate::core::point::*;
 pub use crate::core::primitive::*;
 pub use crate::core::ray::*;
-pub use crate::core::renderer::*;
 pub use crate::core::sampler::*;
 pub use crate::core::scene::*;
 pub use crate::core::shape::*;
