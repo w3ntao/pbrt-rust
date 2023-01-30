@@ -1,6 +1,7 @@
 pub mod bounds;
 pub mod camera;
 pub mod color;
+pub mod configuration;
 pub mod error_float;
 pub mod integrator;
 pub mod interaction;
