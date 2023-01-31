@@ -44,13 +44,9 @@ fn bvh_test(ratio: f32) {
     );
 }
 
-fn test(num_samples: u32, ratio: f32) {
-    println!();
-
+fn rt_weekend(num_samples: u32, ratio: f32) {
     let width = (1920 as f32 * ratio) as usize;
     let height = (1080 as f32 * ratio) as usize;
-
-    bvh_test(ratio);
 
     let config_rt_weekend = create_rt_weekend();
     render(
@@ -74,12 +70,13 @@ fn test(num_samples: u32, ratio: f32) {
         height,
         &format!("rt_weekend"),
     );
+}
 
+fn cornel_box(num_samples: u32, ratio: f32) {
     let width = (1080 as f32 * ratio) as usize;
     let height = (1080 as f32 * ratio) as usize;
 
     let integrator_nee = Arc::new(NextEventEstimation::default());
-    let integrator_normal = Arc::new(DebuggerIntersectNormal::default());
 
     let cornell_box_lambertian = create_cornell_box_lambertian();
     render(
@@ -114,6 +111,14 @@ fn test(num_samples: u32, ratio: f32) {
         height,
         &format!("cornell_box_specular_nee_{}", num_samples),
     );
+}
+
+fn cornel_box_dragon(num_samples: u32, ratio: f32) {
+    let width = (1080 as f32 * ratio) as usize;
+    let height = (1080 as f32 * ratio) as usize;
+
+    let integrator_nee = Arc::new(NextEventEstimation::default());
+    let integrator_normal = Arc::new(DebuggerIntersectNormal::default());
 
     let cornell_box_dragon = create_cornell_box_dragon();
     render(
@@ -131,28 +136,38 @@ fn test(num_samples: u32, ratio: f32) {
         height,
         &format!("cornell_box_dragon_nee_{}", num_samples),
     );
+}
 
-    {
-        let width = (2048 as f32 * ratio) as usize;
-        let height = (1524 as f32 * ratio) as usize;
-        let smallpt = create_smallpt();
-        render(
-            smallpt.clone(),
-            num_samples,
-            width,
-            height,
-            &format!("smallpt_pt_{}", num_samples),
-        );
-        render(
-            smallpt.update_integrator(integrator_nee.clone()),
-            num_samples,
-            width,
-            height,
-            &format!("smallpt_nee_{}", num_samples),
-        );
-    }
+fn smallpt(num_samples: u32, ratio: f32) {
+    let width = (2048 as f32 * ratio) as usize;
+    let height = (1524 as f32 * ratio) as usize;
+    let smallpt = create_smallpt();
+    let integrator_nee = Arc::new(NextEventEstimation::default());
+
+    render(
+        smallpt.clone(),
+        num_samples,
+        width,
+        height,
+        &format!("smallpt_pt_{}", num_samples),
+    );
+    render(
+        smallpt.update_integrator(integrator_nee.clone()),
+        num_samples,
+        width,
+        height,
+        &format!("smallpt_nee_{}", num_samples),
+    );
 }
 
 fn main() {
-    test(16, 1.0);
+    let num_samples = 16;
+    let ratio = 1.0;
+
+    println!();
+    bvh_test(ratio);
+    rt_weekend(num_samples, ratio);
+    cornel_box(num_samples, ratio);
+    cornel_box_dragon(num_samples, ratio);
+    smallpt(num_samples, ratio);
 }
