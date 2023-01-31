@@ -15,9 +15,7 @@ use crate::core::pbrt::*;
 use crate::core::renderer::*;
 use crate::test_cases::configurations::*;
 
-fn test(num_samples: u32, ratio: f32) {
-    println!();
-
+fn bvh_test(ratio: f32) {
     let width = (1920 as f32 * ratio) as usize;
     let height = (1080 as f32 * ratio) as usize;
 
@@ -44,6 +42,15 @@ fn test(num_samples: u32, ratio: f32) {
         height,
         &format!("many_dragons"),
     );
+}
+
+fn test(num_samples: u32, ratio: f32) {
+    println!();
+
+    let width = (1920 as f32 * ratio) as usize;
+    let height = (1080 as f32 * ratio) as usize;
+
+    bvh_test(ratio);
 
     let config_rt_weekend = create_rt_weekend();
     render(

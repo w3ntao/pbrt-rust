@@ -20,13 +20,21 @@ fn print_time(seconds: u32) {
     print!("{}s", seconds);
 }
 
-fn time_estimator(shared_job_list: &mut Arc<Mutex<Vec<usize>>>, total_job: usize, core: usize) {
+fn time_estimator(
+    shared_job_list: &mut Arc<Mutex<Vec<usize>>>,
+    total_job: usize,
+    core: usize,
+    file_name: &str,
+) {
     let start = Instant::now();
     let one_second = time::Duration::from_secs(1);
 
     let mut last_length = total_job;
-    print!("rendering: 0.00%  (time left: ?)");
+    print!("rendering `{}`:  0.00%  (time left: ?)", file_name);
     let _ = io::stdout().flush();
+
+    let spaces = (0..64).map(|_| " ").collect::<String>();
+
     loop {
         thread::sleep(one_second);
         let locked_job = shared_job_list.lock().unwrap();
@@ -43,17 +51,18 @@ fn time_estimator(shared_job_list: &mut Arc<Mutex<Vec<usize>>>, total_job: usize
         last_length = length;
         let seconds_left =
             start.elapsed().as_secs_f32() / (finished_job as f32) * ((length + core) as f32);
-        print!("\r                                        ");
+        print!("\r{}", spaces);
         print!(
-            "\rrendering: {:.2}% (time left: ",
+            "\rrendering `{}`: {:5.2}% (time left: ",
+            file_name,
             finished_job as f32 / total_job as f32 * 100.0
         );
         print_time(seconds_left as u32);
         print!(")");
         let _ = io::stdout().flush();
     }
-    print!("\r                                        ");
-    print!("\rrendering took ");
+    print!("\r{}", spaces);
+    print!("\rrendering `{}` took ", file_name,);
     print_time(start.elapsed().as_secs_f32() as u32);
     println!();
 }
@@ -149,7 +158,9 @@ pub fn render(
         handles.push(handle);
     }
     let mut job_ptr = Arc::clone(&shared_job_list);
-    let handle_time_estimator = thread::spawn(move || time_estimator(&mut job_ptr, width, cpu_num));
+    let file_name_string: String = file_name.into();
+    let handle_time_estimator =
+        thread::spawn(move || time_estimator(&mut job_ptr, width, cpu_num, &file_name_string));
     handles.push(handle_time_estimator);
 
     for handle in handles {
