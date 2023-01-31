@@ -52,7 +52,7 @@ fn time_estimator(shared_job_list: &mut Arc<Mutex<Vec<usize>>>, total_job: usize
         print!(")");
         let _ = io::stdout().flush();
     }
-    print!("\rrendering: 100.00% (time left: 0s)");
+    print!("\r                                        ");
     print!("\rrendering took ");
     print_time(start.elapsed().as_secs_f32() as u32);
     println!();
@@ -89,11 +89,12 @@ fn single_thread_render(
                     for _ in 0..num_samples {
                         let ray = configuration.camera.get_ray(
                             ndc_x,
-                            ndc_x + 2.0 / (width as f32),
-                            ndc_y - 2.0 / (height as f32),
                             ndc_y,
+                            width,
+                            height,
                             mutated_sampler,
                         );
+
                         total += configuration.integrator.get_radiance(
                             ray,
                             configuration.scene.clone(),

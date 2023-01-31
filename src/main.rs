@@ -22,7 +22,7 @@ fn test(num_samples: u32, ratio: f32) {
     let height = (1080 as f32 * ratio) as usize;
 
     render(
-        create_dragon_in_the_air(width, height),
+        create_dragon_in_the_air(),
         1,
         width,
         height,
@@ -30,7 +30,7 @@ fn test(num_samples: u32, ratio: f32) {
     );
 
     render(
-        create_transformed_dragon_in_the_air(width, height),
+        create_transformed_dragon_in_the_air(),
         1,
         width,
         height,
@@ -38,18 +38,22 @@ fn test(num_samples: u32, ratio: f32) {
     );
 
     render(
-        create_bvh_many_dragons(width, height),
+        create_bvh_many_dragons(),
         1,
         width,
         height,
         &format!("many_dragons"),
     );
 
-    let config_rt_weekend = create_rt_weekend(width, height);
+    let config_rt_weekend = create_rt_weekend();
     render(
         config_rt_weekend
             .update_integrator(Arc::new(DebuggerScatterRay::default()))
-            .update_camera(config_rt_weekend.camera.remove_lens()),
+            .update_camera(
+                config_rt_weekend
+                    .camera
+                    .reset_lens_and_focus_distance(0.0, f32::NAN),
+            ),
         4,
         width,
         height,
@@ -70,7 +74,7 @@ fn test(num_samples: u32, ratio: f32) {
     let integrator_nee = Arc::new(NextEventEstimation::default());
     let integrator_normal = Arc::new(DebuggerIntersectNormal::default());
 
-    let cornell_box_lambertian = create_cornell_box_lambertian(width, height);
+    let cornell_box_lambertian = create_cornell_box_lambertian();
     render(
         cornell_box_lambertian.clone(),
         num_samples,
@@ -87,7 +91,7 @@ fn test(num_samples: u32, ratio: f32) {
         &format!("cornell_box_lambertian_nee_{}", num_samples),
     );
 
-    let cornell_box_specular = create_cornell_box_specular(width, height);
+    let cornell_box_specular = create_cornell_box_specular();
     render(
         cornell_box_specular.clone(),
         num_samples,
@@ -104,7 +108,7 @@ fn test(num_samples: u32, ratio: f32) {
         &format!("cornell_box_specular_nee_{}", num_samples),
     );
 
-    let cornell_box_dragon = create_cornell_box_dragon(width, height);
+    let cornell_box_dragon = create_cornell_box_dragon();
     render(
         cornell_box_dragon.update_integrator(integrator_normal.clone()),
         4,
@@ -124,7 +128,7 @@ fn test(num_samples: u32, ratio: f32) {
     {
         let width = (2048 as f32 * ratio) as usize;
         let height = (1524 as f32 * ratio) as usize;
-        let smallpt = create_smallpt(width, height);
+        let smallpt = create_smallpt();
         render(
             smallpt.clone(),
             num_samples,

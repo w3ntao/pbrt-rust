@@ -8,7 +8,6 @@ pub struct Perspective {
 
     vertical: Vector3,
     x_pixel_multiplier: f32,
-    y_pixel_multiplier: f32,
 
     lens_radius: f32,
     focus_distance: f32,
@@ -20,7 +19,6 @@ impl Perspective {
         _forward: Vector3,
         _up: Vector3,
         _horizontal_opening_angle: f32,
-        height_to_width_ratio: f32,
     ) -> Self {
         let _forward = _forward.normalize();
         let _up = _up.normalize();
@@ -35,7 +33,6 @@ impl Perspective {
             vertical: cross(_horizontal, _forward),
 
             x_pixel_multiplier: _x_pixel_multiplier,
-            y_pixel_multiplier: _x_pixel_multiplier * height_to_width_ratio,
 
             lens_radius: 0.0,
             focus_distance: f32::NAN,
@@ -47,7 +44,6 @@ impl Perspective {
         _forward: Vector3,
         _up: Vector3,
         _horizontal_opening_angle: f32,
-        height_to_width_ratio: f32,
         _lens_radius: f32,
         _focus_distance: f32,
     ) -> Self {
@@ -64,7 +60,6 @@ impl Perspective {
             vertical: cross(_horizontal, _forward),
 
             x_pixel_multiplier: _x_pixel_multiplier,
-            y_pixel_multiplier: _x_pixel_multiplier * height_to_width_ratio,
 
             lens_radius: _lens_radius,
             focus_distance: _focus_distance,
@@ -83,19 +78,26 @@ fn random_vector_in_disk(sample: Sample2D) -> (f32, f32) {
 impl Camera for Perspective {
     fn get_ray(
         &self,
-        min_u: f32,
-        max_u: f32,
-        min_v: f32,
-        max_v: f32,
+        ndc_x: f32,
+        ndc_y: f32,
+        width: usize,
+        height: usize,
         sampler: &mut dyn Sampler,
     ) -> Ray {
+        let min_u = ndc_x;
+        let max_u = ndc_x + 2.0 / (width as f32);
+        let min_v = ndc_y - 2.0 / (height as f32);
+        let max_v = ndc_y;
+
+        let y_pixel_multiplier = self.x_pixel_multiplier * (height as f32 / width as f32);
+
         let (random_u, random_v) = sampler.get_2d_sample();
         let u = min_u + random_u * (max_u - min_u);
         let v = min_v + random_v * (max_v - min_v);
 
-        let x = u * self.x_pixel_multiplier;
-        let y = v * self.y_pixel_multiplier;
-        let direction = self.forward + x * self.horizontal + y * self.vertical;
+        let offset_x = u * self.x_pixel_multiplier;
+        let offset_y = v * y_pixel_multiplier;
+        let direction = self.forward + offset_x * self.horizontal + offset_y * self.vertical;
 
         if self.lens_radius <= 0.0 {
             return Ray::new(self.center, direction.normalize(), f32::INFINITY);
@@ -111,10 +113,14 @@ impl Camera for Perspective {
         return Ray::new(origin, (target - origin).normalize(), f32::INFINITY);
     }
 
-    fn remove_lens(&self) -> Arc<Perspective> {
+    fn reset_lens_and_focus_distance(
+        &self,
+        lens_radius: f32,
+        focus_distance: f32,
+    ) -> Arc<Perspective> {
         let mut new_camera = *self;
-        new_camera.lens_radius = 0.0;
-        new_camera.focus_distance = f32::NAN;
+        new_camera.lens_radius = lens_radius;
+        new_camera.focus_distance = focus_distance;
 
         return Arc::new(new_camera);
     }

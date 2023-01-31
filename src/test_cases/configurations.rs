@@ -2,7 +2,7 @@ use crate::core::pbrt::*;
 use crate::test_cases::cornell_box::*;
 use crate::test_cases::smallpt::*;
 
-pub fn create_dragon_in_the_air(width: usize, height: usize) -> Arc<Configuration> {
+pub fn create_dragon_in_the_air() -> Arc<Configuration> {
     let mut world = Scene::default();
     let glass = Arc::new(Glass::new(1.5));
     let dragon_model = Arc::new(load_dragon(glass.clone()));
@@ -16,7 +16,6 @@ pub fn create_dragon_in_the_air(width: usize, height: usize) -> Arc<Configuratio
         Vector3::new(1.0, 0.0, 0.0),
         Vector3::new(0.0, 1.0, 0.0),
         PI / 6.0,
-        (height as f32) / (width as f32),
     );
 
     let integrator = DebuggerRayCastingDotNormal::default();
@@ -29,8 +28,8 @@ pub fn create_dragon_in_the_air(width: usize, height: usize) -> Arc<Configuratio
     ));
 }
 
-pub fn create_transformed_dragon_in_the_air(width: usize, height: usize) -> Arc<Configuration> {
-    pub fn far_camera(width: usize, height: usize) -> Perspective {
+pub fn create_transformed_dragon_in_the_air() -> Arc<Configuration> {
+    fn far_camera() -> Perspective {
         let offset = 1200.0;
 
         let camera = Perspective::without_lens(
@@ -38,12 +37,11 @@ pub fn create_transformed_dragon_in_the_air(width: usize, height: usize) -> Arc<
             Vector3::new(1.0, 0.0, 0.0),
             Vector3::new(0.0, 1.0, 0.0),
             PI / 6.0,
-            (height as f32) / (width as f32),
         );
         return camera;
     }
 
-    pub fn transformed_dragon() -> Scene {
+    fn transformed_dragon() -> Scene {
         let mut scene = Scene::default();
         let glass = Arc::new(Glass::new(1.0));
         let dragon_model = Arc::new(load_dragon(glass.clone()));
@@ -59,7 +57,7 @@ pub fn create_transformed_dragon_in_the_air(width: usize, height: usize) -> Arc<
 
     let configuration = Configuration::new(
         Arc::new(transformed_dragon()),
-        Arc::new(far_camera(width, height)),
+        Arc::new(far_camera()),
         Arc::new(DebuggerRayCastingDotNormal::default()),
         Arc::new(StratifiedSampler::default()),
     );
@@ -67,7 +65,7 @@ pub fn create_transformed_dragon_in_the_air(width: usize, height: usize) -> Arc<
     return Arc::new(configuration);
 }
 
-pub fn create_bvh_many_dragons(width: usize, height: usize) -> Arc<Configuration> {
+pub fn create_bvh_many_dragons() -> Arc<Configuration> {
     let glass = Arc::new(Glass::new(1.5));
     let dragon_model = Arc::new(load_dragon(glass.clone()));
 
@@ -102,7 +100,6 @@ pub fn create_bvh_many_dragons(width: usize, height: usize) -> Arc<Configuration
         look_at,
         Vector3::new(0.0, 1.0, 0.0),
         PI / 6.0,
-        (height as f32) / (width as f32),
     );
 
     let configuration = Configuration::new(
@@ -115,10 +112,10 @@ pub fn create_bvh_many_dragons(width: usize, height: usize) -> Arc<Configuration
     return Arc::new(configuration);
 }
 
-pub fn create_cornell_box_dragon(width: usize, height: usize) -> Arc<Configuration> {
+pub fn create_cornell_box_dragon() -> Arc<Configuration> {
     let configuration = Configuration::new(
         Arc::new(cornell_box_metal_dragon()),
-        Arc::new(cornell_box_camera(width, height)),
+        Arc::new(cornell_box_camera()),
         Arc::new(PathTrace::default()),
         Arc::new(StratifiedSampler::default()),
     );
@@ -126,7 +123,7 @@ pub fn create_cornell_box_dragon(width: usize, height: usize) -> Arc<Configurati
     return Arc::new(configuration);
 }
 
-pub fn create_rt_weekend(width: usize, height: usize) -> Arc<Configuration> {
+pub fn create_rt_weekend() -> Arc<Configuration> {
     const RANDOM_SEED: u64 = 11;
 
     fn random_color(random_generator: &mut StdRng) -> Color {
@@ -145,7 +142,7 @@ pub fn create_rt_weekend(width: usize, height: usize) -> Arc<Configuration> {
         }
     }
 
-    pub fn many_random_spheres_with_dragons() -> Scene {
+    fn many_random_spheres_with_dragons() -> Scene {
         let mut random_generator = StdRng::seed_from_u64(RANDOM_SEED);
         let uniform_distribution = Uniform::new(0.0, 1.0);
 
@@ -255,7 +252,7 @@ pub fn create_rt_weekend(width: usize, height: usize) -> Arc<Configuration> {
         return scene;
     }
 
-    pub fn rt_weekend_camera(width: usize, height: usize) -> Arc<dyn Camera> {
+    fn rt_weekend_camera() -> Arc<dyn Camera> {
         let camera_center = Point::new(13.0, 2.0, 3.0);
         let look_at = Point::new(0.0, 0.0, 0.0);
         let direction = look_at - camera_center;
@@ -266,7 +263,6 @@ pub fn create_rt_weekend(width: usize, height: usize) -> Arc<Configuration> {
             direction,
             Vector3::new(0.0, 1.0, 0.0),
             PI / 6.0,
-            (height as f32) / (width as f32),
             0.1,
             (camera_center - middle_dragon_center).length(),
         );
@@ -277,34 +273,34 @@ pub fn create_rt_weekend(width: usize, height: usize) -> Arc<Configuration> {
     let integrator = PathTrace::new(Color::new(0.7, 0.8, 1.0));
     let configuration = Configuration::new(
         Arc::new(many_random_spheres_with_dragons()),
-        rt_weekend_camera(width, height),
+        rt_weekend_camera(),
         Arc::new(integrator),
         Arc::new(StratifiedSampler::default()),
     );
     return Arc::new(configuration);
 }
 
-pub fn create_cornell_box_lambertian(width: usize, height: usize) -> Arc<Configuration> {
+pub fn create_cornell_box_lambertian() -> Arc<Configuration> {
     let configuration = Configuration::new(
         Arc::new(cornell_box()),
-        Arc::new(cornell_box_camera(width, height)),
+        Arc::new(cornell_box_camera()),
         Arc::new(PathTrace::default()),
         Arc::new(StratifiedSampler::default()),
     );
     return Arc::new(configuration);
 }
 
-pub fn create_cornell_box_specular(width: usize, height: usize) -> Arc<Configuration> {
+pub fn create_cornell_box_specular() -> Arc<Configuration> {
     let configuration = Configuration::new(
         Arc::new(cornell_box_specular()),
-        Arc::new(cornell_box_camera(width, height)),
+        Arc::new(cornell_box_camera()),
         Arc::new(PathTrace::default()),
         Arc::new(StratifiedSampler::default()),
     );
     return Arc::new(configuration);
 }
 
-pub fn create_smallpt(width: usize, height: usize) -> Arc<Configuration> {
+pub fn create_smallpt() -> Arc<Configuration> {
     let camera_center = Point::new(50.0, 52.0, 275.6);
     let direction = Vector3::new(0.0, -0.042612, -1.0);
 
@@ -313,7 +309,6 @@ pub fn create_smallpt(width: usize, height: usize) -> Arc<Configuration> {
         direction,
         Vector3::new(0.0, 1.0, 0.0),
         PI / 4.3,
-        (height as f32) / (width as f32),
     );
 
     let configuration = Configuration::new(

@@ -73,7 +73,7 @@ fn empty_cornell_box() -> Scene {
     return world;
 }
 
-pub fn cornell_box_camera(width: usize, height: usize) -> Perspective {
+pub fn cornell_box_camera() -> Perspective {
     let camera_center = Point::new(278.0, 278.0, -600.0);
 
     return Perspective::without_lens(
@@ -81,7 +81,6 @@ pub fn cornell_box_camera(width: usize, height: usize) -> Perspective {
         Vector3::new(0.0, 0.0, 1.0),
         Vector3::new(0.0, 1.0, 0.0),
         PI / 4.0,
-        (height as f32) / (width as f32),
     );
 }
 

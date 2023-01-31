@@ -3,12 +3,16 @@ use crate::core::pbrt::*;
 pub trait Camera: Send + Sync {
     fn get_ray(
         &self,
-        min_u: f32,
-        max_u: f32,
-        min_v: f32,
-        max_v: f32,
+        ndc_x: f32,
+        ndc_y: f32,
+        width: usize,
+        height: usize,
         sampler: &mut dyn Sampler,
     ) -> Ray;
 
-    fn remove_lens(&self) -> Arc<Perspective>;
+    fn reset_lens_and_focus_distance(
+        &self,
+        lens_radius: f32,
+        focus_distance: f32,
+    ) -> Arc<Perspective>;
 }
