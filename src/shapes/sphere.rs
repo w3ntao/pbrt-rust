@@ -64,7 +64,7 @@ impl Shape for Sphere {
             }
         }
 
-        let mut p_hit = ray(t_shape_hit.value());
+        let mut p_hit = ray.at(t_shape_hit.value());
         p_hit *= self.radius / (p_hit - Point::new(0.0, 0.0, 0.0)).length();
         if p_hit.x == 0.0 && p_hit.y == 0.0 {
             // TODO: what does it do (in PBRT)?
