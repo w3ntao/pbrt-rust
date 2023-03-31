@@ -88,10 +88,10 @@ pub struct TransformedPrimitive {
 impl Primitive for TransformedPrimitive {
     fn intersect(&self, ray: &mut Ray, surface_interaction: &mut SurfaceInteraction) -> bool {
         let inverse_transform = self.transform.inverse();
-        let mut inverse_ray = (inverse_transform)(ray.clone());
+        let mut inverse_ray = inverse_transform.on_ray(ray.clone());
 
         let rescaling = {
-            let direction_length = (inverse_transform)(ray.d).length();
+            let direction_length = inverse_transform.on_vector(ray.d).length();
             2.0_f32.powi(direction_length.log2().round() as i32)
         };
         // rescaling with 2^x to minimise computational errors
@@ -107,7 +107,7 @@ impl Primitive for TransformedPrimitive {
 
         ray.t_max = inverse_ray.t_max / rescaling;
 
-        *surface_interaction = (self.transform)(inverse_si);
+        *surface_interaction = self.transform.on_surface_interaction(inverse_si);
 
         match &self.material {
             Some(material) => {
@@ -128,7 +128,7 @@ impl Primitive for TransformedPrimitive {
     }
 
     fn get_bounds(&self) -> Bounds {
-        return (self.transform)(self.primitive.get_bounds());
+        return self.transform.on_bounds(self.primitive.get_bounds());
     }
 
     fn get_area(&self) -> f32 {
@@ -137,7 +137,7 @@ impl Primitive for TransformedPrimitive {
 
     fn sample(&self, sampler: &mut dyn Sampler) -> (Point, Vector3) {
         let (p, v) = self.primitive.sample(sampler);
-        return ((self.transform)(p), (self.transform)(v));
+        return (self.transform.on_point(p), self.transform.on_vector(v));
     }
 }
 

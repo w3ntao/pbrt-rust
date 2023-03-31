@@ -33,7 +33,7 @@ fn time_estimator(
     print!("rendering `{}`:  0.00%  (time left: ?)", file_name);
     let _ = io::stdout().flush();
 
-    let spaces = (0..64).map(|_| " ").collect::<String>();
+    let spaces = (0..96).map(|_| " ").collect::<String>();
 
     loop {
         thread::sleep(one_second);

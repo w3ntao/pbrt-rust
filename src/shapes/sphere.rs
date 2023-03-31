@@ -27,7 +27,10 @@ impl Shape for Sphere {
         let mut o_error = Vector3::invalid();
         let mut d_error = Vector3::invalid();
 
-        let ray = (self.object_to_world.inverse())(*r, &mut o_error, &mut d_error);
+        let ray = self
+            .object_to_world
+            .inverse()
+            .on_ray_get_error(*r, &mut o_error, &mut d_error);
 
         // Compute quadratic sphere coefficients
 
@@ -86,7 +89,9 @@ impl Shape for Sphere {
             reverse_interaction.n = -normal;
         }
 
-        *interaction = (self.object_to_world)(reverse_interaction);
+        *interaction = self
+            .object_to_world
+            .on_surface_interaction(reverse_interaction);
         *t_hit = t_shape_hit.value();
         return true;
     }

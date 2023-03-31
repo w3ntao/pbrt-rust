@@ -83,26 +83,8 @@ impl Transform {
         self.m = rotate_matrix * self.m;
         self.inv_m = self.m.inverse();
     }
-}
 
-// https://docs.rs/fn_ops/latest/fn_ops/
-impl FnOnce<(Point,)> for Transform {
-    type Output = Point;
-    extern "rust-call" fn call_once(self, _: (Point,)) -> Point {
-        panic!("FnOnce<(Point,)> not implemented for Transform");
-    }
-}
-
-impl FnMut<(Point,)> for Transform {
-    extern "rust-call" fn call_mut(&mut self, _: (Point,)) -> Point {
-        panic!("FnMut<(Point,)> not implemented for Transform");
-    }
-}
-
-impl Fn<(Point,)> for Transform {
-    extern "rust-call" fn call(&self, p: (Point,)) -> Point {
-        let p = p.0;
-
+    pub fn on_point(self, p: Point) -> Point {
         // PBRT: Managing Rounding Error
         // https://www.pbr-book.org/3ed-2018/Shapes/Managing_Rounding_Error#x4-EffectofTransformations
 
@@ -122,25 +104,8 @@ impl Fn<(Point,)> for Transform {
         }
         return Point::new(xp, yp, zp) / wp;
     }
-}
 
-impl FnOnce<(Point, &mut Vector3)> for Transform {
-    type Output = Point;
-    extern "rust-call" fn call_once(self, _: (Point, &mut Vector3)) -> Point {
-        panic!("FnOnce<(Point, &mut Vector3)> not implemented for Transform");
-    }
-}
-
-impl FnMut<(Point, &mut Vector3)> for Transform {
-    extern "rust-call" fn call_mut(&mut self, _: (Point, &mut Vector3)) -> Point {
-        panic!("FnMut<(Point, &mut Vector3)> not implemented for Transform");
-    }
-}
-
-impl Fn<(Point, &mut Vector3)> for Transform {
-    extern "rust-call" fn call(&self, args: (Point, &mut Vector3)) -> Point {
-        let (p, p_error) = args;
-
+    pub fn on_point_get_error(self, p: Point, p_error: &mut Vector3) -> Point {
         // PBRT: Managing Rounding Error
         // https://www.pbr-book.org/3ed-2018/Shapes/Managing_Rounding_Error#x4-EffectofTransformations
 
@@ -178,24 +143,13 @@ impl Fn<(Point, &mut Vector3)> for Transform {
         }
         return Point::new(xp, yp, zp) / wp;
     }
-}
 
-impl FnOnce<(Point, Vector3, &mut Vector3)> for Transform {
-    type Output = Point;
-    extern "rust-call" fn call_once(self, _: (Point, Vector3, &mut Vector3)) -> Point {
-        panic!("FnOnce<(Point, Vector3, &mut Vector3)> not implemented for Transform");
-    }
-}
-
-impl FnMut<(Point, Vector3, &mut Vector3)> for Transform {
-    extern "rust-call" fn call_mut(&mut self, _: (Point, Vector3, &mut Vector3)) -> Point {
-        panic!("FnMut<(Point, Vector3, &mut Vector3)> not implemented for Transform");
-    }
-}
-
-impl Fn<(Point, Vector3, &mut Vector3)> for Transform {
-    extern "rust-call" fn call(&self, args: (Point, Vector3, &mut Vector3)) -> Point {
-        let (pt, pt_error, abs_error) = args;
+    pub fn on_point_with_error_get_error(
+        self,
+        pt: Point,
+        pt_error: Vector3,
+        abs_error: &mut Vector3,
+    ) -> Point {
         let x = pt.x;
         let y = pt.y;
         let z = pt.z;
@@ -241,25 +195,8 @@ impl Fn<(Point, Vector3, &mut Vector3)> for Transform {
         }
         return Point::new(xp, yp, zp) / wp;
     }
-}
 
-impl FnOnce<(Vector3,)> for Transform {
-    type Output = Vector3;
-    extern "rust-call" fn call_once(self, _: (Vector3,)) -> Vector3 {
-        panic!("FnOnce<(Vector3,)> not implemented for Transform");
-    }
-}
-
-impl FnMut<(Vector3,)> for Transform {
-    extern "rust-call" fn call_mut(&mut self, _: (Vector3,)) -> Vector3 {
-        panic!("FnMut<(Vector3,)> not implemented for Transform");
-    }
-}
-
-impl Fn<(Vector3,)> for Transform {
-    extern "rust-call" fn call(&self, args: (Vector3,)) -> Vector3 {
-        let (v,) = args;
-
+    pub fn on_vector(self, v: Vector3) -> Vector3 {
         let x = v.x;
         let y = v.y;
         let z = v.z;
@@ -270,25 +207,8 @@ impl Fn<(Vector3,)> for Transform {
             self.m[2][0] * x + self.m[2][1] * y + self.m[2][2] * z,
         );
     }
-}
 
-impl FnOnce<(Vector3, &mut Vector3)> for Transform {
-    type Output = Vector3;
-    extern "rust-call" fn call_once(self, _: (Vector3, &mut Vector3)) -> Vector3 {
-        panic!("FnOnce<(Vector3, &mut Vector3)> not implemented for Transform");
-    }
-}
-
-impl FnMut<(Vector3, &mut Vector3)> for Transform {
-    extern "rust-call" fn call_mut(&mut self, _: (Vector3, &mut Vector3)) -> Vector3 {
-        panic!("FnMut<(Vector3, &mut Vector3)> not implemented for Transform");
-    }
-}
-
-impl Fn<(Vector3, &mut Vector3)> for Transform {
-    extern "rust-call" fn call(&self, args: (Vector3, &mut Vector3)) -> Vector3 {
-        let (v, abs_error) = args;
-
+    pub fn on_vector_get_error(self, v: Vector3, abs_error: &mut Vector3) -> Vector3 {
         let x = v.x;
         let y = v.y;
         let z = v.z;
@@ -314,25 +234,8 @@ impl Fn<(Vector3, &mut Vector3)> for Transform {
             self.m[2][0] * x + self.m[2][1] * y + self.m[2][2] * z,
         );
     }
-}
 
-impl FnOnce<(Normal,)> for Transform {
-    type Output = Normal;
-    extern "rust-call" fn call_once(self, _: (Normal,)) -> Normal {
-        panic!("FnOnce<(Normal,)> not implemented for Transform");
-    }
-}
-
-impl FnMut<(Normal,)> for Transform {
-    extern "rust-call" fn call_mut(&mut self, _: (Normal,)) -> Normal {
-        panic!("FnMut<(Normal,)> not implemented for Transform");
-    }
-}
-
-impl Fn<(Normal,)> for Transform {
-    extern "rust-call" fn call(&self, n: (Normal,)) -> Normal {
-        let n = n.0;
-
+    pub fn on_normal(self, n: Normal) -> Normal {
         let x = n.x;
         let y = n.y;
         let z = n.z;
@@ -345,25 +248,8 @@ impl Fn<(Normal,)> for Transform {
         )
         .normalize();
     }
-}
 
-impl FnOnce<(Bounds,)> for Transform {
-    type Output = Bounds;
-    extern "rust-call" fn call_once(self, _: (Bounds,)) -> Bounds {
-        panic!("FnOnce<(AABBbounds,)> not implemented for Transform");
-    }
-}
-
-impl FnMut<(Bounds,)> for Transform {
-    extern "rust-call" fn call_mut(&mut self, _: (Bounds,)) -> Bounds {
-        panic!("FnMut<(AABBbounds,)> not implemented for Transform");
-    }
-}
-
-impl Fn<(Bounds,)> for Transform {
-    extern "rust-call" fn call(&self, args: (Bounds,)) -> Bounds {
-        let (bounds,) = args;
-
+    pub fn on_bounds(self, bounds: Bounds) -> Bounds {
         // a smarter way to transform bounds:
         // takes roughly 2 transforms instead of 8
         // https://stackoverflow.com/a/58630206
@@ -386,82 +272,32 @@ impl Fn<(Bounds,)> for Transform {
 
         return transformed_bounds;
     }
-}
 
-impl FnOnce<(Ray,)> for Transform {
-    type Output = Ray;
-    extern "rust-call" fn call_once(self, _: (Ray,)) -> Ray {
-        panic!("FnOnce<(Ray,)> not implemented for Transform");
-    }
-}
-
-impl FnMut<(Ray,)> for Transform {
-    extern "rust-call" fn call_mut(&mut self, _: (Ray,)) -> Ray {
-        panic!("FnMut<(Ray,)> not implemented for Transform");
-    }
-}
-
-impl Fn<(Ray,)> for Transform {
-    extern "rust-call" fn call(&self, args: (Ray,)) -> Ray {
-        let (ray,) = args;
-
+    pub fn on_ray(self, ray: Ray) -> Ray {
         let mut o_error = Vector3::invalid();
-        let o = (self)(ray.o, &mut o_error);
-        let d = (self)(ray.d);
+        let o = self.on_point_get_error(ray.o, &mut o_error);
+        let d = self.on_vector(ray.d);
 
         let length_squared = d.length_squared();
         let dt = d.abs().dot(o_error) / length_squared;
 
         return Ray::new(o + d * dt, d, ray.t_max - dt);
     }
-}
 
-impl FnOnce<(Ray, &mut Vector3, &mut Vector3)> for Transform {
-    type Output = Ray;
-    extern "rust-call" fn call_once(self, _: (Ray, &mut Vector3, &mut Vector3)) -> Ray {
-        panic!("FnOnce<(Ray, &mut Vector3, &mut Vector3)> not implemented for Transform");
-    }
-}
-
-impl FnMut<(Ray, &mut Vector3, &mut Vector3)> for Transform {
-    extern "rust-call" fn call_mut(&mut self, _: (Ray, &mut Vector3, &mut Vector3)) -> Ray {
-        panic!("FnMut<(Ray, &mut Vector3, &mut Vector3)> not implemented for Transform");
-    }
-}
-
-impl Fn<(Ray, &mut Vector3, &mut Vector3)> for Transform {
-    extern "rust-call" fn call(&self, args: (Ray, &mut Vector3, &mut Vector3)) -> Ray {
-        let (ray, o_error, d_error) = args;
-
-        let o = (self)(ray.o, o_error);
-        let d = (self)(ray.d, d_error);
+    pub fn on_ray_get_error(self, ray: Ray, o_error: &mut Vector3, d_error: &mut Vector3) -> Ray {
+        let o = self.on_point_get_error(ray.o, o_error);
+        let d = self.on_vector_get_error(ray.d, d_error);
 
         let length_squared = d.length_squared();
         let dt = d.abs().dot(*o_error) / length_squared;
 
         return Ray::new(o + d * dt, d, ray.t_max);
     }
-}
 
-impl FnOnce<(SurfaceInteraction,)> for Transform {
-    type Output = SurfaceInteraction;
-    extern "rust-call" fn call_once(self, _: (SurfaceInteraction,)) -> SurfaceInteraction {
-        panic!("FnOnce<(SurfaceInteraction,)> not implemented for Transform");
-    }
-}
-
-impl FnMut<(SurfaceInteraction,)> for Transform {
-    extern "rust-call" fn call_mut(&mut self, _: (SurfaceInteraction,)) -> SurfaceInteraction {
-        panic!("FnMut<(SurfaceInteraction,)> not implemented for Transform");
-    }
-}
-
-impl Fn<(SurfaceInteraction,)> for Transform {
-    extern "rust-call" fn call(&self, args: (SurfaceInteraction,)) -> SurfaceInteraction {
-        let (si,) = args;
+    pub fn on_surface_interaction(self, si: SurfaceInteraction) -> SurfaceInteraction {
         let mut ret = SurfaceInteraction::default();
-        ret.p = (self)(si.p, si.p_error, &mut ret.p_error);
-        ret.n = ((self)(si.n)).normalize();
+        ret.p = self.on_point_with_error_get_error(si.p, si.p_error, &mut ret.p_error);
+        ret.n = self.on_normal(si.n).normalize();
         ret.entering_material = si.entering_material;
         ret.material = si.material.clone();
 
