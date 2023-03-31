@@ -14,9 +14,9 @@ $ wget 'https://casual-effects.com/g3d/data10/research/model/dragon/dragon.zip'
 $ mkdir models; unzip dragon.zip -d models/
 ```
 
-switch to channel nightly and run:
+run
 ```
-$ rustup default nightly; cargo run --release
+$ cargo run --release
 ```
 
 ## rendering samples

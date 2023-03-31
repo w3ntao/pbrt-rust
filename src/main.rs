@@ -1,6 +1,3 @@
-#![feature(unboxed_closures, fn_traits)]
-#![feature(const_trait_impl)]
-
 mod accelerators;
 mod cameras;
 mod core;
