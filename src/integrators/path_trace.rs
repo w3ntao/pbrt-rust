@@ -27,11 +27,13 @@ impl Integrator for PathTrace {
         let mut ray = ray;
 
         for depth in 0..u32::MAX {
-            let mut interaction = SurfaceInteraction::default();
-            if !scene.intersect(&ray, &mut interaction) {
-                radiance += throughput * self.background;
-                break;
-            }
+            let interaction = match scene.intersect(&ray) {
+                None => {
+                    radiance += throughput * self.background;
+                    break;
+                }
+                Some(si) => si,
+            };
 
             if interaction.n.dot(ray.d) < 0.0 {
                 // so the light emits uni-directionally

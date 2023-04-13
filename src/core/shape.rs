@@ -1,7 +1,7 @@
 use crate::core::pbrt::*;
 
 pub trait Shape: Send + Sync {
-    fn intersect(&self, ray: &Ray, t_hit: &mut f32, interaction: &mut SurfaceInteraction) -> bool;
+    fn intersect(&self, ray: &Ray, t_hit: &mut f32) -> Option<SurfaceInteraction>;
 
     fn get_bounds(&self) -> Bounds;
 

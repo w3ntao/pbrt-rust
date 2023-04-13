@@ -23,7 +23,7 @@ impl Sphere {
 }
 
 impl Shape for Sphere {
-    fn intersect(&self, r: &Ray, t_hit: &mut f32, interaction: &mut SurfaceInteraction) -> bool {
+    fn intersect(&self, r: &Ray, t_hit: &mut f32) -> Option<SurfaceInteraction> {
         let mut o_error = Vector3::invalid();
         let mut d_error = Vector3::invalid();
 
@@ -52,18 +52,18 @@ impl Shape for Sphere {
         let mut t1 = ErrorFloat::without_error(-f32::INFINITY);
 
         if !error_float_quadratic(a, b, c, &mut t0, &mut t1) {
-            return false;
+            return None;
         }
 
         if t0.upper_bound() > ray.t_max || t1.lower_bound() <= 0.0 {
-            return false;
+            return None;
         }
 
         let mut t_shape_hit = t0.clone();
         if t_shape_hit.lower_bound() <= 0.0 {
             t_shape_hit = t1.clone();
             if t_shape_hit.upper_bound() > ray.t_max {
-                return false;
+                return None;
             }
         }
 
@@ -89,11 +89,11 @@ impl Shape for Sphere {
             reverse_interaction.n = -normal;
         }
 
-        *interaction = self
-            .object_to_world
-            .on_surface_interaction(reverse_interaction);
         *t_hit = t_shape_hit.value();
-        return true;
+        return Some(
+            self.object_to_world
+                .on_surface_interaction(reverse_interaction),
+        );
     }
 
     fn get_bounds(&self) -> Bounds {

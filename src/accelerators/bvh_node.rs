@@ -58,32 +58,58 @@ impl Node {
         &self,
         ray: &mut Ray,
         primitives: &Vec<Arc<dyn Primitive>>,
-        interaction: &mut SurfaceInteraction,
-    ) -> bool {
+    ) -> Option<SurfaceInteraction> {
         let (t_near, t_far) = self.bounds.intersect(ray);
         if t_near > t_far || t_near > ray.t_max || t_far < 0.0 {
-            return false;
+            return None;
         }
 
         match (&self.left, &self.right) {
             (None, None) => {
+                let mut closest_interaction_so_far = SurfaceInteraction::default();
+
                 let mut hit = false;
                 for idx in self.start..self.end {
                     let p = &primitives[idx];
-                    hit |= p.intersect(ray, interaction);
+                    match p.intersect(ray) {
+                        None => {
+                            continue;
+                        }
+                        Some(temp_interaction) => {
+                            hit = true;
+                            closest_interaction_so_far = temp_interaction;
+                        }
+                    };
                 }
-                return hit;
+
+                return {
+                    if hit {
+                        Some(closest_interaction_so_far)
+                    } else {
+                        None
+                    }
+                };
             }
             (Some(left_node), Some(right_node)) => {
-                let left_hit = left_node.intersect(ray, primitives, interaction);
-                let right_hit = right_node.intersect(ray, primitives, interaction);
+                let mut ray_left = ray.clone();
+                let mut ray_right = ray.clone();
+
+                let left_interaction = left_node.intersect(&mut ray_left, primitives);
+                let right_interaction = right_node.intersect(&mut ray_right, primitives);
                 // to make sure ray test with both nodes
-                return left_hit || right_hit;
+
+                return {
+                    if ray_left.t_max < ray_right.t_max {
+                        ray.t_max = ray_left.t_max;
+                        left_interaction
+                    } else {
+                        ray.t_max = ray_right.t_max;
+                        right_interaction
+                    }
+                };
             }
             _ => {
-                panic!(
-                    "Node::intersect(): illegal case --> one child is none but the other is not"
-                );
+                panic!("Node::intersect(): illegal case --> a child is none but the other is not");
             }
         }
     }

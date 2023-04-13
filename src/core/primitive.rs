@@ -1,7 +1,7 @@
 use crate::core::pbrt::*;
 
 pub trait Primitive: Send + Sync {
-    fn intersect(&self, ray: &mut Ray, surface_interaction: &mut SurfaceInteraction) -> bool;
+    fn intersect(&self, ray: &mut Ray) -> Option<SurfaceInteraction>;
 
     fn set_material(&mut self, material: Arc<dyn Material>);
 
@@ -28,21 +28,24 @@ pub struct GeometricPrimitive {
 }
 
 impl Primitive for GeometricPrimitive {
-    fn intersect(&self, ray: &mut Ray, surface_interaction: &mut SurfaceInteraction) -> bool {
+    fn intersect(&self, ray: &mut Ray) -> Option<SurfaceInteraction> {
         let mut t_hit = f32::INFINITY;
-        if !self.shape.intersect(&ray, &mut t_hit, surface_interaction) {
-            return false;
-        }
-        ray.t_max = t_hit;
 
-        match &self.material {
-            Some(material) => {
-                surface_interaction.material = Some(material.clone());
+        return match self.shape.intersect(&ray, &mut t_hit) {
+            None => None,
+            Some(mut si) => {
+                ray.t_max = t_hit;
+
+                match &self.material {
+                    Some(material) => {
+                        si.material = Some(material.clone());
+                    }
+                    _ => {}
+                }
+
+                Some(si)
             }
-            _ => {}
-        }
-
-        return true;
+        };
     }
 
     fn set_material(&mut self, material: Arc<dyn Material>) {
@@ -86,7 +89,7 @@ pub struct TransformedPrimitive {
 }
 
 impl Primitive for TransformedPrimitive {
-    fn intersect(&self, ray: &mut Ray, surface_interaction: &mut SurfaceInteraction) -> bool {
+    fn intersect(&self, ray: &mut Ray) -> Option<SurfaceInteraction> {
         let inverse_transform = self.transform.inverse();
         let mut inverse_ray = inverse_transform.on_ray(ray.clone());
 
@@ -100,23 +103,23 @@ impl Primitive for TransformedPrimitive {
         inverse_ray.d /= rescaling;
         inverse_ray.t_max *= rescaling;
 
-        let mut inverse_si = SurfaceInteraction::default();
-        if !self.primitive.intersect(&mut inverse_ray, &mut inverse_si) {
-            return false;
-        }
+        return match self.primitive.intersect(&mut inverse_ray) {
+            None => None,
+            Some(inverse_si) => {
+                ray.t_max = inverse_ray.t_max / rescaling;
 
-        ray.t_max = inverse_ray.t_max / rescaling;
+                let mut surface_interaction = self.transform.on_surface_interaction(inverse_si);
 
-        *surface_interaction = self.transform.on_surface_interaction(inverse_si);
+                match &self.material {
+                    Some(material) => {
+                        surface_interaction.material = Some(material.clone());
+                    }
+                    _ => {}
+                }
 
-        match &self.material {
-            Some(material) => {
-                surface_interaction.material = Some(material.clone());
+                Some(surface_interaction)
             }
-            _ => {}
-        }
-
-        return true;
+        };
     }
 
     fn set_material(&mut self, material: Arc<dyn Material>) {

@@ -27,14 +27,19 @@ impl Quad {
 }
 
 impl Shape for Quad {
-    fn intersect(&self, ray: &Ray, t_hit: &mut f32, interaction: &mut SurfaceInteraction) -> bool {
+    fn intersect(&self, ray: &Ray, t_hit: &mut f32) -> Option<SurfaceInteraction> {
         for triangle in &self.triangles {
-            if triangle.intersect(ray, t_hit, interaction) {
-                return true;
+            match triangle.intersect(ray, t_hit) {
+                None => {
+                    continue;
+                }
+                Some(si) => {
+                    return Some(si);
+                }
             }
         }
 
-        return false;
+        return None;
     }
 
     fn get_bounds(&self) -> Bounds {

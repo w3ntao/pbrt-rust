@@ -38,7 +38,7 @@ impl Triangle {
 }
 
 impl Shape for Triangle {
-    fn intersect(&self, ray: &Ray, t_hit: &mut f32, interaction: &mut SurfaceInteraction) -> bool {
+    fn intersect(&self, ray: &Ray, t_hit: &mut f32) -> Option<SurfaceInteraction> {
         let vertex_idx0 = self.mesh_root.indices[self.mesh_index];
         let vertex_idx1 = self.mesh_root.indices[self.mesh_index + 1];
         let vertex_idx2 = self.mesh_root.indices[self.mesh_index + 2];
@@ -96,12 +96,12 @@ impl Shape for Triangle {
         }
 
         if (e0 < 0.0 || e1 < 0.0 || e2 < 0.0) && (e0 > 0.0 || e1 > 0.0 || e2 > 0.0) {
-            return false;
+            return None;
         }
 
         let det = e0 + e1 + e2;
         if det == 0.0 {
-            return false;
+            return None;
         }
 
         // Compute scaled hit distance to triangle and test against ray $t$ range
@@ -111,10 +111,10 @@ impl Shape for Triangle {
 
         let t_scaled = e0 * p0t.z + e1 * p1t.z + e2 * p2t.z;
         if det < 0.0 && (t_scaled >= 0.0 || t_scaled < ray.t_max * det) {
-            return false;
+            return None;
         }
         if det > 0.0 && (t_scaled <= 0.0 || t_scaled > ray.t_max * det) {
-            return false;
+            return None;
         }
 
         // Compute barycentric coordinates and $t$ value for triangle intersection
@@ -124,7 +124,7 @@ impl Shape for Triangle {
         let b2 = e2 * inv_det;
         let t = t_scaled * inv_det;
         if t < 0.0 || t > ray.t_max {
-            return false;
+            return None;
         }
 
         // Ensure that computed triangle $t$ is conservatively greater than zero
@@ -148,7 +148,7 @@ impl Shape for Triangle {
             3.0 * (gamma(3) * max_e * max_zt + delta_e * max_zt + delta_z * max_e) * inv_det.abs();
 
         if t <= delta_t {
-            return false;
+            return None;
         };
 
         // Compute error bounds for triangle intersection
@@ -165,11 +165,13 @@ impl Shape for Triangle {
         }
 
         *t_hit = t;
-        interaction.p = p_hit;
-        interaction.n = normal;
-        interaction.p_error = p_error;
 
-        return true;
+        let mut si = SurfaceInteraction::default();
+        si.p = p_hit;
+        si.n = normal;
+        si.p_error = p_error;
+
+        return Some(si);
     }
 
     fn get_bounds(&self) -> Bounds {

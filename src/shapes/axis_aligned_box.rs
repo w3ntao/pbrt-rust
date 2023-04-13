@@ -45,19 +45,33 @@ impl AxisAlignedBox {
 }
 
 impl Shape for AxisAlignedBox {
-    fn intersect(&self, ray: &Ray, t_hit: &mut f32, interaction: &mut SurfaceInteraction) -> bool {
+    fn intersect(&self, ray: &Ray, t_hit: &mut f32) -> Option<SurfaceInteraction> {
         let mut intersected = false;
+        let mut best_si = SurfaceInteraction::default();
         for triangle in &self.triangles {
             let mut temp_t = f32::INFINITY;
-            let mut temp_interaction = SurfaceInteraction::default();
-            intersected |= triangle.intersect(ray, &mut temp_t, &mut temp_interaction);
-            if temp_t < *t_hit {
-                *t_hit = temp_t;
-                *interaction = temp_interaction;
+
+            match triangle.intersect(ray, &mut temp_t) {
+                None => {
+                    continue;
+                }
+                Some(si) => {
+                    if temp_t >= *t_hit {
+                        continue;
+                    }
+
+                    intersected = true;
+                    *t_hit = temp_t;
+                    best_si = si;
+                }
             }
         }
 
-        return intersected;
+        if !intersected {
+            return None;
+        }
+
+        return Some(best_si);
     }
 
     fn get_bounds(&self) -> Bounds {
