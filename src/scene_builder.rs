@@ -1,4 +1,5 @@
 use crate::pbrt::*;
+use crate::transform::Transform;
 
 fn json_value_to_usize(value: Value) -> usize {
     serde_json::from_value(value).unwrap()
@@ -22,29 +23,58 @@ fn trim_quote(token: String) -> String {
     return token;
 }
 
-fn build_look_at(_value: &Value) {
+fn build_look_at_transform(pos: Point3f, look: Point3f, up: Vector3f) -> Transform {
+    let mut worldFromCamera = SquareMatrix::<4>::default();
+    worldFromCamera[0][3] = pos.x;
+    worldFromCamera[1][3] = pos.y;
+    worldFromCamera[2][3] = pos.z;
+    worldFromCamera[3][3] = 1.0;
+
+    let dir = (look - pos).normalize();
+    if up.normalize().cross(&dir).length() == 0.0 {
+        panic!("LookAt: `up` vector and viewing direction are pointing in the same direction");
+    }
+
+    let right = up.normalize().cross(&dir).normalize();
+    let new_up = dir.cross(&right);
+
+    worldFromCamera[0][0] = right.x;
+    worldFromCamera[1][0] = right.y;
+    worldFromCamera[2][0] = right.z;
+    worldFromCamera[3][0] = 0.0;
+    worldFromCamera[0][1] = new_up.x;
+    worldFromCamera[1][1] = new_up.y;
+    worldFromCamera[2][1] = new_up.z;
+    worldFromCamera[3][1] = 0.0;
+    worldFromCamera[0][2] = dir.x;
+    worldFromCamera[1][2] = dir.y;
+    worldFromCamera[2][2] = dir.z;
+    worldFromCamera[3][2] = 0.0;
+
+    let cameraFromWorld = worldFromCamera.inverse();
+    return Transform::new_with_inv(cameraFromWorld, worldFromCamera);
+}
+
+fn parse_look_at(_value: &Value) {
     let array = _value.as_array().unwrap();
     assert_eq!(json_value_to_string(array[0].clone()), "LookAt");
 
     let length = array.len();
     assert_eq!(length, 10);
 
-    let mut matrix = [Float::NAN; 9];
+    let mut data = [Float::NAN; 9];
     for idx in 1..length {
         let number_in_string = trim_quote(json_value_to_string(array[idx].clone()));
 
-        matrix[idx - 1] = number_in_string.parse::<Float>().unwrap();
+        data[idx - 1] = number_in_string.parse::<Float>().unwrap();
     }
 
-    print!("matrix `LookAt`: ");
-    for v in matrix {
-        print!("{} ", v);
-    }
-    println!();
+    let position = Point3f::new(data[0], data[1], data[2]);
+    let look = Point3f::new(data[3], data[4], data[5]);
+    let up = Vector3f::new(data[6], data[7], data[8]);
 
-    let p = Point3f::new(0.0, 0.0, 0.0);
-
-    let p = Point2f::new(0.0, 0.0);
+    let transform = build_look_at_transform(position, look, up);
+    println!("transform LookAt built");
 }
 
 struct Integrator {}
@@ -132,7 +162,7 @@ impl SceneBuilder {
         // build integrator
         // build sampler
 
-        build_look_at(&_tokens[format!("token_{}", look_at_idx)]);
+        parse_look_at(&_tokens[format!("token_{}", look_at_idx)]);
 
         /*
         println!("LookAt:     {}", &_tokens[format!("token_{}", look_at_idx)]);
