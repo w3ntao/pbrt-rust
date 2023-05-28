@@ -77,29 +77,6 @@ fn parse_look_at(_value: &Value) {
     println!("transform LookAt built");
 }
 
-struct Integrator {}
-
-struct Camera {}
-
-struct Film {}
-
-struct Sampler {}
-
-pub struct SceneBuilder {
-    tokens: Value,
-    token_length: usize,
-    // dependency: Camera -> Film -> Filter
-
-    /*
-    look_at: [Float; 9],
-    camera: Arc<Camera>,
-    film: Arc<Film>,
-    integrator: Arc<Integrator>,
-    sampler: Arc<Sampler>,
-    world_start_idx: usize,
-     */
-}
-
 fn parse_json(path: &str) -> Value {
     let mut file = File::open(path).unwrap();
     let mut data = String::new();
@@ -108,9 +85,21 @@ fn parse_json(path: &str) -> Value {
     return serde_json::from_str(&data).expect("JSON was not well-formatted");
 }
 
+pub struct SceneBuilder {
+    file_path: String,
+}
+
 impl SceneBuilder {
-    pub fn build_from_json(file_path: &str) -> Self {
-        let _tokens = parse_json(file_path);
+    pub fn new(_file_path: &str) -> Self {
+        return SceneBuilder {
+            file_path: _file_path.parse().unwrap(),
+        };
+    }
+}
+
+impl SceneBuilder {
+    pub fn build_scene(&mut self) {
+        let _tokens = parse_json(self.file_path.as_ref());
         let _token_length = json_value_to_usize(_tokens["length"].clone());
 
         let mut look_at_idx = usize::MAX;
@@ -171,10 +160,5 @@ impl SceneBuilder {
         println!("Integrator: {}", &_tokens[format!("token_{}", integrator_idx)]);
         println!("Sampler:    {}", &_tokens[format!("token_{}", sampler_idx)]);
         */
-
-        return Self {
-            tokens: _tokens,
-            token_length: _token_length,
-        };
     }
 }

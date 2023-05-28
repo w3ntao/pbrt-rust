@@ -32,7 +32,7 @@ fn json_hello_world() {
 
 fn main() {
     //json_hello_world();
-    let builder = SceneBuilder::build_from_json("data.json");
 
-    let matrix = SquareMatrix::<3>::default();
+    let mut builder = SceneBuilder::new("data.json");
+    builder.build_scene();
 }
