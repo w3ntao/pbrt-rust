@@ -55,28 +55,6 @@ fn build_look_at_transform(pos: Point3f, look: Point3f, up: Vector3f) -> Transfo
     return Transform::new_with_inv(cameraFromWorld, worldFromCamera);
 }
 
-fn parse_look_at(_value: &Value) {
-    let array = _value.as_array().unwrap();
-    assert_eq!(json_value_to_string(array[0].clone()), "LookAt");
-
-    let length = array.len();
-    assert_eq!(length, 10);
-
-    let mut data = [Float::NAN; 9];
-    for idx in 1..length {
-        let number_in_string = trim_quote(json_value_to_string(array[idx].clone()));
-
-        data[idx - 1] = number_in_string.parse::<Float>().unwrap();
-    }
-
-    let position = Point3f::new(data[0], data[1], data[2]);
-    let look = Point3f::new(data[3], data[4], data[5]);
-    let up = Vector3f::new(data[6], data[7], data[8]);
-
-    let transform = build_look_at_transform(position, look, up);
-    println!("transform LookAt built");
-}
-
 fn parse_json(path: &str) -> Value {
     let mut file = File::open(path).unwrap();
     let mut data = String::new();
@@ -85,19 +63,61 @@ fn parse_json(path: &str) -> Value {
     return serde_json::from_str(&data).expect("JSON was not well-formatted");
 }
 
+struct GraphicsState {
+    current_transform: Transform,
+    reverse_orientation: bool,
+}
+
+impl GraphicsState {
+    pub fn new() -> Self {
+        return GraphicsState {
+            current_transform: Transform::identity(),
+            reverse_orientation: false,
+        };
+    }
+}
+
 pub struct SceneBuilder {
     file_path: String,
+    graphics_state: GraphicsState,
 }
 
 impl SceneBuilder {
     pub fn new(_file_path: &str) -> Self {
         return SceneBuilder {
             file_path: _file_path.parse().unwrap(),
+            graphics_state: GraphicsState::new(),
         };
     }
 }
 
 impl SceneBuilder {
+    fn parse_look_at(&mut self, _value: &Value) {
+        println!("parsing LookAt");
+        let array = _value.as_array().unwrap();
+        assert_eq!(json_value_to_string(array[0].clone()), "LookAt");
+
+        let length = array.len();
+        assert_eq!(length, 10);
+
+        let mut data = [Float::NAN; 9];
+        for idx in 1..length {
+            let number_in_string = trim_quote(json_value_to_string(array[idx].clone()));
+
+            data[idx - 1] = number_in_string.parse::<Float>().unwrap();
+        }
+
+        let position = Point3f::new(data[0], data[1], data[2]);
+        let look = Point3f::new(data[3], data[4], data[5]);
+        let up = Vector3f::new(data[6], data[7], data[8]);
+
+        let transform = build_look_at_transform(position, look, up);
+        println!("transform LookAt built");
+
+        // TODO: implement me:
+        // TODO: graphics_state
+    }
+
     pub fn build_scene(&mut self) {
         let _tokens = parse_json(self.file_path.as_ref());
         let _token_length = json_value_to_usize(_tokens["length"].clone());
@@ -118,6 +138,7 @@ impl SceneBuilder {
                 "LookAt" => {
                     look_at_idx = idx;
                     println!("matched `LookAt`");
+                    self.parse_look_at(&_tokens[format!("token_{}", look_at_idx)]);
                 }
                 "Camera" => {
                     camera_idx = idx;
@@ -150,8 +171,6 @@ impl SceneBuilder {
         // build camera
         // build integrator
         // build sampler
-
-        parse_look_at(&_tokens[format!("token_{}", look_at_idx)]);
 
         /*
         println!("LookAt:     {}", &_tokens[format!("token_{}", look_at_idx)]);

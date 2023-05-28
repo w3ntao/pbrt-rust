@@ -1,6 +1,6 @@
 use crate::pbrt::*;
-use std::mem::swap;
 
+#[derive(Copy, Clone)]
 pub struct SquareMatrix<const N: usize> {
     matrix: [[Float; N]; N],
 }
@@ -14,6 +14,12 @@ impl<const N: usize> Default for SquareMatrix<N> {
 }
 
 impl<const N: usize> SquareMatrix<N> {
+    pub fn zero() -> Self {
+        return SquareMatrix {
+            matrix: [[0.0; N]; N],
+        };
+    }
+
     pub fn identity() -> Self {
         let mut data = [[0.0; N]; N];
         for idx in 0..N {
@@ -106,15 +112,41 @@ impl<const N: usize> SquareMatrix<N> {
     }
 }
 
-impl<const N: usize> ops::Index<usize> for SquareMatrix<N> {
+impl<const N: usize> Index<usize> for SquareMatrix<N> {
     type Output = [f32; N];
     fn index(&self, idx: usize) -> &[f32; N] {
         return &self.matrix[idx];
     }
 }
 
-impl<const N: usize> ops::IndexMut<usize> for SquareMatrix<N> {
+impl<const N: usize> IndexMut<usize> for SquareMatrix<N> {
     fn index_mut(&mut self, idx: usize) -> &mut [f32; N] {
         return &mut self.matrix[idx];
+    }
+}
+
+impl Mul<SquareMatrix<4>> for SquareMatrix<4> {
+    type Output = SquareMatrix<4>;
+
+    fn mul(self, rhs: SquareMatrix<4>) -> Self::Output {
+        let mut product = SquareMatrix::<4>::zero();
+        for x in 0..4 {
+            for y in 0..4 {
+                /*
+                product[x][y] = self[x][0] * rhs[0][y]
+                    + self[x][1] * rhs[1][y]
+                    + self[x][2] * rhs[2][y]
+                    + self[x][3] * rhs[3][y];
+                */
+
+                let mut sum = 0.0;
+                for idx in 0..4 {
+                    sum = fma(self[x][idx], rhs[idx][y], sum);
+                }
+                product[x][y] = sum;
+            }
+        }
+
+        return product;
     }
 }

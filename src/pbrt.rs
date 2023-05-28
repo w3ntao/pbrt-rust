@@ -6,8 +6,8 @@ pub use serde_json::Value;
 pub use std::fs::File;
 pub use std::io::Read;
 pub use std::mem;
-pub use std::ops;
-pub use std::ops::{Add, Div, Mul, Sub};
+pub use std::mem::swap;
+pub use std::ops::{Add, Div, Index, IndexMut, Mul, Sub};
 
 pub use crate::euclidean_geometry::math::*;
 pub use crate::euclidean_geometry::point::*;

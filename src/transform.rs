@@ -6,6 +6,14 @@ pub struct Transform {
 }
 
 impl Transform {
+    pub fn identity() -> Self {
+        let identity_matrix = SquareMatrix::<4>::identity();
+        return Transform {
+            matrix: identity_matrix.clone(),
+            inverted_matrix: identity_matrix,
+        };
+    }
+
     pub fn new(_matrix: SquareMatrix<4>) -> Self {
         return Transform {
             matrix: _matrix,
@@ -17,6 +25,17 @@ impl Transform {
         return Transform {
             matrix: _matrix,
             inverted_matrix: _inv_matrix,
+        };
+    }
+}
+
+impl Mul<Transform> for Transform {
+    type Output = Transform;
+
+    fn mul(self, rhs: Transform) -> Self::Output {
+        return Transform {
+            matrix: self.matrix * rhs.matrix,
+            inverted_matrix: rhs.inverted_matrix * self.inverted_matrix,
         };
     }
 }
