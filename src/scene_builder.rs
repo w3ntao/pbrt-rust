@@ -1,6 +1,6 @@
+use serde_json::Value;
 use std::fs::File;
 use std::io::Read;
-use serde_json::Value;
 
 fn json_value_to_usize(value: Value) -> usize {
     serde_json::from_value(value).unwrap()
@@ -13,7 +13,8 @@ fn json_value_to_string(value: Value) -> String {
 fn trim_quote(token: String) -> String {
     fn head_tail(_token: &String, c: char) -> bool {
         let chars = _token.chars();
-        return chars.clone().nth(0).unwrap() == c && chars.clone().nth(_token.len() - 1).unwrap() == c;
+        return chars.clone().nth(0).unwrap() == c
+            && chars.clone().nth(_token.len() - 1).unwrap() == c;
     }
 
     if head_tail(&token, '\"') || head_tail(&token, '\'') {
@@ -117,7 +118,9 @@ impl SceneBuilder {
                     println!("before-world configuration parsing finished\n");
                     break;
                 }
-                _ => { panic!("unknown token: {}", token_without_quote) }
+                _ => {
+                    panic!("unknown token: {}", token_without_quote)
+                }
             }
         }
 

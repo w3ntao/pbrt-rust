@@ -1,3 +1,4 @@
+mod square_matrix;
 mod scene_builder;
 
 use std::fs::File;
@@ -5,6 +6,7 @@ use std::io::Read;
 
 use serde_json::Value;
 use crate::scene_builder::SceneBuilder;
+use crate::square_matrix::SquareMatrix;
 
 fn json_hello_world() {
     // Some JSON input data as a &str. Maybe this comes from the user.
@@ -33,7 +35,7 @@ fn json_hello_world() {
 
 fn main() {
     //json_hello_world();
-
-    //return;
     let builder = SceneBuilder::build_from_json("data.json");
+
+    let matrix = SquareMatrix::<3>::default();
 }
