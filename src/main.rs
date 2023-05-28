@@ -1,12 +1,9 @@
-mod square_matrix;
+mod pbrt;
+mod point;
 mod scene_builder;
+mod square_matrix;
 
-use std::fs::File;
-use std::io::Read;
-
-use serde_json::Value;
-use crate::scene_builder::SceneBuilder;
-use crate::square_matrix::SquareMatrix;
+use crate::pbrt::*;
 
 fn json_hello_world() {
     // Some JSON input data as a &str. Maybe this comes from the user.

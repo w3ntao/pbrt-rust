@@ -1,6 +1,4 @@
-use serde_json::Value;
-use std::fs::File;
-use std::io::Read;
+use crate::pbrt::*;
 
 fn json_value_to_usize(value: Value) -> usize {
     serde_json::from_value(value).unwrap()
@@ -31,11 +29,11 @@ fn build_look_at(_value: &Value) {
     let length = array.len();
     assert_eq!(length, 10);
 
-    let mut matrix = [f32::NAN; 9];
+    let mut matrix = [Float::NAN; 9];
     for idx in 1..length {
         let number_in_string = trim_quote(json_value_to_string(array[idx].clone()));
 
-        matrix[idx - 1] = number_in_string.parse::<f32>().unwrap();
+        matrix[idx - 1] = number_in_string.parse::<Float>().unwrap();
     }
 
     print!("matrix `LookAt`: ");
@@ -43,6 +41,10 @@ fn build_look_at(_value: &Value) {
         print!("{} ", v);
     }
     println!();
+
+    let p = Point3f::new(0.0, 0.0, 0.0);
+
+    let p = Point2f::new(0.0, 0.0);
 }
 
 struct Integrator {}
@@ -59,7 +61,7 @@ pub struct SceneBuilder {
     // dependency: Camera -> Film -> Filter
 
     /*
-    look_at: [f32; 9],
+    look_at: [Float; 9],
     camera: Arc<Camera>,
     film: Arc<Film>,
     integrator: Arc<Integrator>,

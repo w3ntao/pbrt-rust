@@ -1,5 +1,7 @@
+use crate::pbrt::*;
+
 pub struct SquareMatrix<const LENGTH: usize> {
-    matrix: [[f32; LENGTH]; LENGTH],
+    matrix: [[Float; LENGTH]; LENGTH],
 }
 
 impl<const LENGTH: usize> Default for SquareMatrix<LENGTH> {
