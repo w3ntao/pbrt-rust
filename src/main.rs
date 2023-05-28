@@ -1,7 +1,6 @@
+mod euclidean_geometry;
 mod pbrt;
-mod point;
 mod scene_builder;
-mod square_matrix;
 
 use crate::pbrt::*;
 
