@@ -111,11 +111,11 @@ impl SceneBuilder {
         let look = Point3f::new(data[3], data[4], data[5]);
         let up = Vector3f::new(data[6], data[7], data[8]);
 
-        let transform = build_look_at_transform(position, look, up);
+        let transform_look_at = build_look_at_transform(position, look, up);
         println!("transform LookAt built");
 
-        // TODO: implement me:
-        // TODO: graphics_state
+        self.graphics_state.current_transform =
+            self.graphics_state.current_transform.clone() * transform_look_at;
     }
 
     pub fn build_scene(&mut self) {

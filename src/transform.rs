@@ -1,5 +1,6 @@
 use crate::pbrt::*;
 
+#[derive(Copy, Clone)]
 pub struct Transform {
     matrix: SquareMatrix<4>,
     inverted_matrix: SquareMatrix<4>,
