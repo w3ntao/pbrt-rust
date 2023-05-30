@@ -1,27 +1,4 @@
 use crate::pbrt::*;
-use crate::transform::Transform;
-
-fn json_value_to_usize(value: Value) -> usize {
-    serde_json::from_value(value).unwrap()
-}
-
-fn json_value_to_string(value: Value) -> String {
-    serde_json::from_value(value).unwrap()
-}
-
-fn trim_quote(token: String) -> String {
-    fn head_tail(_token: &String, c: char) -> bool {
-        let chars = _token.chars();
-        return chars.clone().nth(0).unwrap() == c
-            && chars.clone().nth(_token.len() - 1).unwrap() == c;
-    }
-
-    if head_tail(&token, '\"') || head_tail(&token, '\'') {
-        return token.chars().skip(1).take(token.len() - 2).collect();
-    }
-
-    return token;
-}
 
 fn build_look_at_transform(pos: Point3f, look: Point3f, up: Vector3f) -> Transform {
     let mut worldFromCamera = SquareMatrix::<4>::default();
@@ -112,10 +89,21 @@ impl SceneBuilder {
         let up = Vector3f::new(data[6], data[7], data[8]);
 
         let transform_look_at = build_look_at_transform(position, look, up);
-        println!("transform LookAt built");
+        println!("transform LookAt built\n");
 
         self.graphics_state.current_transform =
             self.graphics_state.current_transform.clone() * transform_look_at;
+    }
+
+    fn parse_film(&mut self, _value: &Value) {
+        println!("parsing Film");
+
+        let array = _value.as_array().unwrap();
+        assert_eq!(json_value_to_string(array[0].clone()), "Film");
+
+        let parameter_dict = ParameterDict::build_from_vec(&array[2..]);
+
+        parameter_dict.display();
     }
 
     pub fn build_scene(&mut self) {
@@ -138,7 +126,6 @@ impl SceneBuilder {
                 "LookAt" => {
                     look_at_idx = idx;
                     println!("matched `LookAt`");
-                    self.parse_look_at(&_tokens[format!("token_{}", look_at_idx)]);
                 }
                 "Camera" => {
                     camera_idx = idx;
@@ -147,6 +134,7 @@ impl SceneBuilder {
                 "Film" => {
                     film_idx = idx;
                     println!("matched `Film`");
+                    self.parse_film(&_tokens[format!("token_{}", film_idx)]);
                 }
                 "Integrator" => {
                     integrator_idx = idx;
@@ -165,6 +153,10 @@ impl SceneBuilder {
                 }
             }
         }
+
+        self.parse_look_at(&_tokens[format!("token_{}", look_at_idx)]);
+
+        self.parse_film(&_tokens[format!("token_{}", film_idx)])
 
         // build LookAt
         // build Film

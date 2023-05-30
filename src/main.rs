@@ -1,6 +1,6 @@
 mod euclidean_geometry;
 mod pbrt;
-mod scene_builder;
+mod scene_parser;
 mod transform;
 
 use crate::pbrt::*;

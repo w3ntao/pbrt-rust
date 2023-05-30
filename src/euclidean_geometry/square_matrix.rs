@@ -132,16 +132,9 @@ impl Mul<SquareMatrix<4>> for SquareMatrix<4> {
         let mut product = SquareMatrix::<4>::zero();
         for x in 0..4 {
             for y in 0..4 {
-                /*
-                product[x][y] = self[x][0] * rhs[0][y]
-                    + self[x][1] * rhs[1][y]
-                    + self[x][2] * rhs[2][y]
-                    + self[x][3] * rhs[3][y];
-                */
-
                 let mut sum = 0.0;
-                for idx in 0..4 {
-                    sum = fma(self[x][idx], rhs[idx][y], sum);
+                for loop_idx in 0..4 {
+                    sum = fma(self[x][loop_idx], rhs[loop_idx][y], sum);
                 }
                 product[x][y] = sum;
             }
