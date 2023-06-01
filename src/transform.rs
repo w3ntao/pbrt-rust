@@ -28,6 +28,21 @@ impl Transform {
             inverted_matrix: _inv_matrix,
         };
     }
+
+    pub fn translate(delta: Vector3f) -> Self {
+        let mut _matrix = SquareMatrix::<4>::identity();
+        let mut _inverted_matrix = _matrix.clone();
+
+        for idx in 0..3 {
+            _matrix[idx][3] += delta[idx];
+            _inverted_matrix[idx][3] -= delta[idx];
+        }
+
+        return Transform {
+            matrix: _matrix,
+            inverted_matrix: _inverted_matrix,
+        };
+    }
 }
 
 impl Mul<Transform> for Transform {

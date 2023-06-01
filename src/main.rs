@@ -33,6 +33,6 @@ fn json_hello_world() {
 fn main() {
     //json_hello_world();
 
-    let mut builder = SceneBuilder::new("data.json");
+    let mut builder = SceneBuilder::new("killeroo-floor.json");
     builder.build_scene();
 }

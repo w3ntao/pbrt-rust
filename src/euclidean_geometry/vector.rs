@@ -37,6 +37,23 @@ impl Vector3f {
     }
 }
 
+impl Index<usize> for Vector3f {
+    type Output = Float;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        return {
+            match index {
+                0 => &self.x,
+                1 => &self.y,
+                2 => &self.z,
+                _ => {
+                    panic!("illegal indexing: {}", index);
+                }
+            }
+        };
+    }
+}
+
 impl Div<Float> for Vector3f {
     type Output = Vector3f;
 

@@ -1,4 +1,5 @@
 use crate::pbrt::*;
+use std::process;
 
 fn build_look_at_transform(pos: Point3f, look: Point3f, up: Vector3f) -> Transform {
     let mut worldFromCamera = SquareMatrix::<4>::default();
@@ -40,6 +41,7 @@ fn parse_json(path: &str) -> Value {
     return serde_json::from_str(&data).expect("JSON was not well-formatted");
 }
 
+#[derive(Copy, Clone)]
 struct GraphicsState {
     current_transform: Transform,
     reverse_orientation: bool,
@@ -57,6 +59,7 @@ impl GraphicsState {
 pub struct SceneBuilder {
     file_path: String,
     graphics_state: GraphicsState,
+    pushed_graphics_state: Vec<GraphicsState>,
 }
 
 impl SceneBuilder {
@@ -64,6 +67,7 @@ impl SceneBuilder {
         return SceneBuilder {
             file_path: _file_path.parse().unwrap(),
             graphics_state: GraphicsState::new(),
+            pushed_graphics_state: Vec::new(),
         };
     }
 }
@@ -103,7 +107,25 @@ impl SceneBuilder {
 
         let parameter_dict = ParameterDict::build_from_vec(&array[2..]);
 
-        parameter_dict.display();
+        //parameter_dict.display();
+    }
+
+    fn parse_translate(&mut self, _value: &Value) {
+        let array = _value.as_array().unwrap();
+        assert_eq!(json_value_to_string(array[0].clone()), "Translate");
+        assert_eq!(array.len(), 4);
+
+        let floats: Vec<Float> = (&array.clone()[1..])
+            .into_iter()
+            .map(|v| json_value_to_string(v.clone()).parse::<Float>().unwrap())
+            .collect();
+
+        let translate_vector = Vector3f::new(floats[0], floats[1], floats[2]);
+
+        self.graphics_state.current_transform =
+            self.graphics_state.current_transform * Transform::translate(translate_vector);
+
+        println!("`Translate` parsed");
     }
 
     pub fn build_scene(&mut self) {
@@ -116,12 +138,13 @@ impl SceneBuilder {
         let mut integrator_idx = usize::MAX;
         let mut sampler_idx = usize::MAX;
 
+        let mut world_begin_idx = usize::MAX;
+
         for idx in 0.._token_length {
             let key = format!("token_{}", idx);
 
             let first_token = serde_json::to_string(&_tokens[key][0]).unwrap();
             let token_without_quote = trim_quote(first_token);
-
             match token_without_quote.as_ref() {
                 "LookAt" => {
                     look_at_idx = idx;
@@ -134,7 +157,6 @@ impl SceneBuilder {
                 "Film" => {
                     film_idx = idx;
                     println!("matched `Film`");
-                    self.parse_film(&_tokens[format!("token_{}", film_idx)]);
                 }
                 "Integrator" => {
                     integrator_idx = idx;
@@ -145,7 +167,8 @@ impl SceneBuilder {
                     println!("matched `Sampler`");
                 }
                 "WorldBegin" => {
-                    println!("before-world configuration parsing finished\n");
+                    world_begin_idx = idx;
+                    println!("before-world options parsing finished\n");
                     break;
                 }
                 _ => {
@@ -155,21 +178,52 @@ impl SceneBuilder {
         }
 
         self.parse_look_at(&_tokens[format!("token_{}", look_at_idx)]);
+        self.parse_film(&_tokens[format!("token_{}", film_idx)]);
+        // parse camera
+        // parse integrator
+        // parse sampler
 
-        self.parse_film(&_tokens[format!("token_{}", film_idx)])
+        println!("\n2nd part:");
+        for idx in (world_begin_idx + 1).._token_length {
+            let key = format!("token_{}", idx);
 
-        // build LookAt
-        // build Film
-        // build camera
-        // build integrator
-        // build sampler
+            let first_token = serde_json::to_string(&_tokens[key.clone()][0]).unwrap();
+            let token_without_quote = trim_quote(first_token);
+            //println!("{}", token_without_quote);
 
-        /*
-        println!("LookAt:     {}", &_tokens[format!("token_{}", look_at_idx)]);
-        println!("Film:       {}", &_tokens[format!("token_{}", film_idx)]);
-        println!("Camera:     {}", &_tokens[format!("token_{}", camera_idx)]);
-        println!("Integrator: {}", &_tokens[format!("token_{}", integrator_idx)]);
-        println!("Sampler:    {}", &_tokens[format!("token_{}", sampler_idx)]);
-        */
+            match token_without_quote.as_ref() {
+                "AttributeBegin" => {
+                    self.pushed_graphics_state.push(self.graphics_state.clone());
+                }
+
+                "AttributeEnd" => {
+                    match self.pushed_graphics_state.pop() {
+                        None => {
+                            panic!("Unmatched AttributeEnd encountered.");
+                        }
+                        Some(top_graphics_state) => {
+                            self.graphics_state = top_graphics_state;
+                        }
+                    };
+                }
+
+                "Translate" => {
+                    self.parse_translate(&_tokens[key]);
+
+                    process::exit(0x0100);
+                }
+
+                "AreaLightSource" => {
+                    println!("ignore `AreaLightSource`");
+                }
+
+                "Material" => {
+                    println!("ignore `Material`");
+                }
+                _ => {
+                    panic!("unknown token: {}", token_without_quote);
+                }
+            }
+        }
     }
 }
