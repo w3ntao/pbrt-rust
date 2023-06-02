@@ -1,3 +1,4 @@
+mod cameras;
 mod euclidean_geometry;
 mod pbrt;
 mod scene_parser;

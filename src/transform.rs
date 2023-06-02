@@ -15,6 +15,15 @@ impl Transform {
         };
     }
 
+    pub fn nan() -> Self {
+        let nan_matrix = SquareMatrix::<4>::nan();
+
+        return Transform {
+            matrix: nan_matrix,
+            inverted_matrix: nan_matrix,
+        };
+    }
+
     pub fn new(_matrix: SquareMatrix<4>) -> Self {
         return Transform {
             matrix: _matrix,
@@ -22,10 +31,17 @@ impl Transform {
         };
     }
 
-    pub fn new_with_inv(_matrix: SquareMatrix<4>, _inv_matrix: SquareMatrix<4>) -> Self {
+    pub fn new_with_inverse(_matrix: SquareMatrix<4>, _inv_matrix: SquareMatrix<4>) -> Self {
         return Transform {
             matrix: _matrix,
             inverted_matrix: _inv_matrix,
+        };
+    }
+
+    pub fn inverse(&self) -> Transform {
+        return Transform {
+            matrix: self.inverted_matrix,
+            inverted_matrix: self.matrix,
         };
     }
 

@@ -2,11 +2,11 @@ use crate::pbrt::*;
 use std::process;
 
 fn build_look_at_transform(pos: Point3f, look: Point3f, up: Vector3f) -> Transform {
-    let mut worldFromCamera = SquareMatrix::<4>::default();
-    worldFromCamera[0][3] = pos.x;
-    worldFromCamera[1][3] = pos.y;
-    worldFromCamera[2][3] = pos.z;
-    worldFromCamera[3][3] = 1.0;
+    let mut world_from_camera = SquareMatrix::<4>::default();
+    world_from_camera[0][3] = pos.x;
+    world_from_camera[1][3] = pos.y;
+    world_from_camera[2][3] = pos.z;
+    world_from_camera[3][3] = 1.0;
 
     let dir = (look - pos).normalize();
     if up.normalize().cross(&dir).length() == 0.0 {
@@ -16,21 +16,21 @@ fn build_look_at_transform(pos: Point3f, look: Point3f, up: Vector3f) -> Transfo
     let right = up.normalize().cross(&dir).normalize();
     let new_up = dir.cross(&right);
 
-    worldFromCamera[0][0] = right.x;
-    worldFromCamera[1][0] = right.y;
-    worldFromCamera[2][0] = right.z;
-    worldFromCamera[3][0] = 0.0;
-    worldFromCamera[0][1] = new_up.x;
-    worldFromCamera[1][1] = new_up.y;
-    worldFromCamera[2][1] = new_up.z;
-    worldFromCamera[3][1] = 0.0;
-    worldFromCamera[0][2] = dir.x;
-    worldFromCamera[1][2] = dir.y;
-    worldFromCamera[2][2] = dir.z;
-    worldFromCamera[3][2] = 0.0;
+    world_from_camera[0][0] = right.x;
+    world_from_camera[1][0] = right.y;
+    world_from_camera[2][0] = right.z;
+    world_from_camera[3][0] = 0.0;
+    world_from_camera[0][1] = new_up.x;
+    world_from_camera[1][1] = new_up.y;
+    world_from_camera[2][1] = new_up.z;
+    world_from_camera[3][1] = 0.0;
+    world_from_camera[0][2] = dir.x;
+    world_from_camera[1][2] = dir.y;
+    world_from_camera[2][2] = dir.z;
+    world_from_camera[3][2] = 0.0;
 
-    let cameraFromWorld = worldFromCamera.inverse();
-    return Transform::new_with_inv(cameraFromWorld, worldFromCamera);
+    let camera_from_world = world_from_camera.inverse();
+    return Transform::new_with_inverse(camera_from_world, world_from_camera);
 }
 
 fn parse_json(path: &str) -> Value {
@@ -60,6 +60,7 @@ pub struct SceneBuilder {
     file_path: String,
     graphics_state: GraphicsState,
     pushed_graphics_state: Vec<GraphicsState>,
+    named_coordinate_systems: HashMap<String, Transform>,
 }
 
 impl SceneBuilder {
@@ -68,6 +69,7 @@ impl SceneBuilder {
             file_path: _file_path.parse().unwrap(),
             graphics_state: GraphicsState::new(),
             pushed_graphics_state: Vec::new(),
+            named_coordinate_systems: HashMap::new(),
         };
     }
 }
@@ -100,14 +102,31 @@ impl SceneBuilder {
     }
 
     fn parse_film(&mut self, _value: &Value) {
-        println!("parsing Film");
-
         let array = _value.as_array().unwrap();
         assert_eq!(json_value_to_string(array[0].clone()), "Film");
 
-        let parameter_dict = ParameterDict::build_from_vec(&array[2..]);
+        let name = json_value_to_string(array[1].clone());
+        println!("parsing Film: {}", name);
 
+        let parameter_dict = ParameterDict::build_from_vec(&array[2..]);
         //parameter_dict.display();
+    }
+
+    fn parse_camera(&mut self, _value: &Value) {
+        let array = _value.as_array().unwrap();
+        assert_eq!(json_value_to_string(array[0].clone()), "Camera");
+
+        let name = json_value_to_string(array[1].clone());
+        println!("parsing Camera: {}", name);
+
+        let parameter_dict = ParameterDict::build_from_vec(&array[2..]);
+        //parameter_dict.display();
+
+        let camera_from_world = self.graphics_state.current_transform;
+        let world_from_camera = camera_from_world.inverse();
+
+        self.named_coordinate_systems
+            .insert(String::from("camera"), camera_from_world.inverse());
     }
 
     fn parse_translate(&mut self, _value: &Value) {
@@ -179,6 +198,8 @@ impl SceneBuilder {
 
         self.parse_look_at(&_tokens[format!("token_{}", look_at_idx)]);
         self.parse_film(&_tokens[format!("token_{}", film_idx)]);
+        self.parse_camera(&_tokens[format!("token_{}", camera_idx)]);
+
         // parse camera
         // parse integrator
         // parse sampler
