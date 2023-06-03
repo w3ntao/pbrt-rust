@@ -1,0 +1,27 @@
+name: build
+
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "*" ]
+  schedule:
+    - cron: "0 0 * * 0"
+    # runs on 00:00 every Sunday (UTC)
+    # 00:00 UTC = 08:00 Beijing
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-and-test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: build
+      run:
+        cargo build --release;
