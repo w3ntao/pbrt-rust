@@ -38,3 +38,17 @@ impl Sub<Point3f> for Point3f {
         };
     }
 }
+
+impl Div<Float> for Point3f {
+    type Output = Point3f;
+
+    fn div(self, rhs: Float) -> Self::Output {
+        let factor = 1.0 / rhs;
+
+        return Point3f {
+            x: self.x * factor,
+            y: self.y * factor,
+            z: self.z * factor,
+        };
+    }
+}

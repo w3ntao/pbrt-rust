@@ -66,3 +66,13 @@ impl Div<Float> for Vector3f {
         };
     }
 }
+
+impl From<Point3f> for Vector3f {
+    fn from(p: Point3f) -> Self {
+        Vector3f {
+            x: p.x,
+            y: p.y,
+            z: p.z,
+        }
+    }
+}

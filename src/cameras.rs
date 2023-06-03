@@ -11,8 +11,9 @@ impl CameraTransform {
             RenderingCoordinateSystem::Camera => _world_from_camera,
 
             RenderingCoordinateSystem::CameraWorld => {
-                //let pCamera = _world_from_camera(Point3f::new(0.0, 0.0, 0.0));
-                panic!("implementing");
+                let p_camera = _world_from_camera.on_point(Point3f::new(0.0, 0.0, 0.0));
+
+                Transform::translate(Vector3f::from(p_camera))
             }
 
             RenderingCoordinateSystem::World => Transform::identity(),

@@ -59,6 +59,31 @@ impl Transform {
             inverted_matrix: _inverted_matrix,
         };
     }
+
+    pub fn on_point(&self, p: Point3f) -> Point3f {
+        let xp = self.matrix[0][0] * p.x
+            + self.matrix[0][1] * p.y
+            + self.matrix[0][2] * p.z
+            + self.matrix[0][3];
+        let yp = self.matrix[1][0] * p.x
+            + self.matrix[1][1] * p.y
+            + self.matrix[1][2] * p.z
+            + self.matrix[1][3];
+        let zp = self.matrix[2][0] * p.x
+            + self.matrix[2][1] * p.y
+            + self.matrix[2][2] * p.z
+            + self.matrix[2][3];
+        let wp = self.matrix[3][0] * p.x
+            + self.matrix[3][1] * p.y
+            + self.matrix[3][2] * p.z
+            + self.matrix[3][3];
+
+        return if wp == 1.0 {
+            Point3f::new(xp, yp, zp)
+        } else {
+            Point3f::new(xp, yp, zp) / wp
+        };
+    }
 }
 
 impl Mul<Transform> for Transform {
