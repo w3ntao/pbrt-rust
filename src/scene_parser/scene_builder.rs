@@ -1,3 +1,4 @@
+use crate::pbrt::RenderingCoordinateSystem::Camera;
 use crate::pbrt::*;
 use std::process;
 
@@ -127,6 +128,11 @@ impl SceneBuilder {
 
         self.named_coordinate_systems
             .insert(String::from("camera"), camera_from_world.inverse());
+
+        let camera_transform =
+            CameraTransform::new(world_from_camera, RenderingCoordinateSystem::CameraWorld);
+
+        let camera = PerspectiveCamera::new(camera_transform);
     }
 
     fn parse_translate(&mut self, _value: &Value) {
