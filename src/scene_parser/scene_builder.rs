@@ -236,8 +236,6 @@ impl SceneBuilder {
 
                 "Translate" => {
                     self.parse_translate(&_tokens[key]);
-
-                    process::exit(0x0100);
                 }
 
                 "AreaLightSource" => {
@@ -247,8 +245,14 @@ impl SceneBuilder {
                 "Material" => {
                     println!("ignore `Material`");
                 }
+
+                "ReverseOrientation" => {
+                    self.graphics_state.reverse_orientation =
+                        !self.graphics_state.reverse_orientation;
+                }
+
                 _ => {
-                    panic!("unknown token: {}", token_without_quote);
+                    panic!("unknown token: `{}`", token_without_quote);
                 }
             }
         }
