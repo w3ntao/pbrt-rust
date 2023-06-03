@@ -1,5 +1,5 @@
 mod cameras;
-mod euclidean_geometry;
+mod math;
 mod pbrt;
 mod scene_parser;
 mod transform;

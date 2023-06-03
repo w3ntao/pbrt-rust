@@ -17,10 +17,10 @@ pub use std::mem::swap;
 pub use std::ops::{Add, Div, Index, IndexMut, Mul, Sub};
 
 pub use crate::cameras::*;
-pub use crate::euclidean_geometry::math::*;
-pub use crate::euclidean_geometry::point::*;
-pub use crate::euclidean_geometry::square_matrix::*;
-pub use crate::euclidean_geometry::vector::*;
+pub use crate::math::arithmatic::*;
+pub use crate::math::point::*;
+pub use crate::math::square_matrix::*;
+pub use crate::math::vector::*;
 pub use crate::scene_parser::parameter_dict::*;
 pub use crate::scene_parser::scene_builder::*;
 pub use crate::scene_parser::util::*;
