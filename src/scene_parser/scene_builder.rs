@@ -1,6 +1,4 @@
-use crate::pbrt::RenderingCoordinateSystem::Camera;
 use crate::pbrt::*;
-use std::process;
 
 fn build_look_at_transform(pos: Point3f, look: Point3f, up: Vector3f) -> Transform {
     let mut world_from_camera = SquareMatrix::<4>::default();
@@ -99,7 +97,7 @@ impl SceneBuilder {
         println!("transform LookAt built\n");
 
         self.graphics_state.current_transform =
-            self.graphics_state.current_transform.clone() * transform_look_at;
+            self.graphics_state.current_transform * transform_look_at;
     }
 
     fn parse_film(&mut self, _value: &Value) {
@@ -133,6 +131,15 @@ impl SceneBuilder {
             CameraTransform::new(world_from_camera, RenderingCoordinateSystem::CameraWorld);
 
         let camera = PerspectiveCamera::new(camera_transform);
+
+        /*
+        println!("renderFromCamera:");
+        camera.camera_transform.renderFromCamera.display();
+        println!("worldFromRender:");
+        camera.camera_transform.worldFromRender.display();
+        exit(0);
+
+         */
     }
 
     fn parse_translate(&mut self, _value: &Value) {
@@ -151,6 +158,15 @@ impl SceneBuilder {
             self.graphics_state.current_transform * Transform::translate(translate_vector);
 
         println!("`Translate` parsed");
+    }
+
+    fn parse_shape(&mut self, _value: &Value) {
+        let array = _value.as_array().unwrap();
+        assert_eq!(json_value_to_string(array[0].clone()), "Shape");
+
+        for v in array {
+            println!("{}", v);
+        }
     }
 
     pub fn build_scene(&mut self) {
@@ -206,6 +222,8 @@ impl SceneBuilder {
         self.parse_film(&_tokens[format!("token_{}", film_idx)]);
         self.parse_camera(&_tokens[format!("token_{}", camera_idx)]);
 
+        exit(0);
+
         // parse camera
         // parse integrator
         // parse sampler
@@ -249,6 +267,14 @@ impl SceneBuilder {
                 "ReverseOrientation" => {
                     self.graphics_state.reverse_orientation =
                         !self.graphics_state.reverse_orientation;
+                }
+
+                "Shape" => {
+                    self.parse_shape(&_tokens[key]);
+                }
+
+                "Texture" => {
+                    println!("ignore `Texture`");
                 }
 
                 _ => {

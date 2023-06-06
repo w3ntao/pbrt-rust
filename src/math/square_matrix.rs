@@ -110,6 +110,15 @@ impl<const N: usize> SquareMatrix<N> {
 
         return SquareMatrix::<N> { matrix: minv };
     }
+
+    pub fn display(&self) {
+        for y in 0..N {
+            for x in 0..N {
+                print!("{} ", self.matrix[y][x]);
+            }
+            println!();
+        }
+    }
 }
 
 impl<const N: usize> Index<usize> for SquareMatrix<N> {
@@ -132,6 +141,15 @@ impl Mul<SquareMatrix<4>> for SquareMatrix<4> {
         let mut product = SquareMatrix::<4>::zero();
         for x in 0..4 {
             for y in 0..4 {
+                let mut sum = 0.0;
+
+                let adds = self[x][1] * rhs[1][y];
+                let sum = fma(self[x][0], rhs[0][y], adds);
+                let error = fma(self[x][1], rhs[1][y], -adds);
+
+                let result = sum + error;
+
+                continue;
                 let mut sum = 0.0;
                 for loop_idx in 0..4 {
                     sum = fma(self[x][loop_idx], rhs[loop_idx][y], sum);

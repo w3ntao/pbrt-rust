@@ -15,9 +15,10 @@ pub use std::io::Read;
 pub use std::mem;
 pub use std::mem::swap;
 pub use std::ops::{Add, Div, Index, IndexMut, Mul, Sub};
+pub use std::process::exit;
 
 pub use crate::cameras::*;
-pub use crate::math::arithmatic::*;
+pub use crate::math::compensated_float::*;
 pub use crate::math::point::*;
 pub use crate::math::square_matrix::*;
 pub use crate::math::vector::*;

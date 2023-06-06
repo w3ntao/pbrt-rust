@@ -84,6 +84,12 @@ impl Transform {
             Point3f::new(xp, yp, zp) / wp
         };
     }
+
+    pub fn display(&self) {
+        self.matrix.display();
+        println!("inverted matrix:");
+        self.inverted_matrix.display();
+    }
 }
 
 impl Mul<Transform> for Transform {
