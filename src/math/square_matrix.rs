@@ -141,20 +141,11 @@ impl Mul<SquareMatrix<4>> for SquareMatrix<4> {
         let mut product = SquareMatrix::<4>::zero();
         for x in 0..4 {
             for y in 0..4 {
-                let mut sum = 0.0;
-
-                let adds = self[x][1] * rhs[1][y];
-                let sum = fma(self[x][0], rhs[0][y], adds);
-                let error = fma(self[x][1], rhs[1][y], -adds);
-
-                let result = sum + error;
-
-                continue;
-                let mut sum = 0.0;
-                for loop_idx in 0..4 {
-                    sum = fma(self[x][loop_idx], rhs[loop_idx][y], sum);
-                }
-                product[x][y] = sum;
+                let compensated_float = inner_product(
+                    &[self[x][0], self[x][1], self[x][2], self[x][3]],
+                    &[rhs[0][y], rhs[1][y], rhs[2][y], rhs[3][y]],
+                );
+                product[x][y] = compensated_float.eval();
             }
         }
 

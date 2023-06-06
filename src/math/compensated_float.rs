@@ -35,3 +35,22 @@ pub fn difference_of_products(a: Float, b: Float, c: Float, d: Float) -> Float {
     let error = fma(-c, d, cd);
     return difference_of_products + error;
 }
+
+pub fn inner_product(left: &[Float], right: &[Float]) -> CompensatedFloat {
+    let length = left.len();
+    assert_eq!(length, right.len());
+
+    fn _inner_product(left: &[Float], right: &[Float]) -> CompensatedFloat {
+        let ab = two_prod(left[0], right[0]);
+        if left.len() == 1 {
+            return ab;
+        }
+
+        let tp = _inner_product(&left[1..], &right[1..]);
+        let sum = two_sum(ab.value, tp.value);
+
+        return CompensatedFloat::new(sum.value, ab.error + (tp.error + sum.error));
+    }
+
+    return _inner_product(left, right);
+}
