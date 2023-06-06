@@ -36,18 +36,15 @@ impl CameraTransform {
 
 pub struct PerspectiveCamera {
     pub camera_transform: CameraTransform,
+    pub fov: Float,
 }
 
 impl PerspectiveCamera {
-    pub fn new(_camera_transform: CameraTransform) -> Self {
-        println!("PerspectiveCamera built");
-
-        println!("worldFromRender:");
-        _camera_transform.worldFromRender.display();
-        println!();
-
+    pub fn new(_camera_transform: CameraTransform, parameters: ParameterDict) -> Self {
+        let _fov = parameters.get_one_float("fov", 90.0);
         return PerspectiveCamera {
             camera_transform: _camera_transform,
+            fov: _fov,
         };
     }
 }

@@ -130,16 +130,13 @@ impl SceneBuilder {
         let camera_transform =
             CameraTransform::new(world_from_camera, RenderingCoordinateSystem::CameraWorld);
 
-        let camera = PerspectiveCamera::new(camera_transform);
-
-        /*
-        println!("renderFromCamera:");
-        camera.camera_transform.renderFromCamera.display();
-        println!("worldFromRender:");
-        camera.camera_transform.worldFromRender.display();
-        exit(0);
-
-         */
+        let camera = match name.as_str() {
+            "perspective" => PerspectiveCamera::new(camera_transform, parameter_dict),
+            _ => {
+                panic!("unknown camera type: `{}`", name);
+            }
+        };
+        println!("PerspectiveCamera built");
     }
 
     fn parse_translate(&mut self, _value: &Value) {

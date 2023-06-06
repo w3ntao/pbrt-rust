@@ -122,14 +122,14 @@ impl<const N: usize> SquareMatrix<N> {
 }
 
 impl<const N: usize> Index<usize> for SquareMatrix<N> {
-    type Output = [f32; N];
-    fn index(&self, idx: usize) -> &[f32; N] {
+    type Output = [Float; N];
+    fn index(&self, idx: usize) -> &[Float; N] {
         return &self.matrix[idx];
     }
 }
 
 impl<const N: usize> IndexMut<usize> for SquareMatrix<N> {
-    fn index_mut(&mut self, idx: usize) -> &mut [f32; N] {
+    fn index_mut(&mut self, idx: usize) -> &mut [Float; N] {
         return &mut self.matrix[idx];
     }
 }

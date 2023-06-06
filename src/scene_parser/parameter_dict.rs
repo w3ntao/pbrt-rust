@@ -64,7 +64,7 @@ impl ParameterDict {
                     _floats.insert(variable_name, values);
                 }
                 _ => {
-                    println!("duang");
+                    println!("unkown variable type: `{}`", variable_type);
                 }
             }
         }
@@ -86,6 +86,16 @@ impl ParameterDict {
 
     pub fn insert_string(&mut self, name: String, value: String) {
         self.strings.insert(name, value);
+    }
+
+    pub fn get_one_float(&self, key: &str, default: Float) -> Float {
+        return match self.floats.get(key) {
+            None => default,
+            Some(val) => {
+                assert_eq!(val.len(), 1);
+                val[0]
+            }
+        };
     }
 
     pub fn display(&self) {
