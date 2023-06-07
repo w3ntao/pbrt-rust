@@ -2,7 +2,6 @@ mod cameras;
 mod math;
 mod pbrt;
 mod scene_parser;
-mod transform;
 
 use crate::pbrt::*;
 

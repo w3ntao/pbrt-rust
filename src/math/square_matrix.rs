@@ -35,6 +35,10 @@ impl<const N: usize> SquareMatrix<N> {
         };
     }
 
+    pub fn new(values: [[Float; N]; N]) -> SquareMatrix<N> {
+        return SquareMatrix { matrix: values };
+    }
+
     pub fn inverse(&self) -> SquareMatrix<N> {
         let mut indxc = [0; N];
         let mut indxr = [0; N];
@@ -114,7 +118,7 @@ impl<const N: usize> SquareMatrix<N> {
     pub fn display(&self) {
         for y in 0..N {
             for x in 0..N {
-                print!("{} ", self.matrix[y][x]);
+                print!("{:.4} ", self.matrix[y][x]);
             }
             println!();
         }

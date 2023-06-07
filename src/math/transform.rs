@@ -27,7 +27,7 @@ impl Transform {
     pub fn new(_matrix: SquareMatrix<4>) -> Self {
         return Transform {
             matrix: _matrix,
-            inverted_matrix: SquareMatrix::<4>::nan(),
+            inverted_matrix: _matrix.inverse(),
         };
     }
 
@@ -45,19 +45,63 @@ impl Transform {
         };
     }
 
-    pub fn translate(delta: Vector3f) -> Self {
-        let mut _matrix = SquareMatrix::<4>::identity();
-        let mut _inverted_matrix = _matrix.clone();
+    pub fn translate(x: Float, y: Float, z: Float) -> Self {
+        let _matrix = SquareMatrix::new([
+            [1.0, 0.0, 0.0, x],
+            [0.0, 1.0, 0.0, y],
+            [0.0, 0.0, 1.0, z],
+            [0.0, 0.0, 0.0, 1.0],
+        ]);
 
-        for idx in 0..3 {
-            _matrix[idx][3] += delta[idx];
-            _inverted_matrix[idx][3] -= delta[idx];
-        }
+        let _inverted_matrix = SquareMatrix::new([
+            [1.0, 0.0, 0.0, -x],
+            [0.0, 1.0, 0.0, -y],
+            [0.0, 0.0, 1.0, -z],
+            [0.0, 0.0, 0.0, 1.0],
+        ]);
 
         return Transform {
             matrix: _matrix,
             inverted_matrix: _inverted_matrix,
         };
+    }
+
+    pub fn scale(x: Float, y: Float, z: Float) -> Transform {
+        let _matrix = SquareMatrix::<4>::new([
+            [x, 0.0, 0.0, 0.0],
+            [0.0, y, 0.0, 0.0],
+            [0.0, 0.0, z, 0.0],
+            [0.0, 0.0, 0.0, 1.0],
+        ]);
+
+        let _inverted_matrix = SquareMatrix::<4>::new([
+            [1.0 / x, 0.0, 0.0, 0.0],
+            [0.0, 1.0 / y, 0.0, 0.0],
+            [0.0, 0.0, 1.0 / z, 0.0],
+            [0.0, 0.0, 0.0, 1.0],
+        ]);
+
+        return Transform {
+            matrix: _matrix,
+            inverted_matrix: _inverted_matrix,
+        };
+    }
+
+    pub fn perspective(fov: Float, z_near: Float, z_far: Float) -> Transform {
+        let persp = SquareMatrix::<4>::new([
+            [1.0, 0.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0, 0.0],
+            [
+                0.0,
+                0.0,
+                z_far / (z_far - z_near),
+                -z_far * z_near / (z_far - z_near),
+            ],
+            [0.0, 0.0, 1.0, 0.0],
+        ]);
+
+        let invTanAng = 1.0 / (degree_to_radian(fov) / 2.0).tan();
+        return Transform::scale(invTanAng, invTanAng, 1.0) * Transform::new(persp);
     }
 
     pub fn on_point(&self, p: Point3f) -> Point3f {

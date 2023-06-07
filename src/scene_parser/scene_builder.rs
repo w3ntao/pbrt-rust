@@ -149,10 +149,8 @@ impl SceneBuilder {
             .map(|v| json_value_to_string(v.clone()).parse::<Float>().unwrap())
             .collect();
 
-        let translate_vector = Vector3f::new(floats[0], floats[1], floats[2]);
-
-        self.graphics_state.current_transform =
-            self.graphics_state.current_transform * Transform::translate(translate_vector);
+        self.graphics_state.current_transform = self.graphics_state.current_transform
+            * Transform::translate(floats[0], floats[1], floats[2]);
 
         println!("`Translate` parsed");
     }

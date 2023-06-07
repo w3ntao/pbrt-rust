@@ -1,16 +1,32 @@
 use crate::pbrt::*;
 
-pub struct Point2<T> {
-    pub x: T,
-    pub y: T,
+#[derive(Copy, Clone)]
+pub struct Point2f {
+    pub x: Float,
+    pub y: Float,
 }
 
-impl<T> Point2<T> {
-    pub fn new(_x: T, _y: T) -> Point2<T> {
-        return Point2 { x: _x, y: _y };
+impl Point2f {
+    pub fn new(_x: Float, _y: Float) -> Point2f {
+        return Point2f { x: _x, y: _y };
+    }
+
+    pub fn min(&self, rhs: &Point2f) -> Point2f {
+        return Point2f {
+            x: self.x.min(rhs.x),
+            y: self.y.min(rhs.y),
+        };
+    }
+
+    pub fn max(&self, rhs: &Point2f) -> Point2f {
+        return Point2f {
+            x: self.x.max(rhs.x),
+            y: self.y.max(rhs.y),
+        };
     }
 }
 
+#[derive(Copy, Clone)]
 pub struct Point3f {
     pub x: Float,
     pub y: Float,

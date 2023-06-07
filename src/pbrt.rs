@@ -1,6 +1,9 @@
 pub type Float = f32;
 // pub type Float = f64;
 
+pub const X_RESOLUTION: i32 = 1368;
+pub const Y_RESOLUTION: i32 = 1026;
+
 pub enum RenderingCoordinateSystem {
     Camera,
     CameraWorld,
@@ -18,13 +21,12 @@ pub use std::ops::{Add, Div, Index, IndexMut, Mul, Sub};
 pub use std::process::exit;
 
 pub use crate::cameras::*;
+pub use crate::math::arithmetic::*;
 pub use crate::math::compensated_float::*;
 pub use crate::math::point::*;
 pub use crate::math::square_matrix::*;
+pub use crate::math::transform::*;
 pub use crate::math::vector::*;
 pub use crate::scene_parser::parameter_dict::*;
 pub use crate::scene_parser::scene_builder::*;
 pub use crate::scene_parser::util::*;
-pub use crate::transform::*;
-
-pub type Point2f = Point2<Float>;
