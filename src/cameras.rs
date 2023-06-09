@@ -83,8 +83,6 @@ impl PerspectiveCamera {
         let _cameraFromRaster = _screenFromCamera.inverse() * _screenFromRaster;
         // cameraFromRaster verified
 
-        // TODO: progress: 2023/06/07
-
         return PerspectiveCamera {
             camera_transform: _camera_transform,
             rasterFromScreen: _rasterFromScreen,

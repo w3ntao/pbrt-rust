@@ -21,6 +21,7 @@ pub use std::ops::{Add, Div, Index, IndexMut, Mul, Sub};
 pub use std::process::exit;
 
 pub use crate::cameras::*;
+pub use crate::film::*;
 pub use crate::math::arithmetic::*;
 pub use crate::math::compensated_float::*;
 pub use crate::math::point::*;

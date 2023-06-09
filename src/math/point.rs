@@ -1,6 +1,18 @@
 use crate::pbrt::*;
 
 #[derive(Copy, Clone)]
+pub struct Point2i {
+    pub x: i32,
+    pub y: i32,
+}
+
+impl Point2i {
+    pub fn new(_x: i32, _y: i32) -> Point2i {
+        return Point2i { x: _x, y: _y };
+    }
+}
+
+#[derive(Copy, Clone)]
 pub struct Point2f {
     pub x: Float,
     pub y: Float,

@@ -108,7 +108,20 @@ impl SceneBuilder {
         println!("parsing Film: {}", name);
 
         let parameter_dict = ParameterDict::build_from_vec(&array[2..]);
-        //parameter_dict.display();
+        parameter_dict.display();
+
+        /*
+        match name.as_str() {
+            "rgb" => {
+                //let film = Film::new
+            }
+
+            &_ => {
+                panic!("unknown Film name: `{}`", name);
+            }
+        };
+        exit(0);
+        */
     }
 
     fn parse_camera(&mut self, _value: &Value) {
@@ -164,6 +177,12 @@ impl SceneBuilder {
         }
     }
 
+    fn parse_world_begin(&mut self, _value: &Value) {
+        self.graphics_state.current_transform = Transform::identity();
+        self.named_coordinate_systems
+            .insert(String::from("world"), self.graphics_state.current_transform);
+    }
+
     pub fn build_scene(&mut self) {
         let _tokens = parse_json(self.file_path.as_ref());
         let _token_length = json_value_to_usize(_tokens["length"].clone());
@@ -204,6 +223,7 @@ impl SceneBuilder {
                 }
                 "WorldBegin" => {
                     world_begin_idx = idx;
+
                     println!("before-world options parsing finished\n");
                     break;
                 }
@@ -216,6 +236,7 @@ impl SceneBuilder {
         self.parse_look_at(&_tokens[format!("token_{}", look_at_idx)]);
         self.parse_film(&_tokens[format!("token_{}", film_idx)]);
         self.parse_camera(&_tokens[format!("token_{}", camera_idx)]);
+        self.parse_world_begin(&_tokens[format!("token_{}", world_begin_idx)]);
 
         exit(0);
 
