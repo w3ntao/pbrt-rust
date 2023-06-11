@@ -1,6 +1,7 @@
 use crate::pbrt::*;
 
-pub struct Film {
+pub struct SimpleRGBFilm {
     pub resolution: Point2i,
     pub filename: String,
+    pub filter: BoxFilter,
 }

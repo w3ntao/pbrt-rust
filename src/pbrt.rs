@@ -22,7 +22,9 @@ pub use std::process::exit;
 
 pub use crate::cameras::*;
 pub use crate::film::*;
+pub use crate::filter::*;
 pub use crate::math::arithmetic::*;
+pub use crate::math::bounds::*;
 pub use crate::math::compensated_float::*;
 pub use crate::math::point::*;
 pub use crate::math::square_matrix::*;

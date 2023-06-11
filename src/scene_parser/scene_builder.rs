@@ -124,7 +124,7 @@ impl SceneBuilder {
         */
     }
 
-    fn parse_camera(&mut self, _value: &Value) {
+    fn parse_camera(&mut self, _value: &Value) -> PerspectiveCamera {
         let array = _value.as_array().unwrap();
         assert_eq!(json_value_to_string(array[0].clone()), "Camera");
 
@@ -143,13 +143,15 @@ impl SceneBuilder {
         let camera_transform =
             CameraTransform::new(world_from_camera, RenderingCoordinateSystem::CameraWorld);
 
-        let camera = match name.as_str() {
-            "perspective" => PerspectiveCamera::new(camera_transform, parameter_dict),
+        return match name.as_str() {
+            "perspective" => {
+                println!("PerspectiveCamera built");
+                PerspectiveCamera::new(camera_transform, parameter_dict)
+            }
             _ => {
                 panic!("unknown camera type: `{}`", name);
             }
         };
-        println!("PerspectiveCamera built");
     }
 
     fn parse_translate(&mut self, _value: &Value) {
@@ -188,12 +190,13 @@ impl SceneBuilder {
         let _token_length = json_value_to_usize(_tokens["length"].clone());
 
         let mut look_at_idx = usize::MAX;
-        let mut camera_idx = usize::MAX;
-        let mut film_idx = usize::MAX;
         let mut integrator_idx = usize::MAX;
         let mut sampler_idx = usize::MAX;
 
         let mut world_begin_idx = usize::MAX;
+
+        let mut optional_camera: Option<PerspectiveCamera> = None;
+        let mut optional_filter: Option<BoxFilter> = None;
 
         for idx in 0.._token_length {
             let key = format!("token_{}", idx);
@@ -206,12 +209,16 @@ impl SceneBuilder {
                     println!("matched `LookAt`");
                 }
                 "Camera" => {
-                    camera_idx = idx;
                     println!("matched `Camera`");
+                    optional_camera = Some(self.parse_camera(&_tokens[format!("token_{}", idx)]));
                 }
                 "Film" => {
-                    film_idx = idx;
                     println!("matched `Film`");
+                    self.parse_film(&_tokens[format!("token_{}", idx)]);
+                }
+                "Filter" => {
+                    println!("matched `Filter`");
+                    panic!("implement me");
                 }
                 "Integrator" => {
                     integrator_idx = idx;
@@ -234,9 +241,19 @@ impl SceneBuilder {
         }
 
         self.parse_look_at(&_tokens[format!("token_{}", look_at_idx)]);
-        self.parse_film(&_tokens[format!("token_{}", film_idx)]);
-        self.parse_camera(&_tokens[format!("token_{}", camera_idx)]);
         self.parse_world_begin(&_tokens[format!("token_{}", world_begin_idx)]);
+
+        let filter = match optional_filter {
+            None => BoxFilter::new(0.5),
+            Some(_filter) => _filter,
+        };
+
+        let camera = match optional_camera {
+            None => {
+                panic!("implement me");
+            }
+            Some(_camera) => _camera,
+        };
 
         exit(0);
 
