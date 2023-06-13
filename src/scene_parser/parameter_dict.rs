@@ -88,13 +88,44 @@ impl ParameterDict {
         self.strings.insert(name, value);
     }
 
-    pub fn get_one_float(&self, key: &str, default: Float) -> Float {
+    pub fn get_one_float_with_default(&self, key: &str, default: Float) -> Float {
         return match self.floats.get(key) {
             None => default,
             Some(val) => {
                 assert_eq!(val.len(), 1);
                 val[0]
             }
+        };
+    }
+
+    pub fn get_one_integer_with_default(&self, key: &str, default: i32) -> i32 {
+        return match self.integers.get(key) {
+            None => default,
+            Some(val) => {
+                assert_eq!(val.len(), 1);
+                val[0]
+            }
+        };
+    }
+
+    pub fn get_one_integer_or_panic(&self, key: &str) -> i32 {
+        return match self.integers.get(key) {
+            None => {
+                panic!("found no key with name `{}`", key);
+            }
+            Some(val) => {
+                assert_eq!(val.len(), 1);
+                val[0]
+            }
+        };
+    }
+
+    pub fn get_string_or_panic(&self, key: &str) -> String {
+        return match self.strings.get(key) {
+            None => {
+                panic!("found no key with name `{}`", key);
+            }
+            Some(val) => val.clone(),
         };
     }
 

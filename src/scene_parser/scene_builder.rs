@@ -100,7 +100,7 @@ impl SceneBuilder {
             self.graphics_state.current_transform * transform_look_at;
     }
 
-    fn parse_film(&mut self, _value: &Value) {
+    fn parse_film(&mut self, _value: &Value, _filter: &BoxFilter) -> SimpleRGBFilm {
         let array = _value.as_array().unwrap();
         assert_eq!(json_value_to_string(array[0].clone()), "Film");
 
@@ -108,23 +108,26 @@ impl SceneBuilder {
         println!("parsing Film: {}", name);
 
         let parameter_dict = ParameterDict::build_from_vec(&array[2..]);
-        parameter_dict.display();
+        //parameter_dict.display();
 
-        /*
+        let xresolution = parameter_dict.get_one_integer_or_panic("xresolution");
+        let yresolution = parameter_dict.get_one_integer_or_panic("yresolution");
+
+        let resolution = Point2i::new(xresolution, yresolution);
+        let filename = parameter_dict.get_string_or_panic("filename");
+
         match name.as_str() {
             "rgb" => {
-                //let film = Film::new
+                return SimpleRGBFilm::new(resolution, &filename, _filter.clone());
             }
 
             &_ => {
                 panic!("unknown Film name: `{}`", name);
             }
         };
-        exit(0);
-        */
     }
 
-    fn parse_camera(&mut self, _value: &Value) -> PerspectiveCamera {
+    fn parse_camera(&mut self, _value: &Value, film: SimpleRGBFilm) -> PerspectiveCamera {
         let array = _value.as_array().unwrap();
         assert_eq!(json_value_to_string(array[0].clone()), "Camera");
 
@@ -192,10 +195,11 @@ impl SceneBuilder {
         let mut look_at_idx = usize::MAX;
         let mut integrator_idx = usize::MAX;
         let mut sampler_idx = usize::MAX;
-
+        let mut filter_idx = usize::MAX;
+        let mut film_idx = usize::MAX;
+        let mut camera_idx = usize::MAX;
         let mut world_begin_idx = usize::MAX;
 
-        let mut optional_camera: Option<PerspectiveCamera> = None;
         let mut optional_filter: Option<BoxFilter> = None;
 
         for idx in 0.._token_length {
@@ -210,11 +214,11 @@ impl SceneBuilder {
                 }
                 "Camera" => {
                     println!("matched `Camera`");
-                    optional_camera = Some(self.parse_camera(&_tokens[format!("token_{}", idx)]));
+                    camera_idx = idx;
                 }
                 "Film" => {
                     println!("matched `Film`");
-                    self.parse_film(&_tokens[format!("token_{}", idx)]);
+                    film_idx = idx;
                 }
                 "Filter" => {
                     println!("matched `Filter`");
@@ -241,25 +245,17 @@ impl SceneBuilder {
         }
 
         self.parse_look_at(&_tokens[format!("token_{}", look_at_idx)]);
-        self.parse_world_begin(&_tokens[format!("token_{}", world_begin_idx)]);
 
         let filter = match optional_filter {
             None => BoxFilter::new(0.5),
             Some(_filter) => _filter,
         };
 
-        let camera = match optional_camera {
-            None => {
-                panic!("implement me");
-            }
-            Some(_camera) => _camera,
-        };
+        let film = self.parse_film(&_tokens[format!("token_{}", film_idx)], &filter);
 
-        exit(0);
+        let camera = self.parse_camera(&_tokens[format!("token_{}", camera_idx)], film.clone());
 
-        // parse camera
-        // parse integrator
-        // parse sampler
+        self.parse_world_begin(&_tokens[format!("token_{}", world_begin_idx)]);
 
         println!("\n2nd part:");
         for idx in (world_begin_idx + 1).._token_length {

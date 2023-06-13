@@ -5,6 +5,7 @@ pub struct PixelSample {
     pub weight: Float,
 }
 
+#[derive(Copy, Clone)]
 pub struct BoxFilter {
     pub radius: Float,
 }

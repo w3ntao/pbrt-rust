@@ -47,7 +47,7 @@ pub struct PerspectiveCamera {
 
 impl PerspectiveCamera {
     pub fn new(_camera_transform: CameraTransform, parameters: ParameterDict) -> Self {
-        let _fov = parameters.get_one_float("fov", 90.0);
+        let _fov = parameters.get_one_float_with_default("fov", 90.0);
 
         let frame_aspect_ratio = (X_RESOLUTION as Float) / (Y_RESOLUTION as Float);
 
