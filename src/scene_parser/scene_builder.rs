@@ -100,7 +100,7 @@ impl SceneBuilder {
             self.graphics_state.current_transform * transform_look_at;
     }
 
-    fn parse_film(&mut self, _value: &Value, _filter: &BoxFilter) -> SimpleRGBFilm {
+    fn parse_film(&mut self, _value: &Value, _filter: Arc<BoxFilter>) -> SimpleRGBFilm {
         let array = _value.as_array().unwrap();
         assert_eq!(json_value_to_string(array[0].clone()), "Film");
 
@@ -118,7 +118,7 @@ impl SceneBuilder {
 
         match name.as_str() {
             "rgb" => {
-                return SimpleRGBFilm::new(resolution, &filename, _filter.clone());
+                return SimpleRGBFilm::new(resolution, &filename, _filter);
             }
 
             &_ => {
@@ -127,7 +127,11 @@ impl SceneBuilder {
         };
     }
 
-    fn parse_camera(&mut self, _value: &Value, film: SimpleRGBFilm) -> PerspectiveCamera {
+    fn parse_camera(
+        &mut self,
+        _value: &Value,
+        film: Arc<Mutex<SimpleRGBFilm>>,
+    ) -> PerspectiveCamera {
         let array = _value.as_array().unwrap();
         assert_eq!(json_value_to_string(array[0].clone()), "Camera");
 
@@ -149,7 +153,7 @@ impl SceneBuilder {
         return match name.as_str() {
             "perspective" => {
                 println!("PerspectiveCamera built");
-                PerspectiveCamera::new(camera_transform, parameter_dict)
+                PerspectiveCamera::new(camera_transform, parameter_dict, film)
             }
             _ => {
                 panic!("unknown camera type: `{}`", name);
@@ -246,14 +250,18 @@ impl SceneBuilder {
 
         self.parse_look_at(&_tokens[format!("token_{}", look_at_idx)]);
 
-        let filter = match optional_filter {
+        let filter = Arc::new(match optional_filter {
             None => BoxFilter::new(0.5),
             Some(_filter) => _filter,
-        };
+        });
 
-        let film = self.parse_film(&_tokens[format!("token_{}", film_idx)], &filter);
+        let film = self.parse_film(&_tokens[format!("token_{}", film_idx)], filter.clone());
+        let shared_film = Arc::new(Mutex::new(film));
 
-        let camera = self.parse_camera(&_tokens[format!("token_{}", camera_idx)], film.clone());
+        let camera = self.parse_camera(
+            &_tokens[format!("token_{}", camera_idx)],
+            shared_film.clone(),
+        );
 
         self.parse_world_begin(&_tokens[format!("token_{}", world_begin_idx)]);
 

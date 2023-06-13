@@ -19,6 +19,8 @@ pub use std::mem;
 pub use std::mem::swap;
 pub use std::ops::{Add, Div, Index, IndexMut, Mul, Sub};
 pub use std::process::exit;
+pub use std::sync::Arc;
+pub use std::sync::Mutex;
 
 pub use crate::cameras::*;
 pub use crate::film::*;

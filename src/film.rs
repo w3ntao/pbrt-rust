@@ -4,15 +4,19 @@ use crate::pbrt::*;
 pub struct SimpleRGBFilm {
     pub resolution: Point2i,
     pub filename: String,
-    pub filter: BoxFilter,
+    pub filter: Arc<BoxFilter>,
 }
 
 impl SimpleRGBFilm {
-    pub fn new(_resolution: Point2i, _filename: &String, _filter: BoxFilter) -> Self {
+    pub fn new(_resolution: Point2i, _filename: &String, _filter: Arc<BoxFilter>) -> Self {
         return SimpleRGBFilm {
             resolution: _resolution,
             filename: _filename.clone(),
-            filter: _filter,
+            filter: _filter.clone(),
         };
+    }
+
+    pub fn add_sample(&self) {
+        panic!("implement me");
     }
 }

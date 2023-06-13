@@ -1,6 +1,4 @@
-use crate::math::bounds::Bounds2f;
 use crate::pbrt::*;
-use std::iter::Flatten;
 
 pub struct CameraTransform {
     pub renderFromCamera: Transform,
@@ -43,10 +41,19 @@ pub struct PerspectiveCamera {
     pub cameraFromRaster: Transform,
     pub rasterFromScreen: Transform,
     pub screenFromRaster: Transform,
+
+    pub dxCamera: Vector3f,
+    pub dyCamera: Vector3f,
+
+    pub film: Arc<Mutex<SimpleRGBFilm>>,
 }
 
 impl PerspectiveCamera {
-    pub fn new(_camera_transform: CameraTransform, parameters: ParameterDict) -> Self {
+    pub fn new(
+        camera_transform: CameraTransform,
+        parameters: ParameterDict,
+        film: Arc<Mutex<SimpleRGBFilm>>,
+    ) -> Self {
         let _fov = parameters.get_one_float_with_default("fov", 90.0);
 
         let frame_aspect_ratio = (X_RESOLUTION as Float) / (Y_RESOLUTION as Float);
@@ -72,23 +79,39 @@ impl PerspectiveCamera {
 
         let rasterFromNDC = Transform::scale(X_RESOLUTION as Float, -Y_RESOLUTION as Float, 1.0);
 
-        let _rasterFromScreen = rasterFromNDC * NDCFromScreen;
+        let rasterFromScreen = rasterFromNDC * NDCFromScreen;
         // rasterFromScreen verified
 
-        let _screenFromRaster = _rasterFromScreen.inverse();
+        let screenFromRaster = rasterFromScreen.inverse();
 
-        let _screenFromCamera = Transform::perspective(_fov, 1e-2, 1000.0);
+        let screenFromCamera = Transform::perspective(_fov, 1e-2, 1000.0);
         // screenFromCamera verified
 
-        let _cameraFromRaster = _screenFromCamera.inverse() * _screenFromRaster;
+        let cameraFromRaster = screenFromCamera.inverse() * screenFromRaster;
         // cameraFromRaster verified
 
+        let dxCamera = cameraFromRaster.on_point(Point3f::new(1.0, 0.0, 0.0))
+            - cameraFromRaster.on_point(Point3f::new(0.0, 0.0, 0.0));
+
+        let dyCamera = cameraFromRaster.on_point(Point3f::new(0.0, 1.0, 0.0))
+            - cameraFromRaster.on_point(Point3f::new(0.0, 0.0, 0.0));
+
         return PerspectiveCamera {
-            camera_transform: _camera_transform,
-            rasterFromScreen: _rasterFromScreen,
-            screenFromRaster: _screenFromRaster,
-            screenFromCamera: _screenFromCamera,
-            cameraFromRaster: _cameraFromRaster,
+            camera_transform,
+            rasterFromScreen,
+            screenFromRaster,
+            screenFromCamera,
+            cameraFromRaster,
+            dxCamera,
+            dyCamera,
+            film,
         };
+    }
+
+    pub fn sample(&self) {
+        self.film
+            .lock()
+            .expect("fail to unlock camera.film")
+            .add_sample();
     }
 }
