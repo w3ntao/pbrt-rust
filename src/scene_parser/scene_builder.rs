@@ -262,6 +262,13 @@ impl SceneBuilder {
             &_tokens[format!("token_{}", camera_idx)],
             shared_film.clone(),
         );
+        let shared_camera = Arc::new(camera);
+
+        let sampler = SimpleSampler::new();
+        let shared_sampler = Arc::new(sampler);
+
+        let integrator = SimpleIntegrator::new(shared_camera.clone(), shared_sampler.clone());
+        // TODO: wentao: 2023/06/14 progress
 
         self.parse_world_begin(&_tokens[format!("token_{}", world_begin_idx)]);
 

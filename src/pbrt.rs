@@ -22,9 +22,11 @@ pub use std::process::exit;
 pub use std::sync::Arc;
 pub use std::sync::Mutex;
 
-pub use crate::cameras::*;
-pub use crate::film::*;
-pub use crate::filter::*;
+pub use crate::base::cameras::*;
+pub use crate::base::film::*;
+pub use crate::base::filter::*;
+pub use crate::base::integrator::*;
+pub use crate::base::sampler::*;
 pub use crate::math::arithmetic::*;
 pub use crate::math::bounds::*;
 pub use crate::math::compensated_float::*;

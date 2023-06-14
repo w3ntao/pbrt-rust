@@ -1,6 +1,4 @@
-mod cameras;
-mod film;
-mod filter;
+mod base;
 mod math;
 mod pbrt;
 mod scene_parser;
