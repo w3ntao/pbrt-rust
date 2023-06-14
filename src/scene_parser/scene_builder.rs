@@ -60,6 +60,8 @@ pub struct SceneBuilder {
     graphics_state: GraphicsState,
     pushed_graphics_state: Vec<GraphicsState>,
     named_coordinate_systems: HashMap<String, Transform>,
+    renderFromWorld: Transform,
+    shapes: Vec<Triangle>,
 }
 
 impl SceneBuilder {
@@ -69,11 +71,15 @@ impl SceneBuilder {
             graphics_state: GraphicsState::new(),
             pushed_graphics_state: Vec::new(),
             named_coordinate_systems: HashMap::new(),
+            renderFromWorld: Transform::identity(),
+            shapes: vec![],
         };
     }
-}
 
-impl SceneBuilder {
+    fn RenderFromObject(&self) -> Transform {
+        return self.renderFromWorld * self.graphics_state.current_transform;
+    }
+
     fn parse_look_at(&mut self, _value: &Value) {
         println!("parsing LookAt");
         let array = _value.as_array().unwrap();
@@ -150,6 +156,8 @@ impl SceneBuilder {
         let camera_transform =
             CameraTransform::new(world_from_camera, RenderingCoordinateSystem::CameraWorld);
 
+        self.renderFromWorld = camera_transform.RenderFromWorld();
+
         return match name.as_str() {
             "perspective" => {
                 println!("PerspectiveCamera built");
@@ -181,9 +189,42 @@ impl SceneBuilder {
         let array = _value.as_array().unwrap();
         assert_eq!(json_value_to_string(array[0].clone()), "Shape");
 
-        for v in array {
-            println!("{}", v);
-        }
+        let parameter_dict = ParameterDict::build_from_vec(&array[2..]);
+
+        let renderFromObject = self.RenderFromObject();
+        let objectFromRenderer = renderFromObject.inverse();
+
+        let name = json_value_to_string(array[1].clone());
+        match name.as_str() {
+            "trianglemesh" => {
+                let indices = parameter_dict.get_integer_array("indices");
+                let mut points = parameter_dict.get_point3_array("P");
+
+                if !renderFromObject.is_identity() {
+                    for p in &mut points {
+                        *p = renderFromObject.on_point(*p);
+                    }
+                }
+
+                // TODO: 2023/06/20 progress
+                // TODO: points' coord matched !
+
+                let mut triangles = build_triangles(points, indices);
+                let length = triangles.len();
+                self.shapes.append(&mut triangles);
+
+                println!(
+                    "{} triangles appended, {} in total",
+                    length,
+                    self.shapes.len()
+                );
+            }
+            _ => {
+                panic!("unknown Shape name: `{}`", name);
+            }
+        };
+
+        //parameter_dict.display();
     }
 
     fn parse_world_begin(&mut self, _value: &Value) {
@@ -268,7 +309,6 @@ impl SceneBuilder {
         let shared_sampler = Arc::new(sampler);
 
         let integrator = SimpleIntegrator::new(shared_camera.clone(), shared_sampler.clone());
-        // TODO: wentao: 2023/06/14 progress
 
         self.parse_world_begin(&_tokens[format!("token_{}", world_begin_idx)]);
 

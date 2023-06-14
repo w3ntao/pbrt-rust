@@ -15,6 +15,10 @@ impl Transform {
         };
     }
 
+    pub fn is_identity(&self) -> bool {
+        return self.matrix.is_identity() && self.inverted_matrix.is_identity();
+    }
+
     pub fn nan() -> Self {
         let nan_matrix = SquareMatrix::<4>::nan();
 

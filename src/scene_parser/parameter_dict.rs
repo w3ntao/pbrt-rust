@@ -4,6 +4,8 @@ pub struct ParameterDict {
     integers: HashMap<String, Vec<i32>>,
     floats: HashMap<String, Vec<Float>>,
     strings: HashMap<String, String>,
+    point2s: HashMap<String, Vec<Point2f>>,
+    point3s: HashMap<String, Vec<Point3f>>,
 }
 
 impl Default for ParameterDict {
@@ -12,6 +14,8 @@ impl Default for ParameterDict {
             integers: HashMap::new(),
             floats: HashMap::new(),
             strings: HashMap::new(),
+            point2s: HashMap::new(),
+            point3s: HashMap::new(),
         };
     }
 }
@@ -24,7 +28,6 @@ fn split_variable_type_name(token: String) -> (String, String) {
 }
 
 fn fetch_variable_value(value: &Value) -> Vec<String> {
-    //let value_vec = (value.as_array().unwrap()).clone();
     return value
         .as_array()
         .unwrap()
@@ -33,11 +36,35 @@ fn fetch_variable_value(value: &Value) -> Vec<String> {
         .collect();
 }
 
+fn _print<T: std::fmt::Display>(hashmap: &HashMap<String, Vec<T>>) {
+    for (k, values) in hashmap {
+        print!("{} -> ", k);
+        print!("[ ");
+        for v in values {
+            print!("{} ", v);
+        }
+        print!("]\n");
+    }
+    println!();
+}
+
+fn convert_string<T: FromStr>(string_vec: &Vec<String>) -> Vec<T>
+where
+    <T as FromStr>::Err: Debug,
+{
+    return string_vec
+        .into_iter()
+        .map(|x| x.parse::<T>().unwrap())
+        .collect::<Vec<T>>();
+}
+
 impl ParameterDict {
     pub fn build_from_vec(array: &[Value]) -> Self {
-        let mut _integers = HashMap::<String, Vec<i32>>::new();
-        let mut _floats = HashMap::<String, Vec<Float>>::new();
-        let mut _strings = HashMap::<String, String>::new();
+        let mut integers = HashMap::<String, Vec<i32>>::new();
+        let mut floats = HashMap::<String, Vec<Float>>::new();
+        let mut strings = HashMap::<String, String>::new();
+        let mut point2s = HashMap::<String, Vec<Point2f>>::new();
+        let mut point3s = HashMap::<String, Vec<Point3f>>::new();
 
         for idx in (0..array.len()).step_by(2) {
             let token = trim_quote(json_value_to_string(array[idx].clone()));
@@ -47,32 +74,48 @@ impl ParameterDict {
             match variable_type.as_str() {
                 "string" => {
                     assert_eq!(variable_values.len(), 1);
-                    _strings.insert(variable_name, variable_values[0].clone());
+                    strings.insert(variable_name, variable_values[0].clone());
                 }
                 "integer" => {
-                    let values = variable_values
-                        .into_iter()
-                        .map(|x| x.parse::<i32>().unwrap())
-                        .collect::<Vec<i32>>();
-                    _integers.insert(variable_name, values);
+                    integers.insert(variable_name, convert_string::<i32>(&variable_values));
                 }
                 "float" => {
-                    let values = variable_values
-                        .into_iter()
-                        .map(|x| x.parse::<Float>().unwrap())
-                        .collect::<Vec<Float>>();
-                    _floats.insert(variable_name, values);
+                    floats.insert(variable_name, convert_string::<Float>(&variable_values));
+                }
+                "point2" => {
+                    let float_numbers = convert_string::<Float>(&variable_values);
+
+                    let mut point_set = vec![];
+                    for idx in (0..float_numbers.len()).step_by(2) {
+                        point_set.push(Point2f::new(float_numbers[idx], float_numbers[idx + 1]));
+                    }
+                    point2s.insert(variable_name, point_set);
+                }
+                "point3" => {
+                    let float_numbers = convert_string::<Float>(&variable_values);
+
+                    let mut point_set = vec![];
+                    for idx in (0..float_numbers.len()).step_by(3) {
+                        point_set.push(Point3f::new(
+                            float_numbers[idx],
+                            float_numbers[idx + 1],
+                            float_numbers[idx + 2],
+                        ));
+                    }
+                    point3s.insert(variable_name, point_set);
                 }
                 _ => {
-                    println!("unkown variable type: `{}`", variable_type);
+                    panic!("unknown variable type: `{}`", variable_type);
                 }
             }
         }
 
         return ParameterDict {
-            integers: _integers,
-            floats: _floats,
-            strings: _strings,
+            integers,
+            floats,
+            strings,
+            point2s,
+            point3s,
         };
     }
 
@@ -120,6 +163,24 @@ impl ParameterDict {
         };
     }
 
+    pub fn get_integer_array(&self, key: &str) -> Vec<i32> {
+        return match self.integers.get(key) {
+            None => {
+                panic!("found no key with name `{}`", key);
+            }
+            Some(val) => val.clone(),
+        };
+    }
+
+    pub fn get_point3_array(&self, key: &str) -> Vec<Point3f> {
+        return match self.point3s.get(key) {
+            None => {
+                panic!("found no key with name `{}`", key);
+            }
+            Some(val) => val.clone(),
+        };
+    }
+
     pub fn get_string_or_panic(&self, key: &str) -> String {
         return match self.strings.get(key) {
             None => {
@@ -137,25 +198,15 @@ impl ParameterDict {
         println!();
 
         println!("integers: {}", self.integers.len());
-        for (k, values) in &self.integers {
-            print!("{} -> ", k);
-            print!("[ ");
-            for v in values {
-                print!("{} ", v);
-            }
-            print!("]\n");
-        }
-        println!();
+        _print(&self.integers);
 
         println!("floats: {}", self.floats.len());
-        for (k, values) in &self.floats {
-            print!("{} -> ", k);
-            print!("[ ");
-            for v in values {
-                print!("{} ", v);
-            }
-            print!("]\n");
-        }
-        println!();
+        _print(&self.floats);
+
+        println!("point2s: {}", self.point2s.len());
+        _print(&self.point2s);
+
+        println!("point3s: {}", self.point3s.len());
+        _print(&self.point3s);
     }
 }

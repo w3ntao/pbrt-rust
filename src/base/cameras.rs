@@ -1,8 +1,8 @@
 use crate::pbrt::*;
 
 pub struct CameraTransform {
-    pub renderFromCamera: Transform,
-    pub worldFromRender: Transform,
+    renderFromCamera: Transform,
+    worldFromRender: Transform,
 }
 
 impl CameraTransform {
@@ -31,6 +31,14 @@ impl CameraTransform {
             worldFromRender: _worldFromRender,
             renderFromCamera: _renderFromCamera,
         };
+    }
+
+    pub fn RenderFromWorld(&self) -> Transform {
+        return self.worldFromRender.inverse();
+    }
+
+    pub fn CameraFromWorld(&self) -> Transform {
+        return (self.worldFromRender * self.renderFromCamera).inverse();
     }
 }
 

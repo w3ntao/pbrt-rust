@@ -39,6 +39,24 @@ impl<const N: usize> SquareMatrix<N> {
         return SquareMatrix { matrix: values };
     }
 
+    pub fn is_identity(&self) -> bool {
+        for y in 0..N {
+            for x in 0..N {
+                if x == y {
+                    if self[y][x] != 1.0 {
+                        return false;
+                    }
+                } else {
+                    if self[y][x] != 0.0 {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
     pub fn inverse(&self) -> SquareMatrix<N> {
         let mut indxc = [0; N];
         let mut indxr = [0; N];

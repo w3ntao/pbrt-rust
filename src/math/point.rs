@@ -38,11 +38,23 @@ impl Point2f {
     }
 }
 
+impl std::fmt::Display for Point2f {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "({}, {})", self.x, self.y)
+    }
+}
+
 #[derive(Copy, Clone)]
 pub struct Point3f {
     pub x: Float,
     pub y: Float,
     pub z: Float,
+}
+
+impl std::fmt::Display for Point3f {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "({}, {}, {})", self.x, self.y, self.z)
+    }
 }
 
 impl Point3f {

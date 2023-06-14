@@ -13,12 +13,14 @@ pub enum RenderingCoordinateSystem {
 pub use fma::fma;
 pub use serde_json::Value;
 pub use std::collections::HashMap;
+pub use std::fmt::Debug;
 pub use std::fs::File;
 pub use std::io::Read;
 pub use std::mem;
 pub use std::mem::swap;
 pub use std::ops::{Add, Div, Index, IndexMut, Mul, Sub};
 pub use std::process::exit;
+pub use std::str::FromStr;
 pub use std::sync::Arc;
 pub use std::sync::Mutex;
 
@@ -37,3 +39,4 @@ pub use crate::math::vector::*;
 pub use crate::scene_parser::parameter_dict::*;
 pub use crate::scene_parser::scene_builder::*;
 pub use crate::scene_parser::util::*;
+pub use crate::shapes::triangle::*;
