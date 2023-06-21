@@ -16,6 +16,7 @@ impl TriangleMesh {
     }
 }
 
+#[derive(Clone)]
 pub struct Triangle {
     idx: usize,
     mesh: Arc<TriangleMesh>,

@@ -1,12 +1,9 @@
 use crate::pbrt::*;
 
-pub struct SimpleIntegrator {
-    camera: Arc<PerspectiveCamera>,
-    sampler: Arc<SimpleSampler>,
-}
+pub struct SimpleIntegrator {}
 
 impl SimpleIntegrator {
-    pub fn new(camera: Arc<PerspectiveCamera>, sampler: Arc<SimpleSampler>) -> Self {
-        return SimpleIntegrator { camera, sampler };
+    pub fn new() -> Self {
+        return SimpleIntegrator {};
     }
 }

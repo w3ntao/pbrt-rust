@@ -35,5 +35,6 @@ fn main() {
     //json_hello_world();
 
     let mut builder = SceneBuilder::new("killeroo-floor.json");
-    builder.build_scene();
+    let mut scene = builder.build_scene();
+    scene.render();
 }

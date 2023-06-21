@@ -40,6 +40,31 @@ fn parse_json(path: &str) -> Value {
     return serde_json::from_str(&data).expect("JSON was not well-formatted");
 }
 
+pub struct Scene {
+    integrator: Arc<SimpleIntegrator>,
+    camera: Arc<Mutex<PerspectiveCamera>>,
+    sampler: Arc<SimpleSampler>,
+    shapes: Vec<Triangle>,
+}
+
+impl Scene {
+    pub fn new(
+        integrator: Arc<SimpleIntegrator>,
+        camera: Arc<Mutex<PerspectiveCamera>>,
+        sampler: Arc<SimpleSampler>,
+        shapes: Vec<Triangle>,
+    ) -> Self {
+        return Scene {
+            integrator,
+            camera,
+            sampler,
+            shapes,
+        };
+    }
+
+    pub fn render(&mut self) {}
+}
+
 #[derive(Copy, Clone)]
 struct GraphicsState {
     current_transform: Transform,
@@ -233,14 +258,13 @@ impl SceneBuilder {
             .insert(String::from("world"), self.graphics_state.current_transform);
     }
 
-    pub fn build_scene(&mut self) {
+    pub fn build_scene(&mut self) -> Scene {
         let _tokens = parse_json(self.file_path.as_ref());
         let _token_length = json_value_to_usize(_tokens["length"].clone());
 
         let mut look_at_idx = usize::MAX;
         let mut integrator_idx = usize::MAX;
         let mut sampler_idx = usize::MAX;
-        let mut filter_idx = usize::MAX;
         let mut film_idx = usize::MAX;
         let mut camera_idx = usize::MAX;
         let mut world_begin_idx = usize::MAX;
@@ -303,12 +327,12 @@ impl SceneBuilder {
             &_tokens[format!("token_{}", camera_idx)],
             shared_film.clone(),
         );
-        let shared_camera = Arc::new(camera);
+        let shared_camera = Arc::new(Mutex::new(camera));
 
         let sampler = SimpleSampler::new();
         let shared_sampler = Arc::new(sampler);
 
-        let integrator = SimpleIntegrator::new(shared_camera.clone(), shared_sampler.clone());
+        let integrator = Arc::new(SimpleIntegrator::new());
 
         self.parse_world_begin(&_tokens[format!("token_{}", world_begin_idx)]);
 
@@ -366,5 +390,12 @@ impl SceneBuilder {
                 }
             }
         }
+
+        return Scene::new(
+            integrator.clone(),
+            shared_camera.clone(),
+            shared_sampler.clone(),
+            self.shapes.clone(),
+        );
     }
 }
