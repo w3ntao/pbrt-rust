@@ -42,6 +42,35 @@ impl CameraTransform {
     }
 }
 
+pub struct CameraSample {
+    pFilm: Point2f,
+    pLens: Point2f,
+    filterWeight: Float,
+}
+
+impl CameraSample {
+    pub fn new(pFilm: Point2f, pLens: Point2f, filterWeight: Float) -> Self {
+        return CameraSample {
+            pFilm,
+            pLens,
+            filterWeight,
+        };
+    }
+}
+
+pub fn get_camera_sample(
+    sampler: &mut SimpleSampler,
+    pPixel: Point2i,
+    filter: Arc<BoxFilter>,
+) -> CameraSample {
+    let fs = filter.sample(sampler.get_pixel_2d());
+    return CameraSample::new(
+        Point2f::from(pPixel) + fs.p + Vector2f::new(0.5, 0.5),
+        sampler.get_2d(),
+        1.0,
+    );
+}
+
 pub struct PerspectiveCamera {
     pub camera_transform: CameraTransform,
 
@@ -114,6 +143,13 @@ impl PerspectiveCamera {
             dyCamera,
             film,
         };
+    }
+
+    pub fn generate_camera_ray(&self, sample: CameraSample) {
+        let pFilm = Point3f::new(sample.pFilm.x, sample.pFilm.y, 0.0);
+        let pCamera = self.cameraFromRaster.on_point(pFilm);
+
+        // TODO: 06/26 implementing
     }
 
     pub fn sample(&self) {

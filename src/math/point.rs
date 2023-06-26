@@ -6,16 +6,16 @@ pub struct Point2i {
     pub y: i32,
 }
 
-impl Point2i {
-    pub fn new(_x: i32, _y: i32) -> Point2i {
-        return Point2i { x: _x, y: _y };
-    }
-}
-
 #[derive(Copy, Clone)]
 pub struct Point2f {
     pub x: Float,
     pub y: Float,
+}
+
+impl Point2i {
+    pub fn new(_x: i32, _y: i32) -> Point2i {
+        return Point2i { x: _x, y: _y };
+    }
 }
 
 impl Point2f {
@@ -34,6 +34,37 @@ impl Point2f {
         return Point2f {
             x: self.x.max(rhs.x),
             y: self.y.max(rhs.y),
+        };
+    }
+}
+
+impl From<Point2i> for Point2f {
+    fn from(value: Point2i) -> Self {
+        return Point2f {
+            x: value.x as Float,
+            y: value.y as Float,
+        };
+    }
+}
+
+impl Add<Point2f> for Point2f {
+    type Output = Point2f;
+
+    fn add(self, rhs: Point2f) -> Self::Output {
+        return Point2f {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+        };
+    }
+}
+
+impl Add<Vector2f> for Point2f {
+    type Output = Point2f;
+
+    fn add(self, rhs: Vector2f) -> Self::Output {
+        return Point2f {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
         };
     }
 }

@@ -44,6 +44,7 @@ pub struct Scene {
     integrator: Arc<SimpleIntegrator>,
     camera: Arc<Mutex<PerspectiveCamera>>,
     sampler: Arc<SimpleSampler>,
+    filter: Arc<BoxFilter>,
     shapes: Vec<Triangle>,
 }
 
@@ -52,17 +53,31 @@ impl Scene {
         integrator: Arc<SimpleIntegrator>,
         camera: Arc<Mutex<PerspectiveCamera>>,
         sampler: Arc<SimpleSampler>,
+        filter: Arc<BoxFilter>,
         shapes: Vec<Triangle>,
     ) -> Self {
         return Scene {
             integrator,
             camera,
             sampler,
+            filter,
             shapes,
         };
     }
 
-    pub fn render(&mut self) {}
+    pub fn render(&mut self) {
+        let resolution = self.camera.lock().unwrap().film.lock().unwrap().resolution;
+
+        for y in 0..resolution.y {
+            for x in 0..resolution.x {
+                let pixel = Point2i::new(x, y);
+
+                //let camera_sample =
+            }
+        }
+
+        //let pixel_bounds = Bounds
+    }
 }
 
 #[derive(Copy, Clone)]
@@ -231,9 +246,6 @@ impl SceneBuilder {
                     }
                 }
 
-                // TODO: 2023/06/20 progress
-                // TODO: points' coord matched !
-
                 let mut triangles = build_triangles(points, indices);
                 let length = triangles.len();
                 self.shapes.append(&mut triangles);
@@ -332,6 +344,8 @@ impl SceneBuilder {
         let sampler = SimpleSampler::new();
         let shared_sampler = Arc::new(sampler);
 
+        let filter = Arc::new(BoxFilter::new(0.5));
+
         let integrator = Arc::new(SimpleIntegrator::new());
 
         self.parse_world_begin(&_tokens[format!("token_{}", world_begin_idx)]);
@@ -395,6 +409,7 @@ impl SceneBuilder {
             integrator.clone(),
             shared_camera.clone(),
             shared_sampler.clone(),
+            filter.clone(),
             self.shapes.clone(),
         );
     }

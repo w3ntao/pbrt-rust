@@ -1,6 +1,18 @@
 use crate::pbrt::*;
 
 #[derive(Copy, Clone)]
+pub struct Vector2f {
+    pub x: Float,
+    pub y: Float,
+}
+
+impl Vector2f {
+    pub fn new(x: Float, y: Float) -> Self {
+        return Vector2f { x, y };
+    }
+}
+
+#[derive(Copy, Clone)]
 pub struct Vector3f {
     pub x: Float,
     pub y: Float,
