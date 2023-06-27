@@ -1,0 +1,60 @@
+use crate::pbrt::*;
+
+const MACHINE_EPSILON: Float = Float::EPSILON * 0.5;
+
+const fn compute_gamma(n: usize) -> Float {
+    let float_n = n as Float;
+    return (float_n * MACHINE_EPSILON) / (1.0 - float_n * MACHINE_EPSILON);
+}
+
+pub const GAMMA: [Float; 128] = {
+    let mut seq = [Float::NAN; 128];
+    let mut i = 0;
+    while i < 128 {
+        seq[i] = compute_gamma(i);
+        i += 1;
+    }
+    seq
+};
+
+pub fn next_float_up(v: Float) -> Float {
+    if v.is_infinite() && v > 0.0 {
+        return v;
+    }
+
+    let adjusted_v = if v == -0.0 { 0.0 } else { v };
+    let bits = adjusted_v.to_bits();
+
+    return Float::from_bits(if adjusted_v >= 0.0 {
+        bits + 1
+    } else {
+        bits - 1
+    });
+}
+
+pub fn next_float_down(v: Float) -> Float {
+    if v.is_infinite() && v < 0.0 {
+        return v;
+    }
+
+    let adjusted_v = if v == 0.0 { -0.0 } else { v };
+    let bits = adjusted_v.to_bits();
+
+    return Float::from_bits(if adjusted_v > 0.0 { bits - 1 } else { bits + 1 });
+}
+
+pub fn add_round_up(a: Float, b: Float) -> Float {
+    return next_float_up(a + b);
+}
+
+pub fn add_round_down(a: Float, b: Float) -> Float {
+    return next_float_down(a + b);
+}
+
+pub fn sub_round_up(a: Float, b: Float) -> Float {
+    return add_round_up(a, -b);
+}
+
+pub fn sub_round_down(a: Float, b: Float) -> Float {
+    return add_round_down(a, -b);
+}

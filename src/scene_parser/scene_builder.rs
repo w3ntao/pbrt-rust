@@ -242,7 +242,7 @@ impl SceneBuilder {
 
                 if !renderFromObject.is_identity() {
                     for p in &mut points {
-                        *p = renderFromObject.on_point(*p);
+                        *p = renderFromObject.on_point3f(*p);
                     }
                 }
 

@@ -108,7 +108,7 @@ impl Transform {
         return Transform::scale(invTanAng, invTanAng, 1.0) * Transform::new(persp);
     }
 
-    pub fn on_point(&self, p: Point3f) -> Point3f {
+    pub fn on_point3f(&self, p: Point3f) -> Point3f {
         let xp = self.matrix[0][0] * p.x
             + self.matrix[0][1] * p.y
             + self.matrix[0][2] * p.z
@@ -133,7 +133,11 @@ impl Transform {
         };
     }
 
-    pub fn on_vector(&self, v: Vector3f) -> Vector3f {
+    pub fn on_point3fi(&self, p: Point3fi) -> Point3fi {
+        return Point3fi::from(self.on_vector3fi(Vector3fi::from(p)));
+    }
+
+    pub fn on_vector3f(&self, v: Vector3f) -> Vector3f {
         let m = self.matrix;
         return Vector3f::new(
             m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z,
@@ -142,11 +146,55 @@ impl Transform {
         );
     }
 
-    pub fn on_ray(&self, r: Ray) -> Ray {
-        let o = self.on_point(r.o);
-        let d = self.on_vector(r.d);
+    pub fn on_vector3fi(&self, v: Vector3fi) -> Vector3fi {
+        let x = v.x.midpoint();
+        let y = v.y.midpoint();
+        let z = v.z.midpoint();
 
-        panic!("duang");
+        let m = self.matrix;
+
+        let (v_out_error_x, v_out_error_y, v_out_error_z) = if v.is_exact() {
+            (
+                GAMMA[3] * ((m[0][0] * x).abs() + (m[0][1] * y).abs() + (m[0][2] * z).abs()),
+                GAMMA[3] * ((m[1][0] * x).abs() + (m[1][1] * y).abs() + (m[1][2] * z).abs()),
+                GAMMA[3] * ((m[2][0] * x).abs() + (m[2][1] * y).abs() + (m[2][2] * z).abs()),
+            )
+        } else {
+            let vInError = v.error();
+            (
+                (GAMMA[3] + 1.0)
+                    * (m[0][0].abs() * vInError.x
+                        + m[0][1].abs() * vInError.y
+                        + m[0][2].abs() * vInError.z)
+                    + GAMMA[3] * ((m[0][0] * x).abs() + (m[0][1] * y).abs() + (m[0][2] * z).abs()),
+                (GAMMA[3] + 1.0)
+                    * (m[1][0].abs() * vInError.x
+                        + m[1][1].abs() * vInError.y
+                        + m[1][2].abs() * vInError.z)
+                    + GAMMA[3] * ((m[1][0] * x).abs() + (m[1][1] * y).abs() + (m[1][2] * z).abs()),
+                (GAMMA[3] + 1.0)
+                    * (m[2][0].abs() * vInError.x
+                        + m[2][1].abs() * vInError.y
+                        + m[2][2].abs() * vInError.z)
+                    + GAMMA[3] * ((m[2][0] * x).abs() + (m[2][1] * y).abs() + (m[2][2] * z).abs()),
+            )
+        };
+
+        let vOutError = Vector3f::new(v_out_error_x, v_out_error_y, v_out_error_z);
+
+        let xp = m[0][0] * x + m[0][1] * y + m[0][2] * z;
+        let yp = m[1][0] * x + m[1][1] * y + m[1][2] * z;
+        let zp = m[2][0] * x + m[2][1] * y + m[2][2] * z;
+
+        return Vector3fi::new_with_error(Vector3f::new(xp, yp, zp), vOutError);
+    }
+
+    pub fn on_ray(&self, r: Ray) -> Ray {
+        let o = self.on_point3fi(Point3fi::from(r.o));
+        let d = self.on_vector3f(r.d);
+
+        // TODO: 06/28 progress
+        panic!("implementing");
     }
 
     pub fn on_ray_with_error(&self, r: Ray) -> (Ray, Float) {

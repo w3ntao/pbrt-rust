@@ -12,7 +12,7 @@ impl CameraTransform {
 
             RenderingCoordinateSystem::CameraWorld => {
                 // the default option
-                let p_camera = _world_from_camera.on_point(Point3f::new(0.0, 0.0, 0.0));
+                let p_camera = _world_from_camera.on_point3f(Point3f::new(0.0, 0.0, 0.0));
 
                 Transform::translate(p_camera.x, p_camera.y, p_camera.z)
             }
@@ -129,11 +129,11 @@ impl PerspectiveCamera {
         let cameraFromRaster = screenFromCamera.inverse() * screenFromRaster;
         // cameraFromRaster verified
 
-        let dxCamera = cameraFromRaster.on_point(Point3f::new(1.0, 0.0, 0.0))
-            - cameraFromRaster.on_point(Point3f::new(0.0, 0.0, 0.0));
+        let dxCamera = cameraFromRaster.on_point3f(Point3f::new(1.0, 0.0, 0.0))
+            - cameraFromRaster.on_point3f(Point3f::new(0.0, 0.0, 0.0));
 
-        let dyCamera = cameraFromRaster.on_point(Point3f::new(0.0, 1.0, 0.0))
-            - cameraFromRaster.on_point(Point3f::new(0.0, 0.0, 0.0));
+        let dyCamera = cameraFromRaster.on_point3f(Point3f::new(0.0, 1.0, 0.0))
+            - cameraFromRaster.on_point3f(Point3f::new(0.0, 0.0, 0.0));
 
         return PerspectiveCamera {
             camera_transform,
@@ -148,9 +148,9 @@ impl PerspectiveCamera {
         };
     }
 
-    pub fn generate_camera_ray(&self, sample: CameraSample) {
+    pub fn generate_camera_ray(&self, sample: CameraSample) -> Ray {
         let pFilm = Point3f::new(sample.pFilm.x, sample.pFilm.y, 0.0);
-        let pCamera = self.cameraFromRaster.on_point(pFilm);
+        let pCamera = self.cameraFromRaster.on_point3f(pFilm);
 
         let ray = Ray::new(
             Point3f::new(0.0, 0.0, 0.0),
@@ -160,6 +160,8 @@ impl PerspectiveCamera {
         if self.lens_radius > 0.0 {
             panic!("not yet implemented");
         }
+
+        return self.camera_transform.renderFromCamera.on_ray(ray);
 
         // TODO: CameraRay not implemented
         // TODO: wentao: 06/27 progress

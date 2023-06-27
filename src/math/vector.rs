@@ -20,6 +20,26 @@ pub struct Vector3<T: Numerical> {
     pub z: T,
 }
 
+impl<T: Numerical> From<Point3<T>> for Vector3<T> {
+    fn from(p: Point3<T>) -> Self {
+        return Self {
+            x: p.x,
+            y: p.y,
+            z: p.z,
+        };
+    }
+}
+
+impl From<Point3<Float>> for Vector3<Interval> {
+    fn from(value: Point3<Float>) -> Self {
+        return Vector3::<Interval>::new(
+            Interval::new(value.x),
+            Interval::new(value.y),
+            Interval::new(value.z),
+        );
+    }
+}
+
 impl<T: Numerical> Vector3<T> {
     pub fn new(x: T, y: T, z: T) -> Self {
         return Self { x, y, z };
@@ -48,12 +68,24 @@ impl Vector3<Float> {
     }
 }
 
-impl<T: Numerical> From<Point3<T>> for Vector3<T> {
-    fn from(p: Point3<T>) -> Self {
-        return Self {
-            x: p.x,
-            y: p.y,
-            z: p.z,
+impl Vector3<Interval> {
+    pub fn new_with_error(v: Vector3f, error: Vector3f) -> Self {
+        return Vector3fi {
+            x: Interval::from_value_and_error(v.x, error.x),
+            y: Interval::from_value_and_error(v.y, error.y),
+            z: Interval::from_value_and_error(v.z, error.z),
+        };
+    }
+
+    pub fn is_exact(&self) -> bool {
+        return self.x.width() == 0.0 && self.y.width() == 0.0 && self.z.width() == 0.0;
+    }
+
+    pub fn error(&self) -> Vector3<Float> {
+        return Vector3::<Float> {
+            x: self.x.width() / 2.0,
+            y: self.y.width() / 2.0,
+            z: self.z.width() / 2.0,
         };
     }
 }

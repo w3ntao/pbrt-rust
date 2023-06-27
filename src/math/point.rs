@@ -13,6 +13,38 @@ impl<T: Numerical> Point2<T> {
     }
 }
 
+impl From<Point2<i32>> for Point2<Float> {
+    fn from(value: Point2<i32>) -> Self {
+        return Self {
+            x: value.x as Float,
+            y: value.y as Float,
+        };
+    }
+}
+
+#[derive(Copy, Clone)]
+pub struct Point3<T> {
+    pub x: T,
+    pub y: T,
+    pub z: T,
+}
+
+impl From<Point3<Float>> for Point3<Interval> {
+    fn from(value: Point3<Float>) -> Self {
+        return Point3::<Interval>::new(
+            Interval::new(value.x),
+            Interval::new(value.y),
+            Interval::new(value.z),
+        );
+    }
+}
+
+impl From<Vector3<Interval>> for Point3<Interval> {
+    fn from(value: Vector3<Interval>) -> Self {
+        return Point3::<Interval>::new(value.x, value.y, value.z);
+    }
+}
+
 impl Point2<Float> {
     pub fn min(&self, rhs: &Point2<Float>) -> Point2<Float> {
         return Point2::<Float> {
@@ -32,15 +64,6 @@ impl Point2<Float> {
 impl<T: Numerical + Display> Display for Point2<T> {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         write!(f, "({}, {})", self.x, self.y)
-    }
-}
-
-impl From<Point2<i32>> for Point2<Float> {
-    fn from(value: Point2<i32>) -> Self {
-        return Self {
-            x: value.x as Float,
-            y: value.y as Float,
-        };
     }
 }
 
@@ -64,13 +87,6 @@ impl<T: Add<Output = T> + Numerical> Add<Vector2<T>> for Point2<T> {
             y: self.y + rhs.y,
         };
     }
-}
-
-#[derive(Copy, Clone)]
-pub struct Point3<T> {
-    pub x: T,
-    pub y: T,
-    pub z: T,
 }
 
 impl<T> Point3<T> {
