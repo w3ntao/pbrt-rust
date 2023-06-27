@@ -82,6 +82,8 @@ pub struct PerspectiveCamera {
     pub dxCamera: Vector3f,
     pub dyCamera: Vector3f,
 
+    pub lens_radius: Float,
+
     pub film: Arc<Mutex<SimpleRGBFilm>>,
 }
 
@@ -142,6 +144,7 @@ impl PerspectiveCamera {
             dxCamera,
             dyCamera,
             film,
+            lens_radius: 0.0,
         };
     }
 
@@ -149,7 +152,18 @@ impl PerspectiveCamera {
         let pFilm = Point3f::new(sample.pFilm.x, sample.pFilm.y, 0.0);
         let pCamera = self.cameraFromRaster.on_point(pFilm);
 
-        // TODO: 06/26 implementing
+        let ray = Ray::new(
+            Point3f::new(0.0, 0.0, 0.0),
+            Vector3f::from(pCamera).normalize(),
+        );
+
+        if self.lens_radius > 0.0 {
+            panic!("not yet implemented");
+        }
+
+        // TODO: CameraRay not implemented
+        // TODO: wentao: 06/27 progress
+        //self.camera_transform.renderFromCamera.on_point()
     }
 
     pub fn sample(&self) {

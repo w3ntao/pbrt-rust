@@ -36,7 +36,7 @@ fn fetch_variable_value(value: &Value) -> Vec<String> {
         .collect();
 }
 
-fn _print<T: std::fmt::Display>(hashmap: &HashMap<String, Vec<T>>) {
+fn _print<T: Display>(hashmap: &HashMap<String, Vec<T>>) {
     for (k, values) in hashmap {
         print!("{} -> ", k);
         print!("[ ");
@@ -191,6 +191,8 @@ impl ParameterDict {
     }
 
     pub fn display(&self) {
+        panic!("not implemented");
+
         println!("strings: {}", self.strings.len());
         for (k, v) in &self.strings {
             println!("{} -> {}", k, v);

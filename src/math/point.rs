@@ -1,108 +1,101 @@
+use crate::math::vector::*;
 use crate::pbrt::*;
 
 #[derive(Copy, Clone)]
-pub struct Point2i {
-    pub x: i32,
-    pub y: i32,
+pub struct Point2<T: Numerical> {
+    pub x: T,
+    pub y: T,
 }
 
-#[derive(Copy, Clone)]
-pub struct Point2f {
-    pub x: Float,
-    pub y: Float,
-}
-
-impl Point2i {
-    pub fn new(_x: i32, _y: i32) -> Point2i {
-        return Point2i { x: _x, y: _y };
+impl<T: Numerical> Point2<T> {
+    pub fn new(x: T, y: T) -> Self {
+        return Point2::<T> { x, y };
     }
 }
 
-impl Point2f {
-    pub fn new(_x: Float, _y: Float) -> Point2f {
-        return Point2f { x: _x, y: _y };
-    }
-
-    pub fn min(&self, rhs: &Point2f) -> Point2f {
-        return Point2f {
+impl Point2<Float> {
+    pub fn min(&self, rhs: &Point2<Float>) -> Point2<Float> {
+        return Point2::<Float> {
             x: self.x.min(rhs.x),
             y: self.y.min(rhs.y),
         };
     }
 
-    pub fn max(&self, rhs: &Point2f) -> Point2f {
-        return Point2f {
+    pub fn max(&self, rhs: &Point2<Float>) -> Point2<Float> {
+        return Point2::<Float> {
             x: self.x.max(rhs.x),
             y: self.y.max(rhs.y),
         };
     }
 }
 
-impl From<Point2i> for Point2f {
-    fn from(value: Point2i) -> Self {
-        return Point2f {
+impl<T: Numerical + Display> Display for Point2<T> {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "({}, {})", self.x, self.y)
+    }
+}
+
+impl From<Point2<i32>> for Point2<Float> {
+    fn from(value: Point2<i32>) -> Self {
+        return Self {
             x: value.x as Float,
             y: value.y as Float,
         };
     }
 }
 
-impl Add<Point2f> for Point2f {
-    type Output = Point2f;
+impl<T: Add<Output = T> + Numerical> Add<Point2<T>> for Point2<T> {
+    type Output = Point2<T>;
 
-    fn add(self, rhs: Point2f) -> Self::Output {
-        return Point2f {
+    fn add(self, rhs: Point2<T>) -> Self::Output {
+        return Point2::<T> {
             x: self.x + rhs.x,
             y: self.y + rhs.y,
         };
     }
 }
 
-impl Add<Vector2f> for Point2f {
-    type Output = Point2f;
+impl<T: Add<Output = T> + Numerical> Add<Vector2<T>> for Point2<T> {
+    type Output = Point2<T>;
 
-    fn add(self, rhs: Vector2f) -> Self::Output {
-        return Point2f {
+    fn add(self, rhs: Vector2<T>) -> Self::Output {
+        return Point2::<T> {
             x: self.x + rhs.x,
             y: self.y + rhs.y,
         };
-    }
-}
-
-impl std::fmt::Display for Point2f {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "({}, {})", self.x, self.y)
     }
 }
 
 #[derive(Copy, Clone)]
-pub struct Point3f {
-    pub x: Float,
-    pub y: Float,
-    pub z: Float,
+pub struct Point3<T> {
+    pub x: T,
+    pub y: T,
+    pub z: T,
 }
 
-impl std::fmt::Display for Point3f {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "({}, {}, {})", self.x, self.y, self.z)
+impl<T> Point3<T> {
+    pub fn new(x: T, y: T, z: T) -> Self {
+        return Point3::<T> { x, y, z };
     }
 }
 
-impl Point3f {
-    pub fn new(_x: Float, _y: Float, _z: Float) -> Point3f {
-        return Point3f {
-            x: _x,
-            y: _y,
-            z: _z,
+impl<T: Add<Output = T>> Add<Point3<T>> for Point3<T> {
+    type Output = Point3<T>;
+
+    fn add(self, rhs: Point3<T>) -> Self::Output {
+        return Point3::<T> {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z,
         };
     }
 }
 
-impl Sub<Point3f> for Point3f {
-    type Output = Vector3f;
+impl<T: Sub<Output = T> + Numerical> Sub<Point3<T>> for Point3<T> {
+    type Output = Vector3<T>;
 
-    fn sub(self, rhs: Point3f) -> Self::Output {
-        return Vector3f {
+    fn sub(self, rhs: Point3<T>) -> Self::Output {
+        return Vector3::<T> {
             x: self.x - rhs.x,
             y: self.y - rhs.y,
             z: self.z - rhs.z,
@@ -110,16 +103,21 @@ impl Sub<Point3f> for Point3f {
     }
 }
 
-impl Div<Float> for Point3f {
-    type Output = Point3f;
+impl Div<Float> for Point3<Float> {
+    type Output = Point3<Float>;
 
     fn div(self, rhs: Float) -> Self::Output {
         let factor = 1.0 / rhs;
-
-        return Point3f {
+        return Point3::<Float> {
             x: self.x * factor,
             y: self.y * factor,
             z: self.z * factor,
         };
+    }
+}
+
+impl<T: Display> Display for Point3<T> {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "({}, {}, {})", self.x, self.y, self.z)
     }
 }

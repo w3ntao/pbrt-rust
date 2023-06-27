@@ -133,6 +133,26 @@ impl Transform {
         };
     }
 
+    pub fn on_vector(&self, v: Vector3f) -> Vector3f {
+        let m = self.matrix;
+        return Vector3f::new(
+            m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z,
+            m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z,
+            m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z,
+        );
+    }
+
+    pub fn on_ray(&self, r: Ray) -> Ray {
+        let o = self.on_point(r.o);
+        let d = self.on_vector(r.d);
+
+        panic!("duang");
+    }
+
+    pub fn on_ray_with_error(&self, r: Ray) -> (Ray, Float) {
+        panic!("not implemented");
+    }
+
     pub fn display(&self) {
         self.matrix.display();
         println!("inverted matrix:");
