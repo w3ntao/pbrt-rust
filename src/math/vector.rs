@@ -30,12 +30,22 @@ impl<T: Numerical> From<Point3<T>> for Vector3<T> {
     }
 }
 
+impl From<Vector3<Float>> for Vector3<Interval> {
+    fn from(value: Vector3<Float>) -> Self {
+        return Vector3::<Interval>::new(
+            Interval::from(value.x),
+            Interval::from(value.y),
+            Interval::from(value.z),
+        );
+    }
+}
+
 impl From<Point3<Float>> for Vector3<Interval> {
     fn from(value: Point3<Float>) -> Self {
         return Vector3::<Interval>::new(
-            Interval::new(value.x),
-            Interval::new(value.y),
-            Interval::new(value.z),
+            Interval::from(value.x),
+            Interval::from(value.y),
+            Interval::from(value.z),
         );
     }
 }
@@ -47,6 +57,18 @@ impl<T: Numerical> Vector3<T> {
 }
 
 impl Vector3<Float> {
+    pub fn abs(&self) -> Vector3<Float> {
+        return Vector3::<Float> {
+            x: self.x.abs(),
+            y: self.y.abs(),
+            z: self.z.abs(),
+        };
+    }
+
+    pub fn dot(&self, v: Vector3<Float>) -> Float {
+        return self.x * v.x + self.y * v.y + self.z * v.z;
+    }
+
     pub fn length_squared(&self) -> Float {
         return self.x * self.x + self.y * self.y + self.z * self.z;
     }
@@ -86,6 +108,18 @@ impl Vector3<Interval> {
             x: self.x.width() / 2.0,
             y: self.y.width() / 2.0,
             z: self.z.width() / 2.0,
+        };
+    }
+}
+
+impl<T: Numerical + Mul<Float, Output = T>> Mul<Float> for Vector3<T> {
+    type Output = Vector3<T>;
+
+    fn mul(self, rhs: Float) -> Self::Output {
+        return Vector3::<T> {
+            x: self.x * rhs,
+            y: self.y * rhs,
+            z: self.z * rhs,
         };
     }
 }

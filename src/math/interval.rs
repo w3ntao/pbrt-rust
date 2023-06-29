@@ -6,10 +6,6 @@ pub struct Interval {
 }
 
 impl Interval {
-    pub fn new(v: Float) -> Interval {
-        return Interval { low: v, high: v };
-    }
-
     pub fn from_value_and_error(v: Float, error: Float) -> Interval {
         if error == 0.0 {
             return Interval { low: v, high: v };
@@ -33,5 +29,33 @@ impl Interval {
 impl From<Interval> for Float {
     fn from(value: Interval) -> Self {
         return value.midpoint();
+    }
+}
+
+impl From<Float> for Interval {
+    fn from(value: Float) -> Self {
+        return Interval {
+            low: value,
+            high: value,
+        };
+    }
+}
+
+impl Add<Interval> for Interval {
+    type Output = Interval;
+
+    fn add(self, rhs: Interval) -> Self::Output {
+        return Interval {
+            low: add_round_down(self.low, rhs.low),
+            high: add_round_up(self.high, rhs.high),
+        };
+    }
+}
+
+impl Add<Float> for Interval {
+    type Output = Interval;
+
+    fn add(self, rhs: Float) -> Self::Output {
+        return self + Interval::from(rhs);
     }
 }

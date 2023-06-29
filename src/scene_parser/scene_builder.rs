@@ -68,11 +68,20 @@ impl Scene {
     pub fn render(&mut self) {
         let resolution = self.camera.lock().unwrap().film.lock().unwrap().resolution;
 
+        let sampler = SimpleSampler {
+            rng: StdRng::from_entropy(),
+        };
+
         for y in 0..resolution.y {
             for x in 0..resolution.x {
                 let pixel = Point2i::new(x, y);
 
-                //let camera_sample =
+                self.integrator.evaluate_pixel_sample(
+                    pixel,
+                    self.camera.clone(),
+                    self.filter.clone(),
+                    self.shapes.clone(),
+                );
             }
         }
 
@@ -341,7 +350,7 @@ impl SceneBuilder {
         );
         let shared_camera = Arc::new(Mutex::new(camera));
 
-        let sampler = SimpleSampler::new();
+        let sampler = SimpleSampler::new_from_entropy();
         let shared_sampler = Arc::new(sampler);
 
         let filter = Arc::new(BoxFilter::new(0.5));

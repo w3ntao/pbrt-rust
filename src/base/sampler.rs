@@ -1,13 +1,19 @@
 use crate::pbrt::*;
 
 pub struct SimpleSampler {
-    rng: StdRng,
+    pub(crate) rng: StdRng,
 }
 
 impl SimpleSampler {
-    pub fn new() -> Self {
+    pub fn new_from_entropy() -> Self {
         return SimpleSampler {
             rng: StdRng::from_entropy(),
+        };
+    }
+
+    pub fn new_from_seed(seed: u64) -> Self {
+        return SimpleSampler {
+            rng: StdRng::seed_from_u64(seed),
         };
     }
 

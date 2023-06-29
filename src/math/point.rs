@@ -32,10 +32,20 @@ pub struct Point3<T> {
 impl From<Point3<Float>> for Point3<Interval> {
     fn from(value: Point3<Float>) -> Self {
         return Point3::<Interval>::new(
-            Interval::new(value.x),
-            Interval::new(value.y),
-            Interval::new(value.z),
+            Interval::from(value.x),
+            Interval::from(value.y),
+            Interval::from(value.z),
         );
+    }
+}
+
+impl From<Point3<Interval>> for Point3<Float> {
+    fn from(value: Point3<Interval>) -> Self {
+        return Point3 {
+            x: value.x.midpoint(),
+            y: value.y.midpoint(),
+            z: value.z.midpoint(),
+        };
     }
 }
 
@@ -95,6 +105,18 @@ impl<T> Point3<T> {
     }
 }
 
+impl<T: Numerical + Add<Output = T>> Add<Vector3<T>> for Point3<T> {
+    type Output = Point3<T>;
+
+    fn add(self, rhs: Vector3<T>) -> Self::Output {
+        return Point3::<T> {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z,
+        };
+    }
+}
+
 impl<T: Add<Output = T>> Add<Point3<T>> for Point3<T> {
     type Output = Point3<T>;
 
@@ -135,5 +157,15 @@ impl Div<Float> for Point3<Float> {
 impl<T: Display> Display for Point3<T> {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         write!(f, "({}, {}, {})", self.x, self.y, self.z)
+    }
+}
+
+impl Point3<Interval> {
+    pub fn error(&self) -> Vector3<Float> {
+        return Vector3::<Float> {
+            x: self.x.width() / 2.0,
+            y: self.y.width() / 2.0,
+            z: self.z.width() / 2.0,
+        };
     }
 }

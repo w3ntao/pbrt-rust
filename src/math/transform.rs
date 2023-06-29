@@ -189,12 +189,19 @@ impl Transform {
         return Vector3fi::new_with_error(Vector3f::new(xp, yp, zp), vOutError);
     }
 
-    pub fn on_ray(&self, r: Ray) -> Ray {
+    pub fn on_ray(&self, r: Ray) -> (Ray, Float) {
         let o = self.on_point3fi(Point3fi::from(r.o));
         let d = self.on_vector3f(r.d);
 
-        // TODO: 06/28 progress
-        panic!("implementing");
+        let length_squared = d.length_squared();
+        if length_squared <= 0.0 {
+            panic!("illegal Ray");
+        }
+
+        let dt = d.abs().dot(o.error()) / length_squared;
+        let offset_o = o + Vector3fi::from(d * dt);
+
+        return (Ray::new(Point3f::from(offset_o), d), dt);
     }
 
     pub fn on_ray_with_error(&self, r: Ray) -> (Ray, Float) {

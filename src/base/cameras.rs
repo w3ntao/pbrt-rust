@@ -161,11 +161,10 @@ impl PerspectiveCamera {
             panic!("not yet implemented");
         }
 
-        return self.camera_transform.renderFromCamera.on_ray(ray);
+        let (camera_ray, _) = self.camera_transform.renderFromCamera.on_ray(ray);
+        return camera_ray;
 
         // TODO: CameraRay not implemented
-        // TODO: wentao: 06/27 progress
-        //self.camera_transform.renderFromCamera.on_point()
     }
 
     pub fn sample(&self) {
