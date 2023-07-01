@@ -21,10 +21,20 @@ impl SimpleIntegrator {
 
         let camera_ray = camera.lock().unwrap().generate_camera_ray(camera_sample);
 
-        if pPixel.x % 300 == 0 && pPixel.y % 300 == 0 {
-            println!("shoot camera ray towards {}", pPixel);
+        for shape in shapes {
+            match shape.intersect(&camera_ray) {
+                None => {
+                    continue;
+                }
+                Some(shape_intersection) => {
+                    if pPixel.x % 300 == 0 && pPixel.y % 300 == 0 {
+                        println!("{} -> normal: {}", pPixel, shape_intersection.normal);
+                    }
+                    return;
+                }
+            }
         }
-
-        // TODO: 06/29 implementing
+        //panic!("ray missed on {}", pPixel);
+        // TODO: 07/01 implementing
     }
 }

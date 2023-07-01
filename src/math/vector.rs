@@ -2,25 +2,25 @@ use crate::math::point::Point3;
 use crate::pbrt::*;
 
 #[derive(Copy, Clone)]
-pub struct Vector2<T: Numerical> {
+pub struct Vector2<T> {
     pub x: T,
     pub y: T,
 }
 
-impl<T: Numerical> Vector2<T> {
+impl<T> Vector2<T> {
     pub fn new(x: T, y: T) -> Self {
         return Vector2::<T> { x, y };
     }
 }
 
 #[derive(Copy, Clone)]
-pub struct Vector3<T: Numerical> {
+pub struct Vector3<T> {
     pub x: T,
     pub y: T,
     pub z: T,
 }
 
-impl<T: Numerical> From<Point3<T>> for Vector3<T> {
+impl<T> From<Point3<T>> for Vector3<T> {
     fn from(p: Point3<T>) -> Self {
         return Self {
             x: p.x,
@@ -50,9 +50,17 @@ impl From<Point3<Float>> for Vector3<Interval> {
     }
 }
 
-impl<T: Numerical> Vector3<T> {
+impl<T: Copy> Vector3<T> {
     pub fn new(x: T, y: T, z: T) -> Self {
         return Self { x, y, z };
+    }
+
+    pub fn permute(&self, p: [usize; 3]) -> Vector3<T> {
+        return Vector3::<T> {
+            x: self[p[0]],
+            y: self[p[1]],
+            z: self[p[2]],
+        };
     }
 }
 
@@ -65,7 +73,7 @@ impl Vector3<Float> {
         };
     }
 
-    pub fn dot(&self, v: Vector3<Float>) -> Float {
+    pub fn dot(&self, v: Self) -> Float {
         return self.x * v.x + self.y * v.y + self.z * v.z;
     }
 
@@ -81,11 +89,27 @@ impl Vector3<Float> {
         return *self / self.length();
     }
 
-    pub fn cross(&self, rhs: &Self) -> Self {
+    pub fn cross(&self, rhs: Self) -> Self {
         return Self {
             x: difference_of_products(self.y, rhs.z, self.z, rhs.y),
             y: difference_of_products(self.z, rhs.x, self.x, rhs.z),
             z: difference_of_products(self.x, rhs.y, self.y, rhs.x),
+        };
+    }
+
+    pub fn max_component_index(&self) -> usize {
+        return if self.x > self.y {
+            if self.x > self.z {
+                0
+            } else {
+                2
+            }
+        } else {
+            if self.y > self.z {
+                1
+            } else {
+                2
+            }
         };
     }
 }
@@ -112,7 +136,40 @@ impl Vector3<Interval> {
     }
 }
 
-impl<T: Numerical + Mul<Float, Output = T>> Mul<Float> for Vector3<T> {
+impl<T: Display> Display for Vector3<T> {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "({}, {}, {})", self.x, self.y, self.z)
+    }
+}
+
+impl<T> Index<usize> for Vector3<T> {
+    type Output = T;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        return match index {
+            0 => &self.x,
+            1 => &self.y,
+            2 => &self.z,
+            _ => {
+                panic!("Vector3: illegal index: {}", index);
+            }
+        };
+    }
+}
+
+impl<T: Neg<Output = T>> Neg for Vector3<T> {
+    type Output = Vector3<T>;
+
+    fn neg(self) -> Self::Output {
+        return Vector3::<T> {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
+        };
+    }
+}
+
+impl<T: Mul<Float, Output = T>> Mul<Float> for Vector3<T> {
     type Output = Vector3<T>;
 
     fn mul(self, rhs: Float) -> Self::Output {

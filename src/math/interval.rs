@@ -1,5 +1,6 @@
 use crate::pbrt::*;
 
+#[derive(Clone, Copy)]
 pub struct Interval {
     pub low: Float,
     pub high: Float,

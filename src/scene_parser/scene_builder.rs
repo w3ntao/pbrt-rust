@@ -8,12 +8,12 @@ fn build_look_at_transform(pos: Point3f, look: Point3f, up: Vector3f) -> Transfo
     world_from_camera[3][3] = 1.0;
 
     let dir = (look - pos).normalize();
-    if up.normalize().cross(&dir).length() == 0.0 {
+    if up.normalize().cross(dir).length() == 0.0 {
         panic!("LookAt: `up` vector and viewing direction are pointing in the same direction");
     }
 
-    let right = up.normalize().cross(&dir).normalize();
-    let new_up = dir.cross(&right);
+    let right = up.normalize().cross(dir).normalize();
+    let new_up = dir.cross(right);
 
     world_from_camera[0][0] = right.x;
     world_from_camera[1][0] = right.y;

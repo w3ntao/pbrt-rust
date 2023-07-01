@@ -2,7 +2,7 @@ use crate::pbrt::*;
 
 use crate::math::point::Point2;
 
-pub struct Bounds2<T: Numerical> {
+pub struct Bounds2<T> {
     pub p_min: Point2<T>,
     pub p_max: Point2<T>,
 }
@@ -23,5 +23,3 @@ impl Bounds2<Float> {
         };
     }
 }
-
-pub type Bounds2f = Bounds2<Float>;
