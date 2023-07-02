@@ -28,6 +28,7 @@ pub use crate::base::film::*;
 pub use crate::base::filter::*;
 pub use crate::base::integrator::*;
 pub use crate::base::ray::*;
+pub use crate::base::rgb_color::*;
 pub use crate::base::sampler::*;
 pub use crate::base::shape_intersection::*;
 pub use crate::math::arithmetic::*;

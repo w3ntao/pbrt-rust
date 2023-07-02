@@ -166,11 +166,4 @@ impl PerspectiveCamera {
 
         // TODO: CameraRay not implemented
     }
-
-    pub fn sample(&self) {
-        self.film
-            .lock()
-            .expect("fail to unlock camera.film")
-            .add_sample();
-    }
 }

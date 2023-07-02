@@ -369,7 +369,6 @@ impl SceneBuilder {
             integrator.clone(),
             shared_camera.clone(),
             shared_sampler.clone(),
-            filter.clone(),
             self.shapes.clone(),
         );
     }

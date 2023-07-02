@@ -11,13 +11,17 @@ impl SimpleIntegrator {
         &self,
         pPixel: Point2i,
         camera: Arc<Mutex<PerspectiveCamera>>,
-        filter: Arc<BoxFilter>,
         shapes: Vec<Triangle>,
     ) {
         // TODO: rewrite sampler initialization
+
+        let film = camera.lock().unwrap().film.clone();
+
+        let filter = film.lock().unwrap().filter.clone();
+
         let mut sampler = SimpleSampler::new_from_seed(0);
 
-        let camera_sample = get_camera_sample(&mut sampler, pPixel, filter);
+        let camera_sample = get_camera_sample(&mut sampler, pPixel.clone(), filter);
 
         let camera_ray = camera.lock().unwrap().generate_camera_ray(camera_sample);
 
@@ -26,10 +30,11 @@ impl SimpleIntegrator {
                 None => {
                     continue;
                 }
+
                 Some(shape_intersection) => {
-                    if pPixel.x % 300 == 0 && pPixel.y % 300 == 0 {
-                        println!("{} -> normal: {}", pPixel, shape_intersection.normal);
-                    }
+                    let color = RGBColor::from(shape_intersection.normal.abs());
+
+                    film.lock().unwrap().add_sample(pPixel, color);
                     return;
                 }
             }
