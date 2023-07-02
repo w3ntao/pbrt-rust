@@ -40,55 +40,6 @@ fn parse_json(path: &str) -> Value {
     return serde_json::from_str(&data).expect("JSON was not well-formatted");
 }
 
-pub struct Scene {
-    integrator: Arc<SimpleIntegrator>,
-    camera: Arc<Mutex<PerspectiveCamera>>,
-    sampler: Arc<SimpleSampler>,
-    filter: Arc<BoxFilter>,
-    shapes: Vec<Triangle>,
-}
-
-impl Scene {
-    pub fn new(
-        integrator: Arc<SimpleIntegrator>,
-        camera: Arc<Mutex<PerspectiveCamera>>,
-        sampler: Arc<SimpleSampler>,
-        filter: Arc<BoxFilter>,
-        shapes: Vec<Triangle>,
-    ) -> Self {
-        return Scene {
-            integrator,
-            camera,
-            sampler,
-            filter,
-            shapes,
-        };
-    }
-
-    pub fn render(&mut self) {
-        let resolution = self.camera.lock().unwrap().film.lock().unwrap().resolution;
-
-        let sampler = SimpleSampler {
-            rng: StdRng::from_entropy(),
-        };
-
-        for y in 0..resolution.y {
-            for x in 0..resolution.x {
-                let pixel = Point2i::new(x, y);
-
-                self.integrator.evaluate_pixel_sample(
-                    pixel,
-                    self.camera.clone(),
-                    self.filter.clone(),
-                    self.shapes.clone(),
-                );
-            }
-        }
-
-        //let pixel_bounds = Bounds
-    }
-}
-
 #[derive(Copy, Clone)]
 struct GraphicsState {
     current_transform: Transform,
@@ -279,7 +230,7 @@ impl SceneBuilder {
             .insert(String::from("world"), self.graphics_state.current_transform);
     }
 
-    pub fn build_scene(&mut self) -> Scene {
+    pub fn build_scene(&mut self) -> SceneConfig {
         let _tokens = parse_json(self.file_path.as_ref());
         let _token_length = json_value_to_usize(_tokens["length"].clone());
 
@@ -414,7 +365,7 @@ impl SceneBuilder {
             }
         }
 
-        return Scene::new(
+        return SceneConfig::new(
             integrator.clone(),
             shared_camera.clone(),
             shared_sampler.clone(),

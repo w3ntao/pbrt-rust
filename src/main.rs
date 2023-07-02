@@ -3,7 +3,7 @@
 mod base;
 mod math;
 mod pbrt;
-mod scene_parser;
+mod scene;
 mod shapes;
 
 use crate::pbrt::*;

@@ -36,9 +36,10 @@ pub use crate::math::float::*;
 pub use crate::math::interval::*;
 pub use crate::math::square_matrix::*;
 pub use crate::math::transform::*;
-pub use crate::scene_parser::parameter_dict::*;
-pub use crate::scene_parser::scene_builder::*;
-pub use crate::scene_parser::util::*;
+pub use crate::scene::parameter_dict::*;
+pub use crate::scene::scene_builder::*;
+pub use crate::scene::scene_config::*;
+pub use crate::scene::util::*;
 pub use crate::shapes::triangle::*;
 
 use crate::math::bounds::*;
