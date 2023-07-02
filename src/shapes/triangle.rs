@@ -23,14 +23,14 @@ pub struct Triangle {
     mesh: Arc<TriangleMesh>,
 }
 
-pub fn build_triangles(points: Vec<Point3f>, indices: Vec<i32>) -> Vec<Triangle> {
+pub fn build_triangles(points: Vec<Point3f>, indices: Vec<i32>) -> Vec<Arc<Triangle>> {
     let mesh = TriangleMesh::new(points, indices);
     let shared_mesh = Arc::new(mesh);
 
-    let mut triangles: Vec<Triangle> = vec![];
+    let mut triangles = vec![];
 
     for idx in (0..shared_mesh.indices.len()).step_by(3) {
-        let _triangle = Triangle::new(idx, shared_mesh.clone());
+        let _triangle = Arc::new(Triangle::new(idx, shared_mesh.clone()));
         triangles.push(_triangle);
     }
 
@@ -39,7 +39,7 @@ pub fn build_triangles(points: Vec<Point3f>, indices: Vec<i32>) -> Vec<Triangle>
 
 fn intersect_triangle(
     ray: &Ray,
-    tMax: Float,
+    t_max: Float,
     p0: Point3f,
     p1: Point3f,
     p2: Point3f,
@@ -99,11 +99,11 @@ fn intersect_triangle(
     p2t.z *= Sz;
 
     let tScaled = e0 * p0t.z + e1 * p1t.z + e2 * p2t.z;
-    if det < 0.0 && (tScaled >= 0.0 || tScaled < tMax * det) {
+    if det < 0.0 && (tScaled >= 0.0 || tScaled < t_max * det) {
         return None;
     }
 
-    if det > 0.0 && (tScaled <= 0.0 || tScaled > tMax * det) {
+    if det > 0.0 && (tScaled <= 0.0 || tScaled > t_max * det) {
         return None;
     }
 
@@ -135,10 +135,12 @@ impl Triangle {
             self.mesh.points[v2],
         );
     }
+}
 
-    pub fn intersect(&self, ray: &Ray) -> Option<ShapeIntersection> {
+impl Shape for Triangle {
+    fn intersect(&self, ray: &Ray, t_max: Float) -> Option<ShapeIntersection> {
         let (p0, p1, p2) = self.get_points();
 
-        return intersect_triangle(ray, Float::INFINITY, p0, p1, p2);
+        return intersect_triangle(ray, t_max, p0, p1, p2);
     }
 }

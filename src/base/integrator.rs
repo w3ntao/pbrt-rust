@@ -11,7 +11,7 @@ impl SimpleIntegrator {
         &self,
         pPixel: Point2i,
         camera: Arc<Mutex<PerspectiveCamera>>,
-        shapes: Vec<Triangle>,
+        shapes: Vec<Arc<dyn Shape>>,
     ) {
         // TODO: rewrite sampler initialization
 
@@ -26,7 +26,7 @@ impl SimpleIntegrator {
         let camera_ray = camera.lock().unwrap().generate_camera_ray(camera_sample);
 
         for shape in shapes {
-            match shape.intersect(&camera_ray) {
+            match shape.intersect(&camera_ray, Float::INFINITY) {
                 None => {
                     continue;
                 }

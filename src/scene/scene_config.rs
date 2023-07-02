@@ -4,7 +4,7 @@ pub struct SceneConfig {
     integrator: Arc<SimpleIntegrator>,
     camera: Arc<Mutex<PerspectiveCamera>>,
     sampler: Arc<SimpleSampler>,
-    shapes: Vec<Triangle>,
+    shapes: Vec<Arc<dyn Shape>>,
 }
 
 impl SceneConfig {
@@ -12,7 +12,7 @@ impl SceneConfig {
         integrator: Arc<SimpleIntegrator>,
         camera: Arc<Mutex<PerspectiveCamera>>,
         sampler: Arc<SimpleSampler>,
-        shapes: Vec<Triangle>,
+        shapes: Vec<Arc<dyn Shape>>,
     ) -> Self {
         return SceneConfig {
             integrator,

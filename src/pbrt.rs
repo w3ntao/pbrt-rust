@@ -1,9 +1,6 @@
 pub type Float = f32;
 //pub type Float = f64;
 
-pub const X_RESOLUTION: i32 = 1368;
-pub const Y_RESOLUTION: i32 = 1026;
-
 pub enum RenderingCoordinateSystem {
     Camera,
     CameraWorld,
@@ -30,6 +27,7 @@ pub use crate::base::integrator::*;
 pub use crate::base::ray::*;
 pub use crate::base::rgb_color::*;
 pub use crate::base::sampler::*;
+pub use crate::base::shape::*;
 pub use crate::base::shape_intersection::*;
 pub use crate::math::arithmetic::*;
 pub use crate::math::compensated_float::*;

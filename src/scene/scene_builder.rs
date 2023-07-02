@@ -61,7 +61,7 @@ pub struct SceneBuilder {
     pushed_graphics_state: Vec<GraphicsState>,
     named_coordinate_systems: HashMap<String, Transform>,
     renderFromWorld: Transform,
-    shapes: Vec<Triangle>,
+    shapes: Vec<Arc<dyn Shape>>,
 }
 
 impl SceneBuilder {
@@ -206,9 +206,12 @@ impl SceneBuilder {
                     }
                 }
 
-                let mut triangles = build_triangles(points, indices);
+                let triangles = build_triangles(points, indices);
                 let length = triangles.len();
-                self.shapes.append(&mut triangles);
+
+                for _triangle in triangles {
+                    self.shapes.push(_triangle.clone());
+                }
 
                 println!(
                     "{} triangles appended, {} in total",

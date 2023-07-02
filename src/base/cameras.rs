@@ -95,7 +95,9 @@ impl PerspectiveCamera {
     ) -> Self {
         let _fov = parameters.get_one_float_with_default("fov", 90.0);
 
-        let frame_aspect_ratio = (X_RESOLUTION as Float) / (Y_RESOLUTION as Float);
+        let resolution = film.lock().unwrap().resolution;
+
+        let frame_aspect_ratio = (resolution.x as Float) / (resolution.y as Float);
 
         let screen_window = if frame_aspect_ratio > 1.0 {
             Bounds2f::new(&[
@@ -116,7 +118,7 @@ impl PerspectiveCamera {
                 1.0,
             ) * Transform::translate(-screen_window.p_min.x, -screen_window.p_max.y, 0.0);
 
-        let rasterFromNDC = Transform::scale(X_RESOLUTION as Float, -Y_RESOLUTION as Float, 1.0);
+        let rasterFromNDC = Transform::scale(resolution.x as Float, -resolution.y as Float, 1.0);
 
         let rasterFromScreen = rasterFromNDC * NDCFromScreen;
         // rasterFromScreen verified

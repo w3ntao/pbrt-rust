@@ -5,4 +5,5 @@ pub mod integrator;
 pub mod ray;
 pub mod rgb_color;
 pub mod sampler;
+pub mod shape;
 pub mod shape_intersection;
