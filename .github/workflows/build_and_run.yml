@@ -1,4 +1,4 @@
-name: build
+name: build and run
 
 on:
   push:
@@ -15,13 +15,14 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build-and-test:
+  build-and-run:
 
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
 
-    - name: build
+    - name: cargo run
       run:
-        cargo build --release;
+        cargo run --release;
+
