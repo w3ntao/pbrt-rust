@@ -32,7 +32,7 @@ impl SimpleIntegrator {
                 }
 
                 Some(shape_intersection) => {
-                    let color = RGBColor::from(shape_intersection.normal.abs());
+                    let color = shape_intersection.normal.normalize().softmax_color();
 
                     film.lock().unwrap().add_sample(pPixel, color);
                     return;

@@ -112,6 +112,20 @@ impl Vector3<Float> {
             }
         };
     }
+
+    pub fn softmax_color(&self) -> RGBColor {
+        let base: Float = 10.0;
+        let x = base.powf(self.x);
+        let y = base.powf(self.y);
+        let z = base.powf(self.z);
+
+        let sum = x + y + z;
+        return RGBColor {
+            r: x / sum,
+            g: y / sum,
+            b: z / sum,
+        };
+    }
 }
 
 impl Vector3<Interval> {
