@@ -1,6 +1,7 @@
 #![feature(const_fn_floating_point_arithmetic)]
 
 mod base;
+mod cameras;
 mod math;
 mod pbrt;
 mod scene;

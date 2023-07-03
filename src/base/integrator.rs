@@ -10,12 +10,12 @@ impl SimpleIntegrator {
     pub fn evaluate_pixel_sample(
         &self,
         pPixel: Point2i,
-        camera: Arc<Mutex<PerspectiveCamera>>,
+        camera: Arc<Mutex<dyn Camera>>,
         shapes: Vec<Arc<dyn Shape>>,
     ) {
         // TODO: rewrite sampler initialization
 
-        let film = camera.lock().unwrap().film.clone();
+        let film = camera.lock().unwrap().get_film();
 
         let filter = film.lock().unwrap().filter.clone();
 
