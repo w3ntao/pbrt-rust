@@ -1,7 +1,7 @@
 use crate::pbrt::*;
 
 pub struct SceneConfig {
-    integrator: Arc<SimpleIntegrator>,
+    integrator: Arc<dyn Integrator>,
     camera: Arc<Mutex<dyn Camera>>,
     sampler: Arc<SimpleSampler>,
     shapes: Vec<Arc<dyn Shape>>,
@@ -9,7 +9,7 @@ pub struct SceneConfig {
 
 impl SceneConfig {
     pub fn new(
-        integrator: Arc<SimpleIntegrator>,
+        integrator: Arc<dyn Integrator>,
         camera: Arc<Mutex<dyn Camera>>,
         sampler: Arc<SimpleSampler>,
         shapes: Vec<Arc<dyn Shape>>,

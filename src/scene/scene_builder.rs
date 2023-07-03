@@ -309,7 +309,7 @@ impl SceneBuilder {
 
         let filter = Arc::new(BoxFilter::new(0.5));
 
-        let integrator = Arc::new(SimpleIntegrator::new());
+        let integrator = Arc::new(SurfaceNormalVisualizer::new());
 
         self.parse_world_begin(&_tokens[format!("token_{}", world_begin_idx)]);
 

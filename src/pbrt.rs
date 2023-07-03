@@ -30,6 +30,7 @@ pub use crate::base::sampler::*;
 pub use crate::base::shape::*;
 pub use crate::base::shape_intersection::*;
 pub use crate::cameras::perspective_camera::*;
+pub use crate::integrators::surface_normal_visualizer::*;
 pub use crate::math::arithmetic::*;
 pub use crate::math::compensated_float::*;
 pub use crate::math::float::*;
