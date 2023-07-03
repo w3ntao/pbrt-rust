@@ -12,6 +12,8 @@ impl Integrator for SurfaceNormalVisualizer {
     fn evaluate_pixel_sample(
         &self,
         p_pixel: Point2i,
+        sample_index: usize,
+        sampler: &mut dyn Sampler,
         camera: Arc<Mutex<dyn Camera>>,
         shapes: Vec<Arc<dyn Shape>>,
     ) {
@@ -21,9 +23,7 @@ impl Integrator for SurfaceNormalVisualizer {
 
         let filter = film.lock().unwrap().filter.clone();
 
-        let mut sampler = SimpleSampler::new_from_seed(0);
-
-        let camera_sample = get_camera_sample(&mut sampler, p_pixel.clone(), filter);
+        let camera_sample = sampler.get_camera_sample(p_pixel.clone(), filter);
 
         let camera_ray = camera.lock().unwrap().generate_camera_ray(camera_sample);
 

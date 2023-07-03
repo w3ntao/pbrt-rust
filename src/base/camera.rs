@@ -58,19 +58,6 @@ impl CameraSample {
     }
 }
 
-pub fn get_camera_sample(
-    sampler: &mut SimpleSampler,
-    pPixel: Point2i,
-    filter: Arc<BoxFilter>,
-) -> CameraSample {
-    let fs = filter.sample(sampler.get_pixel_2d());
-    return CameraSample::new(
-        Point2f::from(pPixel) + fs.p + Vector2f::new(0.5, 0.5),
-        sampler.get_2d(),
-        1.0,
-    );
-}
-
 pub trait Camera {
     fn get_film(&self) -> Arc<Mutex<SimpleRGBFilm>>;
 

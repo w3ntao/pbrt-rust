@@ -5,6 +5,7 @@ mod cameras;
 mod integrators;
 mod math;
 mod pbrt;
+mod samplers;
 mod scene;
 mod shapes;
 

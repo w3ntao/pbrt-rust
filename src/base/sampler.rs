@@ -1,31 +1,20 @@
 use crate::pbrt::*;
 
-pub struct SimpleSampler {
-    pub(crate) rng: StdRng,
-}
+pub trait Sampler {
+    fn fork(&self) -> Box<dyn Sampler>;
 
-impl SimpleSampler {
-    pub fn new_from_entropy() -> Self {
-        return SimpleSampler {
-            rng: StdRng::from_entropy(),
-        };
-    }
+    fn get_1d(&mut self) -> Float;
 
-    pub fn new_from_seed(seed: u64) -> Self {
-        return SimpleSampler {
-            rng: StdRng::seed_from_u64(seed),
-        };
-    }
+    fn get_2d(&mut self) -> Point2f;
 
-    pub fn get_1d(&mut self) -> Float {
-        return self.rng.gen::<Float>();
-    }
+    fn get_pixel_2d(&mut self) -> Point2f;
 
-    pub fn get_2d(&mut self) -> Point2f {
-        return Point2f::new(self.rng.gen::<Float>(), self.rng.gen::<Float>());
-    }
-
-    pub fn get_pixel_2d(&mut self) -> Point2f {
-        return self.get_2d();
+    fn get_camera_sample(&mut self, p_pixel: Point2i, filter: Arc<BoxFilter>) -> CameraSample {
+        let fs = filter.sample(self.get_pixel_2d());
+        return CameraSample::new(
+            Point2f::from(p_pixel) + fs.p + Vector2f::new(0.5, 0.5),
+            self.get_2d(),
+            1.0,
+        );
     }
 }

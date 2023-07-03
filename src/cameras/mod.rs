@@ -1,1 +1,1 @@
-pub mod perspective_camera;
+pub mod perspective;

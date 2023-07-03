@@ -3,7 +3,7 @@ use crate::pbrt::*;
 pub struct SceneConfig {
     integrator: Arc<dyn Integrator>,
     camera: Arc<Mutex<dyn Camera>>,
-    sampler: Arc<SimpleSampler>,
+    sampler: Arc<dyn Sampler>,
     shapes: Vec<Arc<dyn Shape>>,
 }
 
@@ -11,7 +11,7 @@ impl SceneConfig {
     pub fn new(
         integrator: Arc<dyn Integrator>,
         camera: Arc<Mutex<dyn Camera>>,
-        sampler: Arc<SimpleSampler>,
+        sampler: Arc<dyn Sampler>,
         shapes: Vec<Arc<dyn Shape>>,
     ) -> Self {
         return SceneConfig {
@@ -32,15 +32,24 @@ impl SceneConfig {
             .unwrap()
             .resolution;
 
+        let num_samples = 1;
+
+        let mut forked_sampler = self.sampler.fork();
+        let mutated_sampler = forked_sampler.as_mut();
+
         for y in 0..resolution.y {
             for x in 0..resolution.x {
                 let pixel = Point2i::new(x, y);
 
-                self.integrator.evaluate_pixel_sample(
-                    pixel,
-                    self.camera.clone(),
-                    self.shapes.clone(),
-                );
+                for sample_index in 0..num_samples {
+                    self.integrator.evaluate_pixel_sample(
+                        pixel,
+                        sample_index,
+                        mutated_sampler,
+                        self.camera.clone(),
+                        self.shapes.clone(),
+                    );
+                }
             }
         }
 

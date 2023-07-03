@@ -304,7 +304,7 @@ impl SceneBuilder {
         );
         let shared_camera = Arc::new(Mutex::new(camera));
 
-        let sampler = SimpleSampler::new_from_entropy();
+        let sampler = IndependentSampler::default();
         let shared_sampler = Arc::new(sampler);
 
         let filter = Arc::new(BoxFilter::new(0.5));
