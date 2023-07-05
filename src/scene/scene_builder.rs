@@ -62,6 +62,8 @@ pub struct SceneBuilder {
     named_coordinate_systems: HashMap<String, Transform>,
     renderFromWorld: Transform,
     shapes: Vec<Arc<dyn Shape>>,
+    camera: Option<Arc<Mutex<dyn Camera>>>,
+    film: Option<Arc<Mutex<SimpleRGBFilm>>>,
 }
 
 impl SceneBuilder {
@@ -73,6 +75,8 @@ impl SceneBuilder {
             named_coordinate_systems: HashMap::new(),
             renderFromWorld: Transform::identity(),
             shapes: vec![],
+            camera: None,
+            film: None,
         };
     }
 
@@ -106,12 +110,11 @@ impl SceneBuilder {
             self.graphics_state.current_transform * transform_look_at;
     }
 
-    fn parse_film(&mut self, _value: &Value, _filter: Arc<BoxFilter>) -> SimpleRGBFilm {
+    fn parse_film(&mut self, _value: &Value, _filter: Arc<BoxFilter>) -> Arc<Mutex<SimpleRGBFilm>> {
         let array = _value.as_array().unwrap();
         assert_eq!(json_value_to_string(array[0].clone()), "Film");
 
         let name = json_value_to_string(array[1].clone());
-        println!("parsing Film: {}", name);
 
         let parameter_dict = ParameterDict::build_from_vec(&array[2..]);
         //parameter_dict.display();
@@ -122,30 +125,25 @@ impl SceneBuilder {
         let resolution = Point2i::new(xresolution, yresolution);
         let filename = parameter_dict.get_string_or_panic("filename");
 
-        match name.as_str() {
-            "rgb" => {
-                return SimpleRGBFilm::new(resolution, &filename, _filter);
-            }
-
+        return Arc::new(Mutex::new(match name.as_str() {
+            "rgb" => SimpleRGBFilm::new(resolution, &filename, _filter),
             &_ => {
                 panic!("unknown Film name: `{}`", name);
             }
-        };
+        }));
     }
 
     fn parse_camera(
         &mut self,
         _value: &Value,
         film: Arc<Mutex<SimpleRGBFilm>>,
-    ) -> PerspectiveCamera {
+    ) -> Arc<Mutex<dyn Camera>> {
         let array = _value.as_array().unwrap();
         assert_eq!(json_value_to_string(array[0].clone()), "Camera");
 
         let name = json_value_to_string(array[1].clone());
-        println!("parsing Camera: {}", name);
 
         let parameter_dict = ParameterDict::build_from_vec(&array[2..]);
-        //parameter_dict.display();
 
         let camera_from_world = self.graphics_state.current_transform;
         let world_from_camera = camera_from_world.inverse();
@@ -158,15 +156,12 @@ impl SceneBuilder {
 
         self.renderFromWorld = camera_transform.RenderFromWorld();
 
-        return match name.as_str() {
-            "perspective" => {
-                println!("PerspectiveCamera built");
-                PerspectiveCamera::new(camera_transform, parameter_dict, film)
-            }
+        return Arc::new(Mutex::new(match name.as_str() {
+            "perspective" => PerspectiveCamera::new(camera_transform, parameter_dict, film),
             _ => {
                 panic!("unknown camera type: `{}`", name);
             }
-        };
+        }));
     }
 
     fn parse_translate(&mut self, _value: &Value) {
@@ -219,6 +214,10 @@ impl SceneBuilder {
                     self.shapes.len()
                 );
             }
+            "disk" => {
+                println!("disk not implemented");
+                // TODO: disk not implemented
+            }
             _ => {
                 panic!("unknown Shape name: `{}`", name);
             }
@@ -237,91 +236,58 @@ impl SceneBuilder {
         let _tokens = parse_json(self.file_path.as_ref());
         let _token_length = json_value_to_usize(_tokens["length"].clone());
 
-        let mut look_at_idx = usize::MAX;
         let mut integrator_idx = usize::MAX;
         let mut sampler_idx = usize::MAX;
+        let mut filter_idx = usize::MAX;
         let mut film_idx = usize::MAX;
         let mut camera_idx = usize::MAX;
-        let mut world_begin_idx = usize::MAX;
-
-        let mut optional_filter: Option<BoxFilter> = None;
 
         for idx in 0.._token_length {
             let key = format!("token_{}", idx);
-
-            let first_token = serde_json::to_string(&_tokens[key][0]).unwrap();
+            let first_token = serde_json::to_string(&_tokens[key.clone()][0]).unwrap();
             let token_without_quote = trim_quote(first_token);
+
             match token_without_quote.as_ref() {
                 "LookAt" => {
-                    look_at_idx = idx;
-                    println!("matched `LookAt`");
+                    self.parse_look_at(&_tokens[format!("token_{}", idx)]);
                 }
                 "Camera" => {
-                    println!("matched `Camera`");
                     camera_idx = idx;
                 }
                 "Film" => {
-                    println!("matched `Film`");
                     film_idx = idx;
                 }
                 "Filter" => {
-                    println!("matched `Filter`");
-                    panic!("implement me");
+                    filter_idx = idx;
+                    //TODO: parse Filter
                 }
                 "Integrator" => {
                     integrator_idx = idx;
-                    println!("matched `Integrator`");
+                    //TODO: parse Integrator
                 }
                 "Sampler" => {
                     sampler_idx = idx;
-                    println!("matched `Sampler`");
+                    //TODO: parse Sampler
                 }
                 "WorldBegin" => {
-                    world_begin_idx = idx;
-
                     println!("before-world options parsing finished\n");
-                    break;
+
+                    let filter = Arc::new(if filter_idx == usize::MAX {
+                        BoxFilter::new(0.5)
+                    } else {
+                        panic!("Filter parsing not implemented");
+                    });
+
+                    let film =
+                        self.parse_film(&_tokens[format!("token_{}", film_idx)], filter.clone());
+
+                    self.camera = Some(
+                        self.parse_camera(&_tokens[format!("token_{}", camera_idx)], film.clone()),
+                    );
+
+                    self.parse_world_begin(&_tokens[format!("token_{}", idx)]);
                 }
-                _ => {
-                    panic!("unknown token: {}", token_without_quote)
-                }
-            }
-        }
 
-        self.parse_look_at(&_tokens[format!("token_{}", look_at_idx)]);
-
-        let filter = Arc::new(match optional_filter {
-            None => BoxFilter::new(0.5),
-            Some(_filter) => _filter,
-        });
-
-        let film = self.parse_film(&_tokens[format!("token_{}", film_idx)], filter.clone());
-        let shared_film = Arc::new(Mutex::new(film));
-
-        let camera = self.parse_camera(
-            &_tokens[format!("token_{}", camera_idx)],
-            shared_film.clone(),
-        );
-        let shared_camera = Arc::new(Mutex::new(camera));
-
-        let sampler = IndependentSampler::default();
-        let shared_sampler = Arc::new(sampler);
-
-        let filter = Arc::new(BoxFilter::new(0.5));
-
-        let integrator = Arc::new(SurfaceNormalVisualizer::new());
-
-        self.parse_world_begin(&_tokens[format!("token_{}", world_begin_idx)]);
-
-        println!("\n2nd part:");
-        for idx in (world_begin_idx + 1).._token_length {
-            let key = format!("token_{}", idx);
-
-            let first_token = serde_json::to_string(&_tokens[key.clone()][0]).unwrap();
-            let token_without_quote = trim_quote(first_token);
-            //println!("{}", token_without_quote);
-
-            match token_without_quote.as_ref() {
                 "AttributeBegin" => {
                     self.pushed_graphics_state.push(self.graphics_state.clone());
                 }
@@ -329,7 +295,7 @@ impl SceneBuilder {
                 "AttributeEnd" => {
                     match self.pushed_graphics_state.pop() {
                         None => {
-                            panic!("Unmatched AttributeEnd encountered.");
+                            panic!("unmatched `AttributeEnd` encountered.");
                         }
                         Some(top_graphics_state) => {
                             self.graphics_state = top_graphics_state;
@@ -368,10 +334,21 @@ impl SceneBuilder {
             }
         }
 
+        let camera = match &(self.camera) {
+            None => {
+                panic!("Camera not initialized");
+            }
+            Some(_camera) => _camera.clone(),
+        };
+
+        let sampler = Arc::new(IndependentSampler::default());
+
+        let integrator = Arc::new(SurfaceNormalVisualizer::new());
+
         return SceneConfig::new(
             integrator.clone(),
-            shared_camera.clone(),
-            shared_sampler.clone(),
+            camera.clone(),
+            sampler.clone(),
             self.shapes.clone(),
         );
     }
