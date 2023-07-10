@@ -1,11 +1,19 @@
 use crate::pbrt::*;
 
+#[derive(Copy, Clone)]
 pub struct CameraTransform {
     pub renderFromCamera: Transform,
     pub worldFromRender: Transform,
 }
 
 impl CameraTransform {
+    pub fn nan() -> Self {
+        return Self {
+            renderFromCamera: Transform::nan(),
+            worldFromRender: Transform::nan(),
+        };
+    }
+
     pub fn new(_world_from_camera: Transform, rendering_space: RenderingCoordinateSystem) -> Self {
         let _worldFromRender = match rendering_space {
             RenderingCoordinateSystem::Camera => _world_from_camera,

@@ -11,12 +11,13 @@ mod shapes;
 
 use crate::pbrt::*;
 
-fn main() {
-    let mut builder = SceneBuilder::new("killeroo-floor.json");
-    /*
-    let mut builder =
-        SceneBuilder::new("/home/wentao/Desktop/pbrt-v4-scenes-json/killeroos/killeroo-gold.json");
-    */
-    let mut scene_config = builder.build_scene();
+fn render(file_path: &str) {
+    let mut builder = SceneBuilder::default();
+    let mut scene_config = builder.parse_scene(file_path);
     scene_config.render();
+}
+
+fn main() {
+    //render("killeroo-floor.json");
+    render("/home/wentao/Desktop/pbrt-v4-scenes-json/killeroos/killeroo-gold.json");
 }

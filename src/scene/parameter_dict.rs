@@ -20,6 +20,18 @@ impl Default for ParameterDict {
     }
 }
 
+impl Clone for ParameterDict {
+    fn clone(&self) -> Self {
+        return ParameterDict {
+            integers: self.integers.clone(),
+            floats: self.floats.clone(),
+            strings: self.strings.clone(),
+            point2s: self.point2s.clone(),
+            point3s: self.point3s.clone(),
+        };
+    }
+}
+
 fn split_variable_type_name(token: String) -> (String, String) {
     let parts = token.split_whitespace().collect::<Vec<&str>>();
     assert_eq!(parts.len(), 2);
