@@ -21,3 +21,12 @@ pub fn trim_quote(token: String) -> String {
 
     return token;
 }
+
+pub fn get_folder_potion(path: &str) -> String {
+    return match path.rfind("/") {
+        None => {
+            panic!("couldn't find `/` from {}", path);
+        }
+        Some(pos) => path.chars().take(pos).collect(),
+    };
+}

@@ -139,11 +139,10 @@ impl SceneBuilder {
         return self.renderFromWorld * self.graphics_state.current_transform;
     }
 
-    fn parse_coord_sys_transform(&mut self, _value: &Value) {
-        let array = _value.as_array().unwrap();
-        assert_eq!(json_value_to_string(array[0].clone()), "CoordSysTransform");
+    fn parse_coord_sys_transform(&mut self, tokens: &Vec<Value>) {
+        assert_eq!(json_value_to_string(tokens[0].clone()), "CoordSysTransform");
 
-        let name = json_value_to_string(array[1].clone());
+        let name = json_value_to_string(tokens[1].clone());
         self.graphics_state.current_transform = match self.named_coordinate_systems.get(&name) {
             None => {
                 panic!("couldn't find key {}", name);
@@ -152,9 +151,7 @@ impl SceneBuilder {
         };
     }
 
-    fn parse_look_at(&mut self, _value: &Value) {
-        println!("parsing LookAt");
-        let array = _value.as_array().unwrap();
+    fn parse_look_at(&mut self, array: &Vec<Value>) {
         assert_eq!(json_value_to_string(array[0].clone()), "LookAt");
 
         let length = array.len();
@@ -178,22 +175,19 @@ impl SceneBuilder {
             self.graphics_state.current_transform * transform_look_at;
     }
 
-    fn parse_film(&mut self, _value: &Value) {
-        let array = _value.as_array().unwrap();
-        assert_eq!(json_value_to_string(array[0].clone()), "Film");
+    fn parse_film(&mut self, tokens: &Vec<Value>) {
+        assert_eq!(json_value_to_string(tokens[0].clone()), "Film");
 
         self.film_entity.initialized = true;
-        self.film_entity.name = json_value_to_string(array[1].clone());
-        self.film_entity.parameters = ParameterDict::build_from_vec(&array[2..]);
+        self.film_entity.name = json_value_to_string(tokens[1].clone());
+        self.film_entity.parameters = ParameterDict::build_from_vec(&tokens[2..]);
     }
 
-    fn parse_camera(&mut self, _value: &Value) {
-        let array = _value.as_array().unwrap();
-        assert_eq!(json_value_to_string(array[0].clone()), "Camera");
+    fn parse_camera(&mut self, tokens: &Vec<Value>) {
+        assert_eq!(json_value_to_string(tokens[0].clone()), "Camera");
 
-        let name = json_value_to_string(array[1].clone());
-
-        let parameter_dict = ParameterDict::build_from_vec(&array[2..]);
+        let name = json_value_to_string(tokens[1].clone());
+        let parameter_dict = ParameterDict::build_from_vec(&tokens[2..]);
 
         let camera_from_world = self.graphics_state.current_transform;
         let world_from_camera = camera_from_world.inverse();
@@ -212,12 +206,11 @@ impl SceneBuilder {
         self.camera_entity.parameters = parameter_dict;
     }
 
-    fn parse_translate(&mut self, _value: &Value) {
-        let array = _value.as_array().unwrap();
-        assert_eq!(json_value_to_string(array[0].clone()), "Translate");
-        assert_eq!(array.len(), 4);
+    fn parse_translate(&mut self, tokens: &Vec<Value>) {
+        assert_eq!(tokens.len(), 4);
+        assert_eq!(json_value_to_string(tokens[0].clone()), "Translate");
 
-        let floats: Vec<Float> = (&array.clone()[1..])
+        let floats: Vec<Float> = (&tokens.clone()[1..])
             .into_iter()
             .map(|v| json_value_to_string(v.clone()).parse::<Float>().unwrap())
             .collect();
@@ -228,20 +221,31 @@ impl SceneBuilder {
         println!("`Translate` parsed");
     }
 
-    fn parse_shape(&mut self, _value: &Value) {
-        let array = _value.as_array().unwrap();
-        assert_eq!(json_value_to_string(array[0].clone()), "Shape");
+    fn parse_shape(&mut self, tokens: &Vec<Value>) {
+        assert_eq!(json_value_to_string(tokens[0].clone()), "Shape");
 
-        let parameter_dict = ParameterDict::build_from_vec(&array[2..]);
+        let parameters = ParameterDict::build_from_vec(&tokens[2..]);
 
         let renderFromObject = self.RenderFromObject();
         let objectFromRenderer = renderFromObject.inverse();
 
-        let name = json_value_to_string(array[1].clone());
+        let name = json_value_to_string(tokens[1].clone());
         match name.as_str() {
+            "disk" => {
+                println!("disk not implemented");
+                // TODO: disk not implemented
+            }
+
+            "loopsubdiv" => {
+                // TODO: 2023/07/12 progress
+                println!("loopsubdiv not implemented");
+                parameters.display();
+                exit(0);
+            }
+
             "trianglemesh" => {
-                let indices = parameter_dict.get_integer_array("indices");
-                let mut points = parameter_dict.get_point3_array("P");
+                let indices = parameters.get_integer_array("indices");
+                let mut points = parameters.get_point3_array("P");
 
                 if !renderFromObject.is_identity() {
                     for p in &mut points {
@@ -262,33 +266,19 @@ impl SceneBuilder {
                     self.shapes.len()
                 );
             }
-            "disk" => {
-                println!("disk not implemented");
-                // TODO: disk not implemented
-            }
             _ => {
                 panic!("unknown Shape name: `{}`", name);
             }
         };
     }
 
-    fn parse_world_begin(&mut self, _value: &Value) {
-        self.graphics_state.current_transform = Transform::identity();
-        self.named_coordinate_systems
-            .insert(String::from("world"), self.graphics_state.current_transform);
-    }
-
     fn parse_file(&mut self, file_path: &str) {
-        let _tokens = parse_json(file_path);
-        let _token_length = json_value_to_usize(_tokens["length"].clone());
+        let blocks = parse_json(file_path);
+        let block_length = json_value_to_usize(blocks["length"].clone());
 
-        for idx in 0.._token_length {
-            let key = format!("token_{}", idx);
-            let current_block = &_tokens[key.clone()];
-            let first_token = {
-                let quoted_first_token = serde_json::to_string(&_tokens[key.clone()][0]).unwrap();
-                trim_quote(quoted_first_token)
-            };
+        for idx in 0..block_length {
+            let tokens = blocks[format!("token_{}", idx)].as_array().unwrap();
+            let first_token = trim_quote(json_value_to_string(tokens[0].clone()));
 
             match first_token.as_ref() {
                 "AttributeBegin" => {
@@ -307,19 +297,19 @@ impl SceneBuilder {
                 }
 
                 "Camera" => {
-                    self.parse_camera(current_block);
+                    self.parse_camera(tokens);
                 }
 
                 "CoordSysTransform" => {
-                    self.parse_coord_sys_transform(current_block);
+                    self.parse_coord_sys_transform(tokens);
                 }
 
                 "LookAt" => {
-                    self.parse_look_at(current_block);
+                    self.parse_look_at(tokens);
                 }
 
                 "Film" => {
-                    self.parse_film(current_block);
+                    self.parse_film(tokens);
                 }
                 "Filter" => {
                     println!("parsing Filter not implemented\n");
@@ -335,12 +325,13 @@ impl SceneBuilder {
                 }
                 "WorldBegin" => {
                     println!("before-world options parsing finished\n");
-
-                    self.parse_world_begin(current_block);
+                    self.graphics_state.current_transform = Transform::identity();
+                    self.named_coordinate_systems
+                        .insert(String::from("world"), self.graphics_state.current_transform);
                 }
 
                 "Translate" => {
-                    self.parse_translate(current_block);
+                    self.parse_translate(tokens);
                 }
 
                 "AreaLightSource" => {
@@ -348,7 +339,11 @@ impl SceneBuilder {
                 }
 
                 "Include" => {
-                    println!("ignore `Include`");
+                    let included_path = json_value_to_string(tokens[1].clone());
+                    let absolute_path =
+                        format!("{}/{}", get_folder_potion(file_path), included_path);
+                    println!("{}", absolute_path);
+                    self.parse_file(absolute_path.as_str());
                 }
 
                 "LightSource" => {
@@ -365,7 +360,7 @@ impl SceneBuilder {
                 }
 
                 "Shape" => {
-                    self.parse_shape(current_block);
+                    self.parse_shape(tokens);
                 }
 
                 "Texture" => {

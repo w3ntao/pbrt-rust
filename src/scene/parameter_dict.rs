@@ -203,24 +203,23 @@ impl ParameterDict {
     }
 
     pub fn display(&self) {
-        panic!("not implemented");
-
         println!("strings: {}", self.strings.len());
+        /*
         for (k, v) in &self.strings {
             println!("{} -> {}", k, v);
         }
         println!();
-
+        */
         println!("integers: {}", self.integers.len());
-        _print(&self.integers);
+        //_print(&self.integers);
 
         println!("floats: {}", self.floats.len());
-        _print(&self.floats);
+        //_print(&self.floats);
 
         println!("point2s: {}", self.point2s.len());
-        _print(&self.point2s);
+        //_print(&self.point2s);
 
         println!("point3s: {}", self.point3s.len());
-        _print(&self.point3s);
+        //_print(&self.point3s);
     }
 }
