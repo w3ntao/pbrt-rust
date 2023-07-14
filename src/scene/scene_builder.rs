@@ -59,12 +59,8 @@ impl Default for SceneEntity {
 }
 
 fn build_film(film_entity: &SceneEntity, _filter: Arc<BoxFilter>) -> Arc<Mutex<SimpleRGBFilm>> {
-    let xresolution = film_entity
-        .parameters
-        .get_one_integer_or_panic("xresolution");
-    let yresolution = film_entity
-        .parameters
-        .get_one_integer_or_panic("yresolution");
+    let xresolution = film_entity.parameters.get_one_integer("xresolution", None);
+    let yresolution = film_entity.parameters.get_one_integer("yresolution", None);
 
     let resolution = Point2i::new(xresolution, yresolution);
     let filename = film_entity.parameters.get_string_or_panic("filename");
@@ -239,30 +235,41 @@ impl SceneBuilder {
             "loopsubdiv" => {
                 // TODO: 2023/07/12 progress
                 println!("loopsubdiv not implemented");
-                parameters.display();
-                exit(0);
+                //parameters.display();
+
+                let levels = parameters.get_one_integer("levels", Some(3)) as usize;
+                let indices_i32 = parameters.get_integer_array("indices");
+                let indices = indices_i32.into_iter().map(|x| x as usize).collect();
+
+                let points = parameters.get_point3_array("P");
+
+                loop_subdivide(
+                    renderFromObject,
+                    self.graphics_state.reverse_orientation,
+                    levels,
+                    indices,
+                    points,
+                );
             }
 
             "trianglemesh" => {
                 let indices = parameters.get_integer_array("indices");
                 let mut points = parameters.get_point3_array("P");
 
-                if !renderFromObject.is_identity() {
-                    for p in &mut points {
-                        *p = renderFromObject.on_point3f(*p);
-                    }
-                }
+                let mesh = TriangleMesh::new(
+                    renderFromObject,
+                    points,
+                    indices.into_iter().map(|x| x as usize).collect(),
+                );
 
-                let triangles = build_triangles(points, indices);
-                let length = triangles.len();
-
-                for _triangle in triangles {
+                let triangles = mesh.create_triangles();
+                for _triangle in &triangles {
                     self.shapes.push(_triangle.clone());
                 }
 
                 println!(
                     "{} triangles appended, {} in total",
-                    length,
+                    triangles.len(),
                     self.shapes.len()
                 );
             }

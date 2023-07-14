@@ -143,34 +143,40 @@ impl ParameterDict {
         self.strings.insert(name, value);
     }
 
-    pub fn get_one_float_with_default(&self, key: &str, default: Float) -> Float {
-        return match self.floats.get(key) {
-            None => default,
+    pub fn get_one_float(&self, key: &str, default: Option<Float>) -> Float {
+        match self.floats.get(key) {
+            None => match default {
+                None => {
+                    panic!("found no key with name `{}`", key);
+                }
+                Some(val_default) => {
+                    return val_default;
+                }
+            },
             Some(val) => {
-                assert_eq!(val.len(), 1);
-                val[0]
+                if val.len() != 1 {
+                    panic!("array length is larger than 1");
+                }
+                return val[0];
             }
         };
     }
 
-    pub fn get_one_integer_with_default(&self, key: &str, default: i32) -> i32 {
-        return match self.integers.get(key) {
-            None => default,
+    pub fn get_one_integer(&self, key: &str, default: Option<i32>) -> i32 {
+        match self.integers.get(key) {
+            None => match default {
+                None => {
+                    panic!("found no key with name `{}`", key);
+                }
+                Some(val_default) => {
+                    return val_default;
+                }
+            },
             Some(val) => {
-                assert_eq!(val.len(), 1);
-                val[0]
-            }
-        };
-    }
-
-    pub fn get_one_integer_or_panic(&self, key: &str) -> i32 {
-        return match self.integers.get(key) {
-            None => {
-                panic!("found no key with name `{}`", key);
-            }
-            Some(val) => {
-                assert_eq!(val.len(), 1);
-                val[0]
+                if val.len() != 1 {
+                    panic!("array length is larger than 1");
+                }
+                return val[0];
             }
         };
     }

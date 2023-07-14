@@ -22,7 +22,7 @@ impl PerspectiveCamera {
         parameters: ParameterDict,
         film: Arc<Mutex<SimpleRGBFilm>>,
     ) -> Self {
-        let _fov = parameters.get_one_float_with_default("fov", 90.0);
+        let _fov = parameters.get_one_float("fov", Some(90.0));
 
         let resolution = film.lock().unwrap().resolution;
 

@@ -1,4 +1,3 @@
-use crate::math::vector::*;
 use crate::pbrt::*;
 
 #[derive(Copy, Clone)]
@@ -152,6 +151,12 @@ impl<T: Add<Output = T>> Add<Point3<T>> for Point3<T> {
     }
 }
 
+impl<T: Add<Output = T> + Copy> AddAssign<Point3<T>> for Point3<T> {
+    fn add_assign(&mut self, rhs: Point3<T>) {
+        *self = *self + rhs;
+    }
+}
+
 impl<T: Sub<Output = T>> Sub<Point3<T>> for Point3<T> {
     type Output = Vector3<T>;
 
@@ -173,6 +178,26 @@ impl<T: Sub<Output = T>> Sub<Vector3<T>> for Point3<T> {
             y: self.y - rhs.y,
             z: self.z - rhs.z,
         };
+    }
+}
+
+impl Mul<Float> for Point3<Float> {
+    type Output = Point3<Float>;
+
+    fn mul(self, rhs: Float) -> Self::Output {
+        return Point3::<Float> {
+            x: self.x * rhs,
+            y: self.y * rhs,
+            z: self.z * rhs,
+        };
+    }
+}
+
+impl Mul<Point3<Float>> for Float {
+    type Output = Point3<Float>;
+
+    fn mul(self, rhs: Point3<Float>) -> Self::Output {
+        return rhs * self;
     }
 }
 
