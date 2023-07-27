@@ -54,3 +54,4 @@ pub type Vector3f = Vector3<Float>;
 pub type Vector3fi = Vector3<Interval>;
 
 pub type Bounds2f = Bounds2<Float>;
+pub type Bounds3f = Bounds3<Float>;

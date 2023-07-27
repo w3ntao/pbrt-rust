@@ -113,20 +113,6 @@ impl<T> Index<usize> for Point3<T> {
     }
 }
 
-impl<T: Copy> Point3<T> {
-    pub fn new(x: T, y: T, z: T) -> Self {
-        return Point3::<T> { x, y, z };
-    }
-
-    pub fn permute(&self, p: [usize; 3]) -> Point3<T> {
-        return Point3::<T> {
-            x: self[p[0]],
-            y: self[p[1]],
-            z: self[p[2]],
-        };
-    }
-}
-
 impl<T: Add<Output = T>> Add<Vector3<T>> for Point3<T> {
     type Output = Point3<T>;
 
@@ -217,6 +203,38 @@ impl Div<Float> for Point3<Float> {
 impl<T: Display> Display for Point3<T> {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         write!(f, "({}, {}, {})", self.x, self.y, self.z)
+    }
+}
+
+impl<T: Copy> Point3<T> {
+    pub fn new(x: T, y: T, z: T) -> Self {
+        return Point3::<T> { x, y, z };
+    }
+
+    pub fn permute(&self, p: [usize; 3]) -> Point3<T> {
+        return Point3::<T> {
+            x: self[p[0]],
+            y: self[p[1]],
+            z: self[p[2]],
+        };
+    }
+}
+
+impl Point3<Float> {
+    pub fn min(&self, p: Point3<Float>) -> Point3<Float> {
+        return Point3::<Float> {
+            x: self.x.min(p.x),
+            y: self.y.min(p.y),
+            z: self.z.min(p.z),
+        };
+    }
+
+    pub fn max(&self, p: Point3<Float>) -> Point3<Float> {
+        return Point3::<Float> {
+            x: self.x.max(p.x),
+            y: self.y.max(p.y),
+            z: self.z.max(p.z),
+        };
     }
 }
 

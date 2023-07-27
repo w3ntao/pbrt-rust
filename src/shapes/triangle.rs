@@ -150,4 +150,9 @@ impl Shape for Triangle {
 
         return intersect_triangle(ray, t_max, p0, p1, p2);
     }
+
+    fn get_bounds(&self) -> Bounds3f {
+        let (p0, p1, p2) = self.get_points();
+        return Bounds3f::from_multiple_points(&[p0, p1, p2]);
+    }
 }
