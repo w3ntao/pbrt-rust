@@ -1,10 +1,12 @@
 #![feature(const_fn_floating_point_arithmetic)]
 
+mod accelerator;
 mod base;
 mod cameras;
 mod integrators;
 mod math;
 mod pbrt;
+mod primitives;
 mod samplers;
 mod scene;
 mod shapes;

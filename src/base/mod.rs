@@ -2,6 +2,7 @@ pub mod camera;
 pub mod film;
 pub mod filter;
 pub mod integrator;
+pub mod primitive;
 pub mod ray;
 pub mod rgb_color;
 pub mod sampler;

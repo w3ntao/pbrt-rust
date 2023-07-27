@@ -7,6 +7,6 @@ pub trait Integrator {
         sample_index: usize,
         sampler: &mut dyn Sampler,
         camera: Arc<Mutex<dyn Camera>>,
-        shapes: Vec<Arc<dyn Shape>>,
+        world: Arc<dyn Primitive>,
     );
 }

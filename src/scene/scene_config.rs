@@ -1,11 +1,11 @@
+use crate::accelerator::bvh::BVHAggregate;
 use crate::pbrt::*;
 
 pub struct SceneConfig {
     integrator: Arc<dyn Integrator>,
     camera: Arc<Mutex<dyn Camera>>,
     sampler: Arc<dyn Sampler>,
-    shapes: Vec<Arc<dyn Shape>>,
-    aggregate: Arc<dyn Shape>,
+    aggregate: Arc<BVHAggregate>,
 }
 
 impl SceneConfig {
@@ -13,14 +13,12 @@ impl SceneConfig {
         integrator: Arc<dyn Integrator>,
         camera: Arc<Mutex<dyn Camera>>,
         sampler: Arc<dyn Sampler>,
-        shapes: Vec<Arc<dyn Shape>>,
-        aggregate: Arc<dyn Shape>,
+        aggregate: Arc<BVHAggregate>,
     ) -> Self {
         return SceneConfig {
             integrator,
             camera,
             sampler,
-            shapes,
             aggregate,
         };
     }
@@ -50,7 +48,7 @@ impl SceneConfig {
                         sample_index,
                         mutated_sampler,
                         self.camera.clone(),
-                        self.shapes.clone(),
+                        self.aggregate.clone(),
                     );
                 }
             }

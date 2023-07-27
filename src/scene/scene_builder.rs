@@ -109,7 +109,7 @@ pub struct SceneBuilder {
     pushed_graphics_state: Vec<GraphicsState>,
     named_coordinate_systems: HashMap<String, Transform>,
     renderFromWorld: Transform,
-    shapes: Vec<Arc<dyn Shape>>,
+    primitives: Vec<Arc<dyn Primitive>>,
 
     film_entity: SceneEntity,
     camera_entity: SceneEntity,
@@ -122,7 +122,7 @@ impl Default for SceneBuilder {
             pushed_graphics_state: Vec::new(),
             named_coordinate_systems: HashMap::new(),
             renderFromWorld: Transform::identity(),
-            shapes: vec![],
+            primitives: vec![],
 
             film_entity: SceneEntity::default(),
             camera_entity: SceneEntity::default(),
@@ -262,13 +262,15 @@ impl SceneBuilder {
 
                 let triangles = mesh.create_triangles();
                 for _triangle in &triangles {
-                    self.shapes.push(_triangle.clone());
+                    let primitive = SimplePrimitive::new(_triangle.clone());
+
+                    self.primitives.push(Arc::new(primitive));
                 }
 
                 println!(
                     "{} triangles appended, {} in total",
                     triangles.len(),
-                    self.shapes.len()
+                    self.primitives.len()
                 );
             }
             _ => {
@@ -399,13 +401,13 @@ impl SceneBuilder {
 
         let integrator = Arc::new(SurfaceNormalVisualizer::new());
 
+        let bvh_aggregate = Arc::new(BVHAggregate::build_bvh(self.primitives.clone()));
+
         return SceneConfig::new(
             integrator.clone(),
             camera.clone(),
             sampler.clone(),
-            self.shapes.clone(),
-            self.shapes[0].clone(),
+            bvh_aggregate,
         );
-        // TODO: implement BVH building
     }
 }

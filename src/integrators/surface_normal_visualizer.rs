@@ -15,7 +15,7 @@ impl Integrator for SurfaceNormalVisualizer {
         sample_index: usize,
         sampler: &mut dyn Sampler,
         camera: Arc<Mutex<dyn Camera>>,
-        shapes: Vec<Arc<dyn Shape>>,
+        aggregate: Arc<dyn Primitive>,
     ) {
         // TODO: rewrite sampler initialization
 
@@ -27,23 +27,13 @@ impl Integrator for SurfaceNormalVisualizer {
 
         let camera_ray = camera.lock().unwrap().generate_camera_ray(camera_sample);
 
-        for shape in shapes {
-            match shape.intersect(&camera_ray, Float::INFINITY) {
-                None => {
-                    continue;
-                }
+        let color = match aggregate.intersect(&camera_ray, Float::INFINITY) {
+            None => RGBColor::black(),
+            Some(shape_intersection) => Vector3f::from(shape_intersection.normal)
+                .normalize()
+                .softmax_color(),
+        };
 
-                Some(shape_intersection) => {
-                    let color = Vector3f::from(shape_intersection.normal)
-                        .normalize()
-                        .softmax_color();
-
-                    film.lock().unwrap().add_sample(p_pixel, color);
-                    return;
-                }
-            }
-        }
-        //panic!("ray missed on {}", pPixel);
-        // TODO: 07/01 implementing
+        film.lock().unwrap().add_sample(p_pixel, color);
     }
 }

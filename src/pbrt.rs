@@ -29,9 +29,10 @@ pub use std::{
 };
 
 pub use crate::{
+    accelerator::bvh::*,
     base::{
-        camera::*, film::*, filter::*, integrator::*, ray::*, rgb_color::*, sampler::*, shape::*,
-        shape_intersection::*,
+        camera::*, film::*, filter::*, integrator::*, primitive::*, ray::*, rgb_color::*,
+        sampler::*, shape::*, shape_intersection::*,
     },
     cameras::perspective::*,
     integrators::surface_normal_visualizer::*,
@@ -39,6 +40,7 @@ pub use crate::{
         arithmetic::*, bounds::*, compensated_float::*, float::*, interval::*, interval::*,
         normal::*, point::*, square_matrix::*, transform::*, vector::*,
     },
+    primitives::simple_primitive::*,
     samplers::independent::*,
     scene::{parameter_dict::*, scene_builder::*, scene_config::*, util::*},
     shapes::{loop_subdivision::*, triangle::*},
