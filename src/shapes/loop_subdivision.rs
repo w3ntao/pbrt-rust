@@ -403,7 +403,7 @@ pub fn loop_subdivide(
     nLevels: usize,
     vertexIndices: Vec<usize>,
     p: Vec<Point3f>,
-) {
+) -> Vec<Arc<Triangle>> {
     let mut vertices: Vec<Arc<Mutex<SDVertex>>> = vec![];
     for i in 0..p.len() {
         vertices.push(Arc::new(Mutex::new(SDVertex::new(p[i]))));
@@ -786,11 +786,6 @@ pub fn loop_subdivide(
     }
 
     let mesh = TriangleMesh::new(renderFromObject, pLimit, mesh_vertex_indicies);
-
-    //TODO: implement Normals3
-
-    return;
-
-    //return Arc::new(TriangleMesh::new);
-    panic!("duang duang");
+    return mesh.create_triangles();
+    // TODO: implement Normals3
 }

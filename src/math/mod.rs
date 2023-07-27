@@ -3,6 +3,7 @@ pub mod bounds;
 pub mod compensated_float;
 pub mod float;
 pub mod interval;
+pub mod normal;
 pub mod point;
 pub mod square_matrix;
 pub mod transform;

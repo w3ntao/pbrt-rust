@@ -37,7 +37,7 @@ pub use crate::{
     integrators::surface_normal_visualizer::*,
     math::{
         arithmetic::*, bounds::*, compensated_float::*, float::*, interval::*, interval::*,
-        point::*, square_matrix::*, transform::*, vector::*,
+        normal::*, point::*, square_matrix::*, transform::*, vector::*,
     },
     samplers::independent::*,
     scene::{parameter_dict::*, scene_builder::*, scene_config::*, util::*},

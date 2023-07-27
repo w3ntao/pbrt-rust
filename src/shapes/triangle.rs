@@ -113,12 +113,14 @@ fn intersect_triangle(
     }
 
     return Some(ShapeIntersection {
-        normal: (if normal.dot(ray.d) > 0.0 {
-            -normal
-        } else {
-            normal
-        })
-        .normalize(),
+        normal: Normal3f::from(
+            if normal.dot(ray.d) > 0.0 {
+                -normal
+            } else {
+                normal
+            }
+            .normalize(),
+        ),
     });
 
     // TODO: Intersection computation not finished

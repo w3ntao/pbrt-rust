@@ -1,4 +1,3 @@
-use crate::math::point::Point3;
 use crate::pbrt::*;
 
 #[derive(Copy, Clone)]
@@ -26,6 +25,16 @@ impl<T> From<Point3<T>> for Vector3<T> {
             x: p.x,
             y: p.y,
             z: p.z,
+        };
+    }
+}
+
+impl From<Normal3f> for Vector3f {
+    fn from(n: Normal3f) -> Self {
+        return Self {
+            x: n.x,
+            y: n.y,
+            z: n.z,
         };
     }
 }

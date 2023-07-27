@@ -233,9 +233,7 @@ impl SceneBuilder {
             }
 
             "loopsubdiv" => {
-                // TODO: 2023/07/12 progress
                 println!("loopsubdiv not implemented");
-                //parameters.display();
 
                 let levels = parameters.get_one_integer("levels", Some(3)) as usize;
                 let indices_i32 = parameters.get_integer_array("indices");
@@ -243,7 +241,7 @@ impl SceneBuilder {
 
                 let points = parameters.get_point3_array("P");
 
-                loop_subdivide(
+                let triangles = loop_subdivide(
                     renderFromObject,
                     self.graphics_state.reverse_orientation,
                     levels,

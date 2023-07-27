@@ -34,7 +34,9 @@ impl Integrator for SurfaceNormalVisualizer {
                 }
 
                 Some(shape_intersection) => {
-                    let color = shape_intersection.normal.normalize().softmax_color();
+                    let color = Vector3f::from(shape_intersection.normal)
+                        .normalize()
+                        .softmax_color();
 
                     film.lock().unwrap().add_sample(p_pixel, color);
                     return;
