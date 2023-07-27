@@ -5,6 +5,7 @@ pub struct SceneConfig {
     camera: Arc<Mutex<dyn Camera>>,
     sampler: Arc<dyn Sampler>,
     shapes: Vec<Arc<dyn Shape>>,
+    aggregate: Arc<dyn Shape>,
 }
 
 impl SceneConfig {
@@ -13,12 +14,14 @@ impl SceneConfig {
         camera: Arc<Mutex<dyn Camera>>,
         sampler: Arc<dyn Sampler>,
         shapes: Vec<Arc<dyn Shape>>,
+        aggregate: Arc<dyn Shape>,
     ) -> Self {
         return SceneConfig {
             integrator,
             camera,
             sampler,
             shapes,
+            aggregate,
         };
     }
 

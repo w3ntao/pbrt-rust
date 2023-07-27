@@ -404,6 +404,8 @@ impl SceneBuilder {
             camera.clone(),
             sampler.clone(),
             self.shapes.clone(),
+            self.shapes[0].clone(),
         );
+        // TODO: implement BVH building
     }
 }
