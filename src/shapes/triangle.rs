@@ -1,5 +1,4 @@
 use crate::pbrt::*;
-use std::cmp::max;
 
 pub struct TriangleMesh {
     pub indices: Vec<usize>,
@@ -200,7 +199,7 @@ impl Shape for Triangle {
         };
     }
 
-    fn get_bounds(&self) -> Bounds3f {
+    fn bounds(&self) -> Bounds3f {
         let (p0, p1, p2) = self.get_points();
         return Bounds3f::from_multiple_points(&[p0, p1, p2]);
     }

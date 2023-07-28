@@ -9,8 +9,8 @@ impl Primitive for SimplePrimitive {
         return self.shape.intersect(ray, t_max);
     }
 
-    fn get_bounds(&self) -> Bounds3f {
-        return self.shape.get_bounds();
+    fn bounds(&self) -> Bounds3f {
+        return self.shape.bounds();
     }
 }
 

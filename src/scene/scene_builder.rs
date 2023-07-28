@@ -248,6 +248,11 @@ impl SceneBuilder {
                     indices,
                     points,
                 );
+
+                for _triangle in &triangles {
+                    let primitive = SimplePrimitive::new(_triangle.clone());
+                    self.primitives.push(Arc::new(primitive));
+                }
             }
 
             "trianglemesh" => {
@@ -263,7 +268,6 @@ impl SceneBuilder {
                 let triangles = mesh.create_triangles();
                 for _triangle in &triangles {
                     let primitive = SimplePrimitive::new(_triangle.clone());
-
                     self.primitives.push(Arc::new(primitive));
                 }
 
@@ -401,7 +405,7 @@ impl SceneBuilder {
 
         let integrator = Arc::new(SurfaceNormalVisualizer::new());
 
-        let bvh_aggregate = Arc::new(BVHAggregate::build_bvh(self.primitives.clone()));
+        let bvh_aggregate = Arc::new(BVHAggregate::new(self.primitives.clone()));
 
         return SceneConfig::new(
             integrator.clone(),

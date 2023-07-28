@@ -43,6 +43,17 @@ impl<T> Index<usize> for Bounds3<T> {
 }
 
 impl Bounds3<Float> {
+    pub fn empty() -> Self {
+        return Self {
+            p_min: Point3f::new(Float::INFINITY, Float::INFINITY, Float::INFINITY),
+            p_max: Point3f::new(
+                Float::NEG_INFINITY,
+                Float::NEG_INFINITY,
+                Float::NEG_INFINITY,
+            ),
+        };
+    }
+
     pub fn from_single_point(p: Point3f) -> Self {
         return Self { p_min: p, p_max: p };
     }
@@ -63,10 +74,56 @@ impl Bounds3<Float> {
         return Self { p_min, p_max };
     }
 
-    pub fn union(&self, rhs: &Bounds3<Float>) -> Bounds3<Float> {
+    pub fn max_dimension(&self) -> usize {
+        let d = self.diagonal();
+        return if d.x > d.y && d.x > d.z {
+            0
+        } else if d.y > d.z {
+            1
+        } else {
+            2
+        };
+    }
+
+    pub fn union(&self, p: Point3f) -> Bounds3<Float> {
+        return Bounds3::<Float> {
+            p_min: self.p_min.min(p),
+            p_max: self.p_max.max(p),
+        };
+    }
+
+    pub fn diagonal(&self) -> Vector3f {
+        return self.p_max - self.p_min;
+    }
+
+    pub fn surface_area(&self) -> Float {
+        let d = self.diagonal();
+        return 2.0 * (d.x * d.y + d.x * d.z + d.y * d.z);
+    }
+}
+
+impl Add<Bounds3<Float>> for Bounds3<Float> {
+    type Output = Bounds3<Float>;
+
+    fn add(self, rhs: Bounds3<Float>) -> Self::Output {
         return Bounds3::<Float> {
             p_min: self.p_min.min(rhs.p_min),
             p_max: self.p_max.max(rhs.p_max),
+        };
+    }
+}
+
+impl AddAssign<Bounds3<Float>> for Bounds3<Float> {
+    fn add_assign(&mut self, rhs: Bounds3<Float>) {
+        *self = *self + rhs;
+    }
+}
+
+impl Sum for Bounds3<Float> {
+    fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
+        return match iter.into_iter().reduce(|x, y| x + y) {
+            None => Bounds3::<Float>::empty(),
+            Some(val) => val,
         };
     }
 }
