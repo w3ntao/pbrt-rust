@@ -8,8 +8,11 @@ pub struct RGBColor {
 }
 
 impl RGBColor {
-    pub fn black() -> RGBColor {
-        return RGBColor {
+    pub fn new(r: Float, g: Float, b: Float) -> Self {
+        return Self { r, b, g };
+    }
+    pub fn black() -> Self {
+        return Self {
             r: 0.0,
             g: 0.0,
             b: 0.0,

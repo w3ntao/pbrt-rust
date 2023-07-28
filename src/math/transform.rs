@@ -225,3 +225,13 @@ impl Mul<Transform> for Transform {
         };
     }
 }
+
+impl Display for Transform {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "matrix:\n{}\ninvertex matrix:\n{}\n",
+            self.matrix, self.inverted_matrix
+        )
+    }
+}

@@ -11,6 +11,7 @@ pub use fma::fma;
 pub use rand::{rngs::StdRng, thread_rng, Rng, SeedableRng};
 pub use serde_json::Value;
 pub use std::{
+    any::type_name,
     collections::{HashMap, HashSet},
     fmt::{Debug, Display, Formatter},
     fs::File,
@@ -58,3 +59,7 @@ pub type Vector3fi = Vector3<Interval>;
 
 pub type Bounds2f = Bounds2<Float>;
 pub type Bounds3f = Bounds3<Float>;
+
+pub fn type_of<T>(_: T) -> &'static str {
+    type_name::<T>()
+}

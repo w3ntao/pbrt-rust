@@ -165,7 +165,6 @@ impl SceneBuilder {
         let up = Vector3f::new(data[6], data[7], data[8]);
 
         let transform_look_at = build_look_at_transform(position, look, up);
-        println!("transform LookAt built\n");
 
         self.graphics_state.current_transform =
             self.graphics_state.current_transform * transform_look_at;
@@ -213,8 +212,6 @@ impl SceneBuilder {
 
         self.graphics_state.current_transform = self.graphics_state.current_transform
             * Transform::translate(floats[0], floats[1], floats[2]);
-
-        println!("`Translate` parsed");
     }
 
     fn parse_shape(&mut self, tokens: &Vec<Value>) {
@@ -228,13 +225,10 @@ impl SceneBuilder {
         let name = json_value_to_string(tokens[1].clone());
         match name.as_str() {
             "disk" => {
-                println!("disk not implemented");
                 // TODO: disk not implemented
             }
 
             "loopsubdiv" => {
-                println!("loopsubdiv not implemented");
-
                 let levels = parameters.get_one_integer("levels", Some(3)) as usize;
                 let indices_i32 = parameters.get_integer_array("indices");
                 let indices = indices_i32.into_iter().map(|x| x as usize).collect();
@@ -257,7 +251,7 @@ impl SceneBuilder {
 
             "trianglemesh" => {
                 let indices = parameters.get_integer_array("indices");
-                let mut points = parameters.get_point3_array("P");
+                let points = parameters.get_point3_array("P");
 
                 let mesh = TriangleMesh::new(
                     renderFromObject,
@@ -266,16 +260,11 @@ impl SceneBuilder {
                 );
 
                 let triangles = mesh.create_triangles();
+
                 for _triangle in &triangles {
                     let primitive = SimplePrimitive::new(_triangle.clone());
                     self.primitives.push(Arc::new(primitive));
                 }
-
-                println!(
-                    "{} triangles appended, {} in total",
-                    triangles.len(),
-                    self.primitives.len()
-                );
             }
             _ => {
                 panic!("unknown Shape name: `{}`", name);
@@ -323,19 +312,15 @@ impl SceneBuilder {
                     self.parse_film(tokens);
                 }
                 "Filter" => {
-                    println!("parsing Filter not implemented\n");
                     //TODO: parse Filter
                 }
                 "Integrator" => {
-                    println!("parsing Integrator not implemented\n");
                     //TODO: parse Integrator
                 }
                 "Sampler" => {
-                    println!("parsing Sampler not implemented\n");
                     //TODO: parse Sampler
                 }
                 "WorldBegin" => {
-                    println!("before-world options parsing finished\n");
                     self.graphics_state.current_transform = Transform::identity();
                     self.named_coordinate_systems
                         .insert(String::from("world"), self.graphics_state.current_transform);
@@ -345,25 +330,18 @@ impl SceneBuilder {
                     self.parse_translate(tokens);
                 }
 
-                "AreaLightSource" => {
-                    println!("ignore `AreaLightSource`");
-                }
+                "AreaLightSource" => {}
 
                 "Include" => {
                     let included_path = json_value_to_string(tokens[1].clone());
                     let absolute_path =
                         format!("{}/{}", get_folder_potion(file_path), included_path);
-                    println!("{}", absolute_path);
                     self.parse_file(absolute_path.as_str());
                 }
 
-                "LightSource" => {
-                    println!("ignore `LightSource`");
-                }
+                "LightSource" => {}
 
-                "Material" => {
-                    println!("ignore `Material`");
-                }
+                "Material" => {}
 
                 "ReverseOrientation" => {
                     self.graphics_state.reverse_orientation =
@@ -374,9 +352,7 @@ impl SceneBuilder {
                     self.parse_shape(tokens);
                 }
 
-                "Texture" => {
-                    println!("ignore `Texture`");
-                }
+                "Texture" => {}
                 _ => {
                     panic!("unknown token: `{}`", first_token);
                 }

@@ -202,7 +202,7 @@ impl Div<Float> for Point3<Float> {
 
 impl<T: Display> Display for Point3<T> {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(f, "({}, {}, {})", self.x, self.y, self.z)
+        write!(f, "[ {}, {}, {} ]", self.x, self.y, self.z)
     }
 }
 

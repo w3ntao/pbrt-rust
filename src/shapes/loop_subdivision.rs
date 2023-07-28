@@ -218,6 +218,12 @@ impl Default for SDFace {
     }
 }
 
+impl SDFace {
+    pub fn set_f(&mut self, idx: usize, val: Option<Arc<Mutex<SDFace>>>) {
+        self.f[idx] = val;
+    }
+}
+
 fn NEXT(idx: usize) -> usize {
     return (idx + 1) % 3;
 }
@@ -315,22 +321,7 @@ impl PartialEq<Self> for SDEdge {
                 return false;
             }
         }
-
-        for idx in 0..self.f.len() {
-            match (&(self.f[idx]), &(other.f[idx])) {
-                (None, None) => {}
-                (Some(ref x), Some(ref y)) => {
-                    if !Arc::ptr_eq(x, y) {
-                        return false;
-                    }
-                }
-                _ => {
-                    return false;
-                }
-            }
-        }
-
-        return self.f0_edge_num == other.f0_edge_num;
+        return true;
     }
 }
 
@@ -341,46 +332,7 @@ impl Hash for SDEdge {
         for v in &self.v {
             Arc::as_ptr(v).hash(state);
         }
-
-        for f in &self.f {
-            match f {
-                None => {
-                    for num in [-1, 0, 1] {
-                        num.hash(state);
-                    }
-                }
-                Some(ref _f) => {
-                    Arc::as_ptr(_f).hash(state);
-                }
-            };
-        }
-
-        self.f0_edge_num.hash(state);
     }
-}
-
-fn same_edge(e0: &SDEdge, e1: &SDEdge) -> bool {
-    for idx in 0..e0.v.len() {
-        if !Arc::ptr_eq(&e0.v[idx], &e1.v[idx]) {
-            return false;
-        }
-    }
-
-    for idx in 0..e0.f.len() {
-        match (&e0.f[idx], &e1.f[idx]) {
-            (None, None) => {}
-            (Some(x), Some(y)) => {
-                if !Arc::ptr_eq(x, y) {
-                    return false;
-                }
-            }
-            _ => {
-                return false;
-            }
-        }
-    }
-
-    return e0.f0_edge_num == e1.f0_edge_num;
 }
 
 impl SDEdge {
@@ -394,6 +346,54 @@ impl SDEdge {
             f: [None, None],
             f0_edge_num: -1,
         };
+    }
+}
+
+fn debug_vertex(v: &Vec<Arc<Mutex<SDVertex>>>) {
+    println!("size: {}", v.len());
+    for vertex in v {
+        let id = vertex.clone().lock().unwrap().id.id;
+        let p = vertex.clone().lock().unwrap().p;
+
+        let start_face_id = match vertex.clone().lock().unwrap().start_face.clone() {
+            None => 0,
+            Some(face) => face.clone().lock().unwrap().id.id,
+        };
+
+        println!("{}, {}, {}", id, p, start_face_id);
+        //println!("{}, {}", id, start_face_id);
+    }
+}
+
+fn debug_face(f: &Vec<Arc<Mutex<SDFace>>>) {
+    println!("size: {}", f.len());
+    for face in f {
+        print!("{}, [", face.clone().lock().unwrap().id.id);
+        for i in 0..3 {
+            let v_id = match face.clone().lock().unwrap().v[i].clone() {
+                None => 0,
+                Some(vertex) => vertex.clone().lock().unwrap().id.id,
+            };
+
+            print!("{}, ", v_id);
+        }
+        print!("], [");
+        for i in 0..3 {
+            let f_id = match face.clone().lock().unwrap().f[i].clone() {
+                None => 0,
+                Some(_face) => _face.clone().lock().unwrap().id.id,
+            };
+            print!("{}, ", f_id);
+        }
+        print!("], [");
+        for i in 0..4 {
+            let children_id = match face.clone().lock().unwrap().children[i].clone() {
+                None => 0,
+                Some(child) => child.clone().lock().unwrap().id.id,
+            };
+            print!("{}, ", children_id);
+        }
+        print!("]\n");
     }
 }
 
@@ -426,44 +426,36 @@ pub fn loop_subdivide(
         }
     }
 
-    fn find_edge(e: &SDEdge, edges: &Vec<SDEdge>) -> Option<usize> {
-        for idx in 0..edges.len() {
-            if same_edge(e, &edges[idx]) {
-                return Some(idx);
-            }
-        }
-        return None;
-    }
-
     let mut edges: HashSet<SDEdge> = HashSet::new();
     for i in 0..nFaces {
         let f = &mut faces[i];
+
         for edgeNum in 0..3 {
-            let v0_idx = edgeNum;
-            let v1_idx = NEXT(edgeNum);
+            let v0 = f.lock().unwrap().v[edgeNum].clone().unwrap();
+            let v1 = f.lock().unwrap().v[NEXT(edgeNum)].clone().unwrap();
 
-            let v0 = f.lock().unwrap().v[v0_idx].clone().unwrap();
-            let v1 = f.lock().unwrap().v[v1_idx].clone().unwrap();
-
-            let mut e = &mut SDEdge::new(v0, v1);
+            let mut e = &mut SDEdge::new(v0.clone(), v1.clone());
             if !edges.contains(&e) {
                 e.f[0] = Some(f.clone());
                 e.f0_edge_num = edgeNum as i32;
                 edges.insert(e.clone());
             } else {
                 let mut found_edge = edges.get(&e).unwrap();
-                found_edge.f[0].clone().unwrap().lock().unwrap().f
-                    [found_edge.f0_edge_num as usize] = Some(f.clone());
 
-                f.lock().unwrap().f[edgeNum] = found_edge.f[0].clone();
-                edges.remove(&found_edge.clone());
+                found_edge.f[0]
+                    .clone()
+                    .unwrap()
+                    .lock()
+                    .unwrap()
+                    .set_f(found_edge.f0_edge_num as usize, Some(f.clone()));
+
+                f.lock().unwrap().set_f(edgeNum, found_edge.f[0].clone());
                 edges.remove(e);
-                // TODO: remove one of the upper line
-                // TODO: could be a bug here
             }
         }
     }
 
+    // Finish vertex initialization
     for i in 0..p.len() {
         let mut v = &vertices[i];
 
@@ -504,6 +496,7 @@ pub fn loop_subdivide(
         };
     }
 
+    // Refine _LoopSubdiv_ into triangles
     let mut f = faces.clone();
     let mut v = vertices.clone();
 
@@ -572,13 +565,14 @@ pub fn loop_subdivide(
                 vert.lock().unwrap().start_face = face.lock().unwrap().children[3].clone();
 
                 vert.lock().unwrap().p = if vert.lock().unwrap().boundary {
-                    0.5 * (edge.v[0].lock().unwrap().p + edge.v[1].lock().unwrap().p)
+                    0.5 * edge.v[0].lock().unwrap().p + 0.5 * edge.v[1].lock().unwrap().p
                 } else {
                     let edge_v0_id = edge.v[0].lock().unwrap().id;
                     let edge_v1_id = edge.v[1].lock().unwrap().id;
 
-                    let mut p =
-                        3.0 / 8.0 * (edge.v[0].lock().unwrap().p + edge.v[1].lock().unwrap().p);
+                    let mut p = 3.0 / 8.0 * edge.v[0].lock().unwrap().p;
+
+                    p += 3.0 / 8.0 * edge.v[1].lock().unwrap().p;
 
                     p += 1.0 / 8.0
                         * face
@@ -624,7 +618,6 @@ pub fn loop_subdivide(
         }
 
         // Update face neighbor pointers
-
         for face in &f {
             for j in 0..3 {
                 // Update children _f_ pointers for siblings
@@ -743,8 +736,15 @@ pub fn loop_subdivide(
         }
 
         // Prepare for next level of subdivision
-        f = newFaces.clone();
-        v = newVertices.clone();
+        f.clear();
+        for _face in &newFaces {
+            f.push(_face.clone());
+        }
+
+        v.clear();
+        for _new_vertex in &newVertices {
+            v.push(_new_vertex.clone());
+        }
     }
 
     // Push vertices to limit surface
@@ -761,7 +761,6 @@ pub fn loop_subdivide(
     }
 
     // Create triangle mesh from subdivision mesh
-
     let triangle_num = f.len();
     let mut mesh_vertex_indicies = vec![0; triangle_num * 3];
     let mut used_verts: HashMap<VertexID, usize> = HashMap::default();

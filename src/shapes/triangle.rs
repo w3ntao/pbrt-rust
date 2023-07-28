@@ -1,5 +1,7 @@
 use crate::pbrt::*;
 
+const TYPE_TESTER: Float = Float::NAN;
+
 pub struct TriangleMesh {
     pub indices: Vec<usize>,
     pub points: Vec<Point3f>,
@@ -11,7 +13,7 @@ impl TriangleMesh {
             panic!("TriangleMesh: illegal parameter (indices' length can't be divided to 3)");
         }
 
-        let points = if renderFromObject.is_identity() {
+        let transformed_points = if renderFromObject.is_identity() {
             points
         } else {
             points
@@ -20,7 +22,10 @@ impl TriangleMesh {
                 .collect()
         };
 
-        return TriangleMesh { points, indices };
+        return TriangleMesh {
+            points: transformed_points,
+            indices,
+        };
     }
 
     pub fn create_triangles(self) -> Vec<Arc<Triangle>> {
@@ -89,11 +94,23 @@ fn intersect_triangle(
     p2t.x += Sx * p2t.z;
     p2t.y += Sy * p2t.z;
 
-    let e0 = difference_of_products(p1t.x, p2t.y, p1t.y, p2t.x);
-    let e1 = difference_of_products(p2t.x, p0t.y, p2t.y, p0t.x);
-    let e2 = difference_of_products(p0t.x, p1t.y, p0t.y, p1t.x);
+    let mut e0 = difference_of_products(p1t.x, p2t.y, p1t.y, p2t.x);
+    let mut e1 = difference_of_products(p2t.x, p0t.y, p2t.y, p0t.x);
+    let mut e2 = difference_of_products(p0t.x, p1t.y, p0t.y, p1t.x);
 
-    //TODO: PBRT-v4 shapes.cpp line 217
+    if type_of(TYPE_TESTER) == "f32" && (e0 == 0.0 || e1 == 0.0 || e2 == 0.0) {
+        let p2txp1ty = p2t.x as f64 * p1t.y as f64;
+        let p2typ1tx = p2t.y as f64 * p1t.x as f64;
+        e0 = (p2typ1tx - p2txp1ty) as Float;
+
+        let p0txp2ty = p0t.x as f64 * p2t.y as f64;
+        let p0typ2tx = p0t.y as f64 * p2t.x as f64;
+        e1 = (p0typ2tx - p0txp2ty) as Float;
+
+        let p1txp0ty = p1t.x as f64 * p0t.y as f64;
+        let p1typ0tx = p1t.y as f64 * p0t.x as f64;
+        e2 = (p1typ0tx - p1txp0ty) as Float;
+    }
 
     if (e0 < 0.0 || e1 < 0.0 || e2 < 0.0) && (e0 > 0.0 || e1 > 0.0 || e2 > 0.0) {
         return None;
@@ -130,15 +147,18 @@ fn intersect_triangle(
     let maxZt = Vector3f::new(p0t.z, p1t.z, p2t.z)
         .abs()
         .max_component_value();
+
     let deltaZ = gamma(3) * maxZt;
 
     // Compute $\delta_x$ and $\delta_y$ terms for triangle $t$ error bounds
     let maxXt = Vector3f::new(p0t.x, p1t.x, p2t.x)
         .abs()
         .max_component_value();
+
     let maxYt = Vector3f::new(p0t.y, p1t.y, p2t.y)
         .abs()
         .max_component_value();
+
     let deltaX = gamma(5) * (maxXt + maxZt);
     let deltaY = gamma(5) * (maxYt + maxZt);
 
@@ -147,6 +167,7 @@ fn intersect_triangle(
 
     // Compute $\delta_t$ term for triangle $t$ error bounds and check _t_
     let maxE = Vector3f::new(e0, e1, e2).abs().max_component_value();
+
     let deltaT = 3.0 * (gamma(3) * maxE * maxZt + deltaE * maxZt + deltaZ * maxE) * invDet.abs();
 
     if t <= deltaT {

@@ -174,3 +174,15 @@ impl Mul<SquareMatrix<4>> for SquareMatrix<4> {
         return product;
     }
 }
+
+impl<const N: usize> Display for SquareMatrix<N> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        for y in 0..N {
+            for x in 0..N {
+                write!(f, "{:.4} ", self[y][x]).expect("error");
+            }
+            write!(f, "\n").expect("error");
+        }
+        Ok(())
+    }
+}

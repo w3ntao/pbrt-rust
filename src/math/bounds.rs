@@ -100,6 +100,59 @@ impl Bounds3<Float> {
         let d = self.diagonal();
         return 2.0 * (d.x * d.y + d.x * d.z + d.y * d.z);
     }
+
+    pub fn fast_intersect(
+        &self,
+        ray: &Ray,
+        raytMax: Float,
+        invDir: Vector3f,
+        dirIsNeg: [usize; 3],
+    ) -> bool {
+        // Check for ray intersection against $x$ and $y$ slabs
+        let o = ray.o;
+        let d = ray.d;
+        let mut tMin = (self[dirIsNeg[0]].x - o.x) * invDir.x;
+        let mut tMax = (self[1 - dirIsNeg[0]].x - o.x) * invDir.x;
+        let tyMin = (self[dirIsNeg[1]].y - o.y) * invDir.y;
+        let mut tyMax = (self[1 - dirIsNeg[1]].y - o.y) * invDir.y;
+
+        // Update _tMax_ and _tyMax_ to ensure robust bounds intersection
+        tMax *= 1.0 + 2.0 * gamma(3);
+        tyMax *= 1.0 + 2.0 * gamma(3);
+
+        if tMin > tyMax || tyMin > tMax {
+            return false;
+        }
+
+        if tyMin > tMin {
+            tMin = tyMin;
+        }
+
+        if tyMax < tMax {
+            tMax = tyMax;
+        }
+
+        // Check for ray intersection against $z$ slab
+        let tzMin = (self[dirIsNeg[2]].z - o.z) * invDir.z;
+        let mut tzMax = (self[1 - dirIsNeg[2]].z - o.z) * invDir.z;
+
+        // Update _tzMax_ to ensure robust bounds intersection
+        tzMax *= 1.0 + 2.0 * gamma(3);
+
+        if tMin > tzMax || tzMin > tMax {
+            return false;
+        }
+
+        if tzMin > tMin {
+            tMin = tzMin;
+        }
+
+        if tzMax < tMax {
+            tMax = tzMax;
+        }
+
+        return tMin < raytMax && tMax > 0.0;
+    }
 }
 
 impl Add<Bounds3<Float>> for Bounds3<Float> {
