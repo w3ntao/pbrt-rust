@@ -155,28 +155,28 @@ impl Transform {
 
         let (v_out_error_x, v_out_error_y, v_out_error_z) = if v.is_exact() {
             (
-                GAMMA[3] * ((m[0][0] * x).abs() + (m[0][1] * y).abs() + (m[0][2] * z).abs()),
-                GAMMA[3] * ((m[1][0] * x).abs() + (m[1][1] * y).abs() + (m[1][2] * z).abs()),
-                GAMMA[3] * ((m[2][0] * x).abs() + (m[2][1] * y).abs() + (m[2][2] * z).abs()),
+                gamma(3) * ((m[0][0] * x).abs() + (m[0][1] * y).abs() + (m[0][2] * z).abs()),
+                gamma(3) * ((m[1][0] * x).abs() + (m[1][1] * y).abs() + (m[1][2] * z).abs()),
+                gamma(3) * ((m[2][0] * x).abs() + (m[2][1] * y).abs() + (m[2][2] * z).abs()),
             )
         } else {
             let vInError = v.error();
             (
-                (GAMMA[3] + 1.0)
+                (gamma(3) + 1.0)
                     * (m[0][0].abs() * vInError.x
                         + m[0][1].abs() * vInError.y
                         + m[0][2].abs() * vInError.z)
-                    + GAMMA[3] * ((m[0][0] * x).abs() + (m[0][1] * y).abs() + (m[0][2] * z).abs()),
-                (GAMMA[3] + 1.0)
+                    + gamma(3) * ((m[0][0] * x).abs() + (m[0][1] * y).abs() + (m[0][2] * z).abs()),
+                (gamma(3) + 1.0)
                     * (m[1][0].abs() * vInError.x
                         + m[1][1].abs() * vInError.y
                         + m[1][2].abs() * vInError.z)
-                    + GAMMA[3] * ((m[1][0] * x).abs() + (m[1][1] * y).abs() + (m[1][2] * z).abs()),
-                (GAMMA[3] + 1.0)
+                    + gamma(3) * ((m[1][0] * x).abs() + (m[1][1] * y).abs() + (m[1][2] * z).abs()),
+                (gamma(3) + 1.0)
                     * (m[2][0].abs() * vInError.x
                         + m[2][1].abs() * vInError.y
                         + m[2][2].abs() * vInError.z)
-                    + GAMMA[3] * ((m[2][0] * x).abs() + (m[2][1] * y).abs() + (m[2][2] * z).abs()),
+                    + gamma(3) * ((m[2][0] * x).abs() + (m[2][1] * y).abs() + (m[2][2] * z).abs()),
             )
         };
 

@@ -122,6 +122,10 @@ impl Vector3<Float> {
         };
     }
 
+    pub fn max_component_value(&self) -> Float {
+        return self.x.max(self.y).max(self.z);
+    }
+
     pub fn softmax_color(&self) -> RGBColor {
         let base: Float = 10.0;
         let x = base.powf(self.x);

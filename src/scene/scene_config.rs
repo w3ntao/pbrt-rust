@@ -58,6 +58,6 @@ impl SceneConfig {
         let file_name = film.lock().unwrap().filename.clone();
 
         film.lock().unwrap().save_image(file_name.as_str());
-        println!("image saved to `{}`", file_name);
+        println!("\nimage saved to `{}`", file_name);
     }
 }

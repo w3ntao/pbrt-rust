@@ -7,7 +7,7 @@ const fn compute_gamma(n: usize) -> Float {
     return (float_n * MACHINE_EPSILON) / (1.0 - float_n * MACHINE_EPSILON);
 }
 
-pub const GAMMA: [Float; 128] = {
+const PRECOMPUTED_GAMMA: [Float; 128] = {
     let mut seq = [Float::NAN; 128];
     let mut i = 0;
     while i < 128 {
@@ -16,6 +16,10 @@ pub const GAMMA: [Float; 128] = {
     }
     seq
 };
+
+pub const fn gamma(n: usize) -> Float {
+    return PRECOMPUTED_GAMMA[n];
+}
 
 pub fn next_float_up(v: Float) -> Float {
     if v.is_infinite() && v > 0.0 {

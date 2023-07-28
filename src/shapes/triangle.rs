@@ -1,4 +1,5 @@
 use crate::pbrt::*;
+use std::cmp::max;
 
 pub struct TriangleMesh {
     pub indices: Vec<usize>,
@@ -42,15 +43,21 @@ pub struct Triangle {
     mesh: Arc<TriangleMesh>,
 }
 
+struct TriangleIntersection {
+    pub b0: Float,
+    pub b1: Float,
+    pub b2: Float,
+    pub t: Float,
+}
+
 fn intersect_triangle(
     ray: &Ray,
     t_max: Float,
     p0: Point3f,
     p1: Point3f,
     p2: Point3f,
-) -> Option<ShapeIntersection> {
+) -> Option<TriangleIntersection> {
     let normal = (p2 - p0).cross(p1 - p0);
-
     if normal.length_squared() == 0.0 {
         return None;
     }
@@ -112,18 +119,42 @@ fn intersect_triangle(
         return None;
     }
 
-    return Some(ShapeIntersection {
-        normal: Normal3f::from(
-            if normal.dot(ray.d) > 0.0 {
-                -normal
-            } else {
-                normal
-            }
-            .normalize(),
-        ),
-    });
+    // Compute barycentric coordinates and $t$ value for triangle intersection
+    let invDet = 1.0 / det;
+    let b0 = e0 * invDet;
+    let b1 = e1 * invDet;
+    let b2 = e2 * invDet;
+    let t = tScaled * invDet;
 
-    // TODO: Intersection computation not finished
+    // Ensure that computed triangle $t$ is conservatively greater than zero
+    // Compute $\delta_z$ term for triangle $t$ error bounds
+    let maxZt = Vector3f::new(p0t.z, p1t.z, p2t.z)
+        .abs()
+        .max_component_value();
+    let deltaZ = gamma(3) * maxZt;
+
+    // Compute $\delta_x$ and $\delta_y$ terms for triangle $t$ error bounds
+    let maxXt = Vector3f::new(p0t.x, p1t.x, p2t.x)
+        .abs()
+        .max_component_value();
+    let maxYt = Vector3f::new(p0t.y, p1t.y, p2t.y)
+        .abs()
+        .max_component_value();
+    let deltaX = gamma(5) * (maxXt + maxZt);
+    let deltaY = gamma(5) * (maxYt + maxZt);
+
+    // Compute $\delta_e$ term for triangle $t$ error bounds
+    let deltaE = 2.0 * (gamma(2) * maxXt * maxYt + deltaY * maxXt + deltaX * maxYt);
+
+    // Compute $\delta_t$ term for triangle $t$ error bounds and check _t_
+    let maxE = Vector3f::new(e0, e1, e2).abs().max_component_value();
+    let deltaT = 3.0 * (gamma(3) * maxE * maxZt + deltaE * maxZt + deltaZ * maxE) * invDet.abs();
+
+    if t <= deltaT {
+        return None;
+    }
+
+    return Some(TriangleIntersection { b0, b1, b2, t });
 }
 
 impl Triangle {
@@ -148,7 +179,25 @@ impl Shape for Triangle {
     fn intersect(&self, ray: &Ray, t_max: Float) -> Option<ShapeIntersection> {
         let (p0, p1, p2) = self.get_points();
 
-        return intersect_triangle(ray, t_max, p0, p1, p2);
+        return match intersect_triangle(ray, t_max, p0, p1, p2) {
+            None => None,
+            Some(si) => {
+                let normal = (p2 - p0).cross(p1 - p0);
+                let normalized_normal = Normal3f::from(
+                    if normal.dot(ray.d) > 0.0 {
+                        -normal
+                    } else {
+                        normal
+                    }
+                    .normalize(),
+                );
+
+                Some(ShapeIntersection {
+                    normal: normalized_normal,
+                    t_hit: si.t,
+                })
+            }
+        };
     }
 
     fn get_bounds(&self) -> Bounds3f {
