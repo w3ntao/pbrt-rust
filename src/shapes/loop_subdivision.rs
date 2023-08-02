@@ -399,7 +399,6 @@ fn debug_face(f: &Vec<Arc<Mutex<SDFace>>>) {
 
 pub fn loop_subdivide(
     renderFromObject: Transform,
-    reverseOrientation: bool,
     nLevels: usize,
     vertexIndices: Vec<usize>,
     p: Vec<Point3f>,

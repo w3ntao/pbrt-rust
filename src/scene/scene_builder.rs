@@ -235,13 +235,7 @@ impl SceneBuilder {
 
                 let points = parameters.get_point3_array("P");
 
-                let triangles = loop_subdivide(
-                    renderFromObject,
-                    self.graphics_state.reverse_orientation,
-                    levels,
-                    indices,
-                    points,
-                );
+                let triangles = loop_subdivide(renderFromObject, levels, indices, points);
 
                 for _triangle in &triangles {
                     let primitive = SimplePrimitive::new(_triangle.clone());
