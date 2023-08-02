@@ -110,7 +110,6 @@ impl Bounds3<Float> {
     ) -> bool {
         // Check for ray intersection against $x$ and $y$ slabs
         let o = ray.o;
-        let d = ray.d;
         let mut tMin = (self[dirIsNeg[0]].x - o.x) * invDir.x;
         let mut tMax = (self[1 - dirIsNeg[0]].x - o.x) * invDir.x;
         let tyMin = (self[dirIsNeg[1]].y - o.y) * invDir.y;

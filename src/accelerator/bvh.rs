@@ -147,13 +147,20 @@ impl BVHAggregate {
             bvh_primitives.push(BVHPrimitive::new(idx, primitives[idx].bounds()));
         }
 
-        let mut ordered_primitives = vec![];
-        let root = build_recursive(&primitives, &bvh_primitives, &mut ordered_primitives);
+        let mut ordered_primitives = Vec::with_capacity(bvh_primitives.len());
+        let mut node_count = 0;
+        let root = build_recursive(
+            &primitives,
+            &bvh_primitives,
+            &mut ordered_primitives,
+            &mut node_count,
+        );
         bvh_primitives.clear();
 
         println!("BVH built (primitives: {})", ordered_primitives.len());
 
-        let mut linear_bvh_nodes: Vec<LinearBVHNode> = vec![];
+        let mut linear_bvh_nodes: Vec<LinearBVHNode> = Vec::with_capacity(node_count);
+        // with_capacity() to avoid re-allocations
         flatten_bvh(root, &mut linear_bvh_nodes);
 
         return Self {
@@ -195,7 +202,9 @@ fn build_recursive(
     primitives: &Vec<Arc<dyn Primitive>>,
     bvh_primitives: &Vec<BVHPrimitive>,
     ordered_primitives: &mut Vec<Arc<dyn Primitive>>,
+    node_count: &mut usize,
 ) -> Arc<BVHBuildNode> {
+    *node_count += 1;
     let full_bounds = bvh_primitives
         .iter()
         .map(|primitive| primitive.bounds)
@@ -248,10 +257,15 @@ fn build_recursive(
     }
     // TODO: implement SAH
 
-    let left_child = build_recursive(primitives, &left_primitives, ordered_primitives);
+    let left_child = build_recursive(primitives, &left_primitives, ordered_primitives, node_count);
     left_primitives.clear();
 
-    let right_child = build_recursive(primitives, &right_primitives, ordered_primitives);
+    let right_child = build_recursive(
+        primitives,
+        &right_primitives,
+        ordered_primitives,
+        node_count,
+    );
     right_primitives.clear();
 
     return Arc::new(build_interior(split_axis, left_child, right_child));
