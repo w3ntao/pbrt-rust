@@ -214,6 +214,19 @@ impl SceneBuilder {
             * Transform::rotate(floats[0], floats[1], floats[2], floats[3]);
     }
 
+    fn parse_scale(&mut self, tokens: &Vec<Value>) {
+        assert_eq!(tokens.len(), 4);
+        assert_eq!(json_value_to_string(tokens[0].clone()), "Scale");
+
+        let floats: Vec<Float> = (&tokens.clone()[1..])
+            .into_iter()
+            .map(|v| json_value_to_string(v.clone()).parse::<Float>().unwrap())
+            .collect();
+
+        self.graphics_state.current_transform = self.graphics_state.current_transform
+            * Transform::scale(floats[0], floats[1], floats[2]);
+    }
+
     fn parse_translate(&mut self, tokens: &Vec<Value>) {
         assert_eq!(tokens.len(), 4);
         assert_eq!(json_value_to_string(tokens[0].clone()), "Translate");
@@ -254,6 +267,10 @@ impl SceneBuilder {
                     let primitive = SimplePrimitive::new(_triangle.clone());
                     self.primitives.push(Arc::new(primitive));
                 }
+            }
+
+            "sphere" => {
+                //TODO: implement sphere
             }
 
             "trianglemesh" => {
@@ -351,6 +368,10 @@ impl SceneBuilder {
 
                 "Sampler" => {
                     //TODO: parse Sampler
+                }
+
+                "Scale" => {
+                    self.parse_scale(tokens);
                 }
 
                 "Shape" => {
