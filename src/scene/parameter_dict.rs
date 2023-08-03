@@ -199,7 +199,7 @@ impl ParameterDict {
         };
     }
 
-    pub fn get_string_or_panic(&self, key: &str) -> String {
+    pub fn get_string(&self, key: &str) -> String {
         return match self.strings.get(key) {
             None => {
                 panic!("found no key with name `{}`", key);
@@ -208,24 +208,17 @@ impl ParameterDict {
         };
     }
 
-    pub fn display(&self) {
-        println!("strings: {}", self.strings.len());
-        /*
-        for (k, v) in &self.strings {
-            println!("{} -> {}", k, v);
-        }
-        println!();
-        */
-        println!("integers: {}", self.integers.len());
-        //_print(&self.integers);
+    pub fn display(&self) {}
+}
 
-        println!("floats: {}", self.floats.len());
-        //_print(&self.floats);
+impl Display for ParameterDict {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "strings: {}\n", self.strings.len()).expect("error");
+        write!(f, "integers: {}\n", self.integers.len()).expect("error");
+        write!(f, "floats: {}\n", self.floats.len()).expect("error");
+        write!(f, "point2s: {}\n", self.point2s.len()).expect("error");
+        write!(f, "point3s: {}\n", self.point3s.len()).expect("error");
 
-        println!("point2s: {}", self.point2s.len());
-        //_print(&self.point2s);
-
-        println!("point3s: {}", self.point3s.len());
-        //_print(&self.point3s);
+        return Ok(());
     }
 }

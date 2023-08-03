@@ -14,9 +14,20 @@ impl SimpleRGBFilm {
         let width = _resolution.x;
         let height = _resolution.y;
 
+        let postfix = get_postfix(_filename);
+        let png_filename = if postfix == "png" {
+            _filename.clone()
+        } else {
+            println!(
+                "image format `.{}` is not supported, changed to `.png`",
+                postfix
+            );
+            change_postfix(_filename, "png")
+        };
+
         return SimpleRGBFilm {
             resolution: _resolution.clone(),
-            filename: _filename.clone(),
+            filename: png_filename,
             filter: _filter.clone(),
             pixels: vec![vec![RGBColor::black(); width as usize]; height as usize],
         };

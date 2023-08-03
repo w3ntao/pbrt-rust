@@ -30,3 +30,30 @@ pub fn get_folder_potion(path: &str) -> String {
         Some(pos) => path.chars().take(pos).collect(),
     };
 }
+
+pub fn get_postfix(path: &str) -> String {
+    match path.rfind(".") {
+        None => {
+            panic!("couldn't find `.` from {}", path);
+        }
+        Some(pos) => {
+            return path.chars().skip(pos + 1).take(usize::MAX).collect();
+        }
+    };
+}
+
+pub fn change_postfix(path: &str, postfix: &str) -> String {
+    match path.rfind(".") {
+        None => {
+            panic!("couldn't find `.` from {}", path);
+        }
+        Some(pos) => {
+            let mut filename: String = path.chars().take(pos).collect();
+
+            filename.push('.');
+            filename.push_str(postfix);
+
+            return filename;
+        }
+    };
+}
