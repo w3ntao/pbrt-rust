@@ -70,6 +70,35 @@ impl Transform {
         };
     }
 
+    pub fn rotate(angle: Float, x: Float, y: Float, z: Float) -> Self {
+        let sin_theta = degree_to_radian(angle).sin();
+        let cos_theta = degree_to_radian(angle).cos();
+        let axis = Vector3f::new(x, y, z).normalize();
+
+        let mut m = SquareMatrix::<4>::identity();
+        // Compute rotation of first basis vector
+        m[0][0] = axis.x * axis.x + (1.0 - axis.x * axis.x) * cos_theta;
+        m[0][1] = axis.x * axis.y * (1.0 - cos_theta) - axis.z * sin_theta;
+        m[0][2] = axis.x * axis.z * (1.0 - cos_theta) + axis.y * sin_theta;
+        m[0][3] = 0.0;
+
+        // Compute rotations of second and third basis vectors
+        m[1][0] = axis.x * axis.y * (1.0 - cos_theta) + axis.z * sin_theta;
+        m[1][1] = axis.y * axis.y + (1.0 - axis.y * axis.y) * cos_theta;
+        m[1][2] = axis.y * axis.z * (1.0 - cos_theta) - axis.x * sin_theta;
+        m[1][3] = 0.0;
+
+        m[2][0] = axis.x * axis.z * (1.0 - cos_theta) - axis.y * sin_theta;
+        m[2][1] = axis.y * axis.z * (1.0 - cos_theta) + axis.x * sin_theta;
+        m[2][2] = axis.z * axis.z + (1.0 - axis.z * axis.z) * cos_theta;
+        m[2][3] = 0.0;
+
+        return Transform {
+            matrix: m.clone(),
+            inverted_matrix: m.transpose(),
+        };
+    }
+
     pub fn scale(x: Float, y: Float, z: Float) -> Transform {
         let _matrix = SquareMatrix::<4>::new([
             [x, 0.0, 0.0, 0.0],

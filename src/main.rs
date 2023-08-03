@@ -20,5 +20,5 @@ fn render(file_path: &str) {
 }
 
 fn main() {
-    render("/home/wentao/Desktop/pbrt-v4-scenes-json/killeroos/killeroo-gold.json");
+    render("/home/wentao/Desktop/pbrt-v4-scenes-json/killeroos/killeroo-simple.json");
 }

@@ -201,6 +201,19 @@ impl SceneBuilder {
         self.camera_entity.parameters = parameter_dict;
     }
 
+    fn parse_rotate(&mut self, tokens: &Vec<Value>) {
+        assert_eq!(tokens.len(), 5);
+        assert_eq!(json_value_to_string(tokens[0].clone()), "Rotate");
+
+        let floats: Vec<Float> = (&tokens.clone()[1..])
+            .into_iter()
+            .map(|v| json_value_to_string(v.clone()).parse::<Float>().unwrap())
+            .collect();
+
+        self.graphics_state.current_transform = self.graphics_state.current_transform
+            * Transform::rotate(floats[0], floats[1], floats[2], floats[3]);
+    }
+
     fn parse_translate(&mut self, tokens: &Vec<Value>) {
         assert_eq!(tokens.len(), 4);
         assert_eq!(json_value_to_string(tokens[0].clone()), "Translate");
@@ -275,6 +288,8 @@ impl SceneBuilder {
             let first_token = trim_quote(json_value_to_string(tokens[0].clone()));
 
             match first_token.as_ref() {
+                "AreaLightSource" => {}
+
                 "AttributeBegin" => {
                     self.pushed_graphics_state.push(self.graphics_state.clone());
                 }
@@ -298,33 +313,13 @@ impl SceneBuilder {
                     self.parse_coord_sys_transform(tokens);
                 }
 
-                "LookAt" => {
-                    self.parse_look_at(tokens);
-                }
-
                 "Film" => {
                     self.parse_film(tokens);
                 }
+
                 "Filter" => {
                     //TODO: parse Filter
                 }
-                "Integrator" => {
-                    //TODO: parse Integrator
-                }
-                "Sampler" => {
-                    //TODO: parse Sampler
-                }
-                "WorldBegin" => {
-                    self.graphics_state.current_transform = Transform::identity();
-                    self.named_coordinate_systems
-                        .insert(String::from("world"), self.graphics_state.current_transform);
-                }
-
-                "Translate" => {
-                    self.parse_translate(tokens);
-                }
-
-                "AreaLightSource" => {}
 
                 "Include" => {
                     let included_path = json_value_to_string(tokens[1].clone());
@@ -333,20 +328,49 @@ impl SceneBuilder {
                     self.parse_file(absolute_path.as_str());
                 }
 
+                "Integrator" => {
+                    //TODO: parse Integrator
+                }
+
                 "LightSource" => {}
 
+                "LookAt" => {
+                    self.parse_look_at(tokens);
+                }
+
                 "Material" => {}
+
+                "Rotate" => {
+                    self.parse_rotate(tokens);
+                }
 
                 "ReverseOrientation" => {
                     self.graphics_state.reverse_orientation =
                         !self.graphics_state.reverse_orientation;
                 }
 
+                "Sampler" => {
+                    //TODO: parse Sampler
+                }
+
                 "Shape" => {
                     self.parse_shape(tokens);
                 }
 
-                "Texture" => {}
+                "Texture" => {
+                    //TODO: parse Texture
+                }
+
+                "Translate" => {
+                    self.parse_translate(tokens);
+                }
+
+                "WorldBegin" => {
+                    self.graphics_state.current_transform = Transform::identity();
+                    self.named_coordinate_systems
+                        .insert(String::from("world"), self.graphics_state.current_transform);
+                }
+
                 _ => {
                     panic!("unknown token: `{}`", first_token);
                 }

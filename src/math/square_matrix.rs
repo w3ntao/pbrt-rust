@@ -57,6 +57,18 @@ impl<const N: usize> SquareMatrix<N> {
         return true;
     }
 
+    pub fn transpose(&self) -> SquareMatrix<N> {
+        let mut transposed = SquareMatrix::nan();
+
+        for y in 0..N {
+            for x in 0..N {
+                transposed[y][x] = self[x][y];
+            }
+        }
+
+        return transposed;
+    }
+
     pub fn inverse(&self) -> SquareMatrix<N> {
         let mut indxc = [0; N];
         let mut indxr = [0; N];
