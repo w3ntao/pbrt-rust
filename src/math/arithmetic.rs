@@ -2,6 +2,16 @@ use crate::pbrt::*;
 
 pub const PI: Float = std::f64::consts::PI as Float;
 
+pub fn clamp(val: Float, low: Float, high: Float) -> Float {
+    if val < low {
+        return low;
+    }
+    if val > high {
+        return high;
+    }
+    return val;
+}
+
 pub fn degree_to_radian(degree: Float) -> Float {
     return (PI / 180.0) * degree;
 }

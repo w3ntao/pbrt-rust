@@ -62,3 +62,27 @@ pub fn sub_round_up(a: Float, b: Float) -> Float {
 pub fn sub_round_down(a: Float, b: Float) -> Float {
     return add_round_down(a, -b);
 }
+
+pub fn mul_round_up(a: Float, b: Float) -> Float {
+    return next_float_up(a * b);
+}
+
+pub fn mul_round_down(a: Float, b: Float) -> Float {
+    return next_float_down(a * b);
+}
+
+pub fn div_round_up(a: Float, b: Float) -> Float {
+    return next_float_up(a / b);
+}
+
+pub fn div_round_down(a: Float, b: Float) -> Float {
+    return next_float_down(a / b);
+}
+
+pub fn sqrt_round_up(a: Float) -> Float {
+    return next_float_up(a.sqrt());
+}
+
+pub fn sqrt_round_down(a: Float) -> Float {
+    return next_float_down(a.sqrt()).max(0.0);
+}

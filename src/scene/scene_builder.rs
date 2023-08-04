@@ -246,7 +246,9 @@ impl SceneBuilder {
         let parameters = ParameterDict::build_from_vec(&tokens[2..]);
 
         let renderFromObject = self.RenderFromObject();
-        let objectFromRenderer = renderFromObject.inverse();
+        let objectFromRender = renderFromObject.inverse();
+
+        let reverse_orientation = self.graphics_state.reverse_orientation;
 
         let name = json_value_to_string(tokens[1].clone());
         match name.as_str() {
@@ -270,7 +272,23 @@ impl SceneBuilder {
             }
 
             "sphere" => {
-                //TODO: implement sphere
+                let radius = parameters.get_one_float("radius", Some(1.0));
+                let zmin = parameters.get_one_float("zmin", Some(-radius));
+                let zmax = parameters.get_one_float("zmax", Some(radius));
+                let phimax = parameters.get_one_float("phimax", Some(360.0));
+
+                let sphere = Sphere::new(
+                    renderFromObject,
+                    objectFromRender,
+                    reverse_orientation,
+                    radius,
+                    zmin,
+                    zmax,
+                    phimax,
+                );
+
+                let primitive = SimplePrimitive::new(Arc::new(sphere));
+                self.primitives.push(Arc::new(primitive));
             }
 
             "trianglemesh" => {

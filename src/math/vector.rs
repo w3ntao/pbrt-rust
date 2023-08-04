@@ -59,7 +59,7 @@ impl From<Point3<Float>> for Vector3<Interval> {
     }
 }
 
-impl<T: Copy> Vector3<T> {
+impl<T: Copy + Add<Output = T> + Mul<Output = T>> Vector3<T> {
     pub fn new(x: T, y: T, z: T) -> Self {
         return Self { x, y, z };
     }
@@ -70,6 +70,10 @@ impl<T: Copy> Vector3<T> {
             y: self[p[1]],
             z: self[p[2]],
         };
+    }
+
+    pub fn length_squared(&self) -> T {
+        return self.x * self.x + self.y * self.y + self.z * self.z;
     }
 }
 
@@ -84,10 +88,6 @@ impl Vector3<Float> {
 
     pub fn dot(&self, v: Self) -> Float {
         return self.x * v.x + self.y * v.y + self.z * v.z;
-    }
-
-    pub fn length_squared(&self) -> Float {
-        return self.x * self.x + self.y * self.y + self.z * self.z;
     }
 
     pub fn length(&self) -> Float {
@@ -161,11 +161,25 @@ impl Vector3<Interval> {
             z: self.z.width() / 2.0,
         };
     }
+
+    pub fn length(&self) -> Interval {
+        return self.length_squared().sqrt();
+    }
 }
 
 impl<T: Display> Display for Vector3<T> {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         write!(f, "({}, {}, {})", self.x, self.y, self.z)
+    }
+}
+
+impl From<Vector3<Interval>> for Vector3<Float> {
+    fn from(value: Vector3<Interval>) -> Self {
+        return Self {
+            x: value.x.midpoint(),
+            y: value.y.midpoint(),
+            z: value.z.midpoint(),
+        };
     }
 }
 
@@ -196,15 +210,23 @@ impl<T: Neg<Output = T>> Neg for Vector3<T> {
     }
 }
 
-impl<T: Mul<Float, Output = T>> Mul<Float> for Vector3<T> {
+impl<T: Copy + Mul<T, Output = T>> Mul<T> for Vector3<T> {
     type Output = Vector3<T>;
 
-    fn mul(self, rhs: Float) -> Self::Output {
+    fn mul(self, rhs: T) -> Self::Output {
         return Vector3::<T> {
             x: self.x * rhs,
             y: self.y * rhs,
             z: self.z * rhs,
         };
+    }
+}
+
+impl Mul<Vector3<Float>> for Float {
+    type Output = Vector3<Float>;
+
+    fn mul(self, rhs: Vector3<Float>) -> Self::Output {
+        return rhs * self;
     }
 }
 

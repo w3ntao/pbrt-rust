@@ -1,4 +1,5 @@
 use crate::pbrt::*;
+use std::ops::MulAssign;
 
 #[derive(Copy, Clone)]
 pub struct Point2<T> {
@@ -113,6 +114,19 @@ impl<T> Index<usize> for Point3<T> {
     }
 }
 
+impl<T> IndexMut<usize> for Point3<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        return match index {
+            0 => &mut self.x,
+            1 => &mut self.y,
+            2 => &mut self.z,
+            _ => {
+                panic!("Point3: illegal index: {}", index);
+            }
+        };
+    }
+}
+
 impl<T: Add<Output = T>> Add<Vector3<T>> for Point3<T> {
     type Output = Point3<T>;
 
@@ -187,6 +201,12 @@ impl Mul<Point3<Float>> for Float {
     }
 }
 
+impl MulAssign<Float> for Point3<Float> {
+    fn mul_assign(&mut self, rhs: Float) {
+        *self = *self * rhs;
+    }
+}
+
 impl Div<Float> for Point3<Float> {
     type Output = Point3<Float>;
 
@@ -239,11 +259,34 @@ impl Point3<Float> {
 }
 
 impl Point3<Interval> {
+    pub fn from_value_and_error(p: Point3<Float>, e: Vector3<Float>) -> Self {
+        return Self {
+            x: Interval::from_value_and_error(p.x, e.x),
+            y: Interval::from_value_and_error(p.y, e.y),
+            z: Interval::from_value_and_error(p.z, e.z),
+        };
+    }
     pub fn error(&self) -> Vector3<Float> {
         return Vector3::<Float> {
             x: self.x.width() / 2.0,
             y: self.y.width() / 2.0,
             z: self.z.width() / 2.0,
+        };
+    }
+
+    pub fn is_exact(&self) -> bool {
+        return self.x.width() == 0.0 && self.y.width() == 0.0 && self.z.width() == 0.0;
+    }
+}
+
+impl Div<Float> for Point3<Interval> {
+    type Output = Point3<Interval>;
+
+    fn div(self, rhs: Float) -> Self::Output {
+        return Point3::<Interval> {
+            x: self.x / rhs,
+            y: self.y / rhs,
+            z: self.z / rhs,
         };
     }
 }

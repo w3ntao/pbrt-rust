@@ -59,7 +59,7 @@ impl Bounds3<Float> {
     }
 
     pub fn from_multiple_points(points: &[Point3f]) -> Self {
-        if points.len() <= 2 {
+        if points.len() < 2 {
             panic!("expect 2 or more points");
         }
 

@@ -163,7 +163,66 @@ impl Transform {
     }
 
     pub fn on_point3fi(&self, p: Point3fi) -> Point3fi {
-        return Point3fi::from(self.on_vector3fi(Vector3fi::from(p)));
+        let x = p.x.midpoint();
+        let y = p.y.midpoint();
+        let z = p.z.midpoint();
+
+        let m = self.matrix;
+        // Compute transformed coordinates from point _(x, y, z)_
+        let xp = (m[0][0] * x + m[0][1] * y) + (m[0][2] * z + m[0][3]);
+        let yp = (m[1][0] * x + m[1][1] * y) + (m[1][2] * z + m[1][3]);
+        let zp = (m[2][0] * x + m[2][1] * y) + (m[2][2] * z + m[2][3]);
+        let wp = (m[3][0] * x + m[3][1] * y) + (m[3][2] * z + m[3][3]);
+
+        // Compute absolute error for transformed point, _pError_
+        let pError = if p.is_exact() {
+            let _x = gamma(3)
+                * ((m[0][0] * x).abs() + (m[0][1] * y).abs() + (m[0][2] * z).abs() + m[0][3].abs());
+            let _y = gamma(3)
+                * ((m[1][0] * x).abs() + (m[1][1] * y).abs() + (m[1][2] * z).abs() + m[1][3].abs());
+
+            let _z = gamma(3)
+                * ((m[2][0] * x).abs() + (m[2][1] * y).abs() + (m[2][2] * z).abs() + m[2][3].abs());
+            Vector3f::new(_x, _y, _z)
+        } else {
+            // Compute error for transformed approximate _p_
+            let pInError = p.error();
+            let _x = (gamma(3) + 1.0)
+                * (m[0][0].abs() * pInError.x
+                    + m[0][1].abs() * pInError.y
+                    + m[0][2].abs() * pInError.z)
+                + gamma(3)
+                    * ((m[0][0] * x).abs()
+                        + (m[0][1] * y).abs()
+                        + (m[0][2] * z).abs()
+                        + m[0][3].abs());
+            let _y = (gamma(3) + 1.0)
+                * (m[1][0].abs() * pInError.x
+                    + m[1][1].abs() * pInError.y
+                    + m[1][2].abs() * pInError.z)
+                + gamma(3)
+                    * ((m[1][0] * x).abs()
+                        + (m[1][1] * y).abs()
+                        + (m[1][2] * z).abs()
+                        + m[1][3].abs());
+            let _z = (gamma(3) + 1.0)
+                * (m[2][0].abs() * pInError.x
+                    + m[2][1].abs() * pInError.y
+                    + m[2][2].abs() * pInError.z)
+                + gamma(3)
+                    * ((m[2][0] * x).abs()
+                        + (m[2][1] * y).abs()
+                        + (m[2][2] * z).abs()
+                        + m[2][3].abs());
+
+            Vector3f::new(_x, _y, _z)
+        };
+
+        return if wp == 1.0 {
+            Point3fi::from_value_and_error(Point3f::new(xp, yp, zp), pError)
+        } else {
+            Point3fi::from_value_and_error(Point3f::new(xp, yp, zp), pError) / wp
+        };
     }
 
     pub fn on_vector3f(&self, v: Vector3f) -> Vector3f {
@@ -182,40 +241,61 @@ impl Transform {
 
         let m = self.matrix;
 
-        let (v_out_error_x, v_out_error_y, v_out_error_z) = if v.is_exact() {
-            (
-                gamma(3) * ((m[0][0] * x).abs() + (m[0][1] * y).abs() + (m[0][2] * z).abs()),
-                gamma(3) * ((m[1][0] * x).abs() + (m[1][1] * y).abs() + (m[1][2] * z).abs()),
-                gamma(3) * ((m[2][0] * x).abs() + (m[2][1] * y).abs() + (m[2][2] * z).abs()),
-            )
+        let vOutError = if v.is_exact() {
+            let _x = gamma(3) * ((m[0][0] * x).abs() + (m[0][1] * y).abs() + (m[0][2] * z).abs());
+            let _y = gamma(3) * ((m[1][0] * x).abs() + (m[1][1] * y).abs() + (m[1][2] * z).abs());
+            let _z = gamma(3) * ((m[2][0] * x).abs() + (m[2][1] * y).abs() + (m[2][2] * z).abs());
+            Vector3f::new(_x, _y, _z)
         } else {
             let vInError = v.error();
-            (
-                (gamma(3) + 1.0)
-                    * (m[0][0].abs() * vInError.x
-                        + m[0][1].abs() * vInError.y
-                        + m[0][2].abs() * vInError.z)
-                    + gamma(3) * ((m[0][0] * x).abs() + (m[0][1] * y).abs() + (m[0][2] * z).abs()),
-                (gamma(3) + 1.0)
-                    * (m[1][0].abs() * vInError.x
-                        + m[1][1].abs() * vInError.y
-                        + m[1][2].abs() * vInError.z)
-                    + gamma(3) * ((m[1][0] * x).abs() + (m[1][1] * y).abs() + (m[1][2] * z).abs()),
-                (gamma(3) + 1.0)
-                    * (m[2][0].abs() * vInError.x
-                        + m[2][1].abs() * vInError.y
-                        + m[2][2].abs() * vInError.z)
-                    + gamma(3) * ((m[2][0] * x).abs() + (m[2][1] * y).abs() + (m[2][2] * z).abs()),
-            )
+            let _x = (gamma(3) + 1.0)
+                * (m[0][0].abs() * vInError.x
+                    + m[0][1].abs() * vInError.y
+                    + m[0][2].abs() * vInError.z)
+                + gamma(3) * ((m[0][0] * x).abs() + (m[0][1] * y).abs() + (m[0][2] * z).abs());
+            let _y = (gamma(3) + 1.0)
+                * (m[1][0].abs() * vInError.x
+                    + m[1][1].abs() * vInError.y
+                    + m[1][2].abs() * vInError.z)
+                + gamma(3) * ((m[1][0] * x).abs() + (m[1][1] * y).abs() + (m[1][2] * z).abs());
+            let _z = (gamma(3) + 1.0)
+                * (m[2][0].abs() * vInError.x
+                    + m[2][1].abs() * vInError.y
+                    + m[2][2].abs() * vInError.z)
+                + gamma(3) * ((m[2][0] * x).abs() + (m[2][1] * y).abs() + (m[2][2] * z).abs());
+            Vector3f::new(_x, _y, _z)
         };
-
-        let vOutError = Vector3f::new(v_out_error_x, v_out_error_y, v_out_error_z);
 
         let xp = m[0][0] * x + m[0][1] * y + m[0][2] * z;
         let yp = m[1][0] * x + m[1][1] * y + m[1][2] * z;
         let zp = m[2][0] * x + m[2][1] * y + m[2][2] * z;
 
         return Vector3fi::new_with_error(Vector3f::new(xp, yp, zp), vOutError);
+    }
+
+    pub fn on_bounds(&self, bounds: Bounds3f) -> Bounds3f {
+        // a smarter way to transform bounds:
+        // takes roughly 2 transforms instead of 8
+        // https://stackoverflow.com/a/58630206
+
+        let mut transformed_bounds = Bounds3f::empty();
+        for idx in 0..3 {
+            transformed_bounds.p_min[idx] = self.matrix[idx][3];
+        }
+        transformed_bounds.p_max = transformed_bounds.p_min;
+
+        for i in 0..3 {
+            for k in 0..3 {
+                let a = self.matrix[i][k] * bounds.p_min[k];
+                let b = self.matrix[i][k] * bounds.p_max[k];
+
+                let (min_val, max_val) = if a < b { (a, b) } else { (b, a) };
+                transformed_bounds.p_min[i] += min_val;
+                transformed_bounds.p_max[i] += max_val;
+            }
+        }
+
+        return transformed_bounds;
     }
 
     pub fn on_ray(&self, r: Ray) -> (Ray, Float) {
@@ -235,12 +315,6 @@ impl Transform {
 
     pub fn on_ray_with_error(&self, r: Ray) -> (Ray, Float) {
         panic!("not implemented");
-    }
-
-    pub fn display(&self) {
-        self.matrix.display();
-        println!("inverted matrix:");
-        self.inverted_matrix.display();
     }
 }
 

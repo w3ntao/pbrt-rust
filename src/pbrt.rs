@@ -18,16 +18,13 @@ pub use std::{
     hash::{Hash, Hasher},
     io::Read,
     iter::Sum,
-    mem::swap,
     ops::{Add, AddAssign, Div, Index, IndexMut, Mul, Neg, Sub},
     process::exit,
-    ptr,
     str::FromStr,
     sync::{
         atomic::{AtomicUsize, Ordering},
         {Arc, Mutex},
     },
-    thread,
 };
 
 pub use crate::{
@@ -45,7 +42,7 @@ pub use crate::{
     primitives::simple_primitive::*,
     samplers::independent::*,
     scene::{parameter_dict::*, scene_builder::*, scene_config::*, util::*},
-    shapes::{loop_subdivision::*, triangle::*},
+    shapes::{loop_subdivision::*, sphere::*, triangle::*, util::*},
 };
 
 pub type Point2f = Point2<Float>;
