@@ -40,12 +40,20 @@ fn split_variable_type_name(token: String) -> (String, String) {
 }
 
 fn fetch_variable_value(value: &Value) -> Vec<String> {
-    return value
-        .as_array()
-        .unwrap()
-        .into_iter()
-        .map(|v| json_value_to_string(v.clone()))
-        .collect();
+    return match value.as_array() {
+        None => {
+            // if it's a string
+            let value_str = String::from(value.as_str().unwrap().clone());
+            vec![value_str]
+        }
+        Some(value_vector) => {
+            // if it's a vec of string
+            value_vector
+                .into_iter()
+                .map(|v| json_value_to_string(v.clone()))
+                .collect()
+        }
+    };
 }
 
 fn _print<T: Display>(hashmap: &HashMap<String, Vec<T>>) {
