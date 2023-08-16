@@ -81,6 +81,7 @@ impl ParameterDict {
         for idx in (0..array.len()).step_by(2) {
             let token = trim_quote(json_value_to_string(array[idx].clone()));
             let (variable_type, variable_name) = split_variable_type_name(token);
+
             let variable_values = fetch_variable_value(&array[idx + 1]);
 
             match variable_type.as_str() {
@@ -116,6 +117,11 @@ impl ParameterDict {
                     }
                     point3s.insert(variable_name, point_set);
                 }
+
+                "normal" => {
+                    //TODO: normal should be implement first
+                }
+
                 _ => {
                     panic!("unknown variable type: `{}`", variable_type);
                 }

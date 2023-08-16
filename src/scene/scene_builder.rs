@@ -323,8 +323,6 @@ impl SceneBuilder {
             let first_token = trim_quote(json_value_to_string(tokens[0].clone()));
 
             match first_token.as_ref() {
-                "AreaLightSource" => {}
-
                 "AttributeBegin" => {
                     self.pushed_graphics_state.push(self.graphics_state.clone());
                 }
@@ -352,10 +350,6 @@ impl SceneBuilder {
                     self.parse_film(tokens);
                 }
 
-                "Filter" => {
-                    //TODO: parse Filter
-                }
-
                 "Include" => {
                     let included_path = json_value_to_string(tokens[1].clone());
                     let absolute_path =
@@ -363,17 +357,9 @@ impl SceneBuilder {
                     self.parse_file(absolute_path.as_str());
                 }
 
-                "Integrator" => {
-                    //TODO: parse Integrator
-                }
-
-                "LightSource" => {}
-
                 "LookAt" => {
                     self.parse_look_at(tokens);
                 }
-
-                "Material" => {}
 
                 "Rotate" => {
                     self.parse_rotate(tokens);
@@ -384,20 +370,12 @@ impl SceneBuilder {
                         !self.graphics_state.reverse_orientation;
                 }
 
-                "Sampler" => {
-                    //TODO: parse Sampler
-                }
-
                 "Scale" => {
                     self.parse_scale(tokens);
                 }
 
                 "Shape" => {
                     self.parse_shape(tokens);
-                }
-
-                "Texture" => {
-                    //TODO: parse Texture
                 }
 
                 "Translate" => {
@@ -408,6 +386,39 @@ impl SceneBuilder {
                     self.graphics_state.current_transform = Transform::identity();
                     self.named_coordinate_systems
                         .insert(String::from("world"), self.graphics_state.current_transform);
+                }
+
+                "AreaLightSource" => {
+                    // TODO: parse AreaLightSource
+                }
+
+                "Filter" => {
+                    //TODO: parse Filter
+                }
+
+                "Integrator" => {
+                    //TODO: parse Integrator
+                }
+
+                "LightSource" => {
+                    // TODO: parse LightSource
+                }
+                "Material" => {
+                    // TODO: parse Material
+                }
+                "MakeNamedMaterial" => {
+                    // TODO: parse MakeNamedMaterial
+                }
+                "NamedMaterial" => {
+                    // TODO: parse NamedMaterial
+                }
+
+                "Sampler" => {
+                    //TODO: parse Sampler
+                }
+
+                "Texture" => {
+                    //TODO: parse Texture
                 }
 
                 _ => {
