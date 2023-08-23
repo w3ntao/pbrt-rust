@@ -1,5 +1,4 @@
 use crate::pbrt::*;
-use std::ops::MulAssign;
 
 #[derive(Copy, Clone)]
 pub struct Point2<T> {
@@ -13,6 +12,31 @@ impl<T> Point2<T> {
     }
 }
 
+impl Point2<Float> {
+    pub fn min(&self, rhs: &Point2<Float>) -> Point2<Float> {
+        return Point2::<Float> {
+            x: self.x.min(rhs.x),
+            y: self.y.min(rhs.y),
+        };
+    }
+
+    pub fn max(&self, rhs: &Point2<Float>) -> Point2<Float> {
+        return Point2::<Float> {
+            x: self.x.max(rhs.x),
+            y: self.y.max(rhs.y),
+        };
+    }
+}
+
+impl Default for Point2<Float> {
+    fn default() -> Self {
+        return Self {
+            x: Float::NAN,
+            y: Float::NAN,
+        };
+    }
+}
+
 impl From<Point2<i32>> for Point2<Float> {
     fn from(value: Point2<i32>) -> Self {
         return Self {
@@ -22,11 +46,49 @@ impl From<Point2<i32>> for Point2<Float> {
     }
 }
 
+impl<T: Display> Display for Point2<T> {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "[ {}, {} ]", self.x, self.y)
+    }
+}
+
+impl<T: Add<Output = T>> Add<Point2<T>> for Point2<T> {
+    type Output = Point2<T>;
+
+    fn add(self, rhs: Point2<T>) -> Self::Output {
+        return Point2::<T> {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+        };
+    }
+}
+
+impl<T: Add<Output = T>> Add<Vector2<T>> for Point2<T> {
+    type Output = Point2<T>;
+
+    fn add(self, rhs: Vector2<T>) -> Self::Output {
+        return Point2::<T> {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+        };
+    }
+}
+
 #[derive(Copy, Clone)]
 pub struct Point3<T> {
     pub x: T,
     pub y: T,
     pub z: T,
+}
+
+impl Default for Point3<Float> {
+    fn default() -> Self {
+        return Self {
+            x: Float::NAN,
+            y: Float::NAN,
+            z: Float::NAN,
+        };
+    }
 }
 
 impl From<Point3<Float>> for Point3<Interval> {
@@ -52,50 +114,6 @@ impl From<Point3<Interval>> for Point3<Float> {
 impl From<Vector3<Interval>> for Point3<Interval> {
     fn from(value: Vector3<Interval>) -> Self {
         return Point3::<Interval>::new(value.x, value.y, value.z);
-    }
-}
-
-impl Point2<Float> {
-    pub fn min(&self, rhs: &Point2<Float>) -> Point2<Float> {
-        return Point2::<Float> {
-            x: self.x.min(rhs.x),
-            y: self.y.min(rhs.y),
-        };
-    }
-
-    pub fn max(&self, rhs: &Point2<Float>) -> Point2<Float> {
-        return Point2::<Float> {
-            x: self.x.max(rhs.x),
-            y: self.y.max(rhs.y),
-        };
-    }
-}
-
-impl<T: Display> Display for Point2<T> {
-    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(f, "({}, {})", self.x, self.y)
-    }
-}
-
-impl<T: Add<Output = T>> Add<Point2<T>> for Point2<T> {
-    type Output = Point2<T>;
-
-    fn add(self, rhs: Point2<T>) -> Self::Output {
-        return Point2::<T> {
-            x: self.x + rhs.x,
-            y: self.y + rhs.y,
-        };
-    }
-}
-
-impl<T: Add<Output = T>> Add<Vector2<T>> for Point2<T> {
-    type Output = Point2<T>;
-
-    fn add(self, rhs: Vector2<T>) -> Self::Output {
-        return Point2::<T> {
-            x: self.x + rhs.x,
-            y: self.y + rhs.y,
-        };
     }
 }
 

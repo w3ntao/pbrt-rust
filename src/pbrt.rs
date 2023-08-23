@@ -8,6 +8,7 @@ pub enum RenderingCoordinateSystem {
 }
 
 pub use fma::fma;
+pub use ply_rs::ply;
 pub use rand::{rngs::StdRng, thread_rng, Rng, SeedableRng};
 pub use serde_json::Value;
 pub use std::{
@@ -16,9 +17,9 @@ pub use std::{
     fmt::{Debug, Display, Formatter},
     fs::File,
     hash::{Hash, Hasher},
-    io::Read,
+    io::{BufReader, Read},
     iter::Sum,
-    ops::{Add, AddAssign, Div, Index, IndexMut, Mul, Neg, Sub},
+    ops::{Add, AddAssign, Div, Index, IndexMut, Mul, MulAssign, Neg, Sub},
     process::exit,
     str::FromStr,
     sync::{
@@ -42,7 +43,7 @@ pub use crate::{
     primitives::simple_primitive::*,
     samplers::independent::*,
     scene::{parameter_dict::*, scene_builder::*, scene_config::*, util::*},
-    shapes::{loop_subdivision::*, sphere::*, triangle::*, util::*},
+    shapes::{loop_subdivision::*, sphere::*, tri_quad_mesh::*, triangle::*, util::*},
 };
 
 pub type Point2f = Point2<Float>;

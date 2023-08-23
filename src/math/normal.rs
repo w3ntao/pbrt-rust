@@ -12,6 +12,16 @@ impl Normal3f {
     }
 }
 
+impl Default for Normal3f {
+    fn default() -> Self {
+        return Self {
+            x: Float::NAN,
+            y: Float::NAN,
+            z: Float::NAN,
+        };
+    }
+}
+
 impl From<Vector3f> for Normal3f {
     fn from(v: Vector3f) -> Self {
         return Self {
@@ -19,5 +29,11 @@ impl From<Vector3f> for Normal3f {
             y: v.y,
             z: v.z,
         };
+    }
+}
+
+impl Display for Normal3f {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "[ {}, {}, {} ]", self.x, self.y, self.z)
     }
 }
