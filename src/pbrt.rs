@@ -38,7 +38,7 @@ pub use crate::{
     integrators::surface_normal_visualizer::*,
     math::{
         arithmetic::*, bounds::*, compensated_float::*, float::*, interval::*, interval::*,
-        normal::*, point2::*, point3::*, square_matrix::*, transform::*, vector::*,
+        normal::*, point2::*, point3::*, square_matrix::*, transform::*, vector2::*, vector3::*,
     },
     primitives::simple_primitive::*,
     samplers::independent::*,
