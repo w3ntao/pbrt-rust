@@ -43,7 +43,9 @@ pub use crate::{
     primitives::simple_primitive::*,
     samplers::independent::*,
     scene::{parameter_dict::*, scene_builder::*, scene_config::*, util::*},
-    shapes::{loop_subdivision::*, sphere::*, tri_quad_mesh::*, triangle::*, util::*},
+    shapes::{
+        loop_subdivision::*, sphere::*, tri_quad_mesh::*, triangle::*, triangle_mesh::*, util::*,
+    },
 };
 
 pub type Point2f = Point2<Float>;
