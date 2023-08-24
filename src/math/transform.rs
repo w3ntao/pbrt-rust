@@ -49,6 +49,13 @@ impl Transform {
         };
     }
 
+    pub fn transpose(&self) -> Transform {
+        return Transform {
+            matrix: self.matrix.transpose(),
+            inverted_matrix: self.inverted_matrix.transpose(),
+        };
+    }
+
     pub fn translate(x: Float, y: Float, z: Float) -> Self {
         let _matrix = SquareMatrix::new([
             [1.0, 0.0, 0.0, x],
@@ -333,7 +340,7 @@ impl Display for Transform {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "matrix:\n{}\ninvertex matrix:\n{}\n",
+            "matrix:\n{}invertex matrix:\n{}",
             self.matrix, self.inverted_matrix
         )
     }

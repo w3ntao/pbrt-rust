@@ -39,6 +39,22 @@ impl<const N: usize> SquareMatrix<N> {
         return SquareMatrix { matrix: values };
     }
 
+    pub fn from_vec(values: Vec<Float>) -> SquareMatrix<N> {
+        if values.len() != N * N {
+            panic!("size of vector and size of matrix not matched");
+        }
+
+        let mut data = [[0.0; N]; N];
+
+        for y in 0..N {
+            for x in 0..N {
+                data[y][x] = values[y * N + x];
+            }
+        }
+
+        return SquareMatrix { matrix: data };
+    }
+
     pub fn is_identity(&self) -> bool {
         for y in 0..N {
             for x in 0..N {

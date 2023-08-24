@@ -227,6 +227,17 @@ impl SceneBuilder {
             * Transform::scale(floats[0], floats[1], floats[2]);
     }
 
+    fn parse_transform(&mut self, tokens: &Vec<Value>) {
+        assert_eq!(tokens.len(), 2);
+        assert_eq!(json_value_to_string(tokens[0].clone()), "Transform");
+
+        let value_list = json_value_to_float_vec(tokens[1].clone());
+        assert_eq!(value_list.len(), 16);
+
+        self.graphics_state.current_transform =
+            Transform::new(SquareMatrix::<4>::from_vec(value_list)).transpose();
+    }
+
     fn parse_translate(&mut self, tokens: &Vec<Value>) {
         assert_eq!(tokens.len(), 4);
         assert_eq!(json_value_to_string(tokens[0].clone()), "Translate");
@@ -308,6 +319,13 @@ impl SceneBuilder {
                     self.primitives.push(Arc::new(primitive));
                 }
             }
+
+            "plymesh" => {
+                let filename = parameters.get_string("filename");
+                println!("about to read {}", filename);
+
+                exit(0);
+            }
             _ => {
                 panic!("unknown Shape name: `{}`", name);
             }
@@ -351,6 +369,7 @@ impl SceneBuilder {
                 }
 
                 "Include" => {
+                    assert_eq!(tokens.len(), 2);
                     let included_path = json_value_to_string(tokens[1].clone());
                     let absolute_path =
                         format!("{}/{}", get_folder_potion(file_path), included_path);
@@ -370,12 +389,20 @@ impl SceneBuilder {
                         !self.graphics_state.reverse_orientation;
                 }
 
+                "PixelFilter" => {
+                    //TODO: PixelFilter not implemented
+                }
+
                 "Scale" => {
                     self.parse_scale(tokens);
                 }
 
                 "Shape" => {
                     self.parse_shape(tokens);
+                }
+
+                "Transform" => {
+                    self.parse_transform(tokens);
                 }
 
                 "Translate" => {

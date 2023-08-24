@@ -1,5 +1,4 @@
 #![feature(const_fn_floating_point_arithmetic)]
-extern crate ply_rs;
 
 mod accelerator;
 mod base;
@@ -22,9 +21,8 @@ fn render(file_path: &str) {
 }
 
 fn main() {
-    let path = "/home/wentao/Desktop/pbrt-v4-scenes-json/ganesha/geometry/ganesha.ply";
+    render("/home/wentao/Desktop/pbrt-v4-scenes-json/ganesha/ganesha.json");
 
-    read_ply(path);
     return;
 
     render("/home/wentao/Desktop/pbrt-v4-scenes-json/lte-orb/lte-orb-silver.json");

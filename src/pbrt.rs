@@ -1,3 +1,5 @@
+pub extern crate ply_rs;
+
 pub type Float = f32;
 //pub type Float = f64;
 
@@ -14,6 +16,7 @@ pub use serde_json::Value;
 pub use std::{
     any::type_name,
     collections::{HashMap, HashSet},
+    convert::TryInto,
     fmt::{Debug, Display, Formatter},
     fs::File,
     hash::{Hash, Hasher},

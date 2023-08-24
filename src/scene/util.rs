@@ -1,11 +1,25 @@
 use crate::pbrt::*;
 
 pub fn json_value_to_usize(value: Value) -> usize {
-    serde_json::from_value(value).unwrap()
+    return serde_json::from_value(value).unwrap();
 }
 
 pub fn json_value_to_string(value: Value) -> String {
-    serde_json::from_value(value).unwrap()
+    return serde_json::from_value(value).unwrap();
+}
+
+pub fn json_value_to_float_vec(value: Value) -> Vec<Float> {
+    return value
+        .as_array()
+        .unwrap()
+        .into_iter()
+        .map(|x| json_value_to_string(x.clone()).parse::<Float>().unwrap())
+        .collect();
+}
+
+pub fn json_value_vec_to_float_vec(value: Vec<Value>) {
+    // TODO: rewrite it with template
+    // TODO: implement me
 }
 
 pub fn trim_quote(token: String) -> String {
