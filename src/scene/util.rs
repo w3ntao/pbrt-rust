@@ -8,7 +8,7 @@ pub fn json_value_to_string(value: Value) -> String {
     return serde_json::from_value(value).unwrap();
 }
 
-pub fn json_value_to_float_vec(value: Value) -> Vec<Float> {
+pub fn json_value_to_floats(value: Value) -> Vec<Float> {
     return value
         .as_array()
         .unwrap()
@@ -17,9 +17,11 @@ pub fn json_value_to_float_vec(value: Value) -> Vec<Float> {
         .collect();
 }
 
-pub fn json_value_vec_to_float_vec(value: Vec<Value>) {
-    // TODO: rewrite it with template
-    // TODO: implement me
+pub fn json_values_to_floats(values: &[Value]) -> Vec<Float> {
+    return values
+        .into_iter()
+        .map(|v| json_value_to_string(v.clone()).parse::<Float>().unwrap())
+        .collect();
 }
 
 pub fn trim_quote(token: String) -> String {

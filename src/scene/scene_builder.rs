@@ -205,10 +205,8 @@ impl SceneBuilder {
         assert_eq!(tokens.len(), 5);
         assert_eq!(json_value_to_string(tokens[0].clone()), "Rotate");
 
-        let floats: Vec<Float> = (&tokens.clone()[1..])
-            .into_iter()
-            .map(|v| json_value_to_string(v.clone()).parse::<Float>().unwrap())
-            .collect();
+        let floats = json_values_to_floats(&tokens.clone()[1..]);
+        assert_eq!(floats.len(), 4);
 
         self.graphics_state.current_transform = self.graphics_state.current_transform
             * Transform::rotate(floats[0], floats[1], floats[2], floats[3]);
@@ -218,10 +216,8 @@ impl SceneBuilder {
         assert_eq!(tokens.len(), 4);
         assert_eq!(json_value_to_string(tokens[0].clone()), "Scale");
 
-        let floats: Vec<Float> = (&tokens.clone()[1..])
-            .into_iter()
-            .map(|v| json_value_to_string(v.clone()).parse::<Float>().unwrap())
-            .collect();
+        let floats = json_values_to_floats(&tokens.clone()[1..]);
+        assert_eq!(floats.len(), 3);
 
         self.graphics_state.current_transform = self.graphics_state.current_transform
             * Transform::scale(floats[0], floats[1], floats[2]);
@@ -231,7 +227,7 @@ impl SceneBuilder {
         assert_eq!(tokens.len(), 2);
         assert_eq!(json_value_to_string(tokens[0].clone()), "Transform");
 
-        let value_list = json_value_to_float_vec(tokens[1].clone());
+        let value_list = json_value_to_floats(tokens[1].clone());
         assert_eq!(value_list.len(), 16);
 
         self.graphics_state.current_transform =
@@ -242,10 +238,8 @@ impl SceneBuilder {
         assert_eq!(tokens.len(), 4);
         assert_eq!(json_value_to_string(tokens[0].clone()), "Translate");
 
-        let floats: Vec<Float> = (&tokens.clone()[1..])
-            .into_iter()
-            .map(|v| json_value_to_string(v.clone()).parse::<Float>().unwrap())
-            .collect();
+        let floats = json_values_to_floats(&tokens.clone()[1..]);
+        assert_eq!(floats.len(), 3);
 
         self.graphics_state.current_transform = self.graphics_state.current_transform
             * Transform::translate(floats[0], floats[1], floats[2]);
