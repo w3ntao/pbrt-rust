@@ -22,13 +22,11 @@ fn render(file_path: &str) {
 
 fn main() {
     render("/home/wentao/Desktop/pbrt-v4-scenes-json/ganesha/ganesha.json");
+    render("/home/wentao/Desktop/pbrt-v4-scenes-json/lte-orb/lte-orb-simple-ball.json");
 
-    //render("/home/wentao/Desktop/pbrt-v4-scenes-json/lte-orb/lte-orb-simple-ball.json");
     return;
 
-    render("/home/wentao/Desktop/pbrt-v4-scenes-json/ganesha/ganesha.json");
     render("/home/wentao/Desktop/pbrt-v4-scenes-json/lte-orb/lte-orb-silver.json");
-
     render("/home/wentao/Desktop/pbrt-v4-scenes-json/killeroos/killeroo-gold.json");
     render("/home/wentao/Desktop/pbrt-v4-scenes-json/killeroos/killeroo-simple.json");
 

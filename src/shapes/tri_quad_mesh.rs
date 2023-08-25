@@ -7,25 +7,33 @@ pub struct TriQuadMesh {
     pub tri_indices: Vec<usize>,
 }
 
-pub fn read_ply(path: &str) -> TriQuadMesh {
+pub fn read_ply(ply_file_path: &str) -> TriQuadMesh {
     // create a parser
     let ply_parser = ply_rs::parser::Parser::<ply::DefaultElement>::new();
 
-    let path_without_gz = if path.ends_with(".ply.gz") {
-        &path[..(path.len() - 3)]
+    let path_without_gz = if ply_file_path.ends_with(".ply.gz") {
+        // TODO: rewrite ply-rs to read gzipped files
+        let without_gz = &ply_file_path[..(ply_file_path.len() - 3)];
+        if !Path::new(without_gz).exists() {
+            println!("please unzip `{}` with command:", ply_file_path);
+            println!("$ gzip {} -cdk > {}", ply_file_path, without_gz);
+            exit(1);
+        }
+        without_gz
     } else {
-        &path
+        &ply_file_path
     };
 
+    println!("reading `{}`", path_without_gz);
     // use the parser: read the entire file
-    let ply = ply_parser.read_ply(&mut File::open(path_without_gz).unwrap());
+    let _ply_model = ply_parser.read_ply(&mut File::open(path_without_gz).unwrap());
 
     // make sure it did work
-    if !ply.is_ok() {
-        panic!("illegal ply format: {}", path_without_gz);
+    if !_ply_model.is_ok() {
+        panic!("illegal PLY format: {}", path_without_gz);
     }
 
-    let ply = ply.unwrap();
+    let ply_model = _ply_model.unwrap();
 
     let mut p: Vec<Point3f> = Vec::new();
     let mut n: Vec<Normal3f> = Vec::new();
@@ -34,7 +42,7 @@ pub fn read_ply(path: &str) -> TriQuadMesh {
     let mut has_uvs: bool = false;
     let mut vertex_indices: Vec<usize> = Vec::new();
 
-    for (name, list) in ply.payload.into_iter() {
+    for (name, list) in ply_model.payload.into_iter() {
         match name.as_ref() {
             "vertex" => {
                 for elem in list.into_iter() {

@@ -338,11 +338,9 @@ impl SceneBuilder {
         };
     }
 
-    fn parse_file(&mut self, file_path: &str) {
+    fn parse_file(&mut self, file_path: &str, root: &str) {
         let blocks = parse_json(file_path);
         let block_length = json_value_to_usize(blocks["length"].clone());
-
-        let current_folder = get_folder_potion(file_path);
 
         for idx in 0..block_length {
             let tokens = blocks[format!("token_{}", idx)].as_array().unwrap();
@@ -379,8 +377,8 @@ impl SceneBuilder {
                 "Include" => {
                     assert_eq!(tokens.len(), 2);
                     let included_path = json_value_to_string(tokens[1].clone());
-                    let absolute_path = format!("{}/{}", current_folder, included_path);
-                    self.parse_file(absolute_path.as_str());
+                    let absolute_path = format!("{}/{}", root, included_path);
+                    self.parse_file(absolute_path.as_str(), root);
                 }
 
                 "LookAt" => {
@@ -405,7 +403,7 @@ impl SceneBuilder {
                 }
 
                 "Shape" => {
-                    self.parse_shape(tokens, current_folder.as_str());
+                    self.parse_shape(tokens, root);
                 }
 
                 "Transform" => {
@@ -463,7 +461,7 @@ impl SceneBuilder {
     }
 
     pub fn parse_scene(&mut self, file_path: &str) -> SceneConfig {
-        self.parse_file(file_path);
+        self.parse_file(file_path, &get_folder_potion(file_path));
 
         let filter = Arc::new(BoxFilter::new(0.5));
 
