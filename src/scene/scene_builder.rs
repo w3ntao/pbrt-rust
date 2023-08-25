@@ -245,7 +245,7 @@ impl SceneBuilder {
             * Transform::translate(floats[0], floats[1], floats[2]);
     }
 
-    fn parse_shape(&mut self, tokens: &Vec<Value>) {
+    fn parse_shape(&mut self, tokens: &Vec<Value>, current_folder: &str) {
         assert_eq!(json_value_to_string(tokens[0].clone()), "Shape");
 
         let parameters = ParameterDict::build_from_vec(&tokens[2..]);
@@ -307,7 +307,6 @@ impl SceneBuilder {
                 );
 
                 let triangles = mesh.create_triangles();
-
                 for _triangle in &triangles {
                     let primitive = SimplePrimitive::new(_triangle.clone());
                     self.primitives.push(Arc::new(primitive));
@@ -315,13 +314,26 @@ impl SceneBuilder {
             }
 
             "plymesh" => {
-                let filename = parameters.get_string("filename");
-                println!("about to read {}", filename);
+                let absolute_path =
+                    format!("{}/{}", current_folder, parameters.get_string("filename"));
+                let tri_quad_mesh = read_ply(absolute_path.as_str());
 
-                exit(0);
+                if tri_quad_mesh.tri_indices.len() > 0 {
+                    let triangle_mesh = TriangleMesh::new(
+                        renderFromObject,
+                        tri_quad_mesh.p,
+                        tri_quad_mesh.tri_indices,
+                    );
+
+                    let triangles = triangle_mesh.create_triangles();
+                    for _triangle in &triangles {
+                        let primitive = SimplePrimitive::new(_triangle.clone());
+                        self.primitives.push(Arc::new(primitive));
+                    }
+                }
             }
             _ => {
-                panic!("unknown Shape name: `{}`", name);
+                panic!("unknown Shape: `{}`", name);
             }
         };
     }
@@ -329,6 +341,8 @@ impl SceneBuilder {
     fn parse_file(&mut self, file_path: &str) {
         let blocks = parse_json(file_path);
         let block_length = json_value_to_usize(blocks["length"].clone());
+
+        let current_folder = get_folder_potion(file_path);
 
         for idx in 0..block_length {
             let tokens = blocks[format!("token_{}", idx)].as_array().unwrap();
@@ -365,8 +379,7 @@ impl SceneBuilder {
                 "Include" => {
                     assert_eq!(tokens.len(), 2);
                     let included_path = json_value_to_string(tokens[1].clone());
-                    let absolute_path =
-                        format!("{}/{}", get_folder_potion(file_path), included_path);
+                    let absolute_path = format!("{}/{}", current_folder, included_path);
                     self.parse_file(absolute_path.as_str());
                 }
 
@@ -392,7 +405,7 @@ impl SceneBuilder {
                 }
 
                 "Shape" => {
-                    self.parse_shape(tokens);
+                    self.parse_shape(tokens, current_folder.as_str());
                 }
 
                 "Transform" => {

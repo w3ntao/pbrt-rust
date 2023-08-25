@@ -11,12 +11,18 @@ pub fn read_ply(path: &str) -> TriQuadMesh {
     // create a parser
     let ply_parser = ply_rs::parser::Parser::<ply::DefaultElement>::new();
 
+    let path_without_gz = if path.ends_with(".ply.gz") {
+        &path[..(path.len() - 3)]
+    } else {
+        &path
+    };
+
     // use the parser: read the entire file
-    let ply = ply_parser.read_ply(&mut File::open(path).unwrap());
+    let ply = ply_parser.read_ply(&mut File::open(path_without_gz).unwrap());
 
     // make sure it did work
     if !ply.is_ok() {
-        panic!("illegal ply format: {}", path);
+        panic!("illegal ply format: {}", path_without_gz);
     }
 
     let ply = ply.unwrap();

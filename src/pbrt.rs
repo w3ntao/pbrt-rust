@@ -23,7 +23,7 @@ pub use std::{
     io::{BufReader, Read},
     iter::Sum,
     ops::{Add, AddAssign, Div, Index, IndexMut, Mul, MulAssign, Neg, Sub},
-    process::exit,
+    process::{exit, Command},
     str::FromStr,
     sync::{
         atomic::{AtomicUsize, Ordering},
