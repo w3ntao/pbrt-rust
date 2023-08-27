@@ -73,20 +73,17 @@ fn build_film(film_entity: &SceneEntity, _filter: Arc<BoxFilter>) -> Arc<Mutex<S
     }));
 }
 
-fn build_camera(
-    camera_entity: &SceneEntity,
-    film: Arc<Mutex<SimpleRGBFilm>>,
-) -> Arc<Mutex<dyn Camera>> {
-    return Arc::new(Mutex::new(match camera_entity.name.as_str() {
+fn build_camera(camera_entity: &SceneEntity, resolution: Point2i) -> Arc<dyn Camera> {
+    return Arc::new(match camera_entity.name.as_str() {
         "perspective" => PerspectiveCamera::new(
             camera_entity.camera_transform,
             camera_entity.parameters.clone(),
-            film,
+            resolution,
         ),
         _ => {
             panic!("unknown camera type: `{}`", camera_entity.name);
         }
-    }));
+    });
 }
 
 #[derive(Copy, Clone)]
@@ -472,22 +469,15 @@ impl SceneBuilder {
         };
 
         let camera = if self.camera_entity.initialized {
-            build_camera(&self.camera_entity, film.clone())
+            build_camera(&self.camera_entity, film.lock().unwrap().resolution)
         } else {
             panic!("default Camera not implemented");
         };
 
         let sampler = Arc::new(IndependentSampler::default());
-
         let integrator = Arc::new(SurfaceNormalVisualizer::new());
-
         let bvh_aggregate = Arc::new(BVHAggregate::new(self.primitives.clone()));
 
-        return SceneConfig::new(
-            integrator.clone(),
-            camera.clone(),
-            sampler.clone(),
-            bvh_aggregate,
-        );
+        return SceneConfig::new(integrator, bvh_aggregate, sampler, camera, film);
     }
 }

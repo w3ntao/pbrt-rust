@@ -12,19 +12,15 @@ pub struct PerspectiveCamera {
     pub dyCamera: Vector3f,
 
     pub lens_radius: Float,
-
-    pub film: Arc<Mutex<SimpleRGBFilm>>,
 }
 
 impl PerspectiveCamera {
     pub fn new(
         camera_transform: CameraTransform,
         parameters: ParameterDict,
-        film: Arc<Mutex<SimpleRGBFilm>>,
+        resolution: Point2i,
     ) -> Self {
         let _fov = parameters.get_one_float("fov", Some(90.0));
-
-        let resolution = film.lock().unwrap().resolution;
 
         let frame_aspect_ratio = (resolution.x as Float) / (resolution.y as Float);
 
@@ -74,17 +70,12 @@ impl PerspectiveCamera {
             cameraFromRaster,
             dxCamera,
             dyCamera,
-            film,
             lens_radius: 0.0,
         };
     }
 }
 
 impl Camera for PerspectiveCamera {
-    fn get_film(&self) -> Arc<Mutex<SimpleRGBFilm>> {
-        return self.film.clone();
-    }
-
     fn generate_camera_ray(&self, sample: CameraSample) -> Ray {
         let pFilm = Point3f::new(sample.pFilm.x, sample.pFilm.y, 0.0);
         let pCamera = self.cameraFromRaster.on_point3f(pFilm);

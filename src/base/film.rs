@@ -37,7 +37,7 @@ impl SimpleRGBFilm {
         self.pixels[point_film.y as usize][point_film.x as usize] = spectrum;
     }
 
-    pub fn save_image(&self, file_name: &str) {
+    pub fn save_image(&self) {
         let mut buffer: RgbImage =
             ImageBuffer::new(self.resolution.x as u32, self.resolution.y as u32);
         let factor = 256.0 - 0.0001;
@@ -51,6 +51,7 @@ impl SimpleRGBFilm {
             // sqrt(): gamma correction
         }
 
-        buffer.save(file_name).unwrap();
+        buffer.save(self.filename.clone()).unwrap();
+        println!("image saved to `{}`", self.filename.clone());
     }
 }

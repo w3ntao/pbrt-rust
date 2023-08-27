@@ -5,8 +5,9 @@ pub trait Integrator {
         &self,
         p_pixel: Point2i,
         sample_index: usize,
+        aggregate: Arc<dyn Primitive>,
         sampler: &mut dyn Sampler,
-        camera: Arc<Mutex<dyn Camera>>,
-        world: Arc<dyn Primitive>,
+        camera: Arc<dyn Camera>,
+        film: Arc<Mutex<SimpleRGBFilm>>,
     );
 }

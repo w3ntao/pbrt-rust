@@ -67,7 +67,5 @@ impl CameraSample {
 }
 
 pub trait Camera {
-    fn get_film(&self) -> Arc<Mutex<SimpleRGBFilm>>;
-
     fn generate_camera_ray(&self, sample: CameraSample) -> Ray;
 }

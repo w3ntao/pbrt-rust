@@ -13,19 +13,20 @@ impl Integrator for SurfaceNormalVisualizer {
         &self,
         p_pixel: Point2i,
         sample_index: usize,
-        sampler: &mut dyn Sampler,
-        camera: Arc<Mutex<dyn Camera>>,
         aggregate: Arc<dyn Primitive>,
+        sampler: &mut dyn Sampler,
+        camera: Arc<dyn Camera>,
+        film: Arc<Mutex<SimpleRGBFilm>>,
     ) {
         // TODO: rewrite sampler initialization
-
-        let film = camera.lock().unwrap().get_film();
+        // TODO: rewrite this function to evaluate a row in a time
+        // to reduce concurrent access to shared data
 
         let filter = film.lock().unwrap().filter.clone();
 
         let camera_sample = sampler.get_camera_sample(p_pixel.clone(), filter);
 
-        let camera_ray = camera.lock().unwrap().generate_camera_ray(camera_sample);
+        let camera_ray = camera.generate_camera_ray(camera_sample);
 
         let color = match aggregate.intersect(&camera_ray, Float::INFINITY) {
             None => RGBColor::black(),
