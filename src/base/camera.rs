@@ -66,6 +66,6 @@ impl CameraSample {
     }
 }
 
-pub trait Camera {
+pub trait Camera: Send + Sync {
     fn generate_camera_ray(&self, sample: CameraSample) -> Ray;
 }

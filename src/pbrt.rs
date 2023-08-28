@@ -30,6 +30,9 @@ pub use std::{
         atomic::{AtomicUsize, Ordering},
         {Arc, Mutex},
     },
+    thread,
+    thread::JoinHandle,
+    time::Instant,
 };
 
 pub use crate::{

@@ -16,7 +16,7 @@ impl Integrator for SurfaceNormalVisualizer {
         aggregate: Arc<dyn Primitive>,
         sampler: &mut dyn Sampler,
         camera: Arc<dyn Camera>,
-        film: Arc<Mutex<SimpleRGBFilm>>,
+        film: &mut Arc<Mutex<SimpleRGBFilm>>,
     ) {
         // TODO: rewrite sampler initialization
         // TODO: rewrite this function to evaluate a row in a time

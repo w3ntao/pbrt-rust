@@ -1,6 +1,6 @@
 use crate::pbrt::*;
 
-pub trait Sampler {
+pub trait Sampler: Send + Sync {
     fn fork(&self) -> Box<dyn Sampler>;
 
     fn get_1d(&mut self) -> Float;
