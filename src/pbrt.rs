@@ -42,6 +42,7 @@ pub use crate::{
         sampler::*, shape::*, shape_intersection::*,
     },
     cameras::perspective::*,
+    films::rgb_film::*,
     filters::box_filter::*,
     integrators::surface_normal_visualizer::*,
     math::{

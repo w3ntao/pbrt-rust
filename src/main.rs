@@ -11,6 +11,7 @@ mod samplers;
 mod scene;
 mod shapes;
 mod filters;
+mod films;
 
 use crate::pbrt::*;
 

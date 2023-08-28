@@ -16,13 +16,13 @@ impl Integrator for SurfaceNormalVisualizer {
         aggregate: Arc<dyn Primitive>,
         sampler: &mut dyn Sampler,
         camera: Arc<dyn Camera>,
-        film: &mut Arc<Mutex<SimpleRGBFilm>>,
+        film: &mut Arc<Mutex<dyn Film>>,
     ) {
         // TODO: rewrite sampler initialization
         // TODO: rewrite this function to evaluate a row in a time
         // to reduce concurrent access to shared data
 
-        let filter = film.lock().unwrap().filter.clone();
+        let filter = film.lock().unwrap().get_filter().clone();
 
         let camera_sample = sampler.get_camera_sample(p_pixel.clone(), filter);
 

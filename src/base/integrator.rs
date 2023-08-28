@@ -8,6 +8,6 @@ pub trait Integrator: Send + Sync {
         aggregate: Arc<dyn Primitive>,
         sampler: &mut dyn Sampler,
         camera: Arc<dyn Camera>,
-        film: &mut Arc<Mutex<SimpleRGBFilm>>,
+        film: &mut Arc<Mutex<dyn Film>>,
     );
 }

@@ -58,7 +58,7 @@ impl Default for SceneEntity {
     }
 }
 
-fn build_film(film_entity: &SceneEntity, _filter: Arc<BoxFilter>) -> Arc<Mutex<SimpleRGBFilm>> {
+fn build_film(film_entity: &SceneEntity, _filter: Arc<BoxFilter>) -> Arc<Mutex<dyn Film>> {
     let xresolution = film_entity.parameters.get_one_integer("xresolution", None);
     let yresolution = film_entity.parameters.get_one_integer("yresolution", None);
 
@@ -469,7 +469,7 @@ impl SceneBuilder {
         };
 
         let camera = if self.camera_entity.initialized {
-            build_camera(&self.camera_entity, film.lock().unwrap().resolution)
+            build_camera(&self.camera_entity, film.lock().unwrap().get_resolution())
         } else {
             panic!("default Camera not implemented");
         };

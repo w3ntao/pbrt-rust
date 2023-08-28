@@ -5,11 +5,11 @@ pub struct SceneConfig {
     aggregate: Arc<BVHAggregate>,
     sampler: Arc<dyn Sampler>,
     camera: Arc<dyn Camera>,
-    film: Arc<Mutex<SimpleRGBFilm>>,
+    film: Arc<Mutex<dyn Film>>,
 }
 
 fn single_thread_render(
-    film: &mut Arc<Mutex<SimpleRGBFilm>>,
+    film: &mut Arc<Mutex<dyn Film>>,
     job_list: &mut Arc<Mutex<Vec<i32>>>,
     num_samples: usize,
     integrator: Arc<dyn Integrator>,
@@ -20,7 +20,7 @@ fn single_thread_render(
     let mut forked_sampler = sampler.fork();
     let mutated_sampler = forked_sampler.as_mut();
 
-    let resolution = film.lock().unwrap().resolution;
+    let resolution = film.lock().unwrap().get_resolution();
     loop {
         let mut locked_job_list = job_list.lock().unwrap();
         let maybe_job = locked_job_list.pop();
@@ -55,7 +55,7 @@ impl SceneConfig {
         aggregate: Arc<BVHAggregate>,
         sampler: Arc<dyn Sampler>,
         camera: Arc<dyn Camera>,
-        film: Arc<Mutex<SimpleRGBFilm>>,
+        film: Arc<Mutex<dyn Film>>,
     ) -> Self {
         return SceneConfig {
             integrator,
@@ -67,7 +67,7 @@ impl SceneConfig {
     }
 
     pub fn render(&mut self) -> usize {
-        let resolution = self.film.lock().unwrap().resolution;
+        let resolution = self.film.lock().unwrap().get_resolution();
 
         let job_list = Arc::new(Mutex::new((0..resolution.y).collect::<Vec<i32>>()));
 
@@ -102,7 +102,7 @@ impl SceneConfig {
             handle.join().unwrap();
         }
 
-        self.film.lock().unwrap().save_image();
+        self.film.lock().unwrap().export_image();
 
         return cpu_num;
     }
