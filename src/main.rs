@@ -10,6 +10,7 @@ mod primitives;
 mod samplers;
 mod scene;
 mod shapes;
+mod filters;
 
 use crate::pbrt::*;
 

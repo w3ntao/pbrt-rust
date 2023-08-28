@@ -30,14 +30,9 @@ impl Integrator for SurfaceNormalVisualizer {
 
         let color = match aggregate.intersect(&camera_ray, Float::INFINITY) {
             None => RGBColor::black(),
-            Some(shape_intersection) => {
-                //let normal = shape_intersection.normal;
-                //RGBColor::new(normal.x.abs(), normal.y.abs(), normal.z.abs())
-
-                Vector3f::from(shape_intersection.normal)
-                    .normalize()
-                    .softmax_color()
-            }
+            Some(shape_intersection) => Vector3f::from(shape_intersection.normal)
+                .normalize()
+                .softmax_color(),
         };
 
         film.lock().unwrap().add_sample(p_pixel, color);

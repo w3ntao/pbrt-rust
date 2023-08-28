@@ -9,7 +9,7 @@ pub trait Sampler: Send + Sync {
 
     fn get_pixel_2d(&mut self) -> Point2f;
 
-    fn get_camera_sample(&mut self, p_pixel: Point2i, filter: Arc<BoxFilter>) -> CameraSample {
+    fn get_camera_sample(&mut self, p_pixel: Point2i, filter: Arc<dyn Filter>) -> CameraSample {
         let fs = filter.sample(self.get_pixel_2d());
         return CameraSample::new(
             Point2f::from(p_pixel) + fs.p + Vector2f::new(0.5, 0.5),

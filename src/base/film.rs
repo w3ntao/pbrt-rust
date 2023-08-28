@@ -5,12 +5,12 @@ use image::{ImageBuffer, Rgb, RgbImage};
 pub struct SimpleRGBFilm {
     pub resolution: Point2i,
     pub filename: String,
-    pub filter: Arc<BoxFilter>,
+    pub filter: Arc<dyn Filter>,
     pixels: Vec<Vec<RGBColor>>,
 }
 
 impl SimpleRGBFilm {
-    pub fn new(_resolution: Point2i, _filename: &String, _filter: Arc<BoxFilter>) -> Self {
+    pub fn new(_resolution: Point2i, _filename: &String, filter: Arc<dyn Filter>) -> Self {
         let width = _resolution.x;
         let height = _resolution.y;
 
@@ -28,7 +28,7 @@ impl SimpleRGBFilm {
         return SimpleRGBFilm {
             resolution: _resolution.clone(),
             filename: png_filename,
-            filter: _filter.clone(),
+            filter: filter.clone(),
             pixels: vec![vec![RGBColor::black(); width as usize]; height as usize],
         };
     }
