@@ -24,7 +24,7 @@ pub fn read_ply(ply_file_path: &str) -> TriQuadMesh {
         &ply_file_path
     };
 
-    println!("reading `{}`", path_without_gz);
+    // println!("reading `{}`", path_without_gz);
     // use the parser: read the entire file
     let _ply_model = ply_parser.read_ply(&mut File::open(path_without_gz).unwrap());
 

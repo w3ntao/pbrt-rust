@@ -33,16 +33,14 @@ fn single_thread_render(
             Some(y) => {
                 for x in 0..resolution.x {
                     let pixel = Point2i::new(x, y);
-                    for sample_index in 0..num_samples {
-                        integrator.evaluate_pixel_sample(
-                            pixel,
-                            sample_index,
-                            aggregate.clone(),
-                            mutated_sampler,
-                            camera.clone(),
-                            &mut film.clone(),
-                        );
-                    }
+                    integrator.evaluate_pixel_sample(
+                        pixel,
+                        num_samples,
+                        aggregate.clone(),
+                        mutated_sampler,
+                        camera.clone(),
+                        &mut film.clone(),
+                    );
                 }
             }
         }
@@ -66,16 +64,14 @@ impl SceneConfig {
         };
     }
 
-    pub fn render(&mut self) -> usize {
+    pub fn render(&mut self, num_samples: usize, num_cores: usize) {
         let resolution = self.film.lock().unwrap().get_resolution();
 
         let job_list = Arc::new(Mutex::new((0..resolution.y).collect::<Vec<i32>>()));
 
         let mut handles: Vec<JoinHandle<()>> = vec![];
-        let cpu_num = num_cpus::get();
 
-        let num_samples = 20;
-        for _ in 0..cpu_num {
+        for _ in 0..num_cores {
             let mut shared_film = self.film.clone();
             let mut shared_job_list = job_list.clone();
 
@@ -103,7 +99,5 @@ impl SceneConfig {
         }
 
         self.film.lock().unwrap().export_image();
-
-        return cpu_num;
     }
 }

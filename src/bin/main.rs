@@ -7,13 +7,15 @@ fn render(file_path: &str) {
 
     let preprocessing_finished = Instant::now();
 
-    let cores = scene_config.render();
+    let num_samples = 10;
+    let cpu_num = num_cpus::get();
 
+    scene_config.render(num_samples, cpu_num);
     println!(
         "total times: ({} + {}) second ({} cores)",
         (preprocessing_finished - start).as_secs(),
         preprocessing_finished.elapsed().as_secs(),
-        cores
+        cpu_num
     );
     println!();
 }
@@ -21,13 +23,7 @@ fn render(file_path: &str) {
 fn main() {
     render("/home/wentao/Desktop/pbrt-v4-scenes-json/ganesha/ganesha.json");
     render("/home/wentao/Desktop/pbrt-v4-scenes-json/lte-orb/lte-orb-simple-ball.json");
-    render("/home/wentao/Desktop/pbrt-v4-scenes-json/killeroos/killeroo-simple.json");
-
-    return;
-
-    render("/home/wentao/Desktop/pbrt-v4-scenes-json/lte-orb/lte-orb-silver.json");
     render("/home/wentao/Desktop/pbrt-v4-scenes-json/killeroos/killeroo-gold.json");
     render("/home/wentao/Desktop/pbrt-v4-scenes-json/killeroos/killeroo-simple.json");
-
-    return;
+    render("/home/wentao/Desktop/pbrt-v4-scenes-json/lte-orb/lte-orb-silver.json");
 }
