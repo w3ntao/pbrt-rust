@@ -154,31 +154,49 @@ impl Triangle {
             self.mesh.points[v2],
         );
     }
+
+    fn build_interaction(&self, ti: &TriangleIntersection, wo: Vector3f) -> SurfaceInteraction {
+        let (p0, p1, p2) = self.get_points();
+        let dp02 = p0 - p2;
+        let dp12 = p1 - p2;
+
+        // Interpolate $(u,v)$ parametric coordinates and hit point
+        let pHit = ti.b0 * p0 + ti.b1 * p1 + ti.b2 * p2;
+        let pAbsSum = (ti.b0 * p0).abs() + (ti.b1 * p1).abs() + (ti.b2 * p2).abs();
+
+        let pError = gamma(7) * Vector3f::from(pAbsSum);
+
+        let n = Normal3f::from(dp02.cross(dp12).normalize());
+        // TODO: flip n with `reverseOrientation` and transformSwapsHandedness?
+
+        return SurfaceInteraction {
+            pi: Point3fi::from_value_and_error(pHit, pError),
+            n,
+            wo,
+        };
+    }
 }
 
 impl Shape for Triangle {
     fn intersect(&self, ray: &Ray, t_max: Float) -> Option<ShapeIntersection> {
         let (p0, p1, p2) = self.get_points();
 
-        return match intersect_triangle(ray, t_max, p0, p1, p2) {
-            None => None,
-            Some(si) => {
-                let normal = (p2 - p0).cross(p1 - p0);
-                let normalized_normal = Normal3f::from(
-                    if normal.dot(ray.d) > 0.0 {
-                        -normal
-                    } else {
-                        normal
-                    }
-                    .normalize(),
-                );
-
-                Some(ShapeIntersection {
-                    normal: normalized_normal,
-                    t_hit: si.t,
-                })
+        let triangle_intersection = match intersect_triangle(ray, t_max, p0, p1, p2) {
+            None => {
+                return None;
             }
+            Some(_ti) => _ti,
         };
+
+        return Some(ShapeIntersection {
+            t_hit: triangle_intersection.t,
+            interaction: self.build_interaction(&triangle_intersection, -ray.d),
+        });
+    }
+
+    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool {
+        let (p0, p1, p2) = self.get_points();
+        return intersect_triangle(ray, t_max, p0, p1, p2).is_some();
     }
 
     fn bounds(&self) -> Bounds3f {

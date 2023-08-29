@@ -475,7 +475,8 @@ impl SceneBuilder {
         };
 
         let sampler = Arc::new(IndependentSampler::default());
-        let integrator = Arc::new(SurfaceNormalVisualizer::new());
+        //let integrator = Arc::new(SurfaceNormalVisualizer::new());
+        let integrator = Arc::new(AmbientOcclusion::new());
         let bvh_aggregate = Arc::new(BVHAggregate::new(self.primitives.clone()));
 
         return SceneConfig::new(integrator, bvh_aggregate, sampler, camera, film);

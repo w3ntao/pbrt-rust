@@ -39,22 +39,22 @@ pub use crate::{
     accelerator::bvh::*,
     base::{
         camera::*, film::*, filter::*, integrator::*, primitive::*, ray::*, rgb_color::*,
-        sampler::*, shape::*, shape_intersection::*,
+        sampler::*, shape::*,
     },
     cameras::perspective::*,
     films::rgb_film::*,
     filters::box_filter::*,
-    integrators::surface_normal_visualizer::*,
+    integrators::{ambient_occlusion::*, surface_normal_visualizer::*},
     math::{
-        arithmetic::*, bounds::*, compensated_float::*, float::*, interval::*, interval::*,
-        normal::*, point2::*, point3::*, square_matrix::*, transform::*, vector2::*, vector3::*,
+        arithmetic::*, bounds::*, compensated_float::*, float::*, frame::*, interval::*,
+        interval::*, normal::*, point2::*, point3::*, square_matrix::*, transform::*, vector2::*,
+        vector3::*,
     },
     primitives::simple_primitive::*,
     samplers::independent::*,
     scene::{parameter_dict::*, scene_builder::*, scene_config::*, util::*},
-    shapes::{
-        loop_subdivision::*, sphere::*, tri_quad_mesh::*, triangle::*, triangle_mesh::*, util::*,
-    },
+    shapes::{loop_subdivision::*, sphere::*, tri_quad_mesh::*, triangle::*, triangle_mesh::*},
+    util::{math::*, sampling::*},
 };
 
 pub type Point2f = Point2<Float>;

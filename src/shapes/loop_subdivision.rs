@@ -785,5 +785,5 @@ pub fn loop_subdivide(
 
     let mesh = TriangleMesh::new(renderFromObject, pLimit, mesh_vertex_indicies);
     return mesh.create_triangles();
-    // TODO: implement Normals3
+    // TODO: read and parse Normal3f
 }

@@ -33,7 +33,7 @@ impl Primitive for BVHAggregate {
 
             if node.primitive_num > 0 {
                 for idx in node.offset..(node.offset + node.primitive_num as u32) {
-                    let primitive = self.ordered_primitives[idx as usize].clone();
+                    let primitive = &self.ordered_primitives[idx as usize];
                     match primitive.intersect(ray, best_t) {
                         None => {
                             continue;
@@ -59,6 +59,52 @@ impl Primitive for BVHAggregate {
         }
 
         return best_intersection;
+    }
+
+    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool {
+        let invDir = Vector3f::new(1.0 / ray.d.x, 1.0 / ray.d.y, 1.0 / ray.d.z);
+        let dirIsNeg = [
+            (invDir.x < 0.0) as usize,
+            (invDir.y < 0.0) as usize,
+            (invDir.z < 0.0) as usize,
+        ];
+
+        let mut nodes_to_visit = vec![0];
+        loop {
+            let current_node_idx = match nodes_to_visit.pop() {
+                None => {
+                    return false;
+                }
+                Some(idx) => idx,
+            };
+
+            let node = &self.linear_bvh_nodes[current_node_idx];
+            if !node.bounds.fast_intersect(ray, t_max, invDir, dirIsNeg) {
+                continue;
+            }
+
+            if node.primitive_num > 0 {
+                for idx in node.offset..(node.offset + node.primitive_num as u32) {
+                    let primitive = &self.ordered_primitives[idx as usize];
+                    if primitive.fast_intersect(ray, t_max) {
+                        return true;
+                    }
+                }
+                continue;
+            }
+
+            // interior node
+            // Put far BVH node on _nodesToVisit_ stack, advance to near node
+            if dirIsNeg[node.axis as usize] > 0 {
+                nodes_to_visit.push(current_node_idx + 1);
+                nodes_to_visit.push(node.offset as usize);
+            } else {
+                nodes_to_visit.push(node.offset as usize);
+                nodes_to_visit.push(current_node_idx + 1);
+            }
+        }
+
+        return false;
     }
 
     fn bounds(&self) -> Bounds3f {

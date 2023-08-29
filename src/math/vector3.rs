@@ -66,6 +66,14 @@ impl<T: Copy + Add<Output = T> + Mul<Output = T>> Vector3<T> {
 }
 
 impl Vector3<Float> {
+    pub fn nan() -> Self {
+        return Self {
+            x: Float::NAN,
+            y: Float::NAN,
+            z: Float::NAN,
+        };
+    }
+
     pub fn abs(&self) -> Vector3<Float> {
         return Vector3::<Float> {
             x: self.x.abs(),
@@ -94,6 +102,10 @@ impl Vector3<Float> {
         };
     }
 
+    pub fn face_forward(&self, v: Self) -> Self {
+        return if self.dot(v) >= 0.0 { *self } else { -*self };
+    }
+
     pub fn max_component_index(&self) -> usize {
         return if self.x > self.y {
             if self.x > self.z {
@@ -112,6 +124,18 @@ impl Vector3<Float> {
 
     pub fn max_component_value(&self) -> Float {
         return self.x.max(self.y).max(self.z);
+    }
+
+    pub fn coordinate_system(&self) -> (Vector3f, Vector3f) {
+        let sign = (1.0 as Float).copysign(self.z);
+
+        let a = -1.0 / (sign + self.z);
+        let b = self.x * self.y * a;
+
+        let v2 = Vector3f::new(1.0 + sign * self.x * self.x * a, sign * b, -sign * self.x);
+        let v3 = Vector3f::new(b, sign + self.y * self.y * a, -self.y);
+
+        return (v2, v3);
     }
 
     pub fn softmax_color(&self) -> RGBColor {
@@ -182,6 +206,18 @@ impl<T> Index<usize> for Vector3<T> {
             _ => {
                 panic!("Vector3: illegal index: {}", index);
             }
+        };
+    }
+}
+
+impl<T: Copy + Add<T, Output = T>> Add<Vector3<T>> for Vector3<T> {
+    type Output = Vector3<T>;
+
+    fn add(self, rhs: Vector3<T>) -> Self::Output {
+        return Self {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z,
         };
     }
 }

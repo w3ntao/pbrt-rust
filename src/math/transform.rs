@@ -280,6 +280,32 @@ impl Transform {
         return Vector3fi::new_with_error(Vector3f::new(xp, yp, zp), vOutError);
     }
 
+    pub fn on_normal3f(&self, n: Normal3f) -> Normal3f {
+        /*
+           T x = n.x, y = n.y, z = n.z;
+           return Normal3<T>(mInv[0][0] * x + mInv[1][0] * y + mInv[2][0] * z,
+                             mInv[0][1] * x + mInv[1][1] * y + mInv[2][1] * z,
+                             mInv[0][2] * x + mInv[1][2] * y + mInv[2][2] * z);
+
+        */
+
+        let x = n.x;
+        let y = n.y;
+        let z = n.z;
+
+        return Normal3f {
+            x: self.inverted_matrix[0][0] * x
+                + self.inverted_matrix[1][0] * y
+                + self.inverted_matrix[2][0] * z,
+            y: self.inverted_matrix[0][1] * x
+                + self.inverted_matrix[1][1] * y
+                + self.inverted_matrix[2][1] * z,
+            z: self.inverted_matrix[0][2] * x
+                + self.inverted_matrix[1][2] * y
+                + self.inverted_matrix[2][2] * z,
+        };
+    }
+
     pub fn on_bounds(&self, bounds: Bounds3f) -> Bounds3f {
         // a smarter way to transform bounds:
         // takes roughly 2 transforms instead of 8
@@ -322,6 +348,17 @@ impl Transform {
 
     pub fn on_ray_with_error(&self, r: Ray) -> (Ray, Float) {
         panic!("not implemented");
+    }
+
+    pub fn on_surface_interaction(
+        &self,
+        surface_interaction: SurfaceInteraction,
+    ) -> SurfaceInteraction {
+        let pi = self.on_point3fi(surface_interaction.pi);
+        let n = self.on_normal3f(surface_interaction.n);
+        let wo = self.on_vector3f(surface_interaction.wo).normalize();
+
+        return SurfaceInteraction { pi, n, wo };
     }
 }
 

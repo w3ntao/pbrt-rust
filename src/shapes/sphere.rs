@@ -7,7 +7,7 @@ pub struct Sphere {
     thetaZMin: Float,
     thetaZMax: Float,
     phiMax: Float,
-    renderFromObject: Transform,
+    render_from_object: Transform,
     objectFromRender: Transform,
     reverseOrientation: bool,
 }
@@ -29,7 +29,7 @@ impl Sphere {
         let phiMax = degree_to_radian(clamp(phiMax, 0.0, 360.0));
 
         return Sphere {
-            renderFromObject,
+            render_from_object: renderFromObject,
             objectFromRender,
             reverseOrientation,
             radius,
@@ -41,7 +41,7 @@ impl Sphere {
         };
     }
 
-    pub fn basic_intersect(&self, r: &Ray, t_max: Float) -> Option<QuadricIntersection> {
+    fn basic_intersect(&self, r: &Ray, t_max: Float) -> Option<QuadricIntersection> {
         // Transform _Ray_ origin and direction to object space
         let oi = self.objectFromRender.on_point3fi(Point3fi::from(r.o));
         let di = self.objectFromRender.on_vector3fi(Vector3fi::from(r.d));
@@ -140,10 +140,31 @@ impl Sphere {
 
         // Return _QuadricIntersection_ for sphere intersection
         return Some(QuadricIntersection {
-            tHit: tShapeHit.midpoint(),
-            pObj: pHit,
+            t_hit: tShapeHit.midpoint(),
+            p_obj: pHit,
             phi,
         });
+    }
+
+    fn build_interaction(
+        &self,
+        quadric_intersection: &QuadricIntersection,
+        wo: Vector3f,
+    ) -> SurfaceInteraction {
+        let p_hit = quadric_intersection.p_obj;
+        let p_error = gamma(5) * Vector3f::from(p_hit).abs();
+
+        let n = Normal3f::from(Vector3f::from(p_hit).normalize());
+
+        let local_interaction = SurfaceInteraction {
+            pi: Point3fi::from_value_and_error(p_hit, p_error),
+            n,
+            wo,
+        };
+
+        return self
+            .render_from_object
+            .on_surface_interaction(local_interaction);
     }
 }
 
@@ -151,26 +172,19 @@ impl Shape for Sphere {
     fn intersect(&self, ray: &Ray, t_max: Float) -> Option<ShapeIntersection> {
         return match self.basic_intersect(ray, t_max) {
             None => None,
-            Some(isect) => {
-                // TODO: convert intersection to interaction
-                let hit_point = self.renderFromObject.on_point3f(isect.pObj);
-                let origin_world_coord = self
-                    .renderFromObject
-                    .on_point3f(Point3f::new(0.0, 0.0, 0.0));
-                let normal = (hit_point - origin_world_coord).normalize();
-                let normal = if normal.dot(ray.d) > 0.0 {
-                    -normal
-                } else {
-                    normal
-                };
-                // TODO: convert intersection to interaction
+            Some(quadric_intersection) => {
+                let interaction = self.build_interaction(&quadric_intersection, -ray.d);
 
                 Some(ShapeIntersection {
-                    normal: Normal3f::from(normal),
-                    t_hit: isect.tHit,
+                    t_hit: quadric_intersection.t_hit,
+                    interaction,
                 })
             }
         };
+    }
+
+    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool {
+        return self.basic_intersect(ray, t_max).is_some();
     }
 
     fn bounds(&self) -> Bounds3f {
@@ -179,6 +193,6 @@ impl Shape for Sphere {
 
         let bounds = Bounds3f::from_multiple_points(&[point_0, point_1]);
 
-        return self.renderFromObject.on_bounds(bounds);
+        return self.render_from_object.on_bounds(bounds);
     }
 }

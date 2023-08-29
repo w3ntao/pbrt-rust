@@ -9,6 +9,10 @@ impl Primitive for SimplePrimitive {
         return self.shape.intersect(ray, t_max);
     }
 
+    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool {
+        return self.shape.fast_intersect(ray, t_max);
+    }
+
     fn bounds(&self) -> Bounds3f {
         return self.shape.bounds();
     }

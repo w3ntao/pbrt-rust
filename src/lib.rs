@@ -12,5 +12,6 @@ mod primitives;
 mod samplers;
 mod scene;
 mod shapes;
+mod util;
 
 pub use pbrt::*;

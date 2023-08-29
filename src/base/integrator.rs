@@ -1,6 +1,7 @@
 use crate::pbrt::*;
 
 pub trait Integrator: Send + Sync {
+    //TODO: rewrite Integrator to copy aggregate, sampler, camera
     fn evaluate_pixel_sample(
         &self,
         p_pixel: Point2i,
@@ -20,7 +21,7 @@ pub trait Integrator: Send + Sync {
             let camera_sample = sampler.get_camera_sample(p_pixel.clone(), filter.clone());
             let camera_ray = camera.generate_camera_ray(camera_sample);
 
-            accumulated_spectrum += self.Li(camera_ray, aggregate.clone());
+            accumulated_spectrum += self.Li(camera_ray, aggregate.clone(), sampler);
         }
 
         film.lock()
@@ -28,5 +29,9 @@ pub trait Integrator: Send + Sync {
             .add_sample(p_pixel, accumulated_spectrum / (num_samples as Float));
     }
 
-    fn Li(&self, camera_ray: Ray, aggregate: Arc<BVHAggregate>) -> RGBColor;
+    fn Li(&self, ray: Ray, aggregate: Arc<BVHAggregate>, sampler: &mut dyn Sampler) -> RGBColor;
+
+    fn fast_intersect(&self, ray: Ray, t_max: Float, aggregate: Arc<dyn Primitive>) -> bool {
+        panic!("not implemented");
+    }
 }

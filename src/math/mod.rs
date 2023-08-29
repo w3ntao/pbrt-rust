@@ -2,6 +2,7 @@ pub mod arithmetic;
 pub mod bounds;
 pub mod compensated_float;
 pub mod float;
+pub mod frame;
 pub mod interval;
 pub mod normal;
 pub mod point2;

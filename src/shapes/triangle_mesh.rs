@@ -6,17 +6,17 @@ pub struct TriangleMesh {
 }
 
 impl TriangleMesh {
-    pub fn new(renderFromObject: Transform, points: Vec<Point3f>, indices: Vec<usize>) -> Self {
+    pub fn new(render_from_object: Transform, points: Vec<Point3f>, indices: Vec<usize>) -> Self {
         if indices.len() % 3 != 0 {
             panic!("TriangleMesh: illegal parameter (indices' length can't be divided to 3)");
         }
 
-        let transformed_points = if renderFromObject.is_identity() {
+        let transformed_points = if render_from_object.is_identity() {
             points
         } else {
             points
                 .into_iter()
-                .map(|t| renderFromObject.on_point3f(t))
+                .map(|t| render_from_object.on_point3f(t))
                 .collect()
         };
 

@@ -185,19 +185,34 @@ impl<T: Copy> Point3<T> {
 }
 
 impl Point3<Float> {
-    pub fn min(&self, p: Point3<Float>) -> Point3<Float> {
-        return Point3::<Float> {
+    pub fn nan() -> Self {
+        return Self {
+            x: Float::NAN,
+            y: Float::NAN,
+            z: Float::NAN,
+        };
+    }
+    pub fn min(&self, p: Self) -> Self {
+        return Self {
             x: self.x.min(p.x),
             y: self.y.min(p.y),
             z: self.z.min(p.z),
         };
     }
 
-    pub fn max(&self, p: Point3<Float>) -> Point3<Float> {
-        return Point3::<Float> {
+    pub fn max(&self, p: Self) -> Self {
+        return Self {
             x: self.x.max(p.x),
             y: self.y.max(p.y),
             z: self.z.max(p.z),
+        };
+    }
+
+    pub fn abs(&self) -> Self {
+        return Self {
+            x: self.x.abs(),
+            y: self.y.abs(),
+            z: self.z.abs(),
         };
     }
 }

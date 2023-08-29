@@ -43,8 +43,7 @@ fn fetch_variable_value(value: &Value) -> Vec<String> {
     return match value.as_array() {
         None => {
             // if it's a string
-            let value_str = String::from(value.as_str().unwrap().clone());
-            vec![value_str]
+            vec![String::from(value.as_str().unwrap())]
         }
         Some(value_vector) => {
             // if it's a vec of string
@@ -127,7 +126,8 @@ impl ParameterDict {
                 }
 
                 "normal" => {
-                    //TODO: normal should be implement first
+                    //TODO: implement me
+                    panic!("normal not implemented");
                 }
 
                 _ => {

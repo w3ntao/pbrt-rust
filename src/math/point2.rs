@@ -73,3 +73,33 @@ impl<T: Add<Output = T>> Add<Vector2<T>> for Point2<T> {
         };
     }
 }
+
+impl<T: Sub<Output = T>> Sub<Vector2<T>> for Point2<T> {
+    type Output = Point2<T>;
+
+    fn sub(self, rhs: Vector2<T>) -> Self::Output {
+        return Point2::<T> {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+        };
+    }
+}
+
+impl<T: Mul<Output = T> + Copy> Mul<T> for Point2<T> {
+    type Output = Point2<T>;
+
+    fn mul(self, rhs: T) -> Self::Output {
+        return Self {
+            x: self.x * rhs,
+            y: self.y * rhs,
+        };
+    }
+}
+
+impl Mul<Point2f> for Float {
+    type Output = Point2f;
+
+    fn mul(self, rhs: Point2f) -> Self::Output {
+        return rhs * self;
+    }
+}
