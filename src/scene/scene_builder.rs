@@ -297,10 +297,13 @@ impl SceneBuilder {
                 let indices = parameters.get_integer_array("indices");
                 let points = parameters.get_point3_array("P");
 
+                let normals = parameters.get_normal3_array("N");
+
                 let mesh = TriangleMesh::new(
                     renderFromObject,
                     points,
                     indices.into_iter().map(|x| x as usize).collect(),
+                    normals,
                 );
 
                 let triangles = mesh.create_triangles();
@@ -320,6 +323,7 @@ impl SceneBuilder {
                         renderFromObject,
                         tri_quad_mesh.p,
                         tri_quad_mesh.tri_indices,
+                        tri_quad_mesh.n,
                     );
 
                     let triangles = triangle_mesh.create_triangles();

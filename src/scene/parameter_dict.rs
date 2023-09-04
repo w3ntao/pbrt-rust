@@ -6,6 +6,7 @@ pub struct ParameterDict {
     strings: HashMap<String, String>,
     point2s: HashMap<String, Vec<Point2f>>,
     point3s: HashMap<String, Vec<Point3f>>,
+    normal3s: HashMap<String, Vec<Normal3f>>,
 }
 
 impl Default for ParameterDict {
@@ -16,6 +17,7 @@ impl Default for ParameterDict {
             strings: HashMap::new(),
             point2s: HashMap::new(),
             point3s: HashMap::new(),
+            normal3s: HashMap::new(),
         };
     }
 }
@@ -28,6 +30,7 @@ impl Clone for ParameterDict {
             strings: self.strings.clone(),
             point2s: self.point2s.clone(),
             point3s: self.point3s.clone(),
+            normal3s: self.normal3s.clone(),
         };
     }
 }
@@ -84,6 +87,7 @@ impl ParameterDict {
         let mut strings = HashMap::<String, String>::new();
         let mut point2s = HashMap::<String, Vec<Point2f>>::new();
         let mut point3s = HashMap::<String, Vec<Point3f>>::new();
+        let mut normal3s = HashMap::<String, Vec<Normal3f>>::new();
 
         for idx in (0..array.len()).step_by(2) {
             let token = trim_quote(json_value_to_string(array[idx].clone()));
@@ -126,8 +130,17 @@ impl ParameterDict {
                 }
 
                 "normal" => {
-                    //TODO: implement me
-                    panic!("normal not implemented");
+                    let float_numbers = convert_string::<Float>(&variable_values);
+
+                    let mut normal_set = vec![];
+                    for idx in (0..float_numbers.len()).step_by(3) {
+                        normal_set.push(Normal3f::new(
+                            float_numbers[idx],
+                            float_numbers[idx + 1],
+                            float_numbers[idx + 2],
+                        ));
+                    }
+                    normal3s.insert(variable_name, normal_set);
                 }
 
                 _ => {
@@ -142,6 +155,7 @@ impl ParameterDict {
             strings,
             point2s,
             point3s,
+            normal3s,
         };
     }
 
@@ -208,6 +222,15 @@ impl ParameterDict {
         return match self.point3s.get(key) {
             None => {
                 panic!("found no key with name `{}`", key);
+            }
+            Some(val) => val.clone(),
+        };
+    }
+
+    pub fn get_normal3_array(&self, key: &str) -> Vec<Normal3f> {
+        return match self.normal3s.get(key) {
+            None => {
+                vec![]
             }
             Some(val) => val.clone(),
         };

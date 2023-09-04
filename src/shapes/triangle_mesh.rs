@@ -3,26 +3,39 @@ use crate::pbrt::*;
 pub struct TriangleMesh {
     pub indices: Vec<usize>,
     pub points: Vec<Point3f>,
+    pub normals: Vec<Normal3f>,
 }
 
 impl TriangleMesh {
-    pub fn new(render_from_object: Transform, points: Vec<Point3f>, indices: Vec<usize>) -> Self {
+    pub fn new(
+        render_from_object: Transform,
+        points: Vec<Point3f>,
+        indices: Vec<usize>,
+        normals: Vec<Normal3f>,
+    ) -> Self {
         if indices.len() % 3 != 0 {
             panic!("TriangleMesh: illegal parameter (indices' length can't be divided to 3)");
         }
 
-        let transformed_points = if render_from_object.is_identity() {
-            points
+        let (transformed_points, transformed_normals) = if render_from_object.is_identity() {
+            (points, normals)
         } else {
-            points
-                .into_iter()
-                .map(|t| render_from_object.on_point3f(t))
-                .collect()
+            (
+                points
+                    .into_iter()
+                    .map(|x| render_from_object.on_point3f(x))
+                    .collect(),
+                normals
+                    .into_iter()
+                    .map(|x| render_from_object.on_normal3f(x))
+                    .collect(),
+            )
         };
 
         return TriangleMesh {
             points: transformed_points,
             indices,
+            normals: transformed_normals,
         };
     }
 
