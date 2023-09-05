@@ -65,12 +65,9 @@ fn build_film(film_entity: &SceneEntity, _filter: Arc<BoxFilter>) -> Arc<Mutex<d
     let resolution = Point2i::new(xresolution, yresolution);
     let filename = film_entity.parameters.get_string("filename");
 
-    return Arc::new(Mutex::new(match film_entity.name.as_str() {
-        "rgb" => SimpleRGBFilm::new(resolution, &filename, _filter),
-        &_ => {
-            panic!("unknown Film name: `{}`", film_entity.name);
-        }
-    }));
+    return Arc::new(Mutex::new(SimpleRGBFilm::new(
+        resolution, &filename, _filter,
+    )));
 }
 
 fn build_camera(camera_entity: &SceneEntity, resolution: Point2i) -> Arc<dyn Camera> {

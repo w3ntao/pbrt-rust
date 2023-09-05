@@ -33,16 +33,12 @@ pub fn read_ply(ply_file_path: &str) -> TriQuadMesh {
         ply_file_path
     };
 
-    // println!("reading `{}`", path_without_gz);
-    // use the parser: read the entire file
-    let _ply_model = ply_parser.read_ply(&mut File::open(file_path).unwrap());
-
-    // make sure it did work
-    if !_ply_model.is_ok() {
-        panic!("illegal PLY format: {}", file_path);
-    }
-
-    let ply_model = _ply_model.unwrap();
+    let ply_model = match ply_parser.read_ply(&mut File::open(file_path).unwrap()) {
+        Ok(_model) => _model,
+        Err(msg) => {
+            panic!("fail to read PLY file `{}`:\n{}", file_path, msg);
+        }
+    };
 
     let mut p: Vec<Point3f> = Vec::new();
     let mut n: Vec<Normal3f> = Vec::new();

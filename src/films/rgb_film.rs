@@ -18,10 +18,6 @@ impl SimpleRGBFilm {
         let png_filename = if postfix == "png" {
             _filename.clone()
         } else {
-            println!(
-                "image format `.{}` is not supported, changed to `.png`",
-                postfix
-            );
             change_postfix(_filename, "png")
         };
 
