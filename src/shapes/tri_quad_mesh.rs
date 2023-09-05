@@ -11,26 +11,35 @@ pub fn read_ply(ply_file_path: &str) -> TriQuadMesh {
     // create a parser
     let ply_parser = ply_rs::parser::Parser::<ply::DefaultElement>::new();
 
-    let path_without_gz = if ply_file_path.ends_with(".ply.gz") {
-        // TODO: rewrite ply-rs to read gzipped files
-        let without_gz = &ply_file_path[..(ply_file_path.len() - 3)];
-        if !Path::new(without_gz).exists() {
-            println!("please unzip `{}` with command:", ply_file_path);
-            println!("$ gzip {} -cdk > {}", ply_file_path, without_gz);
-            exit(1);
+    let file_path = if ply_file_path.ends_with(".ply.gz") {
+        let file_path_without_gz = &ply_file_path[..(ply_file_path.len() - 3)];
+        if !Path::new(file_path_without_gz).exists() {
+            println!("unzipping `{}`", ply_file_path);
+            // gzip -dk ?.ply.gz
+            let msg = format!(
+                "\nfail to execute gzip command:\n$ gzip -dk {}\n\n",
+                ply_file_path
+            );
+            Command::new("gzip")
+                .arg("-dk")
+                .arg(ply_file_path)
+                .spawn()
+                .expect(&msg)
+                .wait()
+                .unwrap();
         }
-        without_gz
+        file_path_without_gz
     } else {
-        &ply_file_path
+        ply_file_path
     };
 
     // println!("reading `{}`", path_without_gz);
     // use the parser: read the entire file
-    let _ply_model = ply_parser.read_ply(&mut File::open(path_without_gz).unwrap());
+    let _ply_model = ply_parser.read_ply(&mut File::open(file_path).unwrap());
 
     // make sure it did work
     if !_ply_model.is_ok() {
-        panic!("illegal PLY format: {}", path_without_gz);
+        panic!("illegal PLY format: {}", file_path);
     }
 
     let ply_model = _ply_model.unwrap();
