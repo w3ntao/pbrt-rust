@@ -1,5 +1,4 @@
 #![feature(const_fn_floating_point_arithmetic)]
-extern crate clap;
 
 mod accelerator;
 mod base;

@@ -1,5 +1,6 @@
 extern crate ply_rs;
 use crate::pbrt::*;
+use flate2::bufread::GzDecoder;
 use ply_rs::ply;
 
 pub struct TriQuadMesh {
@@ -10,36 +11,25 @@ pub struct TriQuadMesh {
 }
 
 pub fn read_ply(ply_file_path: &str) -> TriQuadMesh {
-    // create a parser
-    let ply_parser = ply_rs::parser::Parser::<ply::DefaultElement>::new();
+    let ply_model = {
+        let ply_parser = ply_rs::parser::Parser::<ply::DefaultElement>::new();
+        let _file = &mut File::open(ply_file_path).unwrap();
 
-    // TODO: rewrite this part to enable .ply.gz file parsing
-    let file_path = if ply_file_path.ends_with(".ply.gz") {
-        let file_path_without_gz = &ply_file_path[..(ply_file_path.len() - 3)];
-        if !Path::new(file_path_without_gz).exists() {
-            println!("unzipping `{}`", ply_file_path);
-            // gzip -dk ?.ply.gz
-            let msg = format!(
-                "\nfail to execute gzip command:\n$ gzip -dk {}\n\n",
-                ply_file_path
-            );
-            Command::new("gzip")
-                .arg("-dk")
-                .arg(ply_file_path)
-                .spawn()
-                .expect(&msg)
-                .wait()
-                .unwrap();
-        }
-        file_path_without_gz
-    } else {
-        ply_file_path
-    };
+        let optional_model = if ply_file_path.ends_with(".ply.gz") {
+            let buffer_reader = BufReader::new(_file);
+            let mut gzip_reader = GzDecoder::new(buffer_reader);
+            ply_parser.read_ply(&mut gzip_reader)
+        } else if ply_file_path.ends_with(".ply") {
+            ply_parser.read_ply(_file)
+        } else {
+            panic!("unknown file format: {}", ply_file_path);
+        };
 
-    let ply_model = match ply_parser.read_ply(&mut File::open(file_path).unwrap()) {
-        Ok(_model) => _model,
-        Err(msg) => {
-            panic!("fail to read PLY file `{}`:\n{}", file_path, msg);
+        match optional_model {
+            Ok(_model) => _model,
+            Err(msg) => {
+                panic!("fail to read PLY file `{}`:\n{}", ply_file_path, msg);
+            }
         }
     };
 

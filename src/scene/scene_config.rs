@@ -1,4 +1,6 @@
 use crate::pbrt::*;
+use std::thread;
+use std::thread::JoinHandle;
 
 pub struct SceneConfig {
     integrator: Arc<dyn Integrator>,
