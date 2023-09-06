@@ -15,14 +15,23 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build-and-run:
+  build-and-test:
 
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
 
-    - name: cargo run
+    - name: cargo build
       run:
-        cargo run --release;
+        cargo build --release;
 
+    - name: clone scene
+      run:
+        pushd ..;
+        git clone https://github.com/w3ntao/pbrt-v4-scenes-json.git;
+        popd;
+
+    - name: render
+      run:
+        bash .github/workflows/render_test_scene.sh
