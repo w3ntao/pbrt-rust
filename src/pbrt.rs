@@ -1,5 +1,3 @@
-pub extern crate ply_rs;
-
 pub type Float = f32;
 //pub type Float = f64;
 
@@ -10,7 +8,6 @@ pub enum RenderingCoordinateSystem {
 }
 
 pub use fma::fma;
-pub use ply_rs::ply;
 pub use rand::{rngs::StdRng, thread_rng, Rng, SeedableRng};
 pub use serde_json::Value;
 pub use std::{

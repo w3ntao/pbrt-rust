@@ -1,4 +1,6 @@
+extern crate ply_rs;
 use crate::pbrt::*;
+use ply_rs::ply;
 
 pub struct TriQuadMesh {
     pub p: Vec<Point3f>,
@@ -11,6 +13,7 @@ pub fn read_ply(ply_file_path: &str) -> TriQuadMesh {
     // create a parser
     let ply_parser = ply_rs::parser::Parser::<ply::DefaultElement>::new();
 
+    // TODO: rewrite this part to enable .ply.gz file parsing
     let file_path = if ply_file_path.ends_with(".ply.gz") {
         let file_path_without_gz = &ply_file_path[..(ply_file_path.len() - 3)];
         if !Path::new(file_path_without_gz).exists() {
