@@ -103,13 +103,13 @@ impl Bounds3<Float> {
 
     pub fn fast_intersect(
         &self,
-        ray: &Ray,
+        ray: &dyn Ray,
         raytMax: Float,
         invDir: Vector3f,
         dirIsNeg: [usize; 3],
     ) -> bool {
         // Check for ray intersection against $x$ and $y$ slabs
-        let o = ray.o;
+        let o = ray.get_o();
         let mut tMin = (self[dirIsNeg[0]].x - o.x) * invDir.x;
         let mut tMax = (self[1 - dirIsNeg[0]].x - o.x) * invDir.x;
         let tyMin = (self[dirIsNeg[1]].y - o.y) * invDir.y;

@@ -6,8 +6,10 @@ pub struct BVHAggregate {
 }
 
 impl Primitive for BVHAggregate {
-    fn intersect(&self, ray: &Ray, t_max: Float) -> Option<ShapeIntersection> {
-        let invDir = Vector3f::new(1.0 / ray.d.x, 1.0 / ray.d.y, 1.0 / ray.d.z);
+    fn intersect(&self, ray: &dyn Ray, t_max: Float) -> Option<ShapeIntersection> {
+        let d = ray.get_d();
+
+        let invDir = Vector3f::new(1.0 / d.x, 1.0 / d.y, 1.0 / d.z);
         let dirIsNeg = [
             (invDir.x < 0.0) as usize,
             (invDir.y < 0.0) as usize,
@@ -61,8 +63,9 @@ impl Primitive for BVHAggregate {
         return best_intersection;
     }
 
-    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool {
-        let invDir = Vector3f::new(1.0 / ray.d.x, 1.0 / ray.d.y, 1.0 / ray.d.z);
+    fn fast_intersect(&self, ray: &dyn Ray, t_max: Float) -> bool {
+        let d = ray.get_d();
+        let invDir = Vector3f::new(1.0 / d.x, 1.0 / d.y, 1.0 / d.z);
         let dirIsNeg = [
             (invDir.x < 0.0) as usize,
             (invDir.y < 0.0) as usize,

@@ -1,13 +1,21 @@
 use crate::pbrt::*;
 
-pub struct Ray {
+pub trait Ray {
+    fn get_o(&self) -> Point3f;
+
+    fn get_d(&self) -> Vector3f;
+
+    fn at(&self, t: Float) -> Point3f;
+}
+
+pub struct SimpleRay {
     pub o: Point3f,
     pub d: Vector3f,
 }
 
-impl Ray {
-    pub fn new(o: Point3f, d: Vector3f) -> Ray {
-        return Ray { o, d };
+impl SimpleRay {
+    pub fn new(o: Point3f, d: Vector3f) -> SimpleRay {
+        return SimpleRay { o, d };
     }
 
     pub fn at(&self, t: Float) -> Point3f {
@@ -15,12 +23,17 @@ impl Ray {
     }
 }
 
-impl From<DifferentialRay> for Ray {
-    fn from(differential_ray: DifferentialRay) -> Self {
-        return Ray {
-            o: differential_ray.o,
-            d: differential_ray.d,
-        };
+impl Ray for SimpleRay {
+    fn get_o(&self) -> Point3f {
+        return self.o;
+    }
+
+    fn get_d(&self) -> Vector3f {
+        return self.d;
+    }
+
+    fn at(&self, t: Float) -> Point3f {
+        return self.o + t * self.d;
     }
 }
 
@@ -45,5 +58,19 @@ impl DifferentialRay {
             rx_direction: Vector3::nan(),
             ry_direction: Vector3::nan(),
         };
+    }
+}
+
+impl Ray for DifferentialRay {
+    fn get_o(&self) -> Point3f {
+        return self.o;
+    }
+
+    fn get_d(&self) -> Vector3f {
+        return self.d;
+    }
+
+    fn at(&self, t: Float) -> Point3f {
+        return self.o + t * self.d;
     }
 }

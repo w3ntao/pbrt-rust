@@ -28,9 +28,9 @@ pub trait Integrator: Send + Sync {
             .add_sample(p_pixel, accumulated_spectrum / (num_samples as Float));
     }
 
-    fn Li(&self, ray: &Ray, sampler: &mut dyn Sampler) -> RGBColor;
+    fn Li(&self, ray: &dyn Ray, sampler: &mut dyn Sampler) -> RGBColor;
 
-    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool {
+    fn fast_intersect(&self, ray: &dyn Ray, t_max: Float) -> bool {
         panic!("not implemented");
     }
 }

@@ -76,11 +76,11 @@ impl PerspectiveCamera {
 }
 
 impl Camera for PerspectiveCamera {
-    fn generate_camera_ray(&self, sample: CameraSample) -> Ray {
+    fn generate_camera_ray(&self, sample: CameraSample) -> SimpleRay {
         let pFilm = Point3f::new(sample.pFilm.x, sample.pFilm.y, 0.0);
         let pCamera = self.cameraFromRaster.on_point3f(pFilm);
 
-        let ray = Ray::new(
+        let ray = SimpleRay::new(
             Point3f::new(0.0, 0.0, 0.0),
             Vector3f::from(pCamera).normalize(),
         );

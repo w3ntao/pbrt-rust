@@ -41,10 +41,12 @@ impl Sphere {
         };
     }
 
-    fn basic_intersect(&self, r: &Ray, t_max: Float) -> Option<QuadricIntersection> {
+    fn basic_intersect(&self, r: &dyn Ray, t_max: Float) -> Option<QuadricIntersection> {
         // Transform _Ray_ origin and direction to object space
-        let oi = self.objectFromRender.on_point3fi(Point3fi::from(r.o));
-        let di = self.objectFromRender.on_vector3fi(Vector3fi::from(r.d));
+        let oi = self.objectFromRender.on_point3fi(Point3fi::from(r.get_o()));
+        let di = self
+            .objectFromRender
+            .on_vector3fi(Vector3fi::from(r.get_d()));
 
         // Compute sphere quadratic coefficients
         let a = di.x.sqr() + di.y.sqr() + di.z.sqr();
@@ -169,11 +171,11 @@ impl Sphere {
 }
 
 impl Shape for Sphere {
-    fn intersect(&self, ray: &Ray, t_max: Float) -> Option<ShapeIntersection> {
+    fn intersect(&self, ray: &dyn Ray, t_max: Float) -> Option<ShapeIntersection> {
         return match self.basic_intersect(ray, t_max) {
             None => None,
             Some(quadric_intersection) => {
-                let interaction = self.build_interaction(&quadric_intersection, -ray.d);
+                let interaction = self.build_interaction(&quadric_intersection, -ray.get_d());
 
                 Some(ShapeIntersection {
                     t_hit: quadric_intersection.t_hit,
@@ -183,7 +185,7 @@ impl Shape for Sphere {
         };
     }
 
-    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool {
+    fn fast_intersect(&self, ray: &dyn Ray, t_max: Float) -> bool {
         return self.basic_intersect(ray, t_max).is_some();
     }
 

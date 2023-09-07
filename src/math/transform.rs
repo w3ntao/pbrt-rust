@@ -331,7 +331,7 @@ impl Transform {
         return transformed_bounds;
     }
 
-    pub fn on_ray(&self, r: Ray) -> (Ray, Float) {
+    pub fn on_ray(&self, r: SimpleRay) -> (SimpleRay, Float) {
         let o = self.on_point3fi(Point3fi::from(r.o));
         let d = self.on_vector3f(r.d);
 
@@ -343,10 +343,10 @@ impl Transform {
         let dt = d.abs().dot(o.error()) / length_squared;
         let offset_o = o + Vector3fi::from(d * dt);
 
-        return (Ray::new(Point3f::from(offset_o), d), dt);
+        return (SimpleRay::new(Point3f::from(offset_o), d), dt);
     }
 
-    pub fn on_ray_with_error(&self, r: Ray) -> (Ray, Float) {
+    pub fn on_ray_with_error(&self, r: SimpleRay) -> (SimpleRay, Float) {
         panic!("not implemented");
     }
 

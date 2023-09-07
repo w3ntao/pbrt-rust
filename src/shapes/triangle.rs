@@ -16,7 +16,7 @@ struct TriangleIntersection {
 }
 
 fn intersect_triangle(
-    ray: &Ray,
+    ray: &dyn Ray,
     t_max: Float,
     p0: Point3f,
     p1: Point3f,
@@ -27,18 +27,18 @@ fn intersect_triangle(
         return None;
     }
 
-    let ray_origin_v3 = Vector3f::from(ray.o);
+    let ray_origin_v3 = Vector3f::from(ray.get_o());
 
     let p0t = p0 - ray_origin_v3;
     let p1t = p1 - ray_origin_v3;
     let p2t = p2 - ray_origin_v3;
 
-    let kz = ray.d.abs().max_component_index();
+    let kz = ray.get_d().abs().max_component_index();
     let kx = (kz + 1) % 3;
     let ky = (kx + 1) % 3;
 
     let permuted_idx = [kx, ky, kz];
-    let d = ray.d.permute(permuted_idx);
+    let d = ray.get_d().permute(permuted_idx);
 
     let mut p0t = p0t.permute(permuted_idx);
     let mut p1t = p1t.permute(permuted_idx);
@@ -178,7 +178,7 @@ impl Triangle {
 }
 
 impl Shape for Triangle {
-    fn intersect(&self, ray: &Ray, t_max: Float) -> Option<ShapeIntersection> {
+    fn intersect(&self, ray: &dyn Ray, t_max: Float) -> Option<ShapeIntersection> {
         let (p0, p1, p2) = self.get_points();
 
         let triangle_intersection = match intersect_triangle(ray, t_max, p0, p1, p2) {
@@ -190,11 +190,11 @@ impl Shape for Triangle {
 
         return Some(ShapeIntersection {
             t_hit: triangle_intersection.t,
-            interaction: self.build_interaction(&triangle_intersection, -ray.d),
+            interaction: self.build_interaction(&triangle_intersection, -ray.get_d()),
         });
     }
 
-    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool {
+    fn fast_intersect(&self, ray: &dyn Ray, t_max: Float) -> bool {
         let (p0, p1, p2) = self.get_points();
         return intersect_triangle(ray, t_max, p0, p1, p2).is_some();
     }
