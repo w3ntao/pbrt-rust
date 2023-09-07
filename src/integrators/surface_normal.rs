@@ -1,16 +1,16 @@
 use crate::pbrt::*;
 
-pub struct SurfaceNormalVisualizer {
+pub struct SurfaceNormal {
     aggregate: Arc<dyn Primitive>,
 }
 
-impl SurfaceNormalVisualizer {
+impl SurfaceNormal {
     pub fn new(aggregate: Arc<dyn Primitive>) -> Self {
-        return SurfaceNormalVisualizer { aggregate };
+        return SurfaceNormal { aggregate };
     }
 }
 
-impl Integrator for SurfaceNormalVisualizer {
+impl Integrator for SurfaceNormal {
     fn Li(&self, camera_ray: &dyn Ray, sampler: &mut dyn Sampler) -> RGBColor {
         return match self.aggregate.intersect(camera_ray, Float::INFINITY) {
             None => RGBColor::black(),

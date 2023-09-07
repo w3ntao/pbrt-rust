@@ -36,7 +36,7 @@ pub use crate::{
     cameras::perspective::*,
     films::rgb_film::*,
     filters::box_filter::*,
-    integrators::{ambient_occlusion::*, surface_normal_visualizer::*},
+    integrators::{ambient_occlusion::*, surface_normal::*},
     math::{
         arithmetic::*, bounds::*, compensated_float::*, float::*, frame::*, interval::*,
         interval::*, normal::*, point2::*, point3::*, square_matrix::*, transform::*, vector2::*,
