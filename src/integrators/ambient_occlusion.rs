@@ -1,18 +1,20 @@
 use crate::pbrt::*;
 
-pub struct AmbientOcclusion {}
+pub struct AmbientOcclusion {
+    aggregate: Arc<dyn Primitive>,
+}
 
 impl AmbientOcclusion {
-    pub fn new() -> Self {
-        return AmbientOcclusion {};
+    pub fn new(aggregate: Arc<dyn Primitive>) -> Self {
+        return AmbientOcclusion { aggregate };
     }
 }
 
 impl Integrator for AmbientOcclusion {
-    fn Li(&self, ray: Ray, aggregate: Arc<BVHAggregate>, sampler: &mut dyn Sampler) -> RGBColor {
+    fn Li(&self, ray: &Ray, sampler: &mut dyn Sampler) -> RGBColor {
         // TODO: this is incomplete, consider BSDF only for now
 
-        let si = match aggregate.intersect(&ray, Float::INFINITY) {
+        let si = match self.aggregate.intersect(&ray, Float::INFINITY) {
             None => {
                 return RGBColor::black();
             }
@@ -36,17 +38,16 @@ impl Integrator for AmbientOcclusion {
 
         // Divide by pi so that fully visible is one.
         let r = isect.spawn_ray(wi);
-        if !aggregate.fast_intersect(&Ray::from(r), Float::INFINITY) {
+        if !self.fast_intersect(&Ray::from(r), Float::INFINITY) {
             let grey = n.dot(wi) / (PI * pdf);
 
             return RGBColor::new(grey, grey, grey);
         }
 
         return RGBColor::black();
-        // TODO: 2023/08/29 progress
     }
 
-    fn fast_intersect(&self, ray: Ray, t_max: Float, aggregate: Arc<dyn Primitive>) -> bool {
-        panic!("not implemented");
+    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool {
+        return self.aggregate.fast_intersect(ray, t_max);
     }
 }

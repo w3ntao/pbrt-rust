@@ -15,7 +15,6 @@ fn single_thread_render(
     job_list: &mut Arc<Mutex<Vec<i32>>>,
     num_samples: usize,
     integrator: Arc<dyn Integrator>,
-    aggregate: Arc<BVHAggregate>,
     sampler: Arc<dyn Sampler>,
     camera: Arc<dyn Camera>,
 ) {
@@ -38,7 +37,6 @@ fn single_thread_render(
                     integrator.evaluate_pixel_sample(
                         pixel,
                         num_samples,
-                        aggregate.clone(),
                         mutated_sampler,
                         camera.clone(),
                         &mut film.clone(),
@@ -78,7 +76,6 @@ impl SceneConfig {
             let mut shared_job_list = job_list.clone();
 
             let integrator = self.integrator.clone();
-            let aggregate = self.aggregate.clone();
             let sampler = self.sampler.clone();
             let camera = self.camera.clone();
 
@@ -88,7 +85,6 @@ impl SceneConfig {
                     &mut shared_job_list,
                     num_samples,
                     integrator,
-                    aggregate,
                     sampler,
                     camera,
                 )

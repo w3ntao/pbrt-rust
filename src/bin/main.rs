@@ -29,7 +29,6 @@ fn render(file_path: &str, spp: usize) {
         spp,
         cpu_num
     );
-    println!();
 }
 
 fn main() {

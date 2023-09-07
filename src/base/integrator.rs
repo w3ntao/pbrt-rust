@@ -6,7 +6,6 @@ pub trait Integrator: Send + Sync {
         &self,
         p_pixel: Point2i,
         num_samples: usize,
-        aggregate: Arc<BVHAggregate>,
         sampler: &mut dyn Sampler,
         camera: Arc<dyn Camera>,
         film: &mut Arc<Mutex<dyn Film>>,
@@ -21,7 +20,7 @@ pub trait Integrator: Send + Sync {
             let camera_sample = sampler.get_camera_sample(p_pixel.clone(), filter.clone());
             let camera_ray = camera.generate_camera_ray(camera_sample);
 
-            accumulated_spectrum += self.Li(camera_ray, aggregate.clone(), sampler);
+            accumulated_spectrum += self.Li(&camera_ray, sampler);
         }
 
         film.lock()
@@ -29,9 +28,9 @@ pub trait Integrator: Send + Sync {
             .add_sample(p_pixel, accumulated_spectrum / (num_samples as Float));
     }
 
-    fn Li(&self, ray: Ray, aggregate: Arc<BVHAggregate>, sampler: &mut dyn Sampler) -> RGBColor;
+    fn Li(&self, ray: &Ray, sampler: &mut dyn Sampler) -> RGBColor;
 
-    fn fast_intersect(&self, ray: Ray, t_max: Float, aggregate: Arc<dyn Primitive>) -> bool {
+    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool {
         panic!("not implemented");
     }
 }
