@@ -3,10 +3,10 @@
 mod accelerator;
 mod base;
 mod cameras;
+mod euclidean_space;
 mod films;
 mod filters;
 mod integrators;
-mod math;
 mod pbrt;
 mod primitives;
 mod samplers;

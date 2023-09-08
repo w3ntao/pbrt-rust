@@ -34,14 +34,14 @@ pub use crate::{
         sampler::*, shape::*,
     },
     cameras::perspective::*,
-    films::rgb_film::*,
-    filters::box_filter::*,
-    integrators::{ambient_occlusion::*, surface_normal::*},
-    math::{
+    euclidean_space::{
         arithmetic::*, bounds::*, compensated_float::*, float::*, frame::*, interval::*,
         interval::*, normal::*, point2::*, point3::*, square_matrix::*, transform::*, vector2::*,
         vector3::*,
     },
+    films::rgb_film::*,
+    filters::box_filter::*,
+    integrators::{ambient_occlusion::*, surface_normal::*},
     primitives::simple_primitive::*,
     samplers::independent::*,
     scene::{parameter_dict::*, scene_builder::*, scene_config::*, util::*},
