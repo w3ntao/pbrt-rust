@@ -22,16 +22,25 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: cargo build
-      run:
-        cargo build --release;
-
     - name: clone scene
       run:
         pushd ..;
         git clone https://github.com/w3ntao/pbrt-v4-scenes-json.git;
         popd;
 
+    - name: cargo build (f32 as Float)
+      run:
+        cargo build --release;
+
     - name: render
       run:
         bash .github/workflows/render_test_scene.sh
+
+    - name: cargo build (f64 as Float)
+      run:
+        cargo build --release --features use_f64;
+
+    - name: render
+      run:
+        bash .github/workflows/render_test_scene.sh
+

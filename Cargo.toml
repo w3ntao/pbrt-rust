@@ -19,3 +19,6 @@ flate2 = "1.0.27"
 [[bin]]
 name = "pbrt-minus"
 path = "src/bin/main.rs"
+
+[features]
+use_f64 = []

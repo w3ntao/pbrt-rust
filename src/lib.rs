@@ -1,4 +1,5 @@
 #![feature(const_fn_floating_point_arithmetic)]
+#![feature(const_fmt_arguments_new)]
 
 mod accelerator;
 mod base;

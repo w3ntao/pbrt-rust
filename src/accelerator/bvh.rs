@@ -1,4 +1,5 @@
 use crate::pbrt::*;
+use std::mem::{align_of, size_of};
 
 pub struct BVHAggregate {
     ordered_primitives: Vec<Arc<dyn Primitive>>,
@@ -140,7 +141,9 @@ struct BVHBuildNode {
     primitive_num: usize,
 }
 
-#[repr(align(32))]
+// TODO: benchmark the improvement of memory alignment
+#[cfg_attr(feature = "use_f64", repr(align(64)))]
+#[cfg_attr(not(feature = "use_f64"), repr(align(32)))]
 struct LinearBVHNode {
     bounds: Bounds3f,
     offset: u32,
@@ -151,6 +154,45 @@ struct LinearBVHNode {
     axis: u8,
     // for interior node only: 0, 1, 2 for xyz
 }
+
+struct _NonAlignLinearBVHNode {
+    bounds: Bounds3f,
+    offset: u32,
+    primitive_num: u16,
+    axis: u8,
+}
+
+// to make sure LinearBVHNode and _NonAlignLinearBVHNode are 100% identical
+impl From<_NonAlignLinearBVHNode> for LinearBVHNode {
+    fn from(value: _NonAlignLinearBVHNode) -> Self {
+        LinearBVHNode {
+            bounds: value.bounds,
+            offset: value.offset,
+            primitive_num: value.primitive_num,
+            axis: value.axis,
+        }
+    }
+}
+
+// to make sure LinearBVHNode and _NonAlignLinearBVHNode are 100% identical
+impl From<LinearBVHNode> for _NonAlignLinearBVHNode {
+    fn from(value: LinearBVHNode) -> Self {
+        _NonAlignLinearBVHNode {
+            bounds: value.bounds,
+            offset: value.offset,
+            primitive_num: value.primitive_num,
+            axis: value.axis,
+        }
+    }
+}
+
+const _LINEAR_BVH_NODE_ALIGN: usize = align_of::<LinearBVHNode>();
+const _LINEAR_BVH_NODE_ACTUAL_SIZE: usize = size_of::<_NonAlignLinearBVHNode>();
+
+const _DATA_ALIGN_CHECK: () = assert!(
+    _LINEAR_BVH_NODE_ALIGN / _LINEAR_BVH_NODE_ACTUAL_SIZE == 1,
+    "LinearBVHNode: memory alignment mismatched",
+);
 
 fn flatten_bvh(node: Arc<BVHBuildNode>, linear_bvh_nodes: &mut Vec<LinearBVHNode>) -> usize {
     let node_offset = linear_bvh_nodes.len();
@@ -182,15 +224,6 @@ fn flatten_bvh(node: Arc<BVHBuildNode>, linear_bvh_nodes: &mut Vec<LinearBVHNode
 
 impl BVHAggregate {
     pub fn new(primitives: Vec<Arc<dyn Primitive>>) -> BVHAggregate {
-        if std::mem::size_of::<LinearBVHNode>() > 32 {
-            println!(
-                "\nThe size of `LinearBVHNode` is `{}`\nBut you align it with `{}`",
-                std::mem::size_of::<LinearBVHNode>(),
-                32,
-            );
-            panic!("LinearBVHNode not aligned");
-        }
-
         let mut bvh_primitives = vec![];
         for idx in 0..primitives.len() {
             bvh_primitives.push(BVHPrimitive::new(idx, primitives[idx].bounds()));
