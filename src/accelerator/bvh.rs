@@ -10,11 +10,11 @@ impl Primitive for BVHAggregate {
     fn intersect(&self, ray: &dyn Ray, t_max: Float) -> Option<ShapeIntersection> {
         let d = ray.get_d();
 
-        let invDir = Vector3f::new(1.0 / d.x, 1.0 / d.y, 1.0 / d.z);
-        let dirIsNeg = [
-            (invDir.x < 0.0) as usize,
-            (invDir.y < 0.0) as usize,
-            (invDir.z < 0.0) as usize,
+        let inv_dir = Vector3f::new(1.0 / d.x, 1.0 / d.y, 1.0 / d.z);
+        let dir_is_neg = [
+            (inv_dir.x < 0.0) as usize,
+            (inv_dir.y < 0.0) as usize,
+            (inv_dir.z < 0.0) as usize,
         ];
 
         let mut nodes_to_visit = vec![0];
@@ -30,7 +30,7 @@ impl Primitive for BVHAggregate {
             };
 
             let node = &self.linear_bvh_nodes[current_node_idx];
-            if !node.bounds.fast_intersect(ray, best_t, invDir, dirIsNeg) {
+            if !node.bounds.fast_intersect(ray, best_t, inv_dir, dir_is_neg) {
                 continue;
             }
 
@@ -52,7 +52,7 @@ impl Primitive for BVHAggregate {
 
             // interior node
             // Put far BVH node on _nodesToVisit_ stack, advance to near node
-            if dirIsNeg[node.axis as usize] > 0 {
+            if dir_is_neg[node.axis as usize] > 0 {
                 nodes_to_visit.push(current_node_idx + 1);
                 nodes_to_visit.push(node.offset as usize);
             } else {
@@ -66,11 +66,11 @@ impl Primitive for BVHAggregate {
 
     fn fast_intersect(&self, ray: &dyn Ray, t_max: Float) -> bool {
         let d = ray.get_d();
-        let invDir = Vector3f::new(1.0 / d.x, 1.0 / d.y, 1.0 / d.z);
-        let dirIsNeg = [
-            (invDir.x < 0.0) as usize,
-            (invDir.y < 0.0) as usize,
-            (invDir.z < 0.0) as usize,
+        let inv_dir = Vector3f::new(1.0 / d.x, 1.0 / d.y, 1.0 / d.z);
+        let dir_is_neg = [
+            (inv_dir.x < 0.0) as usize,
+            (inv_dir.y < 0.0) as usize,
+            (inv_dir.z < 0.0) as usize,
         ];
 
         let mut nodes_to_visit = vec![0];
@@ -83,7 +83,7 @@ impl Primitive for BVHAggregate {
             };
 
             let node = &self.linear_bvh_nodes[current_node_idx];
-            if !node.bounds.fast_intersect(ray, t_max, invDir, dirIsNeg) {
+            if !node.bounds.fast_intersect(ray, t_max, inv_dir, dir_is_neg) {
                 continue;
             }
 
@@ -99,7 +99,7 @@ impl Primitive for BVHAggregate {
 
             // interior node
             // Put far BVH node on _nodesToVisit_ stack, advance to near node
-            if dirIsNeg[node.axis as usize] > 0 {
+            if dir_is_neg[node.axis as usize] > 0 {
                 nodes_to_visit.push(current_node_idx + 1);
                 nodes_to_visit.push(node.offset as usize);
             } else {
@@ -107,8 +107,6 @@ impl Primitive for BVHAggregate {
                 nodes_to_visit.push(current_node_idx + 1);
             }
         }
-
-        return false;
     }
 
     fn bounds(&self) -> Bounds3f {

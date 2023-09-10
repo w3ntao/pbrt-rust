@@ -44,16 +44,16 @@ fn intersect_triangle(
     let mut p1t = p1t.permute(permuted_idx);
     let mut p2t = p2t.permute(permuted_idx);
 
-    let Sx = -d.x / d.z;
-    let Sy = -d.y / d.z;
-    let Sz = 1.0 / d.z;
+    let sx = -d.x / d.z;
+    let sy = -d.y / d.z;
+    let sz = 1.0 / d.z;
 
-    p0t.x += Sx * p0t.z;
-    p0t.y += Sy * p0t.z;
-    p1t.x += Sx * p1t.z;
-    p1t.y += Sy * p1t.z;
-    p2t.x += Sx * p2t.z;
-    p2t.y += Sy * p2t.z;
+    p0t.x += sx * p0t.z;
+    p0t.y += sy * p0t.z;
+    p1t.x += sx * p1t.z;
+    p1t.y += sy * p1t.z;
+    p2t.x += sx * p2t.z;
+    p2t.y += sy * p2t.z;
 
     let mut e0 = difference_of_products(p1t.x, p2t.y, p1t.y, p2t.x);
     let mut e1 = difference_of_products(p2t.x, p0t.y, p2t.y, p0t.x);
@@ -83,55 +83,56 @@ fn intersect_triangle(
     }
 
     // Compute scaled hit distance to triangle and test against ray $t$ range
-    p0t.z *= Sz;
-    p1t.z *= Sz;
-    p2t.z *= Sz;
+    p0t.z *= sz;
+    p1t.z *= sz;
+    p2t.z *= sz;
 
-    let tScaled = e0 * p0t.z + e1 * p1t.z + e2 * p2t.z;
-    if det < 0.0 && (tScaled >= 0.0 || tScaled < t_max * det) {
+    let t_scaled = e0 * p0t.z + e1 * p1t.z + e2 * p2t.z;
+    if det < 0.0 && (t_scaled >= 0.0 || t_scaled < t_max * det) {
         return None;
     }
 
-    if det > 0.0 && (tScaled <= 0.0 || tScaled > t_max * det) {
+    if det > 0.0 && (t_scaled <= 0.0 || t_scaled > t_max * det) {
         return None;
     }
 
     // Compute barycentric coordinates and $t$ value for triangle intersection
-    let invDet = 1.0 / det;
-    let b0 = e0 * invDet;
-    let b1 = e1 * invDet;
-    let b2 = e2 * invDet;
-    let t = tScaled * invDet;
+    let inv_det = 1.0 / det;
+    let b0 = e0 * inv_det;
+    let b1 = e1 * inv_det;
+    let b2 = e2 * inv_det;
+    let t = t_scaled * inv_det;
 
     // Ensure that computed triangle $t$ is conservatively greater than zero
     // Compute $\delta_z$ term for triangle $t$ error bounds
-    let maxZt = Vector3f::new(p0t.z, p1t.z, p2t.z)
+    let max_zt = Vector3f::new(p0t.z, p1t.z, p2t.z)
         .abs()
         .max_component_value();
 
-    let deltaZ = gamma(3) * maxZt;
+    let delta_z = gamma(3) * max_zt;
 
     // Compute $\delta_x$ and $\delta_y$ terms for triangle $t$ error bounds
-    let maxXt = Vector3f::new(p0t.x, p1t.x, p2t.x)
+    let max_xt = Vector3f::new(p0t.x, p1t.x, p2t.x)
         .abs()
         .max_component_value();
 
-    let maxYt = Vector3f::new(p0t.y, p1t.y, p2t.y)
+    let max_yt = Vector3f::new(p0t.y, p1t.y, p2t.y)
         .abs()
         .max_component_value();
 
-    let deltaX = gamma(5) * (maxXt + maxZt);
-    let deltaY = gamma(5) * (maxYt + maxZt);
+    let delta_x = gamma(5) * (max_xt + max_zt);
+    let delta_y = gamma(5) * (max_yt + max_zt);
 
     // Compute $\delta_e$ term for triangle $t$ error bounds
-    let deltaE = 2.0 * (gamma(2) * maxXt * maxYt + deltaY * maxXt + deltaX * maxYt);
+    let delta_e = 2.0 * (gamma(2) * max_xt * max_yt + delta_y * max_xt + delta_x * max_yt);
 
     // Compute $\delta_t$ term for triangle $t$ error bounds and check _t_
-    let maxE = Vector3f::new(e0, e1, e2).abs().max_component_value();
+    let max_e = Vector3f::new(e0, e1, e2).abs().max_component_value();
 
-    let deltaT = 3.0 * (gamma(3) * maxE * maxZt + deltaE * maxZt + deltaZ * maxE) * invDet.abs();
+    let delta_t =
+        3.0 * (gamma(3) * max_e * max_zt + delta_e * max_zt + delta_z * max_e) * inv_det.abs();
 
-    if t <= deltaT {
+    if t <= delta_t {
         return None;
     }
 
@@ -161,16 +162,16 @@ impl Triangle {
         let dp12 = p1 - p2;
 
         // Interpolate $(u,v)$ parametric coordinates and hit point
-        let pHit = ti.b0 * p0 + ti.b1 * p1 + ti.b2 * p2;
-        let pAbsSum = (ti.b0 * p0).abs() + (ti.b1 * p1).abs() + (ti.b2 * p2).abs();
+        let p_hit = ti.b0 * p0 + ti.b1 * p1 + ti.b2 * p2;
+        let p_abs_sum = (ti.b0 * p0).abs() + (ti.b1 * p1).abs() + (ti.b2 * p2).abs();
 
-        let pError = gamma(7) * Vector3f::from(pAbsSum);
+        let p_error = gamma(7) * Vector3f::from(p_abs_sum);
 
         let n = Normal3f::from(dp02.cross(dp12).normalize());
         // TODO: flip n with `reverseOrientation` and transformSwapsHandedness?
 
         return SurfaceInteraction {
-            pi: Point3fi::from_value_and_error(pHit, pError),
+            pi: Point3fi::from_value_and_error(p_hit, p_error),
             n,
             wo,
         };

@@ -2,50 +2,52 @@ use crate::pbrt::*;
 
 pub struct Sphere {
     radius: Float,
-    zMin: Float,
-    zMax: Float,
-    thetaZMin: Float,
-    thetaZMax: Float,
-    phiMax: Float,
+    z_min: Float,
+    z_max: Float,
+    theta_z_min: Float,
+    theta_z_max: Float,
+    phi_max: Float,
     render_from_object: Transform,
-    objectFromRender: Transform,
-    reverseOrientation: bool,
+    object_from_render: Transform,
+    reverse_orientation: bool,
 }
 
 impl Sphere {
     pub fn new(
-        renderFromObject: Transform,
-        objectFromRender: Transform,
-        reverseOrientation: bool,
+        render_from_object: Transform,
+        object_from_render: Transform,
+        reverse_orientation: bool,
         radius: Float,
-        zMin: Float,
-        zMax: Float,
-        phiMax: Float,
+        z_min: Float,
+        z_max: Float,
+        phi_max: Float,
     ) -> Self {
-        let zMin = clamp(zMin, -radius, radius);
-        let zMax = clamp(zMax, -radius, radius);
-        let thetaZMin = clamp(zMin.min(zMax) / radius, -1.0, 1.0).acos();
-        let thetaZMax = clamp(zMin.max(zMax) / radius, -1.0, 1.0).acos();
-        let phiMax = degree_to_radian(clamp(phiMax, 0.0, 360.0));
+        let z_min = clamp(z_min, -radius, radius);
+        let z_max = clamp(z_max, -radius, radius);
+        let theta_z_min = clamp(z_min.min(z_max) / radius, -1.0, 1.0).acos();
+        let theta_z_max = clamp(z_min.max(z_max) / radius, -1.0, 1.0).acos();
+        let phi_max = degree_to_radian(clamp(phi_max, 0.0, 360.0));
 
         return Sphere {
-            render_from_object: renderFromObject,
-            objectFromRender,
-            reverseOrientation,
+            render_from_object,
+            object_from_render,
+            reverse_orientation,
             radius,
-            zMin,
-            zMax,
-            phiMax,
-            thetaZMin,
-            thetaZMax,
+            z_min,
+            z_max,
+            phi_max,
+            theta_z_min,
+            theta_z_max,
         };
     }
 
     fn basic_intersect(&self, r: &dyn Ray, t_max: Float) -> Option<QuadricIntersection> {
         // Transform _Ray_ origin and direction to object space
-        let oi = self.objectFromRender.on_point3fi(Point3fi::from(r.get_o()));
+        let oi = self
+            .object_from_render
+            .on_point3fi(Point3fi::from(r.get_o()));
         let di = self
-            .objectFromRender
+            .object_from_render
             .on_vector3fi(Vector3fi::from(r.get_d()));
 
         // Compute sphere quadratic coefficients
@@ -67,11 +69,11 @@ impl Sphere {
         }
 
         // Compute quadratic $t$ values
-        let rootDiscrim = discrim.sqrt();
+        let root_discrim = discrim.sqrt();
         let q = if b.midpoint() < 0.0 {
-            -0.5 * (b - rootDiscrim)
+            -0.5 * (b - root_discrim)
         } else {
-            -0.5 * (b + rootDiscrim)
+            -0.5 * (b + root_discrim)
         };
 
         let t0 = q / a;
@@ -84,57 +86,57 @@ impl Sphere {
             return None;
         }
 
-        let mut tShapeHit = t0;
-        if tShapeHit.low <= 0.0 {
-            tShapeHit = t1;
-            if tShapeHit.low > t_max {
+        let mut t_shape_hit = t0;
+        if t_shape_hit.low <= 0.0 {
+            t_shape_hit = t1;
+            if t_shape_hit.low > t_max {
                 return None;
             }
         }
 
         // Compute sphere hit position and $\phi$
-        let mut pHit = Point3f::from(oi) + tShapeHit.midpoint() * Vector3f::from(di);
+        let mut p_hit = Point3f::from(oi) + t_shape_hit.midpoint() * Vector3f::from(di);
         // Refine sphere intersection point
-        pHit *= self.radius / (pHit - Point3f::new(0.0, 0.0, 0.0)).length();
+        p_hit *= self.radius / (p_hit - Point3f::new(0.0, 0.0, 0.0)).length();
 
-        if pHit.x == 0.0 && pHit.y == 0.0 {
-            pHit.x = 1e-5 * self.radius;
+        if p_hit.x == 0.0 && p_hit.y == 0.0 {
+            p_hit.x = 1e-5 * self.radius;
         }
 
-        let mut phi = pHit.y.atan2(pHit.x);
+        let mut phi = p_hit.y.atan2(p_hit.x);
         if phi < 0.0 {
             phi += 2.0 * PI;
         }
 
         // Test sphere intersection against clipping parameters
-        if (self.zMin > -self.radius && pHit.z < self.zMin)
-            || (self.zMax < self.radius && pHit.z > self.zMax)
-            || phi > self.phiMax
+        if (self.z_min > -self.radius && p_hit.z < self.z_min)
+            || (self.z_max < self.radius && p_hit.z > self.z_max)
+            || phi > self.phi_max
         {
-            if tShapeHit == t1 {
+            if t_shape_hit == t1 {
                 return None;
             }
             if t1.high > t_max {
                 return None;
             }
 
-            tShapeHit = t1;
+            t_shape_hit = t1;
             // Compute sphere hit position and $\phi$
-            pHit = Point3f::from(oi) + tShapeHit.midpoint() * Vector3f::from(di);
+            p_hit = Point3f::from(oi) + t_shape_hit.midpoint() * Vector3f::from(di);
             // Refine sphere intersection point
-            pHit *= self.radius / (pHit - Point3f::new(0.0, 0.0, 0.0)).length();
+            p_hit *= self.radius / (p_hit - Point3f::new(0.0, 0.0, 0.0)).length();
 
-            if pHit.x == 0.0 && pHit.y == 0.0 {
-                pHit.x = 1e-5 * self.radius;
+            if p_hit.x == 0.0 && p_hit.y == 0.0 {
+                p_hit.x = 1e-5 * self.radius;
             }
-            phi = pHit.y.atan2(pHit.x);
+            phi = p_hit.y.atan2(p_hit.x);
             if phi < 0.0 {
                 phi += 2.0 * PI;
             }
 
-            if (self.zMin > -self.radius && pHit.z < self.zMin)
-                || (self.zMax < self.radius && pHit.z > self.zMax)
-                || phi > self.phiMax
+            if (self.z_min > -self.radius && p_hit.z < self.z_min)
+                || (self.z_max < self.radius && p_hit.z > self.z_max)
+                || phi > self.phi_max
             {
                 return None;
             }
@@ -142,8 +144,8 @@ impl Sphere {
 
         // Return _QuadricIntersection_ for sphere intersection
         return Some(QuadricIntersection {
-            t_hit: tShapeHit.midpoint(),
-            p_obj: pHit,
+            t_hit: t_shape_hit.midpoint(),
+            p_obj: p_hit,
             phi,
         });
     }
@@ -190,8 +192,8 @@ impl Shape for Sphere {
     }
 
     fn bounds(&self) -> Bounds3f {
-        let point_0 = Point3f::new(-self.radius, -self.radius, self.zMin);
-        let point_1 = Point3f::new(self.radius, self.radius, self.zMax);
+        let point_0 = Point3f::new(-self.radius, -self.radius, self.z_min);
+        let point_1 = Point3f::new(self.radius, self.radius, self.z_max);
 
         let bounds = Bounds3f::from_multiple_points(&[point_0, point_1]);
 

@@ -191,16 +191,6 @@ impl Div<Float> for Interval {
     type Output = Interval;
 
     fn div(self, f: Float) -> Self::Output {
-        /*
-           if (f == 0)
-               return Interval(-Infinity, Infinity);
-
-           if (f > 0)
-               return Interval(DivRoundDown(i.LowerBound(), f), DivRoundUp(i.UpperBound(), f));
-           else
-               return Interval(DivRoundDown(i.UpperBound(), f), DivRoundUp(i.LowerBound(), f));
-
-        */
         if f == 0.0 {
             return Interval {
                 low: -Float::INFINITY,
@@ -235,14 +225,14 @@ impl Div<Interval> for Interval {
             };
         }
 
-        let lowQuot = [
+        let low_quot = [
             div_round_down(self.low, i.low),
             div_round_down(self.high, i.low),
             div_round_down(self.low, i.high),
             div_round_down(self.high, i.high),
         ];
 
-        let highQuot = [
+        let high_quot = [
             div_round_up(self.low, i.low),
             div_round_up(self.high, i.low),
             div_round_up(self.low, i.high),
@@ -250,8 +240,8 @@ impl Div<Interval> for Interval {
         ];
 
         return Interval {
-            low: lowQuot.iter().fold(Float::INFINITY, |a, &b| a.min(b)),
-            high: highQuot.iter().fold(-Float::INFINITY, |a, &b| a.max(b)),
+            low: low_quot.iter().fold(Float::INFINITY, |a, &b| a.min(b)),
+            high: high_quot.iter().fold(-Float::INFINITY, |a, &b| a.max(b)),
         };
     }
 }

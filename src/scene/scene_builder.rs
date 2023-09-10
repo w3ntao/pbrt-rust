@@ -102,7 +102,7 @@ pub struct SceneBuilder {
     graphics_state: GraphicsState,
     pushed_graphics_state: Vec<GraphicsState>,
     named_coordinate_systems: HashMap<String, Transform>,
-    renderFromWorld: Transform,
+    render_from_world: Transform,
     primitives: Vec<Arc<dyn Primitive>>,
 
     film_entity: SceneEntity,
@@ -115,7 +115,7 @@ impl Default for SceneBuilder {
             graphics_state: GraphicsState::new(),
             pushed_graphics_state: Vec::new(),
             named_coordinate_systems: HashMap::new(),
-            renderFromWorld: Transform::identity(),
+            render_from_world: Transform::identity(),
             primitives: vec![],
 
             film_entity: SceneEntity::default(),
@@ -125,8 +125,8 @@ impl Default for SceneBuilder {
 }
 
 impl SceneBuilder {
-    fn RenderFromObject(&self) -> Transform {
-        return self.renderFromWorld * self.graphics_state.current_transform;
+    fn render_from_object(&self) -> Transform {
+        return self.render_from_world * self.graphics_state.current_transform;
     }
 
     fn parse_coord_sys_transform(&mut self, tokens: &Vec<Value>) {
@@ -187,7 +187,7 @@ impl SceneBuilder {
         let camera_transform =
             CameraTransform::new(world_from_camera, RenderingCoordinateSystem::CameraWorld);
 
-        self.renderFromWorld = camera_transform.RenderFromWorld();
+        self.render_from_world = camera_transform.render_from_world();
 
         self.camera_entity.initialized = true;
         self.camera_entity.name = name;
@@ -244,8 +244,8 @@ impl SceneBuilder {
 
         let parameters = ParameterDict::build_from_vec(&tokens[2..]);
 
-        let renderFromObject = self.RenderFromObject();
-        let objectFromRender = renderFromObject.inverse();
+        let render_from_object = self.render_from_object();
+        let object_from_render = render_from_object.inverse();
 
         let reverse_orientation = self.graphics_state.reverse_orientation;
 
@@ -262,7 +262,7 @@ impl SceneBuilder {
 
                 let points = parameters.get_point3_array("P");
 
-                let triangles = loop_subdivide(renderFromObject, levels, indices, points);
+                let triangles = loop_subdivide(render_from_object, levels, indices, points);
 
                 for _triangle in &triangles {
                     let primitive = SimplePrimitive::new(_triangle.clone());
@@ -277,8 +277,8 @@ impl SceneBuilder {
                 let phimax = parameters.get_one_float("phimax", Some(360.0));
 
                 let sphere = Sphere::new(
-                    renderFromObject,
-                    objectFromRender,
+                    render_from_object,
+                    object_from_render,
                     reverse_orientation,
                     radius,
                     zmin,
@@ -297,7 +297,7 @@ impl SceneBuilder {
                 let normals = parameters.get_normal3_array("N");
 
                 let mesh = TriangleMesh::new(
-                    renderFromObject,
+                    render_from_object,
                     points,
                     indices.into_iter().map(|x| x as usize).collect(),
                     normals,
@@ -317,7 +317,7 @@ impl SceneBuilder {
 
                 if tri_quad_mesh.tri_indices.len() > 0 {
                     let triangle_mesh = TriangleMesh::new(
-                        renderFromObject,
+                        render_from_object,
                         tri_quad_mesh.p,
                         tri_quad_mesh.tri_indices,
                         tri_quad_mesh.n,

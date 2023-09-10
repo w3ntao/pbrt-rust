@@ -20,7 +20,7 @@ pub trait Integrator: Send + Sync {
             let camera_sample = sampler.get_camera_sample(p_pixel.clone(), filter.clone());
             let camera_ray = camera.generate_camera_ray(camera_sample);
 
-            accumulated_spectrum += self.Li(&camera_ray, sampler);
+            accumulated_spectrum += self.li(&camera_ray, sampler);
         }
 
         film.lock()
@@ -28,7 +28,7 @@ pub trait Integrator: Send + Sync {
             .add_sample(p_pixel, accumulated_spectrum / (num_samples as Float));
     }
 
-    fn Li(&self, ray: &dyn Ray, sampler: &mut dyn Sampler) -> RGBColor;
+    fn li(&self, ray: &dyn Ray, sampler: &mut dyn Sampler) -> RGBColor;
 
     fn fast_intersect(&self, ray: &dyn Ray, t_max: Float) -> bool {
         panic!("not implemented");

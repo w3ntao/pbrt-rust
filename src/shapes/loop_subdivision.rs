@@ -13,19 +13,6 @@ fn generate_vertex_id() -> VertexID {
     };
 }
 
-#[derive(Copy, Clone, PartialEq)]
-struct FaceID {
-    id: usize,
-}
-
-static FACE_COUNTER: AtomicUsize = AtomicUsize::new(1);
-
-fn generate_face_id() -> FaceID {
-    return FaceID {
-        id: FACE_COUNTER.fetch_add(1, Ordering::SeqCst),
-    };
-}
-
 struct SDVertex {
     pub id: VertexID,
     pub p: Point3f,
@@ -163,37 +150,37 @@ fn one_ring(vertex: &Arc<Mutex<SDVertex>>, p: &mut Vec<Point3f>) {
 
 fn weight_boundary(vertex: &Arc<Mutex<SDVertex>>, beta: Float) -> Point3f {
     let valence = valence(vertex);
-    let mut pRing = vec![Point3f::new(0.0, 0.0, 0.0); valence];
+    let mut p_ring = vec![Point3f::new(0.0, 0.0, 0.0); valence];
 
-    one_ring(vertex, &mut pRing);
+    one_ring(vertex, &mut p_ring);
 
     let mut p = (1.0 - 2.0 * beta) * vertex.lock().unwrap().p;
-    p += beta * pRing[0];
-    p += beta * pRing[valence - 1];
+    p += beta * p_ring[0];
+    p += beta * p_ring[valence - 1];
 
     return p;
 }
 
 fn weight_one_ring(vertex: &Arc<Mutex<SDVertex>>, beta: Float) -> Point3f {
     let valence = valence(vertex);
-    let mut pRing = vec![Point3f::new(0.0, 0.0, 0.0); valence];
+    let mut p_ring = vec![Point3f::new(0.0, 0.0, 0.0); valence];
 
-    one_ring(vertex, &mut pRing);
+    one_ring(vertex, &mut p_ring);
 
     let mut p = (1.0 - (valence as Float) * beta) * vertex.lock().unwrap().p;
     for idx in 0..valence {
-        p += beta * pRing[idx];
+        p += beta * p_ring[idx];
     }
 
     return p;
 }
 
 fn beta(valence: usize) -> Float {
-    if valence == 3 {
-        return 3.0 / 16.0;
+    return if valence == 3 {
+        3.0 / 16.0
     } else {
-        return 3.0 / (8.0 * (valence as Float));
-    }
+        3.0 / (8.0 * (valence as Float))
+    };
 }
 
 fn loop_gamma(valence: usize) -> Float {
@@ -201,7 +188,6 @@ fn loop_gamma(valence: usize) -> Float {
 }
 
 struct SDFace {
-    pub id: FaceID,
     pub v: [Option<Arc<Mutex<SDVertex>>>; 3],
     pub f: [Option<Arc<Mutex<SDFace>>>; 3],
     pub children: [Option<Arc<Mutex<SDFace>>>; 4],
@@ -210,7 +196,6 @@ struct SDFace {
 impl Default for SDFace {
     fn default() -> Self {
         return SDFace {
-            id: generate_face_id(),
             v: [None, None, None],
             f: [None, None, None],
             children: [None, None, None, None],
@@ -224,31 +209,15 @@ impl SDFace {
     }
 }
 
-fn NEXT(idx: usize) -> usize {
+fn next(idx: usize) -> usize {
     return (idx + 1) % 3;
 }
 
-fn PREV(idx: usize) -> usize {
+fn prev(idx: usize) -> usize {
     return (idx + 2) % 3;
 }
 
 impl SDFace {
-    fn display(&self) {
-        print!("face_id: {}, v: [", &self.id.id);
-        for v in &self.v {
-            print!("{} ", v.clone().unwrap().lock().unwrap().id.id);
-        }
-        print!("], f: [");
-        for f in &self.f {
-            print!("{} ", f.clone().unwrap().lock().unwrap().id.id);
-        }
-        print!("], children: [");
-        for c in &self.children {
-            print!("{} ", c.clone().unwrap().lock().unwrap().id.id);
-        }
-        print!("]\n");
-    }
-
     fn vnum(&self, vertex_id: VertexID) -> usize {
         for idx in 0..3 {
             if self.v[idx].clone().unwrap().lock().unwrap().id == vertex_id {
@@ -264,11 +233,11 @@ impl SDFace {
     }
 
     pub fn prev_face(&self, _vertex_id: VertexID) -> Option<Arc<Mutex<SDFace>>> {
-        return self.f[PREV(self.vnum(_vertex_id))].clone();
+        return self.f[prev(self.vnum(_vertex_id))].clone();
     }
 
     pub fn next_vert(&self, _vertex_id: VertexID) -> Arc<Mutex<SDVertex>> {
-        match &self.v[NEXT(self.vnum(_vertex_id))] {
+        match &self.v[next(self.vnum(_vertex_id))] {
             None => {
                 panic!("next_vert(): logic error")
             }
@@ -279,7 +248,7 @@ impl SDFace {
     }
 
     pub fn prev_vert(&self, _vertex_id: VertexID) -> Arc<Mutex<SDVertex>> {
-        match &self.v[PREV(self.vnum(_vertex_id))] {
+        match &self.v[prev(self.vnum(_vertex_id))] {
             None => {
                 panic!("prev_vert(): logic error")
             }
@@ -349,58 +318,10 @@ impl SDEdge {
     }
 }
 
-fn debug_vertex(v: &Vec<Arc<Mutex<SDVertex>>>) {
-    println!("size: {}", v.len());
-    for vertex in v {
-        let id = vertex.clone().lock().unwrap().id.id;
-        let p = vertex.clone().lock().unwrap().p;
-
-        let start_face_id = match vertex.clone().lock().unwrap().start_face.clone() {
-            None => 0,
-            Some(face) => face.clone().lock().unwrap().id.id,
-        };
-
-        println!("{}, {}, {}", id, p, start_face_id);
-        //println!("{}, {}", id, start_face_id);
-    }
-}
-
-fn debug_face(f: &Vec<Arc<Mutex<SDFace>>>) {
-    println!("size: {}", f.len());
-    for face in f {
-        print!("{}, [", face.clone().lock().unwrap().id.id);
-        for i in 0..3 {
-            let v_id = match face.clone().lock().unwrap().v[i].clone() {
-                None => 0,
-                Some(vertex) => vertex.clone().lock().unwrap().id.id,
-            };
-
-            print!("{}, ", v_id);
-        }
-        print!("], [");
-        for i in 0..3 {
-            let f_id = match face.clone().lock().unwrap().f[i].clone() {
-                None => 0,
-                Some(_face) => _face.clone().lock().unwrap().id.id,
-            };
-            print!("{}, ", f_id);
-        }
-        print!("], [");
-        for i in 0..4 {
-            let children_id = match face.clone().lock().unwrap().children[i].clone() {
-                None => 0,
-                Some(child) => child.clone().lock().unwrap().id.id,
-            };
-            print!("{}, ", children_id);
-        }
-        print!("]\n");
-    }
-}
-
 pub fn loop_subdivide(
-    renderFromObject: Transform,
-    nLevels: usize,
-    vertexIndices: Vec<usize>,
+    render_from_object: Transform,
+    n_levels: usize,
+    vertex_indices: Vec<usize>,
     p: Vec<Point3f>,
 ) -> Vec<Arc<Triangle>> {
     let mut vertices: Vec<Arc<Mutex<SDVertex>>> = vec![];
@@ -408,38 +329,38 @@ pub fn loop_subdivide(
         vertices.push(Arc::new(Mutex::new(SDVertex::new(p[i]))));
     }
 
-    let nFaces = vertexIndices.len() / 3;
+    let n_faces = vertex_indices.len() / 3;
     let mut faces = vec![];
-    for _ in 0..nFaces {
+    for _ in 0..n_faces {
         faces.push(Arc::new(Mutex::new(SDFace::default())));
     }
 
     // Set face to vertex pointers
-    for i in 0..nFaces {
+    for i in 0..n_faces {
         let f = &mut faces[i];
 
         for j in 0..3 {
-            let v = vertices[vertexIndices[i * 3 + j]].clone();
+            let v = vertices[vertex_indices[i * 3 + j]].clone();
             f.lock().unwrap().v[j] = Some(v.clone());
             v.lock().unwrap().start_face = Some(f.clone());
         }
     }
 
     let mut edges: HashSet<SDEdge> = HashSet::new();
-    for i in 0..nFaces {
+    for i in 0..n_faces {
         let f = &mut faces[i];
 
-        for edgeNum in 0..3 {
-            let v0 = f.lock().unwrap().v[edgeNum].clone().unwrap();
-            let v1 = f.lock().unwrap().v[NEXT(edgeNum)].clone().unwrap();
+        for edge_num in 0..3 {
+            let v0 = f.lock().unwrap().v[edge_num].clone().unwrap();
+            let v1 = f.lock().unwrap().v[next(edge_num)].clone().unwrap();
 
-            let mut e = &mut SDEdge::new(v0.clone(), v1.clone());
+            let e = &mut SDEdge::new(v0.clone(), v1.clone());
             if !edges.contains(&e) {
                 e.f[0] = Some(f.clone());
-                e.f0_edge_num = edgeNum as i32;
+                e.f0_edge_num = edge_num as i32;
                 edges.insert(e.clone());
             } else {
-                let mut found_edge = edges.get(&e).unwrap();
+                let found_edge = edges.get(&e).unwrap();
 
                 found_edge.f[0]
                     .clone()
@@ -448,7 +369,7 @@ pub fn loop_subdivide(
                     .unwrap()
                     .set_f(found_edge.f0_edge_num as usize, Some(f.clone()));
 
-                f.lock().unwrap().set_f(edgeNum, found_edge.f[0].clone());
+                f.lock().unwrap().set_f(edge_num, found_edge.f[0].clone());
                 edges.remove(e);
             }
         }
@@ -456,7 +377,7 @@ pub fn loop_subdivide(
 
     // Finish vertex initialization
     for i in 0..p.len() {
-        let mut v = &vertices[i];
+        let v = &vertices[i];
 
         let start_face = v.lock().unwrap().start_face.clone().unwrap().clone();
 
@@ -499,9 +420,9 @@ pub fn loop_subdivide(
     let mut f = faces.clone();
     let mut v = vertices.clone();
 
-    for _ in 0..nLevels {
+    for _ in 0..n_levels {
         // Update _f_ and _v_ for next level of subdivision
-        let mut newVertices: Vec<Arc<Mutex<SDVertex>>> = vec![];
+        let mut new_vertices: Vec<Arc<Mutex<SDVertex>>> = vec![];
         for vertex in &mut v {
             let mut child = SDVertex::default();
             child.regular = vertex.lock().unwrap().regular;
@@ -509,15 +430,15 @@ pub fn loop_subdivide(
 
             let child_ptr = Arc::new(Mutex::new(child));
             vertex.lock().unwrap().child = Some(child_ptr.clone());
-            newVertices.push(child_ptr.clone());
+            new_vertices.push(child_ptr.clone());
         }
 
-        let mut newFaces: Vec<Arc<Mutex<SDFace>>> = vec![];
+        let mut new_faces: Vec<Arc<Mutex<SDFace>>> = vec![];
         for face in &mut f {
             for k in 0..4 {
                 let _new_face = Arc::new(Mutex::new(SDFace::default()));
                 face.lock().unwrap().children[k] = Some(_new_face.clone());
-                newFaces.push(_new_face.clone());
+                new_faces.push(_new_face.clone());
             }
         }
 
@@ -546,19 +467,19 @@ pub fn loop_subdivide(
         }
 
         // Compute new odd edge vertices
-        let mut edgeVerts: HashMap<SDEdge, Arc<Mutex<SDVertex>>> = HashMap::default();
+        let mut edge_verts: HashMap<SDEdge, Arc<Mutex<SDVertex>>> = HashMap::default();
         for face in &f {
             for k in 0..3 {
                 let face_v_k = face.lock().unwrap().v[k].clone().unwrap();
-                let face_v_next_k = face.lock().unwrap().v[NEXT(k)].clone().unwrap();
+                let face_v_next_k = face.lock().unwrap().v[next(k)].clone().unwrap();
 
                 let edge = SDEdge::new(face_v_k, face_v_next_k);
-                if !edgeVerts.get(&edge).is_none() {
+                if !edge_verts.get(&edge).is_none() {
                     continue;
                 }
 
                 let vert = Arc::new(Mutex::new(SDVertex::default()));
-                newVertices.push(vert.clone());
+                new_vertices.push(vert.clone());
                 vert.lock().unwrap().regular = true;
                 vert.lock().unwrap().boundary = face.lock().unwrap().f[k].is_none();
                 vert.lock().unwrap().start_face = face.lock().unwrap().children[3].clone();
@@ -594,7 +515,7 @@ pub fn loop_subdivide(
                             .p;
                     p
                 };
-                edgeVerts.insert(edge, vert.clone());
+                edge_verts.insert(edge, vert.clone());
             }
         }
 
@@ -603,7 +524,7 @@ pub fn loop_subdivide(
         for vertex in &v {
             let vertex_id = vertex.lock().unwrap().id;
             let start_face = vertex.lock().unwrap().start_face.clone().unwrap().clone();
-            let vertNum = start_face.clone().lock().unwrap().vnum(vertex_id);
+            let vert_num = start_face.clone().lock().unwrap().vnum(vertex_id);
 
             vertex
                 .lock()
@@ -613,7 +534,7 @@ pub fn loop_subdivide(
                 .unwrap()
                 .lock()
                 .unwrap()
-                .start_face = start_face.lock().unwrap().children[vertNum].clone();
+                .start_face = start_face.lock().unwrap().children[vert_num].clone();
         }
 
         // Update face neighbor pointers
@@ -621,7 +542,7 @@ pub fn loop_subdivide(
             for j in 0..3 {
                 // Update children _f_ pointers for siblings
 
-                let face_children_next_j = face.lock().unwrap().children[NEXT(j)].clone();
+                let face_children_next_j = face.lock().unwrap().children[next(j)].clone();
                 face.lock().unwrap().children[3]
                     .clone()
                     .unwrap()
@@ -635,7 +556,7 @@ pub fn loop_subdivide(
                     .unwrap()
                     .lock()
                     .unwrap()
-                    .f[NEXT(j)] = face_children_3;
+                    .f[next(j)] = face_children_3;
 
                 // Update children _f_ pointers for neighbor children
                 let f2 = face.lock().unwrap().f[j].clone();
@@ -660,7 +581,7 @@ pub fn loop_subdivide(
                     .unwrap()
                     .f[j] = result;
 
-                let f3 = face.lock().unwrap().f[PREV(j)].clone();
+                let f3 = face.lock().unwrap().f[prev(j)].clone();
                 let result = match f3.clone() {
                     None => None,
                     Some(_f3) => {
@@ -680,7 +601,7 @@ pub fn loop_subdivide(
                     .unwrap()
                     .lock()
                     .unwrap()
-                    .f[PREV(j)] = result;
+                    .f[prev(j)] = result;
             }
         }
 
@@ -706,19 +627,19 @@ pub fn loop_subdivide(
                 // Update child vertex pointer to new odd vertex
                 let edge = {
                     let v0 = face.lock().unwrap().v[j].clone().unwrap().clone();
-                    let v1 = face.lock().unwrap().v[NEXT(j)].clone().unwrap().clone();
+                    let v1 = face.lock().unwrap().v[next(j)].clone().unwrap().clone();
                     SDEdge::new(v0, v1)
                 };
-                let vert = edgeVerts.get(&edge).clone().cloned();
+                let vert = edge_verts.get(&edge).clone().cloned();
                 //.cloned() to turn Option<&Arc<...>> into Option<Arc<...>>
                 face.lock().unwrap().children[j]
                     .clone()
                     .unwrap()
                     .lock()
                     .unwrap()
-                    .v[NEXT(j)] = vert.clone();
+                    .v[next(j)] = vert.clone();
 
-                face.lock().unwrap().children[NEXT(j)]
+                face.lock().unwrap().children[next(j)]
                     .clone()
                     .unwrap()
                     .lock()
@@ -736,27 +657,27 @@ pub fn loop_subdivide(
 
         // Prepare for next level of subdivision
         f.clear();
-        for _face in &newFaces {
+        for _face in &new_faces {
             f.push(_face.clone());
         }
 
         v.clear();
-        for _new_vertex in &newVertices {
+        for _new_vertex in &new_vertices {
             v.push(_new_vertex.clone());
         }
     }
 
     // Push vertices to limit surface
-    let mut pLimit = vec![Point3f::new(Float::NAN, Float::NAN, Float::NAN); v.len()];
+    let mut p_limit = vec![Point3f::new(Float::NAN, Float::NAN, Float::NAN); v.len()];
     for i in 0..v.len() {
-        pLimit[i] = if v[i].lock().unwrap().boundary {
+        p_limit[i] = if v[i].lock().unwrap().boundary {
             weight_boundary(&v[i].clone(), 1.0 / 5.0)
         } else {
             weight_boundary(&v[i], loop_gamma(valence(&v[i].clone())))
         }
     }
     for i in 0..v.len() {
-        v[i].lock().unwrap().p = pLimit[i];
+        v[i].lock().unwrap().p = p_limit[i];
     }
 
     // Create triangle mesh from subdivision mesh
@@ -785,6 +706,6 @@ pub fn loop_subdivide(
 
     // TODO: read and parse Normal3f
 
-    let mesh = TriangleMesh::new(renderFromObject, pLimit, mesh_vertex_indicies, vec![]);
+    let mesh = TriangleMesh::new(render_from_object, p_limit, mesh_vertex_indicies, vec![]);
     return mesh.create_triangles();
 }

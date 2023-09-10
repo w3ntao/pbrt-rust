@@ -11,7 +11,7 @@ impl AmbientOcclusion {
 }
 
 impl Integrator for AmbientOcclusion {
-    fn Li(&self, ray: &dyn Ray, sampler: &mut dyn Sampler) -> RGBColor {
+    fn li(&self, ray: &dyn Ray, sampler: &mut dyn Sampler) -> RGBColor {
         // TODO: this is incomplete, consider BSDF only for now
 
         let si = match self.aggregate.intersect(ray, Float::INFINITY) {

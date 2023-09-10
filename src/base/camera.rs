@@ -2,20 +2,20 @@ use crate::pbrt::*;
 
 #[derive(Copy, Clone)]
 pub struct CameraTransform {
-    pub renderFromCamera: Transform,
-    pub worldFromRender: Transform,
+    pub render_from_camera: Transform,
+    pub world_from_render: Transform,
 }
 
 impl CameraTransform {
     pub fn nan() -> Self {
         return Self {
-            renderFromCamera: Transform::nan(),
-            worldFromRender: Transform::nan(),
+            render_from_camera: Transform::nan(),
+            world_from_render: Transform::nan(),
         };
     }
 
     pub fn new(_world_from_camera: Transform, rendering_space: RenderingCoordinateSystem) -> Self {
-        let _worldFromRender = match rendering_space {
+        let world_from_render = match rendering_space {
             RenderingCoordinateSystem::Camera => _world_from_camera,
 
             RenderingCoordinateSystem::CameraWorld => {
@@ -26,42 +26,38 @@ impl CameraTransform {
             }
 
             RenderingCoordinateSystem::World => Transform::identity(),
-
-            _ => {
-                panic!("unknown rendering_space");
-            }
         };
 
-        let renderFromWorld = _worldFromRender.inverse();
-        let _renderFromCamera = renderFromWorld * _world_from_camera;
+        let render_from_world = world_from_render.inverse();
+        let render_from_camera = render_from_world * _world_from_camera;
 
         return CameraTransform {
-            worldFromRender: _worldFromRender,
-            renderFromCamera: _renderFromCamera,
+            world_from_render,
+            render_from_camera,
         };
     }
 
-    pub fn RenderFromWorld(&self) -> Transform {
-        return self.worldFromRender.inverse();
+    pub fn render_from_world(&self) -> Transform {
+        return self.world_from_render.inverse();
     }
 
-    pub fn CameraFromWorld(&self) -> Transform {
-        return (self.worldFromRender * self.renderFromCamera).inverse();
+    pub fn camera_from_world(&self) -> Transform {
+        return (self.world_from_render * self.render_from_camera).inverse();
     }
 }
 
 pub struct CameraSample {
-    pub pFilm: Point2f,
-    pub pLens: Point2f,
-    pub filterWeight: Float,
+    pub p_film: Point2f,
+    pub p_lens: Point2f,
+    pub filter_weight: Float,
 }
 
 impl CameraSample {
-    pub fn new(pFilm: Point2f, pLens: Point2f, filterWeight: Float) -> Self {
+    pub fn new(p_film: Point2f, p_lens: Point2f, filter_weight: Float) -> Self {
         return CameraSample {
-            pFilm,
-            pLens,
-            filterWeight,
+            p_film,
+            p_lens,
+            filter_weight,
         };
     }
 }

@@ -140,8 +140,8 @@ impl Transform {
             [0.0, 0.0, 1.0, 0.0],
         ]);
 
-        let invTanAng = 1.0 / (degree_to_radian(fov) / 2.0).tan();
-        return Transform::scale(invTanAng, invTanAng, 1.0) * Transform::new(persp);
+        let inv_tan_ang = 1.0 / (degree_to_radian(fov) / 2.0).tan();
+        return Transform::scale(inv_tan_ang, inv_tan_ang, 1.0) * Transform::new(persp);
     }
 
     pub fn on_point3f(&self, p: Point3f) -> Point3f {
@@ -182,7 +182,7 @@ impl Transform {
         let wp = (m[3][0] * x + m[3][1] * y) + (m[3][2] * z + m[3][3]);
 
         // Compute absolute error for transformed point, _pError_
-        let pError = if p.is_exact() {
+        let p_error = if p.is_exact() {
             let _x = gamma(3)
                 * ((m[0][0] * x).abs() + (m[0][1] * y).abs() + (m[0][2] * z).abs() + m[0][3].abs());
             let _y = gamma(3)
@@ -193,29 +193,29 @@ impl Transform {
             Vector3f::new(_x, _y, _z)
         } else {
             // Compute error for transformed approximate _p_
-            let pInError = p.error();
+            let p_in_error = p.error();
             let _x = (gamma(3) + 1.0)
-                * (m[0][0].abs() * pInError.x
-                    + m[0][1].abs() * pInError.y
-                    + m[0][2].abs() * pInError.z)
+                * (m[0][0].abs() * p_in_error.x
+                    + m[0][1].abs() * p_in_error.y
+                    + m[0][2].abs() * p_in_error.z)
                 + gamma(3)
                     * ((m[0][0] * x).abs()
                         + (m[0][1] * y).abs()
                         + (m[0][2] * z).abs()
                         + m[0][3].abs());
             let _y = (gamma(3) + 1.0)
-                * (m[1][0].abs() * pInError.x
-                    + m[1][1].abs() * pInError.y
-                    + m[1][2].abs() * pInError.z)
+                * (m[1][0].abs() * p_in_error.x
+                    + m[1][1].abs() * p_in_error.y
+                    + m[1][2].abs() * p_in_error.z)
                 + gamma(3)
                     * ((m[1][0] * x).abs()
                         + (m[1][1] * y).abs()
                         + (m[1][2] * z).abs()
                         + m[1][3].abs());
             let _z = (gamma(3) + 1.0)
-                * (m[2][0].abs() * pInError.x
-                    + m[2][1].abs() * pInError.y
-                    + m[2][2].abs() * pInError.z)
+                * (m[2][0].abs() * p_in_error.x
+                    + m[2][1].abs() * p_in_error.y
+                    + m[2][2].abs() * p_in_error.z)
                 + gamma(3)
                     * ((m[2][0] * x).abs()
                         + (m[2][1] * y).abs()
@@ -226,9 +226,9 @@ impl Transform {
         };
 
         return if wp == 1.0 {
-            Point3fi::from_value_and_error(Point3f::new(xp, yp, zp), pError)
+            Point3fi::from_value_and_error(Point3f::new(xp, yp, zp), p_error)
         } else {
-            Point3fi::from_value_and_error(Point3f::new(xp, yp, zp), pError) / wp
+            Point3fi::from_value_and_error(Point3f::new(xp, yp, zp), p_error) / wp
         };
     }
 
@@ -248,27 +248,27 @@ impl Transform {
 
         let m = self.matrix;
 
-        let vOutError = if v.is_exact() {
+        let v_out_error = if v.is_exact() {
             let _x = gamma(3) * ((m[0][0] * x).abs() + (m[0][1] * y).abs() + (m[0][2] * z).abs());
             let _y = gamma(3) * ((m[1][0] * x).abs() + (m[1][1] * y).abs() + (m[1][2] * z).abs());
             let _z = gamma(3) * ((m[2][0] * x).abs() + (m[2][1] * y).abs() + (m[2][2] * z).abs());
             Vector3f::new(_x, _y, _z)
         } else {
-            let vInError = v.error();
+            let v_in_error = v.error();
             let _x = (gamma(3) + 1.0)
-                * (m[0][0].abs() * vInError.x
-                    + m[0][1].abs() * vInError.y
-                    + m[0][2].abs() * vInError.z)
+                * (m[0][0].abs() * v_in_error.x
+                    + m[0][1].abs() * v_in_error.y
+                    + m[0][2].abs() * v_in_error.z)
                 + gamma(3) * ((m[0][0] * x).abs() + (m[0][1] * y).abs() + (m[0][2] * z).abs());
             let _y = (gamma(3) + 1.0)
-                * (m[1][0].abs() * vInError.x
-                    + m[1][1].abs() * vInError.y
-                    + m[1][2].abs() * vInError.z)
+                * (m[1][0].abs() * v_in_error.x
+                    + m[1][1].abs() * v_in_error.y
+                    + m[1][2].abs() * v_in_error.z)
                 + gamma(3) * ((m[1][0] * x).abs() + (m[1][1] * y).abs() + (m[1][2] * z).abs());
             let _z = (gamma(3) + 1.0)
-                * (m[2][0].abs() * vInError.x
-                    + m[2][1].abs() * vInError.y
-                    + m[2][2].abs() * vInError.z)
+                * (m[2][0].abs() * v_in_error.x
+                    + m[2][1].abs() * v_in_error.y
+                    + m[2][2].abs() * v_in_error.z)
                 + gamma(3) * ((m[2][0] * x).abs() + (m[2][1] * y).abs() + (m[2][2] * z).abs());
             Vector3f::new(_x, _y, _z)
         };
@@ -277,18 +277,10 @@ impl Transform {
         let yp = m[1][0] * x + m[1][1] * y + m[1][2] * z;
         let zp = m[2][0] * x + m[2][1] * y + m[2][2] * z;
 
-        return Vector3fi::new_with_error(Vector3f::new(xp, yp, zp), vOutError);
+        return Vector3fi::new_with_error(Vector3f::new(xp, yp, zp), v_out_error);
     }
 
     pub fn on_normal3f(&self, n: Normal3f) -> Normal3f {
-        /*
-           T x = n.x, y = n.y, z = n.z;
-           return Normal3<T>(mInv[0][0] * x + mInv[1][0] * y + mInv[2][0] * z,
-                             mInv[0][1] * x + mInv[1][1] * y + mInv[2][1] * z,
-                             mInv[0][2] * x + mInv[1][2] * y + mInv[2][2] * z);
-
-        */
-
         let x = n.x;
         let y = n.y;
         let z = n.z;
@@ -377,7 +369,7 @@ impl Display for Transform {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "matrix:\n{}invertex matrix:\n{}",
+            "matrix:\n{}inverted matrix:\n{}",
             self.matrix, self.inverted_matrix
         )
     }

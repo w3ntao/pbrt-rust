@@ -104,53 +104,53 @@ impl Bounds3<Float> {
     pub fn fast_intersect(
         &self,
         ray: &dyn Ray,
-        raytMax: Float,
-        invDir: Vector3f,
-        dirIsNeg: [usize; 3],
+        ray_t_max: Float,
+        inv_dir: Vector3f,
+        dir_is_neg: [usize; 3],
     ) -> bool {
         // Check for ray intersection against $x$ and $y$ slabs
         let o = ray.get_o();
-        let mut tMin = (self[dirIsNeg[0]].x - o.x) * invDir.x;
-        let mut tMax = (self[1 - dirIsNeg[0]].x - o.x) * invDir.x;
-        let tyMin = (self[dirIsNeg[1]].y - o.y) * invDir.y;
-        let mut tyMax = (self[1 - dirIsNeg[1]].y - o.y) * invDir.y;
+        let mut t_min = (self[dir_is_neg[0]].x - o.x) * inv_dir.x;
+        let mut t_max = (self[1 - dir_is_neg[0]].x - o.x) * inv_dir.x;
+        let ty_min = (self[dir_is_neg[1]].y - o.y) * inv_dir.y;
+        let mut ty_max = (self[1 - dir_is_neg[1]].y - o.y) * inv_dir.y;
 
         // Update _tMax_ and _tyMax_ to ensure robust bounds intersection
-        tMax *= 1.0 + 2.0 * gamma(3);
-        tyMax *= 1.0 + 2.0 * gamma(3);
+        t_max *= 1.0 + 2.0 * gamma(3);
+        ty_max *= 1.0 + 2.0 * gamma(3);
 
-        if tMin > tyMax || tyMin > tMax {
+        if t_min > ty_max || ty_min > t_max {
             return false;
         }
 
-        if tyMin > tMin {
-            tMin = tyMin;
+        if ty_min > t_min {
+            t_min = ty_min;
         }
 
-        if tyMax < tMax {
-            tMax = tyMax;
+        if ty_max < t_max {
+            t_max = ty_max;
         }
 
         // Check for ray intersection against $z$ slab
-        let tzMin = (self[dirIsNeg[2]].z - o.z) * invDir.z;
-        let mut tzMax = (self[1 - dirIsNeg[2]].z - o.z) * invDir.z;
+        let tz_min = (self[dir_is_neg[2]].z - o.z) * inv_dir.z;
+        let mut tz_max = (self[1 - dir_is_neg[2]].z - o.z) * inv_dir.z;
 
         // Update _tzMax_ to ensure robust bounds intersection
-        tzMax *= 1.0 + 2.0 * gamma(3);
+        tz_max *= 1.0 + 2.0 * gamma(3);
 
-        if tMin > tzMax || tzMin > tMax {
+        if t_min > tz_max || tz_min > t_max {
             return false;
         }
 
-        if tzMin > tMin {
-            tMin = tzMin;
+        if tz_min > t_min {
+            t_min = tz_min;
         }
 
-        if tzMax < tMax {
-            tMax = tzMax;
+        if tz_max < t_max {
+            t_max = tz_max;
         }
 
-        return tMin < raytMax && tMax > 0.0;
+        return t_min < ray_t_max && t_max > 0.0;
     }
 }
 

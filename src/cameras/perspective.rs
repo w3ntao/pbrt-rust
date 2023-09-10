@@ -3,13 +3,13 @@ use crate::pbrt::*;
 pub struct PerspectiveCamera {
     pub camera_transform: CameraTransform,
 
-    pub screenFromCamera: Transform,
-    pub cameraFromRaster: Transform,
-    pub rasterFromScreen: Transform,
-    pub screenFromRaster: Transform,
+    pub screen_from_camera: Transform,
+    pub camera_from_raster: Transform,
+    pub raster_from_screen: Transform,
+    pub screen_from_raster: Transform,
 
-    pub dxCamera: Vector3f,
-    pub dyCamera: Vector3f,
+    pub dx_camera: Vector3f,
+    pub dy_camera: Vector3f,
 
     pub lens_radius: Float,
 }
@@ -36,40 +36,37 @@ impl PerspectiveCamera {
             ])
         };
 
-        let NDCFromScreen =
+        let ndc_from_screen =
             Transform::scale(
                 1.0 / (screen_window.p_max.x - screen_window.p_min.x),
                 1.0 / (screen_window.p_max.y - screen_window.p_min.y),
                 1.0,
             ) * Transform::translate(-screen_window.p_min.x, -screen_window.p_max.y, 0.0);
 
-        let rasterFromNDC = Transform::scale(resolution.x as Float, -resolution.y as Float, 1.0);
+        let raster_from_ndc = Transform::scale(resolution.x as Float, -resolution.y as Float, 1.0);
 
-        let rasterFromScreen = rasterFromNDC * NDCFromScreen;
-        // rasterFromScreen verified
+        let raster_from_screen = raster_from_ndc * ndc_from_screen;
 
-        let screenFromRaster = rasterFromScreen.inverse();
+        let screen_from_raster = raster_from_screen.inverse();
 
-        let screenFromCamera = Transform::perspective(_fov, 1e-2, 1000.0);
-        // screenFromCamera verified
+        let screen_from_camera = Transform::perspective(_fov, 1e-2, 1000.0);
 
-        let cameraFromRaster = screenFromCamera.inverse() * screenFromRaster;
-        // cameraFromRaster verified
+        let camera_from_raster = screen_from_camera.inverse() * screen_from_raster;
 
-        let dxCamera = cameraFromRaster.on_point3f(Point3f::new(1.0, 0.0, 0.0))
-            - cameraFromRaster.on_point3f(Point3f::new(0.0, 0.0, 0.0));
+        let dx_camera = camera_from_raster.on_point3f(Point3f::new(1.0, 0.0, 0.0))
+            - camera_from_raster.on_point3f(Point3f::new(0.0, 0.0, 0.0));
 
-        let dyCamera = cameraFromRaster.on_point3f(Point3f::new(0.0, 1.0, 0.0))
-            - cameraFromRaster.on_point3f(Point3f::new(0.0, 0.0, 0.0));
+        let dy_camera = camera_from_raster.on_point3f(Point3f::new(0.0, 1.0, 0.0))
+            - camera_from_raster.on_point3f(Point3f::new(0.0, 0.0, 0.0));
 
         return PerspectiveCamera {
             camera_transform,
-            rasterFromScreen,
-            screenFromRaster,
-            screenFromCamera,
-            cameraFromRaster,
-            dxCamera,
-            dyCamera,
+            raster_from_screen: raster_from_screen,
+            screen_from_raster: screen_from_raster,
+            screen_from_camera: screen_from_camera,
+            camera_from_raster: camera_from_raster,
+            dx_camera: dx_camera,
+            dy_camera: dy_camera,
             lens_radius: 0.0,
         };
     }
@@ -77,12 +74,12 @@ impl PerspectiveCamera {
 
 impl Camera for PerspectiveCamera {
     fn generate_camera_ray(&self, sample: CameraSample) -> SimpleRay {
-        let pFilm = Point3f::new(sample.pFilm.x, sample.pFilm.y, 0.0);
-        let pCamera = self.cameraFromRaster.on_point3f(pFilm);
+        let p_film = Point3f::new(sample.p_film.x, sample.p_film.y, 0.0);
+        let p_camera = self.camera_from_raster.on_point3f(p_film);
 
         let ray = SimpleRay::new(
             Point3f::new(0.0, 0.0, 0.0),
-            Vector3f::from(pCamera).normalize(),
+            Vector3f::from(p_camera).normalize(),
         );
 
         if self.lens_radius > 0.0 {
@@ -91,7 +88,7 @@ impl Camera for PerspectiveCamera {
 
         // TODO: CameraRay not implemented
 
-        let (camera_ray, _) = self.camera_transform.renderFromCamera.on_ray(ray);
+        let (camera_ray, _) = self.camera_transform.render_from_camera.on_ray(ray);
         return camera_ray;
     }
 }
