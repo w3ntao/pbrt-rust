@@ -30,17 +30,17 @@ pub use std::{
     time::Instant,
 };
 
+pub use crate::base::spectrum::*;
 pub use crate::{
     accelerator::bvh::*,
     base::{
         camera::*, film::*, filter::*, integrator::*, primitive::*, ray::*, rgb_color::*,
-        sampler::*, shape::*,
+        sampler::*, shape::*, spectrum::*,
     },
     cameras::perspective::*,
     euclidean_space::{
-        arithmetic::*, bounds::*, compensated_float::*, float::*, frame::*, interval::*,
-        interval::*, normal::*, point2::*, point3::*, square_matrix::*, transform::*, vector2::*,
-        vector3::*,
+        bounds::*, compensated_float::*, float::*, frame::*, interval::*, interval::*, normal::*,
+        point2::*, point3::*, square_matrix::*, transform::*, vector2::*, vector3::*,
     },
     films::rgb_film::*,
     filters::box_filter::*,
@@ -49,7 +49,11 @@ pub use crate::{
     samplers::independent::*,
     scene::{parameter_dict::*, scene_builder::*, scene_config::*, util::*},
     shapes::{loop_subdivision::*, sphere::*, tri_quad_mesh::*, triangle::*, triangle_mesh::*},
-    util::{math::*, sampling::*},
+    spectra::{
+        const_piecewise_linear_spectrum::*, densely_sampled_spectrum::*, measured_spectra_data::*,
+        piecewise_linear_spectrum::*,
+    },
+    util::{colorspace::*, math::*, sampling::*},
 };
 
 pub type Point2f = Point2<Float>;

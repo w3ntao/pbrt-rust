@@ -1,4 +1,3 @@
-pub mod arithmetic;
 pub mod bounds;
 pub mod compensated_float;
 pub mod float;
