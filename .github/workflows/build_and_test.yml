@@ -25,22 +25,22 @@ jobs:
     - name: clone scene
       run:
         pushd ..;
-        git clone https://github.com/w3ntao/pbrt-v4-scenes-json.git;
+        git clone https://github.com/w3ntao/pbrt-minus-scenes.git;
         popd;
 
     - name: cargo build (f32 as Float)
       run:
-        cargo build --release;
+        cargo build --release --verbose;
 
     - name: render
       run:
-        bash .github/workflows/render_test_scene.sh
+        bash render_all.sh
 
     - name: cargo build (f64 as Float)
       run:
-        cargo build --release --features use_f64;
+        cargo build --release --verbose --features use_f64;
 
     - name: render
       run:
-        bash .github/workflows/render_test_scene.sh
+        bash render_all.sh
 
