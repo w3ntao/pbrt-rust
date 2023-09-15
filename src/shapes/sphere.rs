@@ -22,11 +22,11 @@ impl Sphere {
         z_max: Float,
         phi_max: Float,
     ) -> Self {
-        let z_min = clamp(z_min, -radius, radius);
-        let z_max = clamp(z_max, -radius, radius);
-        let theta_z_min = clamp(z_min.min(z_max) / radius, -1.0, 1.0).acos();
-        let theta_z_max = clamp(z_min.max(z_max) / radius, -1.0, 1.0).acos();
-        let phi_max = degree_to_radian(clamp(phi_max, 0.0, 360.0));
+        let z_min = clamp_float(z_min, -radius, radius);
+        let z_max = clamp_float(z_max, -radius, radius);
+        let theta_z_min = clamp_float(z_min.min(z_max) / radius, -1.0, 1.0).acos();
+        let theta_z_max = clamp_float(z_min.max(z_max) / radius, -1.0, 1.0).acos();
+        let phi_max = degree_to_radian(clamp_float(phi_max, 0.0, 360.0));
 
         return Sphere {
             render_from_object,

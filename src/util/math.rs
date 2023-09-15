@@ -1,4 +1,5 @@
 use crate::pbrt::*;
+
 pub const PI: Float = std::f64::consts::PI as Float;
 
 pub const PI_OVER_2: Float = PI / 2.0;
@@ -15,7 +16,7 @@ pub const fn lerp(x: Float, a: Float, b: Float) -> Float {
     return (1.0 - x) * a + x * b;
 }
 
-pub const fn clamp(val: Float, low: Float, high: Float) -> Float {
+pub const fn clamp_float(val: Float, low: Float, high: Float) -> Float {
     if val < low {
         return low;
     }
@@ -25,17 +26,7 @@ pub const fn clamp(val: Float, low: Float, high: Float) -> Float {
     return val;
 }
 
-pub const fn usize_clamp(val: usize, low: usize, high: usize) -> usize {
-    if val < low {
-        return low;
-    }
-    if val > high {
-        return high;
-    }
-    return val;
-}
-
-pub fn template_clamp<T: PartialOrd>(val: T, low: T, high: T) -> T {
+pub const fn clamp_usize(val: usize, low: usize, high: usize) -> usize {
     if val < low {
         return low;
     }
