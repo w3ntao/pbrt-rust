@@ -12,6 +12,7 @@ pub enum RenderingCoordinateSystem {
 
 pub use fma::fma;
 pub use rand::{rngs::StdRng, thread_rng, Rng, SeedableRng};
+pub use rayon::prelude::*;
 pub use serde_json::Value;
 pub use std::{
     any::type_name,
