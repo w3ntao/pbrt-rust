@@ -1,4 +1,5 @@
 use crate::pbrt::*;
+use crate::spectra::cie_xyz::CIEXYZ;
 
 pub trait Spectrum: Send + Sync {
     fn eval(&self, lambda: Float) -> Float;
@@ -10,6 +11,14 @@ pub trait Spectrum: Send + Sync {
             .par_iter()
             .map(|_lambda| self.eval(*_lambda as Float) * g.eval(*_lambda as Float))
             .sum();
+    }
+
+    fn to_xyz(&self) -> CIEXYZ {
+        return CIEXYZ {
+            x: self.inner_product(&CIE_MATCHING_CURVE_X),
+            y: self.inner_product(&CIE_MATCHING_CURVE_Y),
+            z: self.inner_product(&CIE_MATCHING_CURVE_Z),
+        } / CIE_Y_INTEGRAL;
     }
 }
 
