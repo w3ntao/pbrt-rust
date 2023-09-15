@@ -17,7 +17,7 @@ pub const fn find_lambda_interval(lambda: Float, lambdas: &[Float]) -> usize {
         };
     }
 
-    return usize_clamp(first - 1, 0, size - 2);
+    return usize_clamp(first - 1, 0, lambdas.len() - 2);
 }
 
 pub const fn strictly_sorted(arrays: &[Float]) -> bool {
