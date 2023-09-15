@@ -52,7 +52,7 @@ pub use crate::{
     shapes::{loop_subdivision::*, sphere::*, tri_quad_mesh::*, triangle::*, triangle_mesh::*},
     spectra::{
         const_piecewise_linear_spectrum::*, densely_sampled_spectrum::*, measured_spectra_data::*,
-        piecewise_linear_spectrum::*,
+        piecewise_linear_spectrum::*, rgb2spec::*,
     },
     util::{colorspace::*, math::*, sampling::*},
 };

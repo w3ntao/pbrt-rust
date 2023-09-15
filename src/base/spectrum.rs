@@ -45,13 +45,13 @@ pub const NUM_SPECTRUM_SAMPLES: usize = 4;
 pub const CIE_Y_INTEGRAL: Float = 106.856895;
 
 pub const CIE_MATCHING_CURVE_Y: ConstPieceWiseLinearSpectrum<NUM_CIE_SAMPLES> =
-    ConstPieceWiseLinearSpectrum::new(CIE_LAMBDA, CIE_Y_VALUE);
+    ConstPieceWiseLinearSpectrum::new(CIE_LAMBDA_RANGE, CIE_Y_VALUE);
 
 pub const CIE_MATCHING_CURVE_X: ConstPieceWiseLinearSpectrum<NUM_CIE_SAMPLES> =
-    ConstPieceWiseLinearSpectrum::new(CIE_LAMBDA, CIE_X_VALUE);
+    ConstPieceWiseLinearSpectrum::new(CIE_LAMBDA_RANGE, CIE_X_VALUE);
 
 pub const CIE_MATCHING_CURVE_Z: ConstPieceWiseLinearSpectrum<NUM_CIE_SAMPLES> =
-    ConstPieceWiseLinearSpectrum::new(CIE_LAMBDA, CIE_Z_VALUE);
+    ConstPieceWiseLinearSpectrum::new(CIE_LAMBDA_RANGE, CIE_Z_VALUE);
 
 pub const ILLUM_D65: ConstPieceWiseLinearSpectrum<{ CIE_ILLUM_D6500.len() / 2 }> =
     ConstPieceWiseLinearSpectrum::from_interleaved_full_visible_wavelengths(CIE_ILLUM_D6500, true);

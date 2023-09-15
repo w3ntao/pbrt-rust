@@ -299,11 +299,14 @@ pub const CIE_Z_VALUE: [Float; NUM_CIE_SAMPLES] = [
     0.000000000000    
 ];
 
-pub const CIE_LAMBDA: [Float; NUM_CIE_SAMPLES] = {
+pub const CIE_LAMBDA_MIN: f64 = 360.0;
+pub const CIE_LAMBDA_MAX: f64 = 830.0;
+
+pub const CIE_LAMBDA_RANGE: [Float; NUM_CIE_SAMPLES] = {
     let mut lambdas = [Float::NAN; NUM_CIE_SAMPLES];
-    let lambda_min = 360;
+    let lambda_min = CIE_LAMBDA_MIN as usize;
     let mut _lambda = lambda_min;
-    while _lambda <= 830 {
+    while _lambda <= (CIE_LAMBDA_MAX as usize) {
         lambdas[_lambda - lambda_min] = _lambda as Float;
         _lambda += 1;
     }

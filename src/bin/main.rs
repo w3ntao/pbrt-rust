@@ -32,6 +32,14 @@ fn render(file_path: &str, spp: usize) {
 }
 
 fn main() {
+    let srgb_to_spectrum_table_data = rgb2spec("sRGB");
+
+    for x in srgb_to_spectrum_table_data {
+        println!("{}", x);
+    }
+
+    return;
+
     let args = Cli::parse();
     if !args.scene_file.is_file() {
         panic!("`{}` is not a file", args.scene_file.display().to_string());
