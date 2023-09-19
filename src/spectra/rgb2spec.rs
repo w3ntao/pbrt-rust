@@ -1,4 +1,6 @@
 use crate::pbrt::*;
+use std::thread;
+use std::thread::JoinHandle;
 
 const CIE_SAMPLES: usize = 95;
 const CIE_FINE_SAMPLES: usize = (CIE_SAMPLES - 1) * 3 + 1;
@@ -137,6 +139,7 @@ const fn cie_interpolate(data: &[f64], x: f64) -> f64 {
     return (1.0 - weight) * data[offset] + weight * data[offset + 1];
 }
 
+#[derive(Copy, Clone)]
 struct Table {
     lambda_tbl: [f64; CIE_FINE_SAMPLES],
     rgb_tbl: [[f64; CIE_FINE_SAMPLES]; 3],
@@ -296,18 +299,18 @@ fn eval_jacobian(table: &Table, coeffs: &[f64; 3], rgb: &[f64; 3], jac: &mut [[f
     }
 }
 
-fn LUPDecompose(A: &mut [[f64; 3]; 3], N: usize, Tol: f64, P: &mut [usize; 4]) -> bool {
-    for i in 0..N + 1 {
+fn lup_decompose(a: &mut [[f64; 3]; 3], n: usize, tolerance: f64, p: &mut [usize; 4]) -> bool {
+    for i in 0..n + 1 {
         // Unit permutation matrix, P[N] initialized with N
-        P[i] = i;
+        p[i] = i;
     }
 
-    for i in 0..N {
+    for i in 0..n {
         let mut maxA = 0.0;
         let mut imax = i;
 
-        for k in i..N {
-            let absA = A[k][i].abs();
+        for k in i..n {
+            let absA = a[k][i].abs();
             if absA > maxA {
                 maxA = absA;
                 imax = k;
@@ -316,31 +319,31 @@ fn LUPDecompose(A: &mut [[f64; 3]; 3], N: usize, Tol: f64, P: &mut [usize; 4]) -
         }
 
         //println!("maxA: {}", maxA);
-        if maxA < Tol {
+        if maxA < tolerance {
             // failure, matrix is degenerate
             return false;
         }
 
         if imax != i {
             // pivoting P
-            let j = P[i];
-            P[i] = P[imax];
-            P[imax] = j;
+            let j = p[i];
+            p[i] = p[imax];
+            p[imax] = j;
 
             // pivoting rows of A
-            let ptr = A[i];
-            A[i] = A[imax];
-            A[imax] = ptr;
+            let ptr = a[i];
+            a[i] = a[imax];
+            a[imax] = ptr;
 
             // counting pivots starting from N (for determinant)
-            P[N] += 1;
+            p[n] += 1;
         }
 
-        for j in i + 1..N {
-            A[j][i] /= A[i][i];
+        for j in i + 1..n {
+            a[j][i] /= a[i][i];
 
-            for k in i + 1..N {
-                A[j][k] -= A[j][i] * A[i][k];
+            for k in i + 1..n {
+                a[j][k] -= a[j][i] * a[i][k];
             }
         }
     }
@@ -348,52 +351,52 @@ fn LUPDecompose(A: &mut [[f64; 3]; 3], N: usize, Tol: f64, P: &mut [usize; 4]) -
     return true;
 }
 
-fn LUPSolve(A: &[[f64; 3]; 3], P: &[usize; 4], b: &[f64; 3], N: usize, x: &mut [f64; 3]) {
-    for i in 0..N {
-        x[i] = b[P[i]];
+fn lup_solve(a: &[[f64; 3]; 3], p: &[usize; 4], b: &[f64; 3], n: usize, x: &mut [f64; 3]) {
+    for i in 0..n {
+        x[i] = b[p[i]];
 
         for k in 0..i {
-            x[i] -= A[i][k] * x[k];
+            x[i] -= a[i][k] * x[k];
         }
     }
 
-    for i in (0..N).rev() {
-        for k in i + 1..N {
-            x[i] -= A[i][k] * x[k];
+    for i in (0..n).rev() {
+        for k in i + 1..n {
+            x[i] -= a[i][k] * x[k];
         }
-        x[i] = x[i] / A[i][i];
+        x[i] = x[i] / a[i][i];
     }
 }
 
-fn gauss_newton(table: &Table, rgb: &[f64; 3], coeffs: &mut [f64; 3]) {
+fn gauss_newton(table: &Table, rgb: &[f64; 3], coefficients: &mut [f64; 3]) {
     let iteration = 15;
 
     for _ in 0..iteration {
-        let mut J = [[0.0; 3]; 3];
+        let mut jacobian = [[0.0; 3]; 3];
         let mut residual = [0.0; 3];
 
-        eval_residual(table, coeffs, rgb, &mut residual);
-        eval_jacobian(table, coeffs, rgb, &mut J);
+        eval_residual(table, coefficients, rgb, &mut residual);
+        eval_jacobian(table, coefficients, rgb, &mut jacobian);
 
-        let mut P = [0; 4];
-        if !LUPDecompose(&mut J, 3, 1e-15, &mut P) {
+        let mut p = [0; 4];
+        if !lup_decompose(&mut jacobian, 3, 1e-15, &mut p) {
             panic!("LU decomposition failed!");
         }
 
         let mut x = [0.0; 3];
-        LUPSolve(&J, &P, &residual, 3, &mut x);
+        lup_solve(&jacobian, &p, &residual, 3, &mut x);
 
         let mut r = 0.0;
         for j in 0..3 {
-            coeffs[j] -= x[j];
+            coefficients[j] -= x[j];
             r += sqr(residual[j]);
         }
 
-        let max = coeffs[0].max(coeffs[1]).max(coeffs[2]);
+        let max = coefficients[0].max(coefficients[1]).max(coefficients[2]);
 
         if max > 200.0 {
             for j in 0..3 {
-                coeffs[j] *= 200.0 / max;
+                coefficients[j] *= 200.0 / max;
             }
         }
 
@@ -407,39 +410,80 @@ const fn sqr(x: f64) -> f64 {
     return x * x;
 }
 
-fn iterate(table: &Table, scale: &[f32; RESOLUTION], l: usize, j: usize, out: &mut Vec<f32>) {
+fn single_thread_iterate(
+    spectrum_table_data: &mut Arc<Mutex<SpectrumTableData>>,
+    job_list: &mut Arc<Mutex<Vec<(usize, usize)>>>,
+    table: Table,
+    scale: [f32; RESOLUTION],
+) {
     let c0 = CIE_LAMBDA_MIN;
     let c1 = 1.0 / (CIE_LAMBDA_MAX - CIE_LAMBDA_MIN);
     let start = RESOLUTION / 5;
 
-    let y = j as f64 / (RESOLUTION - 1) as f64;
+    let mut cache = HashMap::<usize, f32>::new();
 
-    for i in 0..RESOLUTION {
-        let x = i as f64 / (RESOLUTION - 1) as f64;
+    loop {
+        let mut locked_job_list = job_list.lock().unwrap();
+        let maybe_job = locked_job_list.pop();
+        drop(locked_job_list);
 
-        for range in [
-            (start..RESOLUTION).collect::<Vec<usize>>(),
-            (0..start + 1).rev().collect::<Vec<usize>>(),
-        ] {
-            let mut coeffs = [0.0; 3];
-            let mut rgb = [0.0; 3];
-
-            for k in range {
-                let b = scale[k] as f64;
-                rgb[l] = b;
-                rgb[(l + 1) % 3] = x * b;
-                rgb[(l + 2) % 3] = y * b;
-
-                gauss_newton(&table, &rgb, &mut coeffs);
-
-                let [A, B, C] = coeffs;
-
-                let idx = ((l * RESOLUTION + k) * RESOLUTION + j) * RESOLUTION + i;
-
-                out[3 * idx + 0] = (A * (sqr(c1))) as f32;
-                out[3 * idx + 1] = (B * c1 - 2.0 * A * c0 * (sqr(c1))) as f32;
-                out[3 * idx + 2] = (C - B * c0 * c1 + A * (sqr(c0 * c1))) as f32;
+        match maybe_job {
+            None => {
+                break;
             }
+            Some((l, j)) => {
+                let y = j as f64 / (RESOLUTION - 1) as f64;
+                for i in 0..RESOLUTION {
+                    let x = i as f64 / (RESOLUTION - 1) as f64;
+
+                    for range in [
+                        (start..RESOLUTION).collect::<Vec<usize>>(),
+                        (0..start + 1).rev().collect::<Vec<usize>>(),
+                    ] {
+                        let mut coefficients = [0.0; 3];
+                        let mut rgb = [0.0; 3];
+
+                        for k in range {
+                            {
+                                let b = scale[k] as f64;
+                                rgb[l] = b;
+                                rgb[(l + 1) % 3] = x * b;
+                                rgb[(l + 2) % 3] = y * b;
+                            }
+
+                            gauss_newton(&table, &rgb, &mut coefficients);
+
+                            let [a, b, c] = coefficients;
+
+                            let idx = ((l * RESOLUTION + k) * RESOLUTION + j) * RESOLUTION + i;
+
+                            cache.insert(3 * idx + 0, (a * (sqr(c1))) as f32);
+                            cache.insert(3 * idx + 1, (b * c1 - 2.0 * a * c0 * (sqr(c1))) as f32);
+                            cache
+                                .insert(3 * idx + 2, (c - b * c0 * c1 + a * (sqr(c0 * c1))) as f32);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    spectrum_table_data.lock().unwrap().add_data(cache);
+}
+
+struct SpectrumTableData {
+    data: Vec<f32>,
+}
+
+impl SpectrumTableData {
+    pub fn new(size: usize) -> Self {
+        return Self {
+            data: vec![0.0; size],
+        };
+    }
+    pub fn add_data(&mut self, data_map: HashMap<usize, f32>) {
+        for idx in data_map.keys() {
+            self.data[*idx] = data_map[idx];
         }
     }
 }
@@ -458,16 +502,37 @@ pub fn rgb2spec(str_gamut: &str) -> Vec<f32> {
     for k in 0..RESOLUTION {
         scale[k] = smooth_step(smooth_step(k as f64 / (RESOLUTION - 1) as f64)) as f32;
     }
-
     const BUFFER_SIZE: usize = 3 * 3 * RESOLUTION * RESOLUTION * RESOLUTION;
 
-    let mut out = vec![0.0; BUFFER_SIZE];
-    // TODO: parallelize this part
+    let mut job_list = vec![];
     for l in 0..3 {
         for j in 0..RESOLUTION {
-            iterate(&table, &scale, l, j, &mut out);
+            job_list.push((l, j));
         }
     }
+    let shared_job_list = Arc::new(Mutex::new(job_list));
+    let spectrum_data_table = Arc::new(Mutex::new(SpectrumTableData::new(BUFFER_SIZE)));
 
-    return out;
+    let mut handles: Vec<JoinHandle<()>> = vec![];
+    let num_cores = num_cpus::get().min(RESOLUTION);
+    for _ in 0..num_cores {
+        let mut forked_job_list = shared_job_list.clone();
+        let mut forked_spectrum_data_table = spectrum_data_table.clone();
+
+        let handle = thread::spawn(move || {
+            single_thread_iterate(
+                &mut forked_spectrum_data_table,
+                &mut forked_job_list,
+                table,
+                scale,
+            )
+        });
+        handles.push(handle);
+    }
+
+    for handle in handles {
+        handle.join().unwrap();
+    }
+
+    return spectrum_data_table.lock().unwrap().data.clone();
 }
