@@ -7,13 +7,11 @@ const CIE_FINE_SAMPLES: usize = (CIE_SAMPLES - 1) * 3 + 1;
 
 const RGB2SPEC_EPSILON: f64 = 1e-4;
 
-const RESOLUTION: usize = 64;
-
-pub const SPECTRUM_TABLE_RESOLUTION: usize = RESOLUTION;
-pub const SPECTRUM_TABLE_SCALE: usize = RESOLUTION;
+pub const RGB_TO_SPECTRUM_RESOLUTION: usize = 64;
+const RESOLUTION: usize = RGB_TO_SPECTRUM_RESOLUTION;
 
 #[rustfmt::skip]
-const cie_x: [f64; CIE_SAMPLES] = [
+const CIE_X: [f64; CIE_SAMPLES] = [
     0.000129900000, 0.000232100000, 0.000414900000, 0.000741600000, 0.001368000000,
     0.002236000000, 0.004243000000, 0.007650000000, 0.014310000000, 0.023190000000,
     0.043510000000, 0.077630000000, 0.134380000000, 0.214770000000, 0.283900000000,
@@ -36,7 +34,7 @@ const cie_x: [f64; CIE_SAMPLES] = [
 ];
 
 #[rustfmt::skip]
-const cie_y: [f64; CIE_SAMPLES] = [
+const CIE_Y: [f64; CIE_SAMPLES] = [
     0.000003917000, 0.000006965000, 0.000012390000, 0.000022020000, 0.000039000000,
     0.000064000000, 0.000120000000, 0.000217000000, 0.000396000000, 0.000640000000,
     0.001210000000, 0.002180000000, 0.004000000000, 0.007300000000, 0.011600000000,
@@ -59,7 +57,7 @@ const cie_y: [f64; CIE_SAMPLES] = [
 ];
 
 #[rustfmt::skip]
-const cie_z: [f64; CIE_SAMPLES] = [
+const CIE_Z: [f64; CIE_SAMPLES] = [
     0.000606100000, 0.001086000000, 0.001946000000, 0.003486000000, 0.006450001000,
     0.010549990000, 0.020050010000, 0.036210000000, 0.067850010000, 0.110200000000,
     0.207400000000, 0.371300000000, 0.645600000000, 1.039050100000, 1.385600000000,
@@ -82,7 +80,7 @@ const cie_z: [f64; CIE_SAMPLES] = [
 ];
 
 #[rustfmt::skip]
-const cie_d65: [f64; CIE_SAMPLES] = {
+const CIE_D65: [f64; CIE_SAMPLES] = {
     const fn f(x: f64) -> f64 {
         return x / 10566.864005283874576;
     }
@@ -104,20 +102,20 @@ const cie_d65: [f64; CIE_SAMPLES] = {
     ]
 };
 
-const xyz_to_srgb: [[f64; 3]; 3] = [
+const XYZ_TO_SRGB: [[f64; 3]; 3] = [
     [3.240479, -1.537150, -0.498535],
     [-0.969256, 1.875991, 0.041556],
     [0.055648, -0.204043, 1.057311],
 ];
 
-const srgb_to_xyz: [[f64; 3]; 3] = [
+const SRGB_TO_XYZ: [[f64; 3]; 3] = [
     [0.412453, 0.357580, 0.180423],
     [0.212671, 0.715160, 0.072169],
     [0.019334, 0.119193, 0.950227],
 ];
 
 enum Gamut {
-    s_rgb,
+    SRgb,
 }
 
 const fn clamp_usize(val: usize, low: usize, high: usize) -> usize {
@@ -150,7 +148,7 @@ struct Table {
 
 const fn init_table(gamut: Gamut) -> Table {
     let (illuminant, xyz_to_rgb, rgb_to_xyz) = match gamut {
-        Gamut::s_rgb => (cie_d65, xyz_to_srgb, srgb_to_xyz),
+        Gamut::SRgb => (CIE_D65, XYZ_TO_SRGB, SRGB_TO_XYZ),
     };
 
     let h = (CIE_LAMBDA_MAX - CIE_LAMBDA_MIN) / ((CIE_FINE_SAMPLES - 1) as f64);
@@ -166,9 +164,9 @@ const fn init_table(gamut: Gamut) -> Table {
         let lambda = CIE_LAMBDA_MIN + (i as f64) * h;
 
         let xyz = [
-            cie_interpolate(&cie_x, lambda),
-            cie_interpolate(&cie_y, lambda),
-            cie_interpolate(&cie_z, lambda),
+            cie_interpolate(&CIE_X, lambda),
+            cie_interpolate(&CIE_Y, lambda),
+            cie_interpolate(&CIE_Z, lambda),
         ];
         let big_i = cie_interpolate(&illuminant, lambda);
 
@@ -280,21 +278,26 @@ fn eval_residual(table: &Table, coeffs: &[f64; 3], rgb: &[f64; 3], residual: &mu
     }
 }
 
-fn eval_jacobian(table: &Table, coeffs: &[f64; 3], rgb: &[f64; 3], jac: &mut [[f64; 3]; 3]) {
+fn eval_jacobian(
+    table: &Table,
+    coefficients: &[f64; 3],
+    rgb: &[f64; 3],
+    jacobian: &mut [[f64; 3]; 3],
+) {
     let mut r0 = [0.0; 3];
     let mut r1 = [0.0; 3];
 
     for i in 0..3 {
-        let mut tmp = coeffs.clone();
+        let mut tmp = coefficients.clone();
         tmp[i] -= RGB2SPEC_EPSILON;
         eval_residual(table, &tmp, rgb, &mut r0);
 
-        let mut tmp = coeffs.clone();
+        let mut tmp = coefficients.clone();
         tmp[i] += RGB2SPEC_EPSILON;
         eval_residual(table, &tmp, rgb, &mut r1);
 
         for j in 0..3 {
-            jac[j][i] = (r1[j] - r0[j]) * 1.0 / (2.0 * RGB2SPEC_EPSILON);
+            jacobian[j][i] = (r1[j] - r0[j]) * 1.0 / (2.0 * RGB2SPEC_EPSILON);
         }
     }
 }
@@ -306,20 +309,20 @@ fn lup_decompose(a: &mut [[f64; 3]; 3], n: usize, tolerance: f64, p: &mut [usize
     }
 
     for i in 0..n {
-        let mut maxA = 0.0;
+        let mut max_a = 0.0;
         let mut imax = i;
 
         for k in i..n {
-            let absA = a[k][i].abs();
-            if absA > maxA {
-                maxA = absA;
+            let abs_a = a[k][i].abs();
+            if abs_a > max_a {
+                max_a = abs_a;
                 imax = k;
                 //println!("imax: {}", imax);
             }
         }
 
         //println!("maxA: {}", maxA);
-        if maxA < tolerance {
+        if max_a < tolerance {
             // failure, matrix is degenerate
             return false;
         }
@@ -488,9 +491,9 @@ impl SpectrumTableData {
     }
 }
 
-pub fn rgb2spec(str_gamut: &str) -> Vec<f32> {
+pub fn build_spectrum_table_data(str_gamut: &str) -> Vec<f32> {
     let gamut = match str_gamut {
-        "sRGB" => Gamut::s_rgb,
+        "sRGB" => Gamut::SRgb,
         _ => {
             panic!("gamut `{}` not implemented", str_gamut)
         }
@@ -511,17 +514,16 @@ pub fn rgb2spec(str_gamut: &str) -> Vec<f32> {
         }
     }
     let shared_job_list = Arc::new(Mutex::new(job_list));
-    let spectrum_data_table = Arc::new(Mutex::new(SpectrumTableData::new(BUFFER_SIZE)));
+    let spectrum_table_data = Arc::new(Mutex::new(SpectrumTableData::new(BUFFER_SIZE)));
 
     let mut handles: Vec<JoinHandle<()>> = vec![];
-    let num_cores = num_cpus::get().min(RESOLUTION);
-    for _ in 0..num_cores {
+    for _ in 0..num_cpus::get() {
         let mut forked_job_list = shared_job_list.clone();
-        let mut forked_spectrum_data_table = spectrum_data_table.clone();
+        let mut forked_spectrum_table_data = spectrum_table_data.clone();
 
         let handle = thread::spawn(move || {
             single_thread_iterate(
-                &mut forked_spectrum_data_table,
+                &mut forked_spectrum_table_data,
                 &mut forked_job_list,
                 table,
                 scale,
@@ -534,5 +536,5 @@ pub fn rgb2spec(str_gamut: &str) -> Vec<f32> {
         handle.join().unwrap();
     }
 
-    return spectrum_data_table.lock().unwrap().data.clone();
+    return spectrum_table_data.lock().unwrap().data.clone();
 }

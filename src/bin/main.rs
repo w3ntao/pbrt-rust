@@ -32,13 +32,13 @@ fn render(file_path: &str, spp: usize) {
 }
 
 fn main() {
-    let srgb_to_spectrum_table_data = rgb2spec("sRGB");
-
+    /*
+    let srgb_to_spectrum_table_data = build_spectrum_table_data("sRGB");
     for x in srgb_to_spectrum_table_data {
         println!("{}", x);
     }
-
     return;
+    */
 
     let args = Cli::parse();
     if !args.scene_file.is_file() {
