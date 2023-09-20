@@ -1,4 +1,4 @@
-name: build and render (release, f64)
+name: build and render
 
 on:
   push:
@@ -15,10 +15,8 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build-and-test:
-
+  build-and-render-debug-f32:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
 
@@ -28,9 +26,28 @@ jobs:
         git clone https://github.com/w3ntao/pbrt-minus-scenes.git;
         popd;
 
-    - name: cargo build (release, verbose, f64 as Float)
+    - name: cargo build (debug, f32 as Float)
       run:
-        cargo build --release --verbose --features use_f64;
+        cargo build;
+
+    - name: render
+      run:
+        bash render_all.sh --debug
+
+  build-and-render-release-f64:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: clone scene
+      run:
+        pushd ..;
+        git clone https://github.com/w3ntao/pbrt-minus-scenes.git;
+        popd;
+
+    - name: cargo build (release, f64 as Float)
+      run:
+        cargo build --release;
 
     - name: render
       run:
