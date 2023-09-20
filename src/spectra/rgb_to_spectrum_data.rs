@@ -213,6 +213,8 @@ const fn init_table(gamut: Gamut) -> Table {
 }
 
 fn sigmoid(x: f64) -> f64 {
+    // TODO: rust bug: f32.sqrt() can't be made const
+    // https://github.com/rust-lang/rust/issues/57241
     return 0.5 * x / (1.0 + x * x).sqrt() + 0.5;
 }
 fn smooth_step(x: f64) -> f64 {
@@ -476,6 +478,8 @@ fn single_thread_iterate(
 
 struct SpectrumTableData {
     data: Vec<f32>,
+    // TODO: rust bug: allocating large array triggers main thread overflow
+    // https://github.com/rust-lang/rust/issues/53827
 }
 
 impl SpectrumTableData {
@@ -491,7 +495,7 @@ impl SpectrumTableData {
     }
 }
 
-pub fn build_spectrum_table_data(str_gamut: &str) -> Vec<f32> {
+pub fn compute_spectrum_table_data(str_gamut: &str) -> ([f32; RESOLUTION], Vec<f32>) {
     let gamut = match str_gamut {
         "sRGB" => Gamut::SRgb,
         _ => {
@@ -505,6 +509,7 @@ pub fn build_spectrum_table_data(str_gamut: &str) -> Vec<f32> {
     for k in 0..RESOLUTION {
         scale[k] = smooth_step(smooth_step(k as f64 / (RESOLUTION - 1) as f64)) as f32;
     }
+
     const BUFFER_SIZE: usize = 3 * 3 * RESOLUTION * RESOLUTION * RESOLUTION;
 
     let mut job_list = vec![];
@@ -536,5 +541,5 @@ pub fn build_spectrum_table_data(str_gamut: &str) -> Vec<f32> {
         handle.join().unwrap();
     }
 
-    return spectrum_table_data.lock().unwrap().data.clone();
+    return (scale, spectrum_table_data.lock().unwrap().data.clone());
 }

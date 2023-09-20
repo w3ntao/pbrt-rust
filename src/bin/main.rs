@@ -33,10 +33,10 @@ fn render(file_path: &str, spp: usize) {
 
 fn main() {
     /*
-    let srgb_to_spectrum_table_data = build_spectrum_table_data("sRGB");
-    for x in srgb_to_spectrum_table_data {
-        println!("{}", x);
-    }
+    let (scale, coefficients) = compute_spectrum_table_data("sRGB");
+
+    let rgb_to_spectrum_table = RGBtoSpectrumTable::new(scale, &coefficients);
+
     return;
     */
 
