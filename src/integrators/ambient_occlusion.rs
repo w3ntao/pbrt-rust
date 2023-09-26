@@ -11,12 +11,12 @@ impl AmbientOcclusion {
 }
 
 impl Integrator for AmbientOcclusion {
-    fn li(&self, ray: &dyn Ray, sampler: &mut dyn Sampler) -> RGBColor {
+    fn li(&self, ray: &dyn Ray, sampler: &mut dyn Sampler) -> RGB {
         // TODO: this is incomplete, consider BSDF only for now
 
         let si = match self.aggregate.intersect(ray, Float::INFINITY) {
             None => {
-                return RGBColor::black();
+                return RGB::black();
             }
             Some(_si) => _si,
         };
@@ -30,7 +30,7 @@ impl Integrator for AmbientOcclusion {
         let pdf = cosine_hemisphere_pdf(local_wi.z.abs());
 
         if pdf == 0.0 {
-            return RGBColor::black();
+            return RGB::black();
         }
 
         let frame = Frame::from_z(Vector3f::from(n));
@@ -41,10 +41,10 @@ impl Integrator for AmbientOcclusion {
         if !self.fast_intersect(&differential_ray, Float::INFINITY) {
             let grey = n.dot(wi) / (PI * pdf);
 
-            return RGBColor::new(grey, grey, grey);
+            return RGB::new(grey, grey, grey);
         }
 
-        return RGBColor::black();
+        return RGB::black();
     }
 
     fn fast_intersect(&self, ray: &dyn Ray, t_max: Float) -> bool {

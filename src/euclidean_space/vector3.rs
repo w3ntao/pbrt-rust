@@ -138,14 +138,14 @@ impl Vector3<Float> {
         return (v2, v3);
     }
 
-    pub fn softmax_color(&self) -> RGBColor {
+    pub fn softmax_color(&self) -> RGB {
         let base: Float = 10.0;
         let x = base.powf(self.x);
         let y = base.powf(self.y);
         let z = base.powf(self.z);
 
         let sum = x + y + z;
-        return RGBColor {
+        return RGB {
             r: x / sum,
             g: y / sum,
             b: z / sum,

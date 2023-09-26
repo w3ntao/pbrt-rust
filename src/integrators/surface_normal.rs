@@ -11,9 +11,9 @@ impl SurfaceNormal {
 }
 
 impl Integrator for SurfaceNormal {
-    fn li(&self, camera_ray: &dyn Ray, _sampler: &mut dyn Sampler) -> RGBColor {
+    fn li(&self, camera_ray: &dyn Ray, _sampler: &mut dyn Sampler) -> RGB {
         return match self.aggregate.intersect(camera_ray, Float::INFINITY) {
-            None => RGBColor::black(),
+            None => RGB::black(),
             Some(shape_intersection) => {
                 let n = shape_intersection
                     .interaction

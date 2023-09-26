@@ -35,3 +35,22 @@ pub const fn clamp_usize(val: usize, low: usize, high: usize) -> usize {
     }
     return val;
 }
+
+pub fn sigmoid(x: Float) -> Float {
+    if x.is_infinite() {
+        return if x > 0.0 { 1.0 } else { 0.0 };
+    }
+
+    return 0.5 + x / (2.0 * (1.0 + x * x).sqrt());
+}
+
+pub fn evaluate_polynomial(t: Float, args: &[Float]) -> Float {
+    let c = args[0];
+    let length = args.len();
+
+    if length == 1 {
+        return c;
+    }
+
+    return fma(t, evaluate_polynomial(t, &args[1..length]), c);
+}

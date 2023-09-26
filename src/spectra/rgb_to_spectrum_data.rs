@@ -114,10 +114,6 @@ const SRGB_TO_XYZ: [[f64; 3]; 3] = [
     [0.019334, 0.119193, 0.950227],
 ];
 
-enum Gamut {
-    SRgb,
-}
-
 const fn clamp_usize(val: usize, low: usize, high: usize) -> usize {
     if val < low {
         return low;
@@ -495,14 +491,7 @@ impl SpectrumTableData {
     }
 }
 
-pub fn compute_spectrum_table_data(str_gamut: &str) -> ([f32; RESOLUTION], Vec<f32>) {
-    let gamut = match str_gamut {
-        "sRGB" => Gamut::SRgb,
-        _ => {
-            panic!("gamut `{}` not implemented", str_gamut)
-        }
-    };
-
+pub fn compute_spectrum_table_data(gamut: Gamut) -> ([f32; RESOLUTION], Vec<f32>) {
     let table = init_table(gamut);
 
     let mut scale = [0.0; RESOLUTION];

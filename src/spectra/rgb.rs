@@ -1,13 +1,13 @@
 use crate::pbrt::*;
 
 #[derive(Clone, Copy)]
-pub struct RGBColor {
+pub struct RGB {
     pub r: Float,
     pub g: Float,
     pub b: Float,
 }
 
-impl RGBColor {
+impl RGB {
     pub fn new(r: Float, g: Float, b: Float) -> Self {
         return Self { r, b, g };
     }
@@ -20,9 +20,9 @@ impl RGBColor {
     }
 }
 
-impl From<Vector3f> for RGBColor {
+impl From<Vector3f> for RGB {
     fn from(value: Vector3f) -> Self {
-        return RGBColor {
+        return RGB {
             r: value.x,
             g: value.y,
             b: value.z,
@@ -30,11 +30,26 @@ impl From<Vector3f> for RGBColor {
     }
 }
 
-impl Add<RGBColor> for RGBColor {
-    type Output = RGBColor;
+impl Index<usize> for RGB {
+    type Output = Float;
 
-    fn add(self, rhs: RGBColor) -> Self::Output {
-        return RGBColor {
+    fn index(&self, index: usize) -> &Self::Output {
+        return match index {
+            0 => &self.r,
+            1 => &self.g,
+            2 => &self.b,
+            _ => {
+                unreachable!();
+            }
+        };
+    }
+}
+
+impl Add<RGB> for RGB {
+    type Output = RGB;
+
+    fn add(self, rhs: RGB) -> Self::Output {
+        return RGB {
             r: self.r + rhs.r,
             g: self.g + rhs.g,
             b: self.b + rhs.b,
@@ -42,11 +57,11 @@ impl Add<RGBColor> for RGBColor {
     }
 }
 
-impl Div<Float> for RGBColor {
-    type Output = RGBColor;
+impl Div<Float> for RGB {
+    type Output = RGB;
 
     fn div(self, rhs: Float) -> Self::Output {
-        return RGBColor {
+        return RGB {
             r: self.r / rhs,
             g: self.g / rhs,
             b: self.b / rhs,
@@ -54,8 +69,8 @@ impl Div<Float> for RGBColor {
     }
 }
 
-impl AddAssign<RGBColor> for RGBColor {
-    fn add_assign(&mut self, rhs: RGBColor) {
+impl AddAssign<RGB> for RGB {
+    fn add_assign(&mut self, rhs: RGB) {
         *self = *self + rhs;
     }
 }

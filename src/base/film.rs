@@ -5,7 +5,7 @@ pub trait Film: Send + Sync {
 
     fn get_filter(&self) -> Arc<dyn Filter>;
 
-    fn add_sample(&mut self, point_film: Point2i, spectrum: RGBColor);
+    fn add_sample(&mut self, point_film: Point2i, spectrum: RGB);
 
     fn export_image(&self);
 }

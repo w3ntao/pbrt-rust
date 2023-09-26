@@ -6,7 +6,7 @@ pub struct SimpleRGBFilm {
     pub resolution: Point2i,
     pub filename: String,
     pub filter: Arc<dyn Filter>,
-    pixels: Vec<Vec<RGBColor>>,
+    pixels: Vec<Vec<RGB>>,
 }
 
 impl SimpleRGBFilm {
@@ -25,7 +25,7 @@ impl SimpleRGBFilm {
             resolution: _resolution.clone(),
             filename: png_filename,
             filter: filter.clone(),
-            pixels: vec![vec![RGBColor::black(); width as usize]; height as usize],
+            pixels: vec![vec![RGB::black(); width as usize]; height as usize],
         };
     }
 }
@@ -39,7 +39,7 @@ impl Film for SimpleRGBFilm {
         return self.filter.clone();
     }
 
-    fn add_sample(&mut self, point_film: Point2i, spectrum: RGBColor) {
+    fn add_sample(&mut self, point_film: Point2i, spectrum: RGB) {
         self.pixels[point_film.y as usize][point_film.x as usize] = spectrum;
     }
 

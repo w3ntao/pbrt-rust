@@ -32,11 +32,12 @@ pub use std::{
 };
 
 pub use crate::base::spectrum::*;
+pub use crate::spectra::rgb::*;
 pub use crate::{
     accelerator::bvh::*,
     base::{
-        camera::*, film::*, filter::*, integrator::*, primitive::*, ray::*, rgb_color::*,
-        sampler::*, shape::*, spectrum::*,
+        camera::*, film::*, filter::*, integrator::*, primitive::*, ray::*, sampler::*, shape::*,
+        spectrum::*,
     },
     cameras::perspective::*,
     euclidean_space::{
@@ -52,7 +53,8 @@ pub use crate::{
     shapes::{loop_subdivision::*, sphere::*, tri_quad_mesh::*, triangle::*, triangle_mesh::*},
     spectra::{
         const_piecewise_linear_spectrum::*, densely_sampled_spectrum::*, measured_spectra_data::*,
-        piecewise_linear_spectrum::*, rgb_to_spectrum_data::*, rgb_to_spectrum_table::*,
+        piecewise_linear_spectrum::*, rgb_sigmoid_polynomial::*, rgb_to_spectrum_data::*,
+        rgb_to_spectrum_table::*,
     },
     util::{colorspace::*, math::*, sampling::*},
 };

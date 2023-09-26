@@ -4,7 +4,6 @@ pub mod filter;
 pub mod integrator;
 pub mod primitive;
 pub mod ray;
-pub mod rgb_color;
 pub mod sampler;
 pub mod shape;
 pub mod spectrum;
