@@ -7,3 +7,5 @@ pub mod rgb;
 pub mod rgb_sigmoid_polynomial;
 pub mod rgb_to_spectrum_data;
 pub mod rgb_to_spectrum_table;
+pub mod sampled_spectrum;
+pub mod sampled_wavelengths;

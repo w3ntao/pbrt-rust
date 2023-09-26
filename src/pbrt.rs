@@ -54,7 +54,7 @@ pub use crate::{
     spectra::{
         const_piecewise_linear_spectrum::*, densely_sampled_spectrum::*, measured_spectra_data::*,
         piecewise_linear_spectrum::*, rgb_sigmoid_polynomial::*, rgb_to_spectrum_data::*,
-        rgb_to_spectrum_table::*,
+        rgb_to_spectrum_table::*, sampled_spectrum::*, sampled_wavelengths::*,
     },
     util::{colorspace::*, math::*, sampling::*},
 };
