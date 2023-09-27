@@ -1,4 +1,6 @@
+pub mod black_body_spectrum;
 pub mod cie_xyz;
+pub mod const_densely_sampled_spectrum;
 pub mod const_piecewise_linear_spectrum;
 pub mod densely_sampled_spectrum;
 pub mod measured_spectra_data;

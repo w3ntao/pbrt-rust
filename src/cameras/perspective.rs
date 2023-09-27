@@ -61,19 +61,20 @@ impl PerspectiveCamera {
 
         return PerspectiveCamera {
             camera_transform,
-            raster_from_screen: raster_from_screen,
-            screen_from_raster: screen_from_raster,
-            screen_from_camera: screen_from_camera,
-            camera_from_raster: camera_from_raster,
-            dx_camera: dx_camera,
-            dy_camera: dy_camera,
+            raster_from_screen,
+            screen_from_raster,
+            screen_from_camera,
+            camera_from_raster,
+            dx_camera,
+            dy_camera,
             lens_radius: 0.0,
         };
     }
 }
 
 impl Camera for PerspectiveCamera {
-    fn generate_camera_ray(&self, sample: CameraSample) -> SimpleRay {
+    fn generate_camera_ray(&self, sample: CameraSample, _lambda: SampledWavelengths) -> CameraRay {
+        // Compute raster and camera sample positions
         let p_film = Point3f::new(sample.p_film.x, sample.p_film.y, 0.0);
         let p_camera = self.camera_from_raster.on_point3f(p_film);
 
@@ -82,13 +83,19 @@ impl Camera for PerspectiveCamera {
             Vector3f::from(p_camera).normalize(),
         );
 
-        if self.lens_radius > 0.0 {
-            panic!("not yet implemented");
+        if self.lens_radius == 0.0 {
+            let (transformed_ray, _) = self
+                .camera_transform
+                .render_from_camera
+                .on_ray(ray.to_simple_ray());
+
+            return CameraRay {
+                ray: transformed_ray,
+                weight: SampledSpectrum::new([1.0; NUM_SPECTRUM_SAMPLES]),
+            };
         }
 
-        // TODO: CameraRay not implemented
-
-        let (camera_ray, _) = self.camera_transform.render_from_camera.on_ray(ray);
-        return camera_ray;
+        //self.lens_radius > 0.0
+        panic!("not implemented");
     }
 }

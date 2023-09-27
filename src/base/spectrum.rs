@@ -1,34 +1,37 @@
 use crate::pbrt::*;
-use crate::spectra::cie_xyz::CIEXYZ;
 
 pub trait Spectrum: Send + Sync {
     fn eval(&self, lambda: Float) -> Float;
 
-    fn non_zero(&self) -> bool;
+    fn sample(&self, lambda: &SampledWavelengths) -> SampledSpectrum;
 
     fn inner_product(&self, g: &dyn Spectrum) -> Float {
+        // The parallel (possibly faster) implementation
         return LAMBDA_RANGE
             .par_iter()
-            .map(|_lambda| self.eval(*_lambda as Float) * g.eval(*_lambda as Float))
+            .map(|_lambda| self.eval(*_lambda) * g.eval(*_lambda))
             .sum();
     }
 
     fn to_xyz(&self) -> CIEXYZ {
         return CIEXYZ {
-            x: self.inner_product(&CIE_MATCHING_CURVE_X),
-            y: self.inner_product(&CIE_MATCHING_CURVE_Y),
-            z: self.inner_product(&CIE_MATCHING_CURVE_Z),
+            x: self.inner_product(&CIE_X_PLS),
+            y: self.inner_product(&CIE_Y_PLS),
+            z: self.inner_product(&CIE_Z_PLS),
         } / CIE_Y_INTEGRAL;
+    }
+
+    fn to_photometric(&self) -> Float {
+        // TODO: implement a special case for RGBIlluminantSpectrum
+        return self.inner_product(&CIE_Y_DENSELY_SAMPLED);
     }
 }
 
 pub const LAMBDA_MIN: Float = 360.0;
 pub const LAMBDA_MAX: Float = 830.0;
 
-const _VISIBLE_LAMBDA_RANGE_LENGTH: usize = (LAMBDA_MAX as usize - LAMBDA_MIN as usize) + 1;
-
-pub const LAMBDA_RANGE: [Float; _VISIBLE_LAMBDA_RANGE_LENGTH] = {
-    let mut lambdas = [Float::NAN; _VISIBLE_LAMBDA_RANGE_LENGTH];
+pub const LAMBDA_RANGE: [Float; NUM_CIE_SAMPLES] = {
+    let mut lambdas = [Float::NAN; NUM_CIE_SAMPLES];
 
     let lambda_min_usize = LAMBDA_MIN as usize;
 
@@ -40,18 +43,33 @@ pub const LAMBDA_RANGE: [Float; _VISIBLE_LAMBDA_RANGE_LENGTH] = {
     lambdas
 };
 
+const _CHECK_LAMBDA: bool = {
+    assert!(LAMBDA_RANGE[0] == LAMBDA_MIN);
+    assert!(LAMBDA_RANGE[LAMBDA_RANGE.len() - 1] == LAMBDA_MAX);
+    true
+};
 pub const NUM_SPECTRUM_SAMPLES: usize = 4;
 
 pub const CIE_Y_INTEGRAL: Float = 106.856895;
+// TODO: compute CIE_Y_INTEGRAL during compilation rather than hard coding it
 
-pub const CIE_MATCHING_CURVE_Y: ConstPieceWiseLinearSpectrum<NUM_CIE_SAMPLES> =
+pub const CIE_Y_PLS: ConstPieceWiseLinearSpectrum<NUM_CIE_SAMPLES> =
     ConstPieceWiseLinearSpectrum::new(CIE_LAMBDA_RANGE, CIE_Y_VALUE);
 
-pub const CIE_MATCHING_CURVE_X: ConstPieceWiseLinearSpectrum<NUM_CIE_SAMPLES> =
+pub const CIE_X_PLS: ConstPieceWiseLinearSpectrum<NUM_CIE_SAMPLES> =
     ConstPieceWiseLinearSpectrum::new(CIE_LAMBDA_RANGE, CIE_X_VALUE);
 
-pub const CIE_MATCHING_CURVE_Z: ConstPieceWiseLinearSpectrum<NUM_CIE_SAMPLES> =
+pub const CIE_Z_PLS: ConstPieceWiseLinearSpectrum<NUM_CIE_SAMPLES> =
     ConstPieceWiseLinearSpectrum::new(CIE_LAMBDA_RANGE, CIE_Z_VALUE);
+
+pub const CIE_X_DENSELY_SAMPLED: ConstDenselySampledSpectrum =
+    ConstDenselySampledSpectrum::from_const_spectrum(&CIE_X_PLS);
+
+pub const CIE_Y_DENSELY_SAMPLED: ConstDenselySampledSpectrum =
+    ConstDenselySampledSpectrum::from_const_spectrum(&CIE_Y_PLS);
+
+pub const CIE_Z_DENSELY_SAMPLED: ConstDenselySampledSpectrum =
+    ConstDenselySampledSpectrum::from_const_spectrum(&CIE_Z_PLS);
 
 pub const ILLUM_D65: ConstPieceWiseLinearSpectrum<{ CIE_ILLUM_D6500.len() / 2 }> =
     ConstPieceWiseLinearSpectrum::from_interleaved_full_visible_wavelengths(CIE_ILLUM_D6500, true);
@@ -63,12 +81,4 @@ pub fn get_named_spectrum(name: &str) -> Arc<dyn Spectrum> {
             panic!("unknown spectrum: `{}`", name);
         }
     };
-}
-
-pub fn test_spectrum() {
-    // TODO: for debugging only
-    let const_illum_d65 = get_named_spectrum("stdillum-D65");
-
-    let non_const_illum_d65 =
-        PiecewiseLinearSpectrum::from_interleaved(CIE_ILLUM_D6500.to_vec(), true);
 }

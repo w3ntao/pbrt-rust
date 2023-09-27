@@ -7,6 +7,7 @@ pub struct ParameterDict {
     point2s: HashMap<String, Vec<Point2f>>,
     point3s: HashMap<String, Vec<Point3f>>,
     normal3s: HashMap<String, Vec<Normal3f>>,
+    bools: HashMap<String, Vec<bool>>,
 }
 
 impl Default for ParameterDict {
@@ -18,6 +19,7 @@ impl Default for ParameterDict {
             point2s: HashMap::new(),
             point3s: HashMap::new(),
             normal3s: HashMap::new(),
+            bools: HashMap::new(),
         };
     }
 }
@@ -31,6 +33,7 @@ impl Clone for ParameterDict {
             point2s: self.point2s.clone(),
             point3s: self.point3s.clone(),
             normal3s: self.normal3s.clone(),
+            bools: self.bools.clone(),
         };
     }
 }
@@ -88,6 +91,7 @@ impl ParameterDict {
         let mut point2s = HashMap::<String, Vec<Point2f>>::new();
         let mut point3s = HashMap::<String, Vec<Point3f>>::new();
         let mut normal3s = HashMap::<String, Vec<Normal3f>>::new();
+        let mut bools = HashMap::<String, Vec<bool>>::new();
 
         for idx in (0..array.len()).step_by(2) {
             let token = trim_quote(json_value_to_string(array[idx].clone()));
@@ -156,6 +160,7 @@ impl ParameterDict {
             point2s,
             point3s,
             normal3s,
+            bools,
         };
     }
 
@@ -172,6 +177,8 @@ impl ParameterDict {
     }
 
     pub fn get_one_float(&self, key: &str, default: Option<Float>) -> Float {
+        // TODO: rewrite 2 match into 1
+
         match self.floats.get(key) {
             None => match default {
                 None => {
@@ -191,7 +198,29 @@ impl ParameterDict {
     }
 
     pub fn get_one_integer(&self, key: &str, default: Option<i32>) -> i32 {
+        // TODO: rewrite 2 match into 1
+
         match self.integers.get(key) {
+            None => match default {
+                None => {
+                    panic!("found no key with name `{}`", key);
+                }
+                Some(val_default) => {
+                    return val_default;
+                }
+            },
+            Some(val) => {
+                if val.len() != 1 {
+                    panic!("array length is larger than 1");
+                }
+                return val[0];
+            }
+        };
+    }
+
+    pub fn get_one_bool(&self, key: &str, default: Option<bool>) -> bool {
+        // TODO: rewrite 2 match into 1
+        match self.bools.get(key) {
             None => match default {
                 None => {
                     panic!("found no key with name `{}`", key);
@@ -236,12 +265,13 @@ impl ParameterDict {
         };
     }
 
-    pub fn get_string(&self, key: &str) -> String {
-        return match self.strings.get(key) {
-            None => {
+    pub fn get_string(&self, key: &str, default: Option<String>) -> String {
+        return match (self.strings.get(key), default) {
+            (None, Some(val)) => val,
+            (Some(val), _) => val.clone(),
+            _ => {
                 panic!("found no key with name `{}`", key);
             }
-            Some(val) => val.clone(),
         };
     }
 

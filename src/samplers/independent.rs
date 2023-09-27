@@ -25,6 +25,10 @@ impl Sampler for IndependentSampler {
         return Box::new(IndependentSampler::default());
     }
 
+    fn start_pixel_sample(&mut self, p_pixel: Point2i, sample_index: usize) {
+        // do nothing
+    }
+
     fn get_1d(&mut self) -> Float {
         return self.rng.gen::<Float>();
     }

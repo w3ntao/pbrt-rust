@@ -2,8 +2,8 @@ use crate::pbrt::*;
 use std::thread;
 use std::thread::JoinHandle;
 
-const CIE_SAMPLES: usize = 95;
-const CIE_FINE_SAMPLES: usize = (CIE_SAMPLES - 1) * 3 + 1;
+const CIE_COARSE_SAMPLES: usize = 95;
+const CIE_FINE_SAMPLES: usize = (CIE_COARSE_SAMPLES - 1) * 3 + 1;
 
 const RGB2SPEC_EPSILON: f64 = 1e-4;
 
@@ -11,7 +11,7 @@ pub const RGB_TO_SPECTRUM_RESOLUTION: usize = 64;
 const RESOLUTION: usize = RGB_TO_SPECTRUM_RESOLUTION;
 
 #[rustfmt::skip]
-const CIE_X: [f64; CIE_SAMPLES] = [
+const CIE_X: [f64; CIE_COARSE_SAMPLES] = [
     0.000129900000, 0.000232100000, 0.000414900000, 0.000741600000, 0.001368000000,
     0.002236000000, 0.004243000000, 0.007650000000, 0.014310000000, 0.023190000000,
     0.043510000000, 0.077630000000, 0.134380000000, 0.214770000000, 0.283900000000,
@@ -34,7 +34,7 @@ const CIE_X: [f64; CIE_SAMPLES] = [
 ];
 
 #[rustfmt::skip]
-const CIE_Y: [f64; CIE_SAMPLES] = [
+const CIE_Y: [f64; CIE_COARSE_SAMPLES] = [
     0.000003917000, 0.000006965000, 0.000012390000, 0.000022020000, 0.000039000000,
     0.000064000000, 0.000120000000, 0.000217000000, 0.000396000000, 0.000640000000,
     0.001210000000, 0.002180000000, 0.004000000000, 0.007300000000, 0.011600000000,
@@ -57,7 +57,7 @@ const CIE_Y: [f64; CIE_SAMPLES] = [
 ];
 
 #[rustfmt::skip]
-const CIE_Z: [f64; CIE_SAMPLES] = [
+const CIE_Z: [f64; CIE_COARSE_SAMPLES] = [
     0.000606100000, 0.001086000000, 0.001946000000, 0.003486000000, 0.006450001000,
     0.010549990000, 0.020050010000, 0.036210000000, 0.067850010000, 0.110200000000,
     0.207400000000, 0.371300000000, 0.645600000000, 1.039050100000, 1.385600000000,
@@ -80,7 +80,7 @@ const CIE_Z: [f64; CIE_SAMPLES] = [
 ];
 
 #[rustfmt::skip]
-const CIE_D65: [f64; CIE_SAMPLES] = {
+const CIE_D65: [f64; CIE_COARSE_SAMPLES] = {
     const fn f(x: f64) -> f64 {
         return x / 10566.864005283874576;
     }
@@ -125,8 +125,9 @@ const fn clamp_usize(val: usize, low: usize, high: usize) -> usize {
 }
 
 const fn cie_interpolate(data: &[f64], x: f64) -> f64 {
-    let x = (x - CIE_LAMBDA_MIN) * ((CIE_SAMPLES as f64 - 1.0) / (CIE_LAMBDA_MAX - CIE_LAMBDA_MIN));
-    let offset = clamp_usize(x as usize, 0, CIE_SAMPLES - 2);
+    let x = (x - CIE_LAMBDA_MIN)
+        * ((CIE_COARSE_SAMPLES as f64 - 1.0) / (CIE_LAMBDA_MAX - CIE_LAMBDA_MIN));
+    let offset = clamp_usize(x as usize, 0, CIE_COARSE_SAMPLES - 2);
 
     let weight = x - (offset as f64);
 

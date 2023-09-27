@@ -11,12 +11,23 @@ impl RGB {
     pub fn new(r: Float, g: Float, b: Float) -> Self {
         return Self { r, b, g };
     }
+
     pub fn black() -> Self {
         return Self {
             r: 0.0,
             g: 0.0,
             b: 0.0,
         };
+    }
+
+    pub fn max_component(&self) -> Float {
+        return self.r.max(self.g).max(self.b);
+    }
+}
+
+impl Display for RGB {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "[ RGB [{}, {}, {}] ]", self.r, self.g, self.b)
     }
 }
 
@@ -54,6 +65,26 @@ impl Add<RGB> for RGB {
             g: self.g + rhs.g,
             b: self.b + rhs.b,
         };
+    }
+}
+
+impl Mul<Float> for RGB {
+    type Output = RGB;
+
+    fn mul(self, rhs: Float) -> Self::Output {
+        return RGB {
+            r: self.r * rhs,
+            g: self.g * rhs,
+            b: self.b * rhs,
+        };
+    }
+}
+
+impl Mul<RGB> for Float {
+    type Output = RGB;
+
+    fn mul(self, rhs: RGB) -> Self::Output {
+        return rhs * self;
     }
 }
 

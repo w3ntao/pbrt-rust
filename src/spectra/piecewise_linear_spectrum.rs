@@ -21,14 +21,8 @@ impl Spectrum for PiecewiseLinearSpectrum {
         return lerp(t, self.values[o], self.values[o + 1]);
     }
 
-    fn non_zero(&self) -> bool {
-        for v in &self.values {
-            if *v > 0.0 {
-                return true;
-            }
-        }
-
-        return false;
+    fn sample(&self, lambda: &SampledWavelengths) -> SampledSpectrum {
+        panic!("not implemented for PiecewiseLinearSpectrum");
     }
 }
 
@@ -83,7 +77,7 @@ impl PiecewiseLinearSpectrum {
         return if !normalize {
             spectrum
         } else {
-            return spectrum.scale(CIE_Y_INTEGRAL / spectrum.inner_product(&CIE_MATCHING_CURVE_Y));
+            return spectrum.scale(CIE_Y_INTEGRAL / spectrum.inner_product(&CIE_Y_PLS));
         };
     }
 }

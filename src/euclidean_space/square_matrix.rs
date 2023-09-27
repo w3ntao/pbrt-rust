@@ -5,14 +5,6 @@ pub struct SquareMatrix<const N: usize> {
     matrix: [[Float; N]; N],
 }
 
-impl<const N: usize> Default for SquareMatrix<N> {
-    fn default() -> Self {
-        return SquareMatrix {
-            matrix: [[0.0; N]; N],
-        };
-    }
-}
-
 impl<const N: usize> SquareMatrix<N> {
     pub fn zero() -> Self {
         return SquareMatrix {
@@ -35,11 +27,12 @@ impl<const N: usize> SquareMatrix<N> {
         };
     }
 
-    pub fn new(values: [[Float; N]; N]) -> SquareMatrix<N> {
+    pub const fn new(values: [[Float; N]; N]) -> SquareMatrix<N> {
         return SquareMatrix { matrix: values };
     }
 
     pub fn from_vec(values: Vec<Float>) -> SquareMatrix<N> {
+        // TODO: rename to from_array
         if values.len() != N * N {
             panic!("size of vector and size of matrix not matched");
         }
@@ -53,6 +46,15 @@ impl<const N: usize> SquareMatrix<N> {
         }
 
         return SquareMatrix { matrix: data };
+    }
+
+    pub fn from_diag(diag: [Float; N]) -> Self {
+        let mut matrix = Self::zero();
+        for i in 0..N {
+            matrix[i][i] = diag[i];
+        }
+
+        return matrix;
     }
 
     pub fn is_identity(&self) -> bool {
@@ -181,6 +183,52 @@ impl<const N: usize> Index<usize> for SquareMatrix<N> {
 impl<const N: usize> IndexMut<usize> for SquareMatrix<N> {
     fn index_mut(&mut self, idx: usize) -> &mut [Float; N] {
         return &mut self.matrix[idx];
+    }
+}
+
+impl Mul<RGB> for SquareMatrix<3> {
+    type Output = RGB;
+
+    fn mul(self, rhs: RGB) -> Self::Output {
+        let array = [rhs.r, rhs.g, rhs.b];
+        return RGB {
+            r: inner_product(&self[0], &array).value,
+            g: inner_product(&self[1], &array).value,
+            b: inner_product(&self[2], &array).value,
+        };
+    }
+}
+
+impl Mul<CIEXYZ> for SquareMatrix<3> {
+    type Output = CIEXYZ;
+
+    fn mul(self, rhs: CIEXYZ) -> Self::Output {
+        let array = [rhs.x, rhs.y, rhs.z];
+
+        return CIEXYZ {
+            x: inner_product(&self[0], &array).value,
+            y: inner_product(&self[1], &array).value,
+            z: inner_product(&self[2], &array).value,
+        };
+    }
+}
+
+impl Mul<SquareMatrix<3>> for SquareMatrix<3> {
+    type Output = SquareMatrix<3>;
+
+    fn mul(self, rhs: SquareMatrix<3>) -> Self::Output {
+        let mut product = SquareMatrix::<3>::zero();
+        for x in 0..3 {
+            for y in 0..3 {
+                let compensated_float = inner_product(
+                    &[self[x][0], self[x][1], self[x][2]],
+                    &[rhs[0][y], rhs[1][y], rhs[2][y]],
+                );
+                product[x][y] = compensated_float.eval();
+            }
+        }
+
+        return product;
     }
 }
 

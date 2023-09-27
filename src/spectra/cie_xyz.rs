@@ -1,5 +1,7 @@
 use crate::pbrt::*;
 
+#[derive(Copy, Clone)]
+
 pub struct CIEXYZ {
     pub x: Float,
     pub y: Float,
@@ -31,6 +33,21 @@ impl CIEXYZ {
         let sum_xyz = self.x + self.y + self.z;
 
         return Point2f::new(self.x / sum_xyz, self.y / sum_xyz);
+    }
+}
+
+impl Index<usize> for CIEXYZ {
+    type Output = Float;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        return match index {
+            0 => &self.x,
+            1 => &self.y,
+            2 => &self.z,
+            _ => {
+                unreachable!()
+            }
+        };
     }
 }
 

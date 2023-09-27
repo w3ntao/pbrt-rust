@@ -1,7 +1,8 @@
+use crate::films::pixel_sensor::PixelSensor;
 use crate::pbrt::*;
 
 fn build_look_at_transform(pos: Point3f, look: Point3f, up: Vector3f) -> Transform {
-    let mut world_from_camera = SquareMatrix::<4>::default();
+    let mut world_from_camera = SquareMatrix::<4>::zero();
     world_from_camera[0][3] = pos.x;
     world_from_camera[1][3] = pos.y;
     world_from_camera[2][3] = pos.z;
@@ -58,16 +59,44 @@ impl Default for SceneEntity {
     }
 }
 
-fn build_film(film_entity: &SceneEntity, _filter: Arc<BoxFilter>) -> Arc<Mutex<dyn Film>> {
+fn build_film(
+    film_entity: &SceneEntity,
+    _filter: Arc<BoxFilter>,
+    global_variable: &GlobalVariable,
+) -> Arc<Mutex<dyn Film>> {
     let xresolution = film_entity.parameters.get_one_integer("xresolution", None);
     let yresolution = film_entity.parameters.get_one_integer("yresolution", None);
 
     let resolution = Point2i::new(xresolution, yresolution);
-    let filename = film_entity.parameters.get_string("filename");
+    let filename = film_entity.parameters.get_string("filename", None);
 
-    return Arc::new(Mutex::new(SimpleRGBFilm::new(
-        resolution, &filename, _filter,
-    )));
+    match film_entity.name.as_str() {
+        "rgb" => {
+            /*
+            let max_component_value = film_entity
+                .parameters
+                .get_one_float("maxcomponentvalue", Some(Float::INFINITY));
+            let write_fp16 = film_entity.parameters.get_one_bool("savefp16", Some(true));
+            */
+
+            // TODO: 2023/10/30 progress add max_component_value and write_fp16
+
+            let exposure_time = 1.0;
+            let sensor =
+                PixelSensor::create(&film_entity.parameters, exposure_time, global_variable);
+
+            return Arc::new(Mutex::new(RGBFilm::new(
+                resolution,
+                &filename,
+                Arc::new(sensor),
+                _filter,
+                global_variable,
+            )));
+        }
+        _ => {
+            panic!("film `{}` not implemented", film_entity.name);
+        }
+    };
 }
 
 fn build_camera(camera_entity: &SceneEntity, resolution: Point2i) -> Arc<dyn Camera> {
@@ -169,6 +198,11 @@ impl SceneBuilder {
 
         self.film_entity.initialized = true;
         self.film_entity.name = json_value_to_string(tokens[1].clone());
+        if self.film_entity.name != "rgb" {
+            println!("warning: only `rgb` film is supported for the moment");
+            self.film_entity.name = "rgb".to_string();
+        }
+
         self.film_entity.parameters = ParameterDict::build_from_vec(&tokens[2..]);
     }
 
@@ -311,8 +345,11 @@ impl SceneBuilder {
             }
 
             "plymesh" => {
-                let absolute_path =
-                    format!("{}/{}", current_folder, parameters.get_string("filename"));
+                let absolute_path = format!(
+                    "{}/{}",
+                    current_folder,
+                    parameters.get_string("filename", None)
+                );
                 let tri_quad_mesh = read_ply(absolute_path.as_str());
 
                 if tri_quad_mesh.tri_indices.len() > 0 {
@@ -458,13 +495,13 @@ impl SceneBuilder {
         }
     }
 
-    pub fn parse_scene(&mut self, file_path: &str) -> Renderer {
+    pub fn parse_scene(&mut self, file_path: &str, global_variable: &GlobalVariable) -> Renderer {
         self.parse_file(file_path, &get_folder_potion(file_path));
 
         let filter = Arc::new(BoxFilter::new(0.5));
 
         let film = if self.film_entity.initialized {
-            build_film(&self.film_entity, filter.clone())
+            build_film(&self.film_entity, filter.clone(), global_variable)
         } else {
             panic!("default Film not implemented");
         };
@@ -478,8 +515,18 @@ impl SceneBuilder {
         let sampler = Arc::new(IndependentSampler::default());
         let bvh_aggregate = Arc::new(BVHAggregate::new(self.primitives.clone()));
 
-        //let integrator = Arc::new(SurfaceNormal::new(bvh_aggregate.clone()));
-        let integrator = Arc::new(AmbientOcclusion::new(bvh_aggregate.clone()));
+        // TODO: rewrite this part: move colorspace initialization to main.rs
+        let srgb_table = RGBtoSpectrumTable::new("sRGB");
+        let srgb_color_space = RGBColorSpace::new(
+            Point2f::new(0.64, 0.33),
+            Point2f::new(0.3, 0.6),
+            Point2f::new(0.15, 0.06),
+            get_named_spectrum("stdillum-D65"),
+            srgb_table,
+        );
+        let illuminant = Arc::new(srgb_color_space.illuminant);
+
+        let integrator = Arc::new(AmbientOcclusion::new(illuminant, bvh_aggregate.clone()));
 
         return Renderer::new(integrator, sampler, camera, film);
     }

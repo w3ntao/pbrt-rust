@@ -46,6 +46,8 @@ impl CameraTransform {
     }
 }
 
+#[derive(Copy, Clone)]
+
 pub struct CameraSample {
     pub p_film: Point2f,
     pub p_lens: Point2f,
@@ -62,6 +64,12 @@ impl CameraSample {
     }
 }
 
+pub struct CameraRay {
+    pub ray: SimpleRay,
+    pub weight: SampledSpectrum,
+}
+
 pub trait Camera: Send + Sync {
-    fn generate_camera_ray(&self, sample: CameraSample) -> SimpleRay;
+    fn generate_camera_ray(&self, sample: CameraSample, lambda: SampledWavelengths) -> CameraRay;
+    // TODO: can I delete lambda?
 }

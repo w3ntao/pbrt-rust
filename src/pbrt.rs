@@ -4,6 +4,10 @@ pub type Float = f64;
 #[cfg(not(feature = "use_f64"))]
 pub type Float = f32;
 
+pub struct GlobalVariable {
+    pub srgb_color_space: RGBColorSpace,
+}
+
 pub enum RenderingCoordinateSystem {
     Camera,
     CameraWorld,
@@ -44,7 +48,7 @@ pub use crate::{
         bounds::*, compensated_float::*, float::*, frame::*, interval::*, interval::*, normal::*,
         point2::*, point3::*, square_matrix::*, transform::*, vector2::*, vector3::*,
     },
-    films::rgb_film::*,
+    films::{pixel_sensor::*, rgb_film::*},
     filters::box_filter::*,
     integrators::{ambient_occlusion::*, surface_normal::*},
     primitives::simple_primitive::*,
@@ -52,11 +56,12 @@ pub use crate::{
     scene::{parameter_dict::*, renderer::*, scene_builder::*, util::*},
     shapes::{loop_subdivision::*, sphere::*, tri_quad_mesh::*, triangle::*, triangle_mesh::*},
     spectra::{
+        black_body_spectrum::*, cie_xyz::*, const_densely_sampled_spectrum::*,
         const_piecewise_linear_spectrum::*, densely_sampled_spectrum::*, measured_spectra_data::*,
         piecewise_linear_spectrum::*, rgb_sigmoid_polynomial::*, rgb_to_spectrum_data::*,
         rgb_to_spectrum_table::*, sampled_spectrum::*, sampled_wavelengths::*,
     },
-    util::{colorspace::*, math::*, sampling::*},
+    util::{color::*, colorspace::*, math::*, sampling::*},
 };
 
 pub type Point2f = Point2<Float>;

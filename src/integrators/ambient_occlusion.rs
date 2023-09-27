@@ -1,22 +1,34 @@
 use crate::pbrt::*;
 
 pub struct AmbientOcclusion {
+    illuminant_spectrum: Arc<dyn Spectrum>,
+    illuminant_scale: Float,
     aggregate: Arc<dyn Primitive>,
 }
 
 impl AmbientOcclusion {
-    pub fn new(aggregate: Arc<dyn Primitive>) -> Self {
-        return AmbientOcclusion { aggregate };
+    pub fn new(illuminant_spectrum: Arc<dyn Spectrum>, aggregate: Arc<dyn Primitive>) -> Self {
+        let illuminant_scale = 1.0 / illuminant_spectrum.to_photometric();
+
+        return AmbientOcclusion {
+            illuminant_spectrum,
+            illuminant_scale,
+            aggregate,
+        };
     }
 }
 
 impl Integrator for AmbientOcclusion {
-    fn li(&self, ray: &dyn Ray, sampler: &mut dyn Sampler) -> RGB {
+    fn li(
+        &self,
+        ray: &dyn Ray,
+        lambda: SampledWavelengths,
+        sampler: &mut dyn Sampler,
+    ) -> SampledSpectrum {
         // TODO: this is incomplete, consider BSDF only for now
-
         let si = match self.aggregate.intersect(ray, Float::INFINITY) {
             None => {
-                return RGB::black();
+                return SampledSpectrum::zero();
             }
             Some(_si) => _si,
         };
@@ -30,7 +42,7 @@ impl Integrator for AmbientOcclusion {
         let pdf = cosine_hemisphere_pdf(local_wi.z.abs());
 
         if pdf == 0.0 {
-            return RGB::black();
+            return SampledSpectrum::zero();
         }
 
         let frame = Frame::from_z(Vector3f::from(n));
@@ -39,12 +51,11 @@ impl Integrator for AmbientOcclusion {
         // Divide by pi so that fully visible is one.
         let differential_ray = isect.spawn_ray(wi);
         if !self.fast_intersect(&differential_ray, Float::INFINITY) {
-            let grey = n.dot(wi) / (PI * pdf);
-
-            return RGB::new(grey, grey, grey);
+            return self.illuminant_spectrum.sample(&lambda)
+                * (self.illuminant_scale * n.dot(wi) / (PI * pdf));
         }
 
-        return RGB::black();
+        return SampledSpectrum::zero();
     }
 
     fn fast_intersect(&self, ray: &dyn Ray, t_max: Float) -> bool {

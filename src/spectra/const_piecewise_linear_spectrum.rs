@@ -1,8 +1,6 @@
 use crate::pbrt::*;
 
 pub const fn find_lambda_interval(lambda: Float, lambdas: &[Float]) -> usize {
-    // pred: lambdas[idx] <= lambda
-
     let mut size = lambdas.len() - 2;
     let mut first = 1;
 
@@ -54,7 +52,7 @@ impl<const N: usize> ConstPieceWiseLinearSpectrum<N> {
         Self { lambdas, values }
     }
 
-    const fn const_eval(&self, lambda: Float) -> Float {
+    pub const fn const_eval(&self, lambda: Float) -> Float {
         if self.lambdas.len() == 0 || lambda < self.lambdas[0] || lambda > self.lambdas[N - 1] {
             return 0.0;
         }
@@ -107,8 +105,7 @@ impl<const N: usize> ConstPieceWiseLinearSpectrum<N> {
         return if !normalize {
             spectrum
         } else {
-            spectrum
-                .const_scale(CIE_Y_INTEGRAL / spectrum.const_inner_product(&CIE_MATCHING_CURVE_Y))
+            spectrum.const_scale(CIE_Y_INTEGRAL / spectrum.const_inner_product(&CIE_Y_PLS))
         };
     }
 
@@ -139,9 +136,10 @@ impl<const N: usize> ConstPieceWiseLinearSpectrum<N> {
         normalize: bool,
     ) -> Self {
         let _lambda_min = samples[0];
-        let _lambda_max = samples[N * 2 - 2];
+        let _lambda_max = samples[N * 2 - 6];
 
         assert!(_lambda_min > LAMBDA_MIN);
+        assert!(_lambda_max < LAMBDA_MAX);
 
         let mut lambdas = [Float::NAN; N];
         let mut values = [Float::NAN; N];
@@ -168,13 +166,7 @@ impl<const N: usize> Spectrum for ConstPieceWiseLinearSpectrum<N> {
         return self.const_eval(lambda);
     }
 
-    fn non_zero(&self) -> bool {
-        for v in &self.values {
-            if *v > 0.0 {
-                return true;
-            }
-        }
-
-        return false;
+    fn sample(&self, lambda: &SampledWavelengths) -> SampledSpectrum {
+        panic!("not implemented for ConstPieceWiseLinearSpectrum");
     }
 }

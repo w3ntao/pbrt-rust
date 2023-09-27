@@ -29,14 +29,8 @@ pub fn two_sum(a: Float, b: Float) -> CompensatedFloat {
     return CompensatedFloat::new(s, (a - (s - delta)) + (b - delta));
 }
 
-pub fn difference_of_products(a: Float, b: Float, c: Float, d: Float) -> Float {
-    let cd = c * d;
-    let difference_of_products = fma(a, b, -cd);
-    let error = fma(-c, d, cd);
-    return difference_of_products + error;
-}
-
 pub fn inner_product(left: &[Float], right: &[Float]) -> CompensatedFloat {
+    // TODO: rewrite this with template
     let length = left.len();
     assert_eq!(length, right.len());
 

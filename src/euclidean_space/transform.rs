@@ -338,10 +338,6 @@ impl Transform {
         return (SimpleRay::new(Point3f::from(offset_o), d), dt);
     }
 
-    pub fn on_ray_with_error(&self, r: SimpleRay) -> (SimpleRay, Float) {
-        panic!("not implemented");
-    }
-
     pub fn on_surface_interaction(
         &self,
         surface_interaction: SurfaceInteraction,

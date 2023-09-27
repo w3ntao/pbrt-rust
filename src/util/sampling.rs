@@ -28,6 +28,22 @@ pub fn sample_cosine_hemisphere(u: Point2f) -> Vector3f {
     return Vector3f::new(d.x, d.y, z);
 }
 
-pub fn cosine_hemisphere_pdf(cos_theta: Float) -> Float {
+pub const fn cosine_hemisphere_pdf(cos_theta: Float) -> Float {
     return cos_theta * INV_PI;
+}
+
+pub fn sample_visible_wavelengths(u: Float) -> Float {
+    return 538.0 - 138.888889 * (0.85691062 - 1.82750197 * u).atanh();
+}
+
+const fn sqr(x: Float) -> Float {
+    return x * x;
+}
+
+pub fn visible_wavelengths_pdf(lambda: Float) -> Float {
+    if lambda < 360.0 || lambda > 830.0 {
+        return 0.0;
+    }
+
+    return 0.0039398042 / sqr((0.0072 * (lambda - 538.0)).cosh());
 }

@@ -11,7 +11,14 @@ impl SurfaceNormal {
 }
 
 impl Integrator for SurfaceNormal {
-    fn li(&self, camera_ray: &dyn Ray, _sampler: &mut dyn Sampler) -> RGB {
+    fn li(
+        &self,
+        camera_ray: &dyn Ray,
+        lambda: SampledWavelengths,
+        _sampler: &mut dyn Sampler,
+    ) -> SampledSpectrum {
+        panic!("not implemented");
+        /*
         return match self.aggregate.intersect(camera_ray, Float::INFINITY) {
             None => RGB::black(),
             Some(shape_intersection) => {
@@ -23,5 +30,6 @@ impl Integrator for SurfaceNormal {
                 Vector3f::from(n).normalize().softmax_color()
             }
         };
+        */
     }
 }

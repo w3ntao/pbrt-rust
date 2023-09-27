@@ -11,6 +11,8 @@ pub struct FilterSample {
 }
 
 pub trait Filter: Send + Sync {
+    fn get_integral(&self) -> Float;
+
     fn sample(&self, u: Point2f) -> FilterSample;
 
     fn evaluate(&self, p: Point2f) -> Float;

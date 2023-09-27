@@ -6,6 +6,13 @@ pub trait Ray {
     fn get_d(&self) -> Vector3f;
 
     fn at(&self, t: Float) -> Point3f;
+
+    fn to_simple_ray(&self) -> SimpleRay {
+        return SimpleRay {
+            o: self.get_o(),
+            d: self.get_d(),
+        };
+    }
 }
 
 pub struct SimpleRay {

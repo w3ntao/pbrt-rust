@@ -16,11 +16,24 @@ struct Cli {
 
 fn render(file_path: &str, spp: usize) {
     let start = Instant::now();
+
+    let srgb_table = RGBtoSpectrumTable::new("sRGB");
+    let srgb_color_space = RGBColorSpace::new(
+        Point2f::new(0.64, 0.33),
+        Point2f::new(0.3, 0.6),
+        Point2f::new(0.15, 0.06),
+        get_named_spectrum("stdillum-D65"),
+        srgb_table,
+    );
+
+    let global_variable = GlobalVariable { srgb_color_space };
+
     let mut builder = SceneBuilder::default();
-    let mut scene_config = builder.parse_scene(file_path);
+    let mut scene_config = builder.parse_scene(file_path, &global_variable);
     let preprocessing_finished = Instant::now();
 
     let cpu_num = num_cpus::get();
+
     scene_config.render(spp, cpu_num);
     println!(
         "total times: ({} + {}) second ({} spp with {} cores)",
@@ -32,14 +45,6 @@ fn render(file_path: &str, spp: usize) {
 }
 
 fn main() {
-    /*
-    let srgb_table = RGBtoSpectrumTable::new("sRGB");
-    for color in [RGB::new(0.1, 0.5, 0.7), RGB::new(0.2, 0.3, 0.4)] {
-        println!("{}", srgb_table.eval(color));
-    }
-    return;
-    */
-
     let args = Cli::parse();
     if !args.scene_file.is_file() {
         panic!("`{}` is not a file", args.scene_file.display().to_string());

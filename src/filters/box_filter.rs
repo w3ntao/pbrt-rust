@@ -14,6 +14,10 @@ impl BoxFilter {
 }
 
 impl Filter for BoxFilter {
+    fn get_integral(&self) -> Float {
+        return 4.0 * self.radius.x * self.radius.y;
+    }
+
     fn sample(&self, u: Point2f) -> FilterSample {
         let p = Point2f::new(
             lerp(u.x, -self.radius.x, self.radius.x),
