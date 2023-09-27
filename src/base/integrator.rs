@@ -1,7 +1,6 @@
 use crate::pbrt::*;
 
 pub trait Integrator: Send + Sync {
-    //TODO: rewrite Integrator to copy aggregate, sampler, camera
     fn evaluate_pixel_sample(
         &self,
         p_pixel: Point2i,

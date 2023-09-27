@@ -2,9 +2,8 @@ use crate::pbrt::*;
 use std::thread;
 use std::thread::JoinHandle;
 
-pub struct SceneConfig {
+pub struct Renderer {
     integrator: Arc<dyn Integrator>,
-    aggregate: Arc<BVHAggregate>,
     sampler: Arc<dyn Sampler>,
     camera: Arc<dyn Camera>,
     film: Arc<Mutex<dyn Film>>,
@@ -47,17 +46,15 @@ fn single_thread_render(
     }
 }
 
-impl SceneConfig {
+impl Renderer {
     pub fn new(
         integrator: Arc<dyn Integrator>,
-        aggregate: Arc<BVHAggregate>,
         sampler: Arc<dyn Sampler>,
         camera: Arc<dyn Camera>,
         film: Arc<Mutex<dyn Film>>,
     ) -> Self {
-        return SceneConfig {
+        return Renderer {
             integrator,
-            aggregate,
             sampler,
             camera,
             film,

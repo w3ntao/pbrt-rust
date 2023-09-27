@@ -458,7 +458,7 @@ impl SceneBuilder {
         }
     }
 
-    pub fn parse_scene(&mut self, file_path: &str) -> SceneConfig {
+    pub fn parse_scene(&mut self, file_path: &str) -> Renderer {
         self.parse_file(file_path, &get_folder_potion(file_path));
 
         let filter = Arc::new(BoxFilter::new(0.5));
@@ -481,6 +481,6 @@ impl SceneBuilder {
         //let integrator = Arc::new(SurfaceNormal::new(bvh_aggregate.clone()));
         let integrator = Arc::new(AmbientOcclusion::new(bvh_aggregate.clone()));
 
-        return SceneConfig::new(integrator, bvh_aggregate, sampler, camera, film);
+        return Renderer::new(integrator, sampler, camera, film);
     }
 }

@@ -49,7 +49,7 @@ pub use crate::{
     integrators::{ambient_occlusion::*, surface_normal::*},
     primitives::simple_primitive::*,
     samplers::independent::*,
-    scene::{parameter_dict::*, scene_builder::*, scene_config::*, util::*},
+    scene::{parameter_dict::*, renderer::*, scene_builder::*, util::*},
     shapes::{loop_subdivision::*, sphere::*, tri_quad_mesh::*, triangle::*, triangle_mesh::*},
     spectra::{
         const_piecewise_linear_spectrum::*, densely_sampled_spectrum::*, measured_spectra_data::*,
