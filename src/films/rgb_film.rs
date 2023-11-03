@@ -1,5 +1,4 @@
 use crate::pbrt::*;
-use image::{ImageBuffer, Rgb, RgbImage};
 
 #[derive(Copy, Clone)]
 struct Pixel {
@@ -59,6 +58,10 @@ impl RGBFilm {
 }
 
 impl Film for RGBFilm {
+    fn get_filename(&self) -> String {
+        return self.filename.clone();
+    }
+
     fn get_resolution(&self) -> Point2i {
         return self.resolution;
     }
@@ -116,22 +119,5 @@ impl Film for RGBFilm {
             pixel.rgb_sum[c] += (weight * rgb[c]) as f64;
         }
         pixel.weight_sum += weight as f64;
-    }
-
-    fn export_image(&self) {
-        let mut buffer: RgbImage =
-            ImageBuffer::new(self.resolution.x as u32, self.resolution.y as u32);
-
-        for (x, y, mut_pixel) in buffer.enumerate_pixels_mut() {
-            let rgb = self.get_pixel_rgb(Point2i::new(x as i32, y as i32));
-
-            let gamma_rgb = RGB::new(rgb.r.sqrt(), rgb.g.sqrt(), rgb.b.sqrt());
-            let u16_rgb = gamma_rgb * (256.0 - 0.0001);
-
-            *mut_pixel = Rgb([u16_rgb.r as u8, u16_rgb.g as u8, u16_rgb.b as u8]);
-        }
-
-        buffer.save(self.filename.clone()).unwrap();
-        println!("image saved to `{}`", self.filename.clone());
     }
 }

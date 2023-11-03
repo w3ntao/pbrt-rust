@@ -73,7 +73,7 @@ impl PerspectiveCamera {
 }
 
 impl Camera for PerspectiveCamera {
-    fn generate_camera_ray(&self, sample: CameraSample, _lambda: SampledWavelengths) -> CameraRay {
+    fn generate_camera_ray(&self, sample: CameraSample) -> CameraRay {
         // Compute raster and camera sample positions
         let p_film = Point3f::new(sample.p_film.x, sample.p_film.y, 0.0);
         let p_camera = self.camera_from_raster.on_point3f(p_film);

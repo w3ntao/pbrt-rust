@@ -9,7 +9,7 @@ pub struct RGBColorSpace {
     pub xyz_from_rgb: SquareMatrix<3>,
     pub rgb_from_xyz: SquareMatrix<3>,
 
-    pub illuminant: DenselySampledSpectrum,
+    pub illuminant: Arc<DenselySampledSpectrum>,
 
     rgb_to_spectrum_table: RGBtoSpectrumTable,
 }
@@ -45,11 +45,11 @@ impl RGBColorSpace {
             w: cie_w.xy(),
             xyz_from_rgb,
             rgb_from_xyz,
-            illuminant: DenselySampledSpectrum::from_spectrum(
+            illuminant: Arc::new(DenselySampledSpectrum::from_spectrum(
                 illuminant.as_ref(),
                 LAMBDA_MIN as usize,
                 LAMBDA_MAX as usize,
-            ),
+            )),
             rgb_to_spectrum_table,
         };
     }

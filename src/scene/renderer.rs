@@ -99,6 +99,12 @@ impl Renderer {
             handle.join().unwrap();
         }
 
-        self.film.lock().unwrap().export_image();
+        let filename = self.film.lock().unwrap().get_filename();
+        let resolution = self.film.lock().unwrap().get_resolution();
+
+        self.film
+            .lock()
+            .unwrap()
+            .export_image(&filename, resolution);
     }
 }

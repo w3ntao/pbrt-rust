@@ -83,6 +83,23 @@ where
         .collect::<Vec<T>>();
 }
 
+fn search_dict<T: Copy>(key: &str, default: Option<T>, dict: &HashMap<String, Vec<T>>) -> T {
+    match (dict.get(key), default) {
+        (Some(val), _) => {
+            if val.len() != 1 {
+                panic!("array length is larger than 1");
+            }
+            return val[0];
+        }
+        (_, Some(val)) => {
+            return val;
+        }
+        _ => {
+            panic!("found no key with name `{}`", key);
+        }
+    }
+}
+
 impl ParameterDict {
     pub fn build_from_vec(array: &[Value]) -> Self {
         let mut integers = HashMap::<String, Vec<i32>>::new();
@@ -177,65 +194,15 @@ impl ParameterDict {
     }
 
     pub fn get_one_float(&self, key: &str, default: Option<Float>) -> Float {
-        // TODO: rewrite 2 match into 1
-
-        match self.floats.get(key) {
-            None => match default {
-                None => {
-                    panic!("found no key with name `{}`", key);
-                }
-                Some(val_default) => {
-                    return val_default;
-                }
-            },
-            Some(val) => {
-                if val.len() != 1 {
-                    panic!("array length is larger than 1");
-                }
-                return val[0];
-            }
-        };
+        return search_dict(key, default, &self.floats);
     }
 
     pub fn get_one_integer(&self, key: &str, default: Option<i32>) -> i32 {
-        // TODO: rewrite 2 match into 1
-
-        match self.integers.get(key) {
-            None => match default {
-                None => {
-                    panic!("found no key with name `{}`", key);
-                }
-                Some(val_default) => {
-                    return val_default;
-                }
-            },
-            Some(val) => {
-                if val.len() != 1 {
-                    panic!("array length is larger than 1");
-                }
-                return val[0];
-            }
-        };
+        return search_dict(key, default, &self.integers);
     }
 
     pub fn get_one_bool(&self, key: &str, default: Option<bool>) -> bool {
-        // TODO: rewrite 2 match into 1
-        match self.bools.get(key) {
-            None => match default {
-                None => {
-                    panic!("found no key with name `{}`", key);
-                }
-                Some(val_default) => {
-                    return val_default;
-                }
-            },
-            Some(val) => {
-                if val.len() != 1 {
-                    panic!("array length is larger than 1");
-                }
-                return val[0];
-            }
-        };
+        return search_dict(key, default, &self.bools);
     }
 
     pub fn get_integer_array(&self, key: &str) -> Vec<i32> {

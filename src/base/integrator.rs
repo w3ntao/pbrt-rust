@@ -14,13 +14,13 @@ pub trait Integrator: Send + Sync {
 
         let camera_sample = sampler.get_camera_sample(p_pixel.clone(), filter.clone());
 
-        let camera_ray = camera.generate_camera_ray(camera_sample, lambda);
+        let camera_ray = camera.generate_camera_ray(camera_sample);
 
-        let L = camera_ray.weight * self.li(&camera_ray.ray, lambda, sampler);
+        let spectrum_l = camera_ray.weight * self.li(&camera_ray.ray, lambda, sampler);
 
         film.lock()
             .unwrap()
-            .add_sample(p_pixel, &L, &lambda, camera_sample.filter_weight);
+            .add_sample(p_pixel, &spectrum_l, &lambda, camera_sample.filter_weight);
     }
 
     fn li(

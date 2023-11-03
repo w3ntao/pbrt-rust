@@ -72,15 +72,6 @@ fn build_film(
 
     match film_entity.name.as_str() {
         "rgb" => {
-            /*
-            let max_component_value = film_entity
-                .parameters
-                .get_one_float("maxcomponentvalue", Some(Float::INFINITY));
-            let write_fp16 = film_entity.parameters.get_one_bool("savefp16", Some(true));
-            */
-
-            // TODO: 2023/10/30 progress add max_component_value and write_fp16
-
             let exposure_time = 1.0;
             let sensor =
                 PixelSensor::create(&film_entity.parameters, exposure_time, global_variable);
@@ -515,16 +506,7 @@ impl SceneBuilder {
         let sampler = Arc::new(IndependentSampler::default());
         let bvh_aggregate = Arc::new(BVHAggregate::new(self.primitives.clone()));
 
-        // TODO: rewrite this part: move colorspace initialization to main.rs
-        let srgb_table = RGBtoSpectrumTable::new("sRGB");
-        let srgb_color_space = RGBColorSpace::new(
-            Point2f::new(0.64, 0.33),
-            Point2f::new(0.3, 0.6),
-            Point2f::new(0.15, 0.06),
-            get_named_spectrum("stdillum-D65"),
-            srgb_table,
-        );
-        let illuminant = Arc::new(srgb_color_space.illuminant);
+        let illuminant = global_variable.srgb_color_space.illuminant.clone();
 
         let integrator = Arc::new(AmbientOcclusion::new(illuminant, bvh_aggregate.clone()));
 
