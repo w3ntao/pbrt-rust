@@ -27,27 +27,27 @@ pub struct RGBFilm {
 
 impl RGBFilm {
     pub fn new(
-        _resolution: Point2i,
-        _filename: &String,
+        resolution: Point2i,
+        filename: &String,
         sensor: Arc<PixelSensor>,
         filter: Arc<dyn Filter>,
         global_variable: &GlobalVariable,
     ) -> Self {
-        let width = _resolution.x;
-        let height = _resolution.y;
+        let width = resolution.x;
+        let height = resolution.y;
 
-        let postfix = get_postfix(_filename);
+        let postfix = get_postfix(filename);
         let png_filename = if postfix == "png" {
-            _filename.clone()
+            filename.clone()
         } else {
-            change_postfix(_filename, "png")
+            change_postfix(filename, "png")
         };
 
         let output_rgb_from_sensor_rgb =
             global_variable.srgb_color_space.rgb_from_xyz * sensor.xyz_from_sensor_rgb;
 
         return RGBFilm {
-            resolution: _resolution.clone(),
+            resolution: resolution.clone(),
             filename: png_filename,
             sensor,
             filter: filter.clone(),
@@ -71,7 +71,7 @@ impl Film for RGBFilm {
     }
 
     fn get_pixel_rgb(&self, p: Point2i) -> RGB {
-        let pixel = self.pixels[p.x as usize][p.y as usize];
+        let pixel = self.pixels[p.y as usize][p.x as usize];
         let raw_rgb = RGB::new(
             pixel.rgb_sum[0] as Float,
             pixel.rgb_sum[1] as Float,
@@ -114,7 +114,7 @@ impl Film for RGBFilm {
         */
 
         // Update pixel values with filtered sample contribution
-        let pixel = &mut self.pixels[point_film.x as usize][point_film.y as usize];
+        let pixel = &mut self.pixels[point_film.y as usize][point_film.x as usize];
         for c in 0..3 {
             pixel.rgb_sum[c] += (weight * rgb[c]) as f64;
         }

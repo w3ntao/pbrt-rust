@@ -16,11 +16,11 @@ pub trait Integrator: Send + Sync {
 
         let camera_ray = camera.generate_camera_ray(camera_sample);
 
-        let spectrum_l = camera_ray.weight * self.li(&camera_ray.ray, lambda, sampler);
+        let l = camera_ray.weight * self.li(&camera_ray.ray, lambda, sampler);
 
         film.lock()
             .unwrap()
-            .add_sample(p_pixel, &spectrum_l, &lambda, camera_sample.filter_weight);
+            .add_sample(p_pixel, &l, &lambda, camera_sample.filter_weight);
     }
 
     fn li(
