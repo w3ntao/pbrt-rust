@@ -45,11 +45,7 @@ impl RGBColorSpace {
             w: cie_w.xy(),
             xyz_from_rgb,
             rgb_from_xyz,
-            illuminant: Arc::new(DenselySampledSpectrum::from_spectrum(
-                illuminant.as_ref(),
-                LAMBDA_MIN as usize,
-                LAMBDA_MAX as usize,
-            )),
+            illuminant: Arc::new(DenselySampledSpectrum::from_spectrum(illuminant.as_ref())),
             rgb_to_spectrum_table,
         };
     }

@@ -62,14 +62,14 @@ pub const CIE_X_PLS: ConstPieceWiseLinearSpectrum<NUM_CIE_SAMPLES> =
 pub const CIE_Z_PLS: ConstPieceWiseLinearSpectrum<NUM_CIE_SAMPLES> =
     ConstPieceWiseLinearSpectrum::new(CIE_LAMBDA_RANGE, CIE_Z_VALUE);
 
-pub const CIE_X_DENSELY_SAMPLED: ConstDenselySampledSpectrum =
-    ConstDenselySampledSpectrum::from_const_spectrum(&CIE_X_PLS);
+pub const CIE_X_DENSELY_SAMPLED: DenselySampledSpectrum =
+    DenselySampledSpectrum::from_const_spectrum(&CIE_X_PLS);
 
-pub const CIE_Y_DENSELY_SAMPLED: ConstDenselySampledSpectrum =
-    ConstDenselySampledSpectrum::from_const_spectrum(&CIE_Y_PLS);
+pub const CIE_Y_DENSELY_SAMPLED: DenselySampledSpectrum =
+    DenselySampledSpectrum::from_const_spectrum(&CIE_Y_PLS);
 
-pub const CIE_Z_DENSELY_SAMPLED: ConstDenselySampledSpectrum =
-    ConstDenselySampledSpectrum::from_const_spectrum(&CIE_Z_PLS);
+pub const CIE_Z_DENSELY_SAMPLED: DenselySampledSpectrum =
+    DenselySampledSpectrum::from_const_spectrum(&CIE_Z_PLS);
 
 pub const ILLUM_D65: ConstPieceWiseLinearSpectrum<{ CIE_ILLUM_D6500.len() / 2 }> =
     ConstPieceWiseLinearSpectrum::from_interleaved_full_visible_wavelengths(CIE_ILLUM_D6500, true);

@@ -56,10 +56,10 @@ pub use crate::{
     scene::{parameter_dict::*, renderer::*, scene_builder::*, util::*},
     shapes::{loop_subdivision::*, sphere::*, tri_quad_mesh::*, triangle::*, triangle_mesh::*},
     spectra::{
-        black_body_spectrum::*, cie_xyz::*, const_densely_sampled_spectrum::*,
-        const_piecewise_linear_spectrum::*, densely_sampled_spectrum::*, measured_spectra_data::*,
-        piecewise_linear_spectrum::*, rgb_sigmoid_polynomial::*, rgb_to_spectrum_data::*,
-        rgb_to_spectrum_table::*, sampled_spectrum::*, sampled_wavelengths::*,
+        black_body_spectrum::*, cie_xyz::*, const_piecewise_linear_spectrum::*,
+        densely_sampled_spectrum::*, measured_spectra_data::*, piecewise_linear_spectrum::*,
+        rgb_sigmoid_polynomial::*, rgb_to_spectrum_data::*, rgb_to_spectrum_table::*,
+        sampled_spectrum::*, sampled_wavelengths::*,
     },
     util::{color::*, colorspace::*, math::*, sampling::*},
 };

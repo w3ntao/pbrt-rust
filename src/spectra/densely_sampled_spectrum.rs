@@ -1,11 +1,9 @@
 use crate::pbrt::*;
 
-pub struct DenselySampledSpectrum {
-    // TODO: remove lambda_min and lambda_max, use const value instead
-    lambda_min: usize,
-    lambda_max: usize,
+const N: usize = (LAMBDA_MAX as usize - LAMBDA_MIN as usize) + 1;
 
-    values: Vec<Float>,
+pub struct DenselySampledSpectrum {
+    values: [Float; N],
 }
 
 impl Spectrum for DenselySampledSpectrum {
@@ -13,15 +11,15 @@ impl Spectrum for DenselySampledSpectrum {
         let floor = lambda.floor();
         let ceil = lambda.ceil();
 
-        if floor < self.lambda_min as Float || ceil > self.lambda_max as Float {
+        if floor < LAMBDA_MIN || ceil > LAMBDA_MAX as Float {
             return 0.0;
         }
 
         // TODO: make a patch for PBRT-v4 regarding this interpolation
         return lerp(
             lambda - floor,
-            self.values[floor as usize - self.lambda_min],
-            self.values[ceil as usize - self.lambda_min],
+            self.values[floor as usize - LAMBDA_MIN as usize],
+            self.values[ceil as usize - LAMBDA_MIN as usize],
         );
     }
 
@@ -33,13 +31,13 @@ impl Spectrum for DenselySampledSpectrum {
         for i in 0..NUM_SPECTRUM_SAMPLES {
             let floor = lambda[i].floor();
             let ceil = lambda[i].ceil();
-            values[i] = if floor < self.lambda_min as Float || ceil > self.lambda_max as Float {
+            values[i] = if floor < LAMBDA_MIN as Float || ceil > LAMBDA_MAX as Float {
                 0.0
             } else {
                 lerp(
                     lambda[i] - floor as Float,
-                    self.values[floor as usize - self.lambda_min],
-                    self.values[ceil as usize - self.lambda_min],
+                    self.values[floor as usize - LAMBDA_MIN as usize],
+                    self.values[ceil as usize - LAMBDA_MIN as usize],
                 )
             }
         }
@@ -53,34 +51,43 @@ fn sqr(x: Float) -> Float {
 }
 
 impl DenselySampledSpectrum {
-    pub fn new(lambda_min: usize, lambda_max: usize) -> Self {
-        return Self {
-            lambda_min,
-            lambda_max,
-            values: vec![0.0; lambda_max - lambda_min + 1],
-        };
-    }
-
-    pub fn from_spectrum(spectrum: &dyn Spectrum, lambda_min: usize, lambda_max: usize) -> Self {
-        let mut values = vec![0.0; lambda_max - lambda_min + 1];
-
-        for lambda in lambda_min..(lambda_max + 1) {
-            values[lambda - lambda_min] = spectrum.eval(lambda as Float);
+    pub const fn from_const_spectrum<const K: usize>(
+        spectrum: &ConstPieceWiseLinearSpectrum<K>,
+    ) -> Self {
+        let mut values = [Float::NAN; N];
+        let mut lambda = LAMBDA_MIN as usize;
+        while lambda <= LAMBDA_MAX as usize {
+            values[lambda - LAMBDA_MIN as usize] = spectrum.const_eval(lambda as Float);
+            lambda += 1;
         }
 
-        return DenselySampledSpectrum {
-            lambda_min,
-            lambda_max,
-            values,
-        };
+        let mut idx = 0;
+        while idx < values.len() {
+            assert!(values[idx].is_finite());
+            idx += 1;
+        }
+
+        return Self { values };
+    }
+
+    pub fn from_spectrum(spectrum: &dyn Spectrum) -> Self {
+        let mut values = [Float::NAN; N];
+
+        for lambda in LAMBDA_RANGE {
+            values[lambda as usize - LAMBDA_MIN as usize] = spectrum.eval(lambda);
+        }
+
+        return DenselySampledSpectrum { values };
     }
 
     pub fn from_sample_function(f: impl Fn(Float) -> Float) -> Self {
-        return DenselySampledSpectrum {
-            lambda_min: LAMBDA_MIN as usize,
-            lambda_max: LAMBDA_MAX as usize,
-            values: LAMBDA_RANGE.into_iter().map(f).collect::<Vec<Float>>(),
-        };
+        let mut values = [Float::NAN; N];
+
+        for lambda in LAMBDA_RANGE {
+            values[lambda as usize - LAMBDA_MIN as usize] = f(lambda);
+        }
+
+        return DenselySampledSpectrum { values };
     }
 
     // D function in PBRT-v4
@@ -115,10 +122,6 @@ impl DenselySampledSpectrum {
 
         let piecewise_linear_spectrum = PiecewiseLinearSpectrum::new(CIE_S_LAMBDA.to_vec(), values);
 
-        return DenselySampledSpectrum::from_spectrum(
-            &piecewise_linear_spectrum,
-            LAMBDA_MIN as usize,
-            LAMBDA_MAX as usize,
-        );
+        return DenselySampledSpectrum::from_spectrum(&piecewise_linear_spectrum);
     }
 }
