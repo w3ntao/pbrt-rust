@@ -24,8 +24,6 @@ impl Spectrum for DenselySampledSpectrum {
     }
 
     fn sample(&self, lambda: &SampledWavelengths) -> SampledSpectrum {
-        // TODO: rewrite this with ConstDenselySampledSpectrum
-
         let mut values = [Float::NAN; NUM_SPECTRUM_SAMPLES];
 
         for i in 0..NUM_SPECTRUM_SAMPLES {
@@ -35,7 +33,7 @@ impl Spectrum for DenselySampledSpectrum {
                 0.0
             } else {
                 lerp(
-                    lambda[i] - floor as Float,
+                    lambda[i] - floor,
                     self.values[floor as usize - LAMBDA_MIN as usize],
                     self.values[ceil as usize - LAMBDA_MIN as usize],
                 )

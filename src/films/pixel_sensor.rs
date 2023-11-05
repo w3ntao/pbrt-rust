@@ -314,10 +314,18 @@ impl PixelSensor {
             white_balance_val
         });
 
+        let sensor_illum = if white_balance_val != 0.0 {
+            Some(d_illum)
+        } else {
+            None
+        };
+
         return match sensor_name.as_str() {
-            "cie1931" => {
-                PixelSensor::cie_1931(&global_variable.srgb_color_space, &d_illum, imaging_ratio)
-            }
+            "cie1931" => PixelSensor::cie_1931(
+                &global_variable.srgb_color_space,
+                sensor_illum,
+                imaging_ratio,
+            ),
             _ => {
                 panic!("sensor `{}` is not implemented", sensor_name);
             }
@@ -326,17 +334,23 @@ impl PixelSensor {
 
     fn cie_1931(
         output_color_space: &RGBColorSpace,
-        sensor_illum: &dyn Spectrum,
+        sensor_illum: Option<DenselySampledSpectrum>,
         imaging_ratio: Float,
     ) -> Self {
+        // TODO: sensor_illum: why can't I change Option<DenselySampledSpectrum> to Option<dyn Spectrum>
         let r_bar = Arc::new(CIE_X_DENSELY_SAMPLED);
         let g_bar = Arc::new(CIE_Y_DENSELY_SAMPLED);
         let b_bar = Arc::new(CIE_Z_DENSELY_SAMPLED);
 
-        let source_white = sensor_illum.to_xyz().xy();
-        let target_white = output_color_space.w;
+        let xyz_from_sensor_rgb = match sensor_illum {
+            None => SquareMatrix::<3>::identity(),
+            Some(_sensor_illum) => {
+                let source_white = _sensor_illum.to_xyz().xy();
+                let target_white = output_color_space.w;
 
-        let xyz_from_sensor_rgb = white_balance(source_white, target_white);
+                white_balance(source_white, target_white)
+            }
+        };
 
         return Self {
             r_bar,

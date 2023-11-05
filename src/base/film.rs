@@ -2,6 +2,12 @@ use crate::pbrt::*;
 use image::{ImageBuffer, Rgb, RgbImage};
 
 pub trait Film: Send + Sync {
+    fn fork(&self) -> Box<dyn Film>;
+
+    fn convert_to_rgb_film(&self) -> RGBFilm {
+        panic!("you should implement this function only for RGBFilm");
+    }
+
     fn get_filename(&self) -> String;
 
     fn get_resolution(&self) -> Point2i;
@@ -10,7 +16,7 @@ pub trait Film: Send + Sync {
 
     fn get_pixel_rgb(&self, p: Point2i) -> RGB;
 
-    fn sample_wavelengths(&self, u: Float) -> SampledWavelengths;
+    fn merge(&mut self, film: &dyn Film, y_list: Vec<i32>);
 
     fn add_sample(
         &mut self,

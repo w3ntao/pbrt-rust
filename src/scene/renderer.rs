@@ -19,10 +19,13 @@ fn single_thread_render(
 ) {
     let mut forked_sampler = sampler.fork();
     let mutated_sampler = forked_sampler.as_mut();
-
     let filter = film.lock().unwrap().get_filter().clone();
-
     let resolution = film.lock().unwrap().get_resolution();
+
+    let mut forked_film = film.lock().unwrap().fork();
+    let local_film = forked_film.as_mut();
+
+    let mut rendered_y = vec![];
     loop {
         let mut locked_job_list = job_list.lock().unwrap();
         let maybe_job = locked_job_list.pop();
@@ -38,18 +41,23 @@ fn single_thread_render(
 
                     for sample_index in 0..num_samples {
                         mutated_sampler.start_pixel_sample(pixel, sample_index);
+
                         integrator.evaluate_pixel_sample(
                             pixel,
                             mutated_sampler,
                             camera.clone(),
                             filter.clone(),
-                            &mut film.clone(),
+                            local_film,
                         );
                     }
                 }
+
+                rendered_y.push(y);
             }
         }
     }
+
+    film.lock().unwrap().merge(local_film, rendered_y);
 }
 
 impl Renderer {

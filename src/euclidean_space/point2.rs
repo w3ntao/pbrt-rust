@@ -1,6 +1,6 @@
 use crate::pbrt::*;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct Point2<T> {
     pub x: T,
     pub y: T,

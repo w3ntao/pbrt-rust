@@ -17,12 +17,13 @@ impl Default for Pixel {
 
 #[derive(Clone)]
 pub struct RGBFilm {
-    pub resolution: Point2i,
-    pub filename: String,
-    pub filter: Arc<dyn Filter>,
-    pub sensor: Arc<PixelSensor>,
+    resolution: Point2i,
+    filename: String,
+    filter: Arc<dyn Filter>,
+    sensor: Arc<PixelSensor>,
     output_rgb_from_sensor_rgb: SquareMatrix<3>,
     pixels: Vec<Vec<Pixel>>,
+    rendered_pixel_y: Vec<usize>,
 }
 
 impl RGBFilm {
@@ -53,11 +54,31 @@ impl RGBFilm {
             filter: filter.clone(),
             output_rgb_from_sensor_rgb,
             pixels: vec![vec![Pixel::default(); width as usize]; height as usize],
+            rendered_pixel_y: vec![],
         };
     }
 }
 
 impl Film for RGBFilm {
+    fn fork(&self) -> Box<dyn Film> {
+        return Box::new(RGBFilm {
+            resolution: self.resolution,
+            filename: self.filename.clone(),
+            filter: self.filter.clone(),
+            sensor: self.sensor.clone(),
+            output_rgb_from_sensor_rgb: self.output_rgb_from_sensor_rgb,
+            pixels: vec![
+                vec![Pixel::default(); self.resolution.x as usize];
+                self.resolution.y as usize
+            ],
+            rendered_pixel_y: vec![],
+        });
+    }
+
+    fn convert_to_rgb_film(&self) -> RGBFilm {
+        return self.clone();
+    }
+
     fn get_filename(&self) -> String {
         return self.filename.clone();
     }
@@ -91,8 +112,14 @@ impl Film for RGBFilm {
         return self.output_rgb_from_sensor_rgb * rgb;
     }
 
-    fn sample_wavelengths(&self, u: Float) -> SampledWavelengths {
-        return SampledWavelengths::sample_visible(u);
+    fn merge(&mut self, film: &dyn Film, y_list: Vec<i32>) {
+        assert!(self.resolution == film.get_resolution());
+
+        let rgb_film = film.convert_to_rgb_film();
+
+        for y in y_list {
+            self.pixels[y as usize] = rgb_film.pixels[y as usize].clone();
+        }
     }
 
     fn add_sample(

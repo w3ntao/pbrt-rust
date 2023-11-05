@@ -7,10 +7,10 @@ pub trait Integrator: Send + Sync {
         sampler: &mut dyn Sampler,
         camera: Arc<dyn Camera>,
         filter: Arc<dyn Filter>,
-        film: &mut Arc<Mutex<dyn Film>>,
+        film: &mut dyn Film,
     ) {
         let lu = sampler.get_1d();
-        let lambda = film.lock().unwrap().sample_wavelengths(lu);
+        let lambda = SampledWavelengths::sample_visible(lu);
 
         let camera_sample = sampler.get_camera_sample(p_pixel.clone(), filter.clone());
 
@@ -18,9 +18,7 @@ pub trait Integrator: Send + Sync {
 
         let l = camera_ray.weight * self.li(&camera_ray.ray, lambda, sampler);
 
-        film.lock()
-            .unwrap()
-            .add_sample(p_pixel, &l, &lambda, camera_sample.filter_weight);
+        film.add_sample(p_pixel, &l, &lambda, camera_sample.filter_weight);
     }
 
     fn li(
