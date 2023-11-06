@@ -1,6 +1,6 @@
 # pbrt-rust
 
-[![build and test](https://github.com/w3ntao/rust-ray-tracer/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/w3ntao/rust-ray-tracer/actions/workflows/build-and-test.yml)
+[![build and test](https://github.com/w3ntao/pbrt-rust/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/w3ntao/pbrt-rust/actions/workflows/build-and-test.yml)
 
 
 A rust ray tracer inspired by [Ray Tracing in One Weekend Series](https://raytracing.github.io/)
@@ -19,6 +19,14 @@ run
 $ cargo run --release
 ```
 
-## rendering samples
+## preview
 
-You may check rendering samples at [pbrt-rust-gallery](https://github.com/w3ntao/pbrt-rust-gallery).
+![](https://github.com/w3ntao/pbrt-rust-gallery/blob/main/test_case_rt_weekend_dragon_pt_1936.png)
+
+![](https://github.com/w3ntao/pbrt-rust-gallery/blob/main/test_case_cornell_box_next_event_estimation_1936.png)
+
+![](https://github.com/w3ntao/pbrt-rust-gallery/blob/main/test_case_cornell_box_specular_next_event_estimation_1936.png)
+
+![](https://github.com/w3ntao/pbrt-rust-gallery/blob/main/test_case_cornell_box_metal_dragon_next_event_estimation_1936.png)
+
+![](https://github.com/w3ntao/pbrt-rust-gallery/blob/main/test_case_smallpt_1936.png)

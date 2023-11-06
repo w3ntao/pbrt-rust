@@ -1,3 +1,4 @@
 /target
-*.png
 models/*
+*.png
+
