@@ -83,7 +83,7 @@ where
         .collect::<Vec<T>>();
 }
 
-fn search_dict<T: Copy>(key: &str, default: Option<T>, dict: &HashMap<String, Vec<T>>) -> T {
+fn get_one_val<T: Copy>(key: &str, default: Option<T>, dict: &HashMap<String, Vec<T>>) -> T {
     match (dict.get(key), default) {
         (Some(val), _) => {
             if val.len() != 1 {
@@ -98,6 +98,15 @@ fn search_dict<T: Copy>(key: &str, default: Option<T>, dict: &HashMap<String, Ve
             panic!("found no key with name `{}`", key);
         }
     }
+}
+
+fn get_array<T: Copy>(key: &str, dict: &HashMap<String, Vec<T>>) -> Vec<T> {
+    return match dict.get(key) {
+        None => {
+            panic!("found no key with name `{}`", key);
+        }
+        Some(val) => val.clone(),
+    };
 }
 
 impl ParameterDict {
@@ -189,49 +198,6 @@ impl ParameterDict {
         self.floats.insert(name, value);
     }
 
-    pub fn insert_string(&mut self, name: String, value: String) {
-        self.strings.insert(name, value);
-    }
-
-    pub fn get_one_float(&self, key: &str, default: Option<Float>) -> Float {
-        return search_dict(key, default, &self.floats);
-    }
-
-    pub fn get_one_integer(&self, key: &str, default: Option<i32>) -> i32 {
-        return search_dict(key, default, &self.integers);
-    }
-
-    pub fn get_one_bool(&self, key: &str, default: Option<bool>) -> bool {
-        return search_dict(key, default, &self.bools);
-    }
-
-    pub fn get_integer_array(&self, key: &str) -> Vec<i32> {
-        return match self.integers.get(key) {
-            None => {
-                panic!("found no key with name `{}`", key);
-            }
-            Some(val) => val.clone(),
-        };
-    }
-
-    pub fn get_point3_array(&self, key: &str) -> Vec<Point3f> {
-        return match self.point3s.get(key) {
-            None => {
-                panic!("found no key with name `{}`", key);
-            }
-            Some(val) => val.clone(),
-        };
-    }
-
-    pub fn get_normal3_array(&self, key: &str) -> Vec<Normal3f> {
-        return match self.normal3s.get(key) {
-            None => {
-                vec![]
-            }
-            Some(val) => val.clone(),
-        };
-    }
-
     pub fn get_string(&self, key: &str, default: Option<String>) -> String {
         return match (self.strings.get(key), default) {
             (None, Some(val)) => val,
@@ -242,7 +208,38 @@ impl ParameterDict {
         };
     }
 
-    pub fn display(&self) {}
+    pub fn insert_string(&mut self, name: String, value: String) {
+        self.strings.insert(name, value);
+    }
+
+    pub fn get_one_float(&self, key: &str, default: Option<Float>) -> Float {
+        return get_one_val(key, default, &self.floats);
+    }
+
+    pub fn get_one_integer(&self, key: &str, default: Option<i32>) -> i32 {
+        return get_one_val(key, default, &self.integers);
+    }
+
+    pub fn get_one_bool(&self, key: &str, default: Option<bool>) -> bool {
+        return get_one_val(key, default, &self.bools);
+    }
+
+    pub fn get_integer_array(&self, key: &str) -> Vec<i32> {
+        return get_array(key, &self.integers);
+    }
+
+    pub fn get_point3_array(&self, key: &str) -> Vec<Point3f> {
+        return get_array(key, &self.point3s);
+    }
+
+    pub fn get_normal3_array(&self, key: &str) -> Vec<Normal3f> {
+        return match self.normal3s.get(key) {
+            None => {
+                return vec![];
+            }
+            Some(val) => val.clone(),
+        };
+    }
 }
 
 impl Display for ParameterDict {
@@ -252,6 +249,7 @@ impl Display for ParameterDict {
         write!(f, "floats: {}\n", self.floats.len()).expect("error");
         write!(f, "point2s: {}\n", self.point2s.len()).expect("error");
         write!(f, "point3s: {}\n", self.point3s.len()).expect("error");
+        write!(f, "normal3s: {}\n", self.normal3s.len()).expect("error");
 
         return Ok(());
     }

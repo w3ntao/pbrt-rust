@@ -29,22 +29,18 @@ pub fn two_sum(a: Float, b: Float) -> CompensatedFloat {
     return CompensatedFloat::new(s, (a - (s - delta)) + (b - delta));
 }
 
-pub fn inner_product(left: &[Float], right: &[Float]) -> CompensatedFloat {
-    // TODO: rewrite this with template
-    let length = left.len();
-    assert_eq!(length, right.len());
-
-    fn _inner_product(left: &[Float], right: &[Float]) -> CompensatedFloat {
+pub fn inner_product<const N: usize>(left: &[Float; N], right: &[Float; N]) -> CompensatedFloat {
+    fn _inner_product(left: &[Float], right: &[Float], n: usize) -> CompensatedFloat {
         let ab = two_prod(left[0], right[0]);
-        if left.len() == 1 {
+        if n == 1 {
             return ab;
         }
 
-        let tp = _inner_product(&left[1..], &right[1..]);
+        let tp = _inner_product(&left[1..], &right[1..], n - 1);
         let sum = two_sum(ab.value, tp.value);
 
         return CompensatedFloat::new(sum.value, ab.error + (tp.error + sum.error));
     }
 
-    return _inner_product(left, right);
+    return _inner_product(left, right, N);
 }

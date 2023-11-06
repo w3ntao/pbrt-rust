@@ -38,7 +38,7 @@ pub trait Film: Send + Sync {
             *mut_pixel = Rgb([u16_rgb.r as u8, u16_rgb.g as u8, u16_rgb.b as u8]);
         }
 
-        buffer.save(filename.clone()).unwrap();
-        println!("image saved to `{}`", filename.clone());
+        buffer.save(filename).unwrap();
+        println!("image saved to `{}`", filename);
     }
 }

@@ -23,7 +23,6 @@ pub struct RGBFilm {
     sensor: Arc<PixelSensor>,
     output_rgb_from_sensor_rgb: SquareMatrix<3>,
     pixels: Vec<Vec<Pixel>>,
-    rendered_pixel_y: Vec<usize>,
 }
 
 impl RGBFilm {
@@ -54,7 +53,6 @@ impl RGBFilm {
             filter: filter.clone(),
             output_rgb_from_sensor_rgb,
             pixels: vec![vec![Pixel::default(); width as usize]; height as usize],
-            rendered_pixel_y: vec![],
         };
     }
 }
@@ -71,7 +69,6 @@ impl Film for RGBFilm {
                 vec![Pixel::default(); self.resolution.x as usize];
                 self.resolution.y as usize
             ],
-            rendered_pixel_y: vec![],
         });
     }
 
