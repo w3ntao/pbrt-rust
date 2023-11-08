@@ -151,6 +151,14 @@ impl Vector3<Float> {
             b: z / sum,
         };
     }
+
+    pub fn same_hemisphere(&self, wp: Vector3f) -> bool {
+        return self.z * wp.z > 0.0;
+    }
+
+    pub fn abs_cos_theta(&self) -> Float {
+        return self.z.abs();
+    }
 }
 
 impl Vector3<Interval> {

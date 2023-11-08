@@ -1,5 +1,11 @@
 use crate::pbrt::*;
 
+pub enum RenderingCoordinateSystem {
+    Camera,
+    CameraWorld,
+    World,
+}
+
 #[derive(Copy, Clone)]
 pub struct CameraTransform {
     pub render_from_camera: Transform,

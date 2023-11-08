@@ -7,6 +7,7 @@
 
 mod accelerator;
 mod base;
+mod bxdfs;
 mod cameras;
 mod euclidean_space;
 mod films;

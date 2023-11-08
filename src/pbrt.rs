@@ -8,12 +8,6 @@ pub struct GlobalVariable {
     pub srgb_color_space: RGBColorSpace,
 }
 
-pub enum RenderingCoordinateSystem {
-    Camera,
-    CameraWorld,
-    World,
-}
-
 pub use fma::fma;
 pub use rand::{rngs::StdRng, thread_rng, Rng, SeedableRng};
 pub use rayon::prelude::*;
@@ -26,7 +20,7 @@ pub use std::{
     hash::{Hash, Hasher},
     io::{BufReader, Read},
     iter::Sum,
-    ops::{Add, AddAssign, Div, Index, IndexMut, Mul, MulAssign, Neg, Sub},
+    ops::{Add, AddAssign, BitAnd, BitOr, Div, Index, IndexMut, Mul, MulAssign, Neg, Sub},
     str::FromStr,
     sync::{
         atomic::{AtomicUsize, Ordering},
@@ -35,14 +29,13 @@ pub use std::{
     time::Instant,
 };
 
-pub use crate::base::spectrum::*;
-pub use crate::spectra::rgb::*;
 pub use crate::{
     accelerator::bvh::*,
     base::{
-        camera::*, film::*, filter::*, integrator::*, primitive::*, ray::*, sampler::*, shape::*,
-        spectrum::*,
+        bxdf::*, camera::*, film::*, filter::*, integrator::*, primitive::*, ray::*, sampler::*,
+        shape::*, spectrum::*,
     },
+    bxdfs::diffuse_bxdf::*,
     cameras::perspective::*,
     euclidean_space::{
         bounds::*, compensated_float::*, float::*, frame::*, interval::*, interval::*, normal::*,
@@ -58,7 +51,7 @@ pub use crate::{
     spectra::{
         black_body_spectrum::*, cie_xyz::*, const_piecewise_linear_spectrum::*,
         densely_sampled_spectrum::*, measured_spectra_data::*, piecewise_linear_spectrum::*,
-        rgb_sigmoid_polynomial::*, rgb_to_spectrum_data::*, rgb_to_spectrum_table::*,
+        rgb::*, rgb_sigmoid_polynomial::*, rgb_to_spectrum_data::*, rgb_to_spectrum_table::*,
         sampled_spectrum::*, sampled_wavelengths::*,
     },
     util::{color::*, colorspace::*, math::*, sampling::*},
