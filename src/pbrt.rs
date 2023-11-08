@@ -5,7 +5,7 @@ pub type Float = f64;
 pub type Float = f32;
 
 pub struct GlobalVariable {
-    pub srgb_color_space: RGBColorSpace,
+    pub rgb_color_space: Arc<RGBColorSpace>,
 }
 
 pub use fma::fma;
@@ -13,7 +13,8 @@ pub use rand::{rngs::StdRng, thread_rng, Rng, SeedableRng};
 pub use rayon::prelude::*;
 pub use serde_json::Value;
 pub use std::{
-    any::type_name,
+    any::{type_name, Any, TypeId},
+    cmp::Ordering,
     collections::{HashMap, HashSet},
     fmt::{Debug, Display, Formatter},
     fs::File,
@@ -21,9 +22,10 @@ pub use std::{
     io::{BufReader, Read},
     iter::Sum,
     ops::{Add, AddAssign, BitAnd, BitOr, Div, Index, IndexMut, Mul, MulAssign, Neg, Sub},
+    process::exit,
     str::FromStr,
     sync::{
-        atomic::{AtomicUsize, Ordering},
+        atomic::AtomicUsize,
         {Arc, Mutex},
     },
     time::Instant,
@@ -33,7 +35,7 @@ pub use crate::{
     accelerator::bvh::*,
     base::{
         bxdf::*, camera::*, film::*, filter::*, integrator::*, primitive::*, ray::*, sampler::*,
-        shape::*, spectrum::*,
+        shape::*, spectrum::*, texture::*,
     },
     bxdfs::diffuse_bxdf::*,
     cameras::perspective::*,
@@ -54,7 +56,12 @@ pub use crate::{
         rgb::*, rgb_sigmoid_polynomial::*, rgb_to_spectrum_data::*, rgb_to_spectrum_table::*,
         sampled_spectrum::*, sampled_wavelengths::*,
     },
-    util::{color::*, colorspace::*, math::*, sampling::*},
+    textures::{
+        float_constant_texture::*, mipmap::*, spectrum_constant_texture::*,
+        spectrum_image_texture::*, spectrum_scaled_texture::*, texture_mapping_2d::*,
+        uv_mapping::*,
+    },
+    util::{color::*, color_encoding::*, colorspace::*, image::*, math::*, sampling::*},
 };
 
 pub type Point2f = Point2<Float>;
@@ -69,6 +76,6 @@ pub type Vector3fi = Vector3<Interval>;
 pub type Bounds2f = Bounds2<Float>;
 pub type Bounds3f = Bounds3<Float>;
 
-pub fn type_of<T>(_: T) -> &'static str {
-    type_name::<T>()
+pub fn same_type<T0: ?Sized + Any, T1: ?Sized + Any>() -> bool {
+    return TypeId::of::<T0>() == TypeId::of::<T1>();
 }

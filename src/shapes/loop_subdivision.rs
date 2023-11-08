@@ -9,7 +9,7 @@ static VERTEX_ID_COUNTER: AtomicUsize = AtomicUsize::new(1);
 
 fn generate_vertex_id() -> VertexID {
     return VertexID {
-        id: VERTEX_ID_COUNTER.fetch_add(1, Ordering::SeqCst),
+        id: VERTEX_ID_COUNTER.fetch_add(1, std::sync::atomic::Ordering::SeqCst),
     };
 }
 
@@ -319,7 +319,7 @@ impl SDEdge {
 }
 
 pub fn loop_subdivide(
-    render_from_object: Transform,
+    render_from_object: &Transform,
     n_levels: usize,
     vertex_indices: Vec<usize>,
     p: Vec<Point3f>,

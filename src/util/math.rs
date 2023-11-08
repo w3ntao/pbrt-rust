@@ -1,4 +1,5 @@
 use crate::pbrt::*;
+use std::ffi::c_float;
 
 pub const PI: Float = std::f64::consts::PI as Float;
 
@@ -60,4 +61,39 @@ pub fn difference_of_products(a: Float, b: Float, c: Float, d: Float) -> Float {
     let difference_of_products = fma(a, b, -cd);
     let error = fma(-c, d, cd);
     return difference_of_products + error;
+}
+
+pub const fn is_power_of_2(v: i32) -> bool {
+    return v > 0 && !(v & (v - 1) > 0);
+}
+
+pub const fn round_up_pow_2(v: i32) -> i32 {
+    let mut x = v - 1;
+    x |= x >> 1;
+    x |= x >> 2;
+    x |= x >> 4;
+    x |= x >> 8;
+    x |= x >> 16;
+
+    return x + 1;
+}
+
+// http://www.plunk.org/~hatch/rightway.html
+pub fn sinx_over_x(x: Float) -> Float {
+    if 1.0 - x * x == 1.0 {
+        return 1.0;
+    }
+
+    return x.sin() / x;
+}
+
+pub fn sinc(x: Float) -> Float {
+    return sinx_over_x(PI * x);
+}
+
+pub fn windowed_sinc(x: Float, radius: Float, tau: Float) -> Float {
+    if x.abs() > radius {
+        return 0.0;
+    }
+    return sinc(x) * sinc(x / tau);
 }

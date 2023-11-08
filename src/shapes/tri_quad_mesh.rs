@@ -13,7 +13,13 @@ pub struct TriQuadMesh {
 pub fn read_ply(ply_file_path: &str) -> TriQuadMesh {
     let ply_model = {
         let ply_parser = ply_rs::parser::Parser::<ply::DefaultElement>::new();
-        let _file = &mut File::open(ply_file_path).unwrap();
+
+        let _file = &mut match File::open(ply_file_path) {
+            Ok(opened_file) => opened_file,
+            Err(_) => {
+                panic!("couldn't read PLY from `{}`", ply_file_path);
+            }
+        };
 
         let optional_model = if ply_file_path.ends_with(".ply.gz") {
             let buffer_reader = BufReader::new(_file);

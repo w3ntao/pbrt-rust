@@ -1,5 +1,11 @@
 use crate::pbrt::*;
 
+pub enum SpectrumType {
+    Illuminant,
+    Albedo,
+    Unbounded,
+}
+
 pub trait Spectrum: Send + Sync {
     fn eval(&self, lambda: Float) -> Float;
 
@@ -74,9 +80,9 @@ pub const CIE_Z_DENSELY_SAMPLED: DenselySampledSpectrum =
 pub const ILLUM_D65: ConstPieceWiseLinearSpectrum<{ CIE_ILLUM_D6500.len() / 2 }> =
     ConstPieceWiseLinearSpectrum::from_interleaved_full_visible_wavelengths(CIE_ILLUM_D6500, true);
 
-pub fn get_named_spectrum(name: &str) -> Arc<dyn Spectrum> {
+pub fn get_named_spectrum(name: &str) -> &'static dyn Spectrum {
     return match name {
-        "stdillum-D65" => Arc::new(ILLUM_D65),
+        "stdillum-D65" => &ILLUM_D65,
         _ => {
             panic!("unknown spectrum: `{}`", name);
         }

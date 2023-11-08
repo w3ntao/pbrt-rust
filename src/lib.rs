@@ -19,6 +19,7 @@ mod samplers;
 mod scene;
 mod shapes;
 mod spectra;
+mod textures;
 mod util;
 
 pub use pbrt::*;

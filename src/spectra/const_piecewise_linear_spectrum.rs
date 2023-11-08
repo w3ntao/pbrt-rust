@@ -167,6 +167,11 @@ impl<const N: usize> Spectrum for ConstPieceWiseLinearSpectrum<N> {
     }
 
     fn sample(&self, lambda: &SampledWavelengths) -> SampledSpectrum {
-        panic!("not implemented for ConstPieceWiseLinearSpectrum");
+        let mut values = [Float::NAN; NUM_SPECTRUM_SAMPLES];
+        for i in 0..NUM_SPECTRUM_SAMPLES {
+            values[i] = self.eval(lambda[i]);
+        }
+
+        return SampledSpectrum { values };
     }
 }

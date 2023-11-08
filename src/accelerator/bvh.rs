@@ -187,7 +187,7 @@ impl From<LinearBVHNode> for _NonAlignLinearBVHNode {
 const _LINEAR_BVH_NODE_ALIGN: usize = align_of::<LinearBVHNode>();
 const _LINEAR_BVH_NODE_ACTUAL_SIZE: usize = size_of::<_NonAlignLinearBVHNode>();
 
-const _DATA_ALIGN_CHECK: () = assert!(
+const _DATA_ALIGNMENT_CHECK: () = assert!(
     _LINEAR_BVH_NODE_ALIGN / _LINEAR_BVH_NODE_ACTUAL_SIZE == 1,
     "LinearBVHNode: memory alignment mismatched",
 );

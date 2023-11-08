@@ -1,4 +1,3 @@
-use crate::films::pixel_sensor::PixelSensor;
 use crate::pbrt::*;
 
 fn build_look_at_transform(pos: Point3f, look: Point3f, up: Vector3f) -> Transform {
@@ -34,7 +33,13 @@ fn build_look_at_transform(pos: Point3f, look: Point3f, up: Vector3f) -> Transfo
 }
 
 fn parse_json(path: &str) -> Value {
-    let mut file = File::open(path).unwrap();
+    let mut file = match File::open(path) {
+        Ok(_file) => _file,
+        Err(_) => {
+            panic!("fail to read `{}`", path);
+        }
+    };
+
     let mut data = String::new();
     file.read_to_string(&mut data).unwrap();
 
@@ -121,30 +126,48 @@ impl GraphicsState {
 pub struct SceneBuilder {
     graphics_state: GraphicsState,
     pushed_graphics_state: Vec<GraphicsState>,
+
     named_coordinate_systems: HashMap<String, Transform>,
+    named_texture: HashMap<String, Arc<dyn SpectrumTexture>>,
+
     render_from_world: Transform,
     primitives: Vec<Arc<dyn Primitive>>,
 
     film_entity: SceneEntity,
     camera_entity: SceneEntity,
+
+    root: Option<String>,
+
+    global_variable: Arc<GlobalVariable>,
 }
 
-impl Default for SceneBuilder {
-    fn default() -> Self {
+impl SceneBuilder {
+    pub fn new(global_variable: Arc<GlobalVariable>) -> Self {
         return SceneBuilder {
             graphics_state: GraphicsState::new(),
             pushed_graphics_state: Vec::new(),
+
             named_coordinate_systems: HashMap::new(),
+            named_texture: HashMap::new(),
+
             render_from_world: Transform::identity(),
             primitives: vec![],
 
             film_entity: SceneEntity::default(),
             camera_entity: SceneEntity::default(),
+
+            root: None,
+            global_variable,
         };
     }
-}
 
-impl SceneBuilder {
+    fn get_filepath(&self, file_basename: &str) -> String {
+        return match &self.root {
+            None => file_basename.to_string(),
+            Some(root) => format!("{}/{}", root, file_basename),
+        };
+    }
+
     fn render_from_object(&self) -> Transform {
         return self.render_from_world * self.graphics_state.current_transform;
     }
@@ -190,24 +213,24 @@ impl SceneBuilder {
         self.film_entity.initialized = true;
         self.film_entity.name = json_value_to_string(tokens[1].clone());
         if self.film_entity.name != "rgb" {
-            println!("warning: only `rgb` film is supported for the moment");
+            println!("warning: only `rgb` film is supported for the moment.");
             self.film_entity.name = "rgb".to_string();
         }
 
-        self.film_entity.parameters = ParameterDict::build_from_vec(&tokens[2..]);
+        self.film_entity.parameters = ParameterDict::build_parameter_dict(&tokens[2..], None);
     }
 
     fn parse_camera(&mut self, tokens: &Vec<Value>) {
         assert_eq!(json_value_to_string(tokens[0].clone()), "Camera");
 
         let name = json_value_to_string(tokens[1].clone());
-        let parameter_dict = ParameterDict::build_from_vec(&tokens[2..]);
+        let parameter_dict = ParameterDict::build_parameter_dict(&tokens[2..], self.root.clone());
 
         let camera_from_world = self.graphics_state.current_transform;
         let world_from_camera = camera_from_world.inverse();
 
         self.named_coordinate_systems
-            .insert(String::from("camera"), camera_from_world.inverse());
+            .insert("camera".to_string(), camera_from_world.inverse());
 
         let camera_transform =
             CameraTransform::new(world_from_camera, RenderingCoordinateSystem::CameraWorld);
@@ -242,32 +265,10 @@ impl SceneBuilder {
             * Transform::scale(floats[0], floats[1], floats[2]);
     }
 
-    fn parse_transform(&mut self, tokens: &Vec<Value>) {
-        assert_eq!(tokens.len(), 2);
-        assert_eq!(json_value_to_string(tokens[0].clone()), "Transform");
-
-        let value_list = json_value_to_floats(tokens[1].clone());
-        assert_eq!(value_list.len(), 16);
-
-        self.graphics_state.current_transform =
-            Transform::new(SquareMatrix::<4>::from_vec(value_list)).transpose();
-    }
-
-    fn parse_translate(&mut self, tokens: &Vec<Value>) {
-        assert_eq!(tokens.len(), 4);
-        assert_eq!(json_value_to_string(tokens[0].clone()), "Translate");
-
-        let floats = json_values_to_floats(&tokens.clone()[1..]);
-        assert_eq!(floats.len(), 3);
-
-        self.graphics_state.current_transform = self.graphics_state.current_transform
-            * Transform::translate(floats[0], floats[1], floats[2]);
-    }
-
-    fn parse_shape(&mut self, tokens: &Vec<Value>, current_folder: &str) {
+    fn parse_shape(&mut self, tokens: &Vec<Value>) {
         assert_eq!(json_value_to_string(tokens[0].clone()), "Shape");
 
-        let parameters = ParameterDict::build_from_vec(&tokens[2..]);
+        let parameters = ParameterDict::build_parameter_dict(&tokens[2..], self.root.clone());
 
         let render_from_object = self.render_from_object();
         let object_from_render = render_from_object.inverse();
@@ -287,7 +288,7 @@ impl SceneBuilder {
 
                 let points = parameters.get_point3_array("P");
 
-                let triangles = loop_subdivide(render_from_object, levels, indices, points);
+                let triangles = loop_subdivide(&render_from_object, levels, indices, points);
 
                 for _triangle in &triangles {
                     let primitive = SimplePrimitive::new(_triangle.clone());
@@ -322,7 +323,7 @@ impl SceneBuilder {
                 let normals = parameters.get_normal3_array("N");
 
                 let mesh = TriangleMesh::new(
-                    render_from_object,
+                    &render_from_object,
                     points,
                     indices.into_iter().map(|x| x as usize).collect(),
                     normals,
@@ -336,16 +337,12 @@ impl SceneBuilder {
             }
 
             "plymesh" => {
-                let absolute_path = format!(
-                    "{}/{}",
-                    current_folder,
-                    parameters.get_string("filename", None)
-                );
-                let tri_quad_mesh = read_ply(absolute_path.as_str());
+                let file_path = &parameters.get_string("filename", None);
+                let tri_quad_mesh = read_ply(file_path);
 
                 if tri_quad_mesh.tri_indices.len() > 0 {
                     let triangle_mesh = TriangleMesh::new(
-                        render_from_object,
+                        &render_from_object,
                         tri_quad_mesh.p,
                         tri_quad_mesh.tri_indices,
                         tri_quad_mesh.n,
@@ -364,8 +361,63 @@ impl SceneBuilder {
         };
     }
 
-    fn parse_file(&mut self, file_path: &str, root: &str) {
-        let blocks = parse_json(file_path);
+    fn parse_texture(&mut self, tokens: &Vec<Value>) {
+        assert_eq!(json_value_to_string(tokens[0].clone()), "Texture");
+
+        let texture_name = json_value_to_string(tokens[1].clone());
+
+        let color_type = json_value_to_string(tokens[2].clone());
+        let texture_type = json_value_to_string(tokens[3].clone());
+
+        match color_type.as_str() {
+            "spectrum" => {
+                let parameter_dict =
+                    ParameterDict::build_parameter_dict(&tokens[4..], self.root.clone());
+
+                //TODO: SpectrumType is missing in creating SpectrumTexture
+                let texture = create_spectrum_texture(
+                    &texture_type,
+                    &self.render_from_object(),
+                    &parameter_dict,
+                    &self.named_texture,
+                    self.global_variable.as_ref(),
+                );
+
+                self.named_texture.insert(texture_name, texture);
+            }
+            _ => {
+                panic!(
+                    "unknown color type and texture type: ({}, {})",
+                    color_type, texture_type
+                );
+            }
+        };
+    }
+
+    fn parse_transform(&mut self, tokens: &Vec<Value>) {
+        assert_eq!(tokens.len(), 2);
+        assert_eq!(json_value_to_string(tokens[0].clone()), "Transform");
+
+        let value_list = json_value_to_floats(tokens[1].clone());
+        assert_eq!(value_list.len(), 16);
+
+        self.graphics_state.current_transform =
+            Transform::new(SquareMatrix::<4>::from_vec(value_list)).transpose();
+    }
+
+    fn parse_translate(&mut self, tokens: &Vec<Value>) {
+        assert_eq!(tokens.len(), 4);
+        assert_eq!(json_value_to_string(tokens[0].clone()), "Translate");
+
+        let floats = json_values_to_floats(&tokens.clone()[1..]);
+        assert_eq!(floats.len(), 3);
+
+        self.graphics_state.current_transform = self.graphics_state.current_transform
+            * Transform::translate(floats[0], floats[1], floats[2]);
+    }
+
+    fn parse_file(&mut self, filename: &str) {
+        let blocks = parse_json(&self.get_filepath(filename));
         let block_length = json_value_to_usize(blocks["length"].clone());
 
         for idx in 0..block_length {
@@ -402,9 +454,8 @@ impl SceneBuilder {
 
                 "Include" => {
                     assert_eq!(tokens.len(), 2);
-                    let included_path = json_value_to_string(tokens[1].clone());
-                    let absolute_path = format!("{}/{}", root, included_path);
-                    self.parse_file(absolute_path.as_str(), root);
+                    let included_filename = json_value_to_string(tokens[1].clone());
+                    self.parse_file(&included_filename);
                 }
 
                 "LookAt" => {
@@ -429,7 +480,7 @@ impl SceneBuilder {
                 }
 
                 "Shape" => {
-                    self.parse_shape(tokens, root);
+                    self.parse_shape(tokens);
                 }
 
                 "Transform" => {
@@ -443,7 +494,7 @@ impl SceneBuilder {
                 "WorldBegin" => {
                     self.graphics_state.current_transform = Transform::identity();
                     self.named_coordinate_systems
-                        .insert(String::from("world"), self.graphics_state.current_transform);
+                        .insert("world".to_string(), self.graphics_state.current_transform);
                 }
 
                 "AreaLightSource" => {
@@ -461,12 +512,16 @@ impl SceneBuilder {
                 "LightSource" => {
                     // TODO: parse LightSource
                 }
+
                 "Material" => {
-                    // TODO: parse Material
+                    // TODO: progress 2023/11/26 should work on Material now
+                    panic!("wentao is working on building Material");
                 }
+
                 "MakeNamedMaterial" => {
                     // TODO: parse MakeNamedMaterial
                 }
+
                 "NamedMaterial" => {
                     // TODO: parse NamedMaterial
                 }
@@ -476,7 +531,7 @@ impl SceneBuilder {
                 }
 
                 "Texture" => {
-                    //TODO: parse Texture
+                    self.parse_texture(tokens);
                 }
 
                 _ => {
@@ -486,13 +541,18 @@ impl SceneBuilder {
         }
     }
 
-    pub fn parse_scene(&mut self, file_path: &str, global_variable: &GlobalVariable) -> Renderer {
-        self.parse_file(file_path, &get_folder_potion(file_path));
+    pub fn parse_scene(&mut self, file_path: &str) -> Renderer {
+        self.root = Some(get_dirname(file_path));
+        self.parse_file(&get_basename(file_path));
 
         let filter = Arc::new(BoxFilter::new(0.5));
 
         let film = if self.film_entity.initialized {
-            build_film(&self.film_entity, filter.clone(), global_variable)
+            build_film(
+                &self.film_entity,
+                filter.clone(),
+                self.global_variable.as_ref(),
+            )
         } else {
             panic!("default Film not implemented");
         };
@@ -506,7 +566,7 @@ impl SceneBuilder {
         let sampler = Arc::new(IndependentSampler::default());
         let bvh_aggregate = Arc::new(BVHAggregate::new(self.primitives.clone()));
 
-        let illuminant = global_variable.srgb_color_space.illuminant.clone();
+        let illuminant = self.global_variable.rgb_color_space.illuminant;
 
         let integrator = Arc::new(AmbientOcclusion::new(illuminant, bvh_aggregate.clone()));
 

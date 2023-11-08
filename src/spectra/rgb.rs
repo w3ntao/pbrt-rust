@@ -23,6 +23,23 @@ impl RGB {
     pub fn max_component(&self) -> Float {
         return self.r.max(self.g).max(self.b);
     }
+
+    pub fn gamma_correction(&self) -> Self {
+        return Self {
+            r: self.r.sqrt(),
+            g: self.g.sqrt(),
+            b: self.b.sqrt(),
+        };
+    }
+
+    pub fn to_u256(&self) -> [u8; 3] {
+        let factor = 256.0 - 0.0001;
+        return [
+            (self.r * factor) as u8,
+            (self.g * factor) as u8,
+            (self.b * factor) as u8,
+        ];
+    }
 }
 
 impl Display for RGB {

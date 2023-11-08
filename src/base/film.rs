@@ -1,5 +1,4 @@
 use crate::pbrt::*;
-use image::{ImageBuffer, Rgb, RgbImage};
 
 pub trait Film: Send + Sync {
     fn fork(&self) -> Box<dyn Film>;
@@ -16,7 +15,7 @@ pub trait Film: Send + Sync {
 
     fn get_pixel_rgb(&self, p: Point2i) -> RGB;
 
-    fn merge(&mut self, film: &dyn Film, y_list: Vec<i32>);
+    fn merge(&mut self, film: &dyn Film, y_list: Vec<usize>);
 
     fn add_sample(
         &mut self,
@@ -27,18 +26,15 @@ pub trait Film: Send + Sync {
     );
 
     fn export_image(&self, filename: &str, resolution: Point2i) {
-        let mut buffer: RgbImage = ImageBuffer::new(resolution.x as u32, resolution.y as u32);
+        let mut image = Image::new(resolution, PixelFormat::U256);
 
-        for (x, y, mut_pixel) in buffer.enumerate_pixels_mut() {
-            let rgb = self.get_pixel_rgb(Point2i::new(x as i32, y as i32));
-
-            let gamma_rgb = RGB::new(rgb.r.sqrt(), rgb.g.sqrt(), rgb.b.sqrt());
-            let u16_rgb = gamma_rgb * (256.0 - 0.0001);
-
-            *mut_pixel = Rgb([u16_rgb.r as u8, u16_rgb.g as u8, u16_rgb.b as u8]);
+        for y in 0..resolution.y {
+            for x in 0..resolution.x {
+                image[y as usize][x as usize] = self.get_pixel_rgb(Point2i::new(x, y));
+            }
         }
 
-        buffer.save(filename).unwrap();
+        image.export_to_png(filename);
         println!("image saved to `{}`", filename);
     }
 }

@@ -38,18 +38,18 @@ impl Clone for ParameterDict {
     }
 }
 
-fn split_variable_type_name(token: String) -> (String, String) {
+pub fn split_variable_type_name(token: String) -> (String, String) {
     let parts = token.split_whitespace().collect::<Vec<&str>>();
     assert_eq!(parts.len(), 2);
 
-    return (String::from(parts[0]), String::from(parts[1]));
+    return (parts[0].to_string(), parts[1].to_string());
 }
 
-fn fetch_variable_value(value: &Value) -> Vec<String> {
+pub fn fetch_variable_value(value: &Value) -> Vec<String> {
     return match value.as_array() {
         None => {
             // if it's a string
-            vec![String::from(value.as_str().unwrap())]
+            vec![value.as_str().unwrap().to_string()]
         }
         Some(value_vector) => {
             // if it's a vec of string
@@ -73,7 +73,7 @@ fn _print<T: Display>(hashmap: &HashMap<String, Vec<T>>) {
     println!();
 }
 
-fn convert_string<T: FromStr>(string_vec: &Vec<String>) -> Vec<T>
+pub fn convert_string<T: FromStr>(string_vec: &Vec<String>) -> Vec<T>
 where
     <T as FromStr>::Err: Debug,
 {
@@ -110,7 +110,8 @@ fn get_array<T: Copy>(key: &str, dict: &HashMap<String, Vec<T>>) -> Vec<T> {
 }
 
 impl ParameterDict {
-    pub fn build_from_vec(array: &[Value]) -> Self {
+    pub fn build_parameter_dict(array: &[Value], dir_path: Option<String>) -> ParameterDict {
+        // TODO: move this function into scene_builder to directly fetch current_folder and named_textures
         let mut integers = HashMap::<String, Vec<i32>>::new();
         let mut floats = HashMap::<String, Vec<Float>>::new();
         let mut strings = HashMap::<String, String>::new();
@@ -128,7 +129,18 @@ impl ParameterDict {
             match variable_type.as_str() {
                 "string" => {
                     assert_eq!(variable_values.len(), 1);
-                    strings.insert(variable_name, variable_values[0].clone());
+
+                    match (variable_name.as_str(), &dir_path) {
+                        ("filename", Some(dir)) => {
+                            strings.insert(
+                                variable_name,
+                                format!("{}/{}", dir, variable_values[0].clone()),
+                            );
+                        }
+                        (_, _) => {
+                            strings.insert(variable_name, variable_values[0].clone());
+                        }
+                    };
                 }
                 "integer" => {
                     integers.insert(variable_name, convert_string::<i32>(&variable_values));
@@ -173,13 +185,38 @@ impl ParameterDict {
                     normal3s.insert(variable_name, normal_set);
                 }
 
+                "texture" => {
+                    assert_eq!(variable_values.len(), 1);
+                    strings.insert(variable_name, variable_values[0].clone());
+                }
+
                 _ => {
                     panic!("unknown variable type: `{}`", variable_type);
                 }
             }
         }
 
-        return ParameterDict {
+        return Self {
+            integers,
+            floats,
+            strings,
+            point2s,
+            point3s,
+            normal3s,
+            bools,
+        };
+    }
+
+    pub fn new(
+        integers: HashMap<String, Vec<i32>>,
+        floats: HashMap<String, Vec<Float>>,
+        strings: HashMap<String, String>,
+        point2s: HashMap<String, Vec<Point2f>>,
+        point3s: HashMap<String, Vec<Point3f>>,
+        normal3s: HashMap<String, Vec<Normal3f>>,
+        bools: HashMap<String, Vec<bool>>,
+    ) -> Self {
+        return Self {
             integers,
             floats,
             strings,
@@ -191,11 +228,27 @@ impl ParameterDict {
     }
 
     pub fn insert_integer(&mut self, name: String, value: Vec<i32>) {
+        if self.integers.contains_key(&name) {
+            panic!("duplicate key: `{}`", name);
+        }
+
         self.integers.insert(name, value);
     }
 
     pub fn insert_float(&mut self, name: String, value: Vec<Float>) {
+        if self.floats.contains_key(&name) {
+            panic!("duplicate key: `{}`", name);
+        }
+
         self.floats.insert(name, value);
+    }
+
+    pub fn insert_string(&mut self, name: String, value: String) {
+        if self.strings.contains_key(&name) {
+            panic!("duplicate key: `{}`", name);
+        }
+
+        self.strings.insert(name, value);
     }
 
     pub fn get_string(&self, key: &str, default: Option<String>) -> String {
@@ -206,10 +259,6 @@ impl ParameterDict {
                 panic!("found no key with name `{}`", key);
             }
         };
-    }
-
-    pub fn insert_string(&mut self, name: String, value: String) {
-        self.strings.insert(name, value);
     }
 
     pub fn get_one_float(&self, key: &str, default: Option<Float>) -> Float {
@@ -242,14 +291,45 @@ impl ParameterDict {
     }
 }
 
+//floats: HashMap<String, Vec<Float>>,
+fn display_single_value_dict<T: Display>(dict: &HashMap<String, T>) {
+    for (key, value) in dict {
+        println!("    {} -> {}", key, value);
+    }
+}
+
+fn display_multi_value_dict<T: Display>(dict: &HashMap<String, Vec<T>>) {
+    for (key, value) in dict {
+        print!("    {} -> [ ", key);
+        for v in value {
+            print!("{}, ", v);
+        }
+        println!("]");
+    }
+}
+
 impl Display for ParameterDict {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(f, "strings: {}\n", self.strings.len()).expect("error");
-        write!(f, "integers: {}\n", self.integers.len()).expect("error");
-        write!(f, "floats: {}\n", self.floats.len()).expect("error");
-        write!(f, "point2s: {}\n", self.point2s.len()).expect("error");
-        write!(f, "point3s: {}\n", self.point3s.len()).expect("error");
-        write!(f, "normal3s: {}\n", self.normal3s.len()).expect("error");
+        write!(f, "strings: {}\n", self.strings.len()).unwrap();
+        display_single_value_dict(&self.strings);
+
+        write!(f, "integers: {}\n", self.integers.len()).unwrap();
+        display_multi_value_dict(&self.integers);
+
+        write!(f, "floats: {}\n", self.floats.len()).unwrap();
+        display_multi_value_dict(&self.floats);
+
+        write!(f, "point2s: {}\n", self.point2s.len()).unwrap();
+        display_multi_value_dict(&self.point2s);
+
+        write!(f, "point3s: {}\n", self.point3s.len()).unwrap();
+        display_multi_value_dict(&self.point3s);
+
+        write!(f, "normal3s: {}\n", self.normal3s.len()).unwrap();
+        display_multi_value_dict(&self.normal3s);
+
+        write!(f, "bools: {}\n", self.bools.len()).unwrap();
+        display_multi_value_dict(&self.bools);
 
         return Ok(());
     }

@@ -59,6 +59,10 @@ impl SampledWavelengths {
 
         let pdf = [1.0 / LAMBDA_EXTEND; NUM_SPECTRUM_SAMPLES];
 
+        debug_assert!(lambda.into_iter().all(|x| x >= 0.0));
+        debug_assert!(pdf.into_iter().all(|x| x >= 0.0));
+        debug_assert!(pdf.into_iter().any(|x| x > 0.0));
+
         return Self { lambda, pdf };
     }
 

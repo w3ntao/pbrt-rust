@@ -38,7 +38,16 @@ pub fn trim_quote(token: String) -> String {
     return token;
 }
 
-pub fn get_folder_potion(path: &str) -> String {
+pub fn get_basename(path: &str) -> String {
+    return match path.rfind("/") {
+        None => {
+            panic!("couldn't find `/` from {}", path);
+        }
+        Some(pos) => path.chars().skip(pos + 1).collect(),
+    };
+}
+
+pub fn get_dirname(path: &str) -> String {
     return match path.rfind("/") {
         None => {
             panic!("couldn't find `/` from {}", path);
@@ -47,7 +56,7 @@ pub fn get_folder_potion(path: &str) -> String {
     };
 }
 
-pub fn get_postfix(path: &str) -> String {
+pub fn get_extension(path: &str) -> String {
     match path.rfind(".") {
         None => {
             panic!("couldn't find `.` from {}", path);
@@ -58,7 +67,7 @@ pub fn get_postfix(path: &str) -> String {
     };
 }
 
-pub fn change_postfix(path: &str, postfix: &str) -> String {
+pub fn change_extension(path: &str, extension: &str) -> String {
     match path.rfind(".") {
         None => {
             panic!("couldn't find `.` from {}", path);
@@ -67,7 +76,7 @@ pub fn change_postfix(path: &str, postfix: &str) -> String {
             let mut filename: String = path.chars().take(pos).collect();
 
             filename.push('.');
-            filename.push_str(postfix);
+            filename.push_str(extension);
 
             return filename;
         }

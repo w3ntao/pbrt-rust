@@ -1,7 +1,5 @@
 use crate::pbrt::*;
 
-const TYPE_TESTER: Float = Float::NAN;
-
 #[derive(Clone)]
 pub struct Triangle {
     idx: usize,
@@ -59,7 +57,7 @@ fn intersect_triangle(
     let mut e1 = difference_of_products(p2t.x, p0t.y, p2t.y, p0t.x);
     let mut e2 = difference_of_products(p0t.x, p1t.y, p0t.y, p1t.x);
 
-    if type_of(TYPE_TESTER) == "f32" && (e0 == 0.0 || e1 == 0.0 || e2 == 0.0) {
+    if same_type::<Float, f32>() && (e0 == 0.0 || e1 == 0.0 || e2 == 0.0) {
         let p2txp1ty = p2t.x as f64 * p1t.y as f64;
         let p2typ1tx = p2t.y as f64 * p1t.x as f64;
         e0 = (p2typ1tx - p2txp1ty) as Float;

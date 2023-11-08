@@ -8,3 +8,4 @@ pub mod ray;
 pub mod sampler;
 pub mod shape;
 pub mod spectrum;
+pub mod texture;

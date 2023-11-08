@@ -1,5 +1,6 @@
 use crate::pbrt::*;
 
+// TODO: remove Copy from Transform
 #[derive(Copy, Clone)]
 pub struct Transform {
     matrix: SquareMatrix<4>,

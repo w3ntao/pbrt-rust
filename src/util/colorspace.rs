@@ -9,7 +9,7 @@ pub struct RGBColorSpace {
     pub xyz_from_rgb: SquareMatrix<3>,
     pub rgb_from_xyz: SquareMatrix<3>,
 
-    pub illuminant: Arc<DenselySampledSpectrum>,
+    pub illuminant: &'static dyn Spectrum,
 
     rgb_to_spectrum_table: RGBtoSpectrumTable,
 }
@@ -19,7 +19,7 @@ impl RGBColorSpace {
         r: Point2f,
         g: Point2f,
         b: Point2f,
-        illuminant: Arc<dyn Spectrum>,
+        illuminant: &'static dyn Spectrum,
         rgb_to_spectrum_table: RGBtoSpectrumTable,
     ) -> Self {
         let cie_w = illuminant.to_xyz();
@@ -45,7 +45,7 @@ impl RGBColorSpace {
             w: cie_w.xy(),
             xyz_from_rgb,
             rgb_from_xyz,
-            illuminant: Arc::new(DenselySampledSpectrum::from_spectrum(illuminant.as_ref())),
+            illuminant,
             rgb_to_spectrum_table,
         };
     }

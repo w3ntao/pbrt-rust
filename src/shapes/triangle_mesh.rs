@@ -8,7 +8,7 @@ pub struct TriangleMesh {
 
 impl TriangleMesh {
     pub fn new(
-        render_from_object: Transform,
+        render_from_object: &Transform,
         points: Vec<Point3f>,
         indices: Vec<usize>,
         normals: Vec<Normal3f>,
@@ -20,6 +20,7 @@ impl TriangleMesh {
         let (transformed_points, transformed_normals) = if render_from_object.is_identity() {
             (points, normals)
         } else {
+            // TODO: change all `into_iter` into `into_par_iter` and test
             (
                 points
                     .into_iter()

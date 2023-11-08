@@ -322,7 +322,7 @@ impl PixelSensor {
 
         return match sensor_name.as_str() {
             "cie1931" => PixelSensor::cie_1931(
-                &global_variable.srgb_color_space,
+                &global_variable.rgb_color_space,
                 sensor_illum,
                 imaging_ratio,
             ),

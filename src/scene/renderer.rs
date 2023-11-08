@@ -52,7 +52,7 @@ fn single_thread_render(
                     }
                 }
 
-                rendered_y.push(y);
+                rendered_y.push(y as usize);
             }
         }
     }

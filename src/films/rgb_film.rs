@@ -36,15 +36,15 @@ impl RGBFilm {
         let width = resolution.x;
         let height = resolution.y;
 
-        let postfix = get_postfix(filename);
-        let png_filename = if postfix == "png" {
+        let extension = get_extension(filename);
+        let png_filename = if extension == "png" {
             filename.clone()
         } else {
-            change_postfix(filename, "png")
+            change_extension(filename, "png")
         };
 
         let output_rgb_from_sensor_rgb =
-            global_variable.srgb_color_space.rgb_from_xyz * sensor.xyz_from_sensor_rgb;
+            global_variable.rgb_color_space.rgb_from_xyz * sensor.xyz_from_sensor_rgb;
 
         return RGBFilm {
             resolution: resolution.clone(),
@@ -109,13 +109,12 @@ impl Film for RGBFilm {
         return self.output_rgb_from_sensor_rgb * rgb;
     }
 
-    fn merge(&mut self, film: &dyn Film, y_list: Vec<i32>) {
-        assert!(self.resolution == film.get_resolution());
-
+    fn merge(&mut self, film: &dyn Film, y_list: Vec<usize>) {
         let rgb_film = film.convert_to_rgb_film();
+        assert_eq!(self.resolution, rgb_film.get_resolution());
 
         for y in y_list {
-            self.pixels[y as usize] = rgb_film.pixels[y as usize].clone();
+            self.pixels[y] = rgb_film.pixels[y].clone();
         }
     }
 

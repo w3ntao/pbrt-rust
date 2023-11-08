@@ -1,13 +1,13 @@
 use crate::pbrt::*;
 
 pub struct AmbientOcclusion {
-    illuminant_spectrum: Arc<dyn Spectrum>,
+    illuminant_spectrum: &'static dyn Spectrum,
     illuminant_scale: Float,
     aggregate: Arc<dyn Primitive>,
 }
 
 impl AmbientOcclusion {
-    pub fn new(illuminant_spectrum: Arc<dyn Spectrum>, aggregate: Arc<dyn Primitive>) -> Self {
+    pub fn new(illuminant_spectrum: &'static dyn Spectrum, aggregate: Arc<dyn Primitive>) -> Self {
         let illuminant_scale = 1.0 / illuminant_spectrum.to_photometric();
 
         return AmbientOcclusion {

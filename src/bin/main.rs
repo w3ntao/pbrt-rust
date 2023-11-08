@@ -17,19 +17,21 @@ struct Cli {
 fn render(file_path: &str, spp: usize) {
     let start = Instant::now();
 
-    let srgb_table = RGBtoSpectrumTable::new("sRGB");
-    let srgb_color_space = RGBColorSpace::new(
+    let srgb_to_spectrum_table = RGBtoSpectrumTable::new("sRGB");
+    let srgb_color_space: RGBColorSpace = RGBColorSpace::new(
         Point2f::new(0.64, 0.33),
         Point2f::new(0.3, 0.6),
         Point2f::new(0.15, 0.06),
         get_named_spectrum("stdillum-D65"),
-        srgb_table,
+        srgb_to_spectrum_table,
     );
 
-    let global_variable = GlobalVariable { srgb_color_space };
+    let global_variable = Arc::new(GlobalVariable {
+        rgb_color_space: Arc::new(srgb_color_space),
+    });
 
-    let mut builder = SceneBuilder::default();
-    let mut scene_config = builder.parse_scene(file_path, &global_variable);
+    let mut builder = SceneBuilder::new(global_variable.clone());
+    let mut scene_config = builder.parse_scene(file_path);
     let preprocessing_finished = Instant::now();
 
     let cpu_num = num_cpus::get();
