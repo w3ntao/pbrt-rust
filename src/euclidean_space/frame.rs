@@ -10,7 +10,15 @@ impl Frame {
     pub fn from_z(z: Vector3f) -> Self {
         let (x, y) = z.coordinate_system();
 
-        return Frame { x, y, z };
+        return Self { x, y, z };
+    }
+
+    pub fn from_xz(x: Vector3f, z: Vector3f) -> Self {
+        return Self {
+            x,
+            y: z.cross(x),
+            z,
+        };
     }
 
     pub fn from_local(&self, v: Vector3f) -> Vector3f {

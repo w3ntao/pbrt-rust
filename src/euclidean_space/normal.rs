@@ -12,6 +12,23 @@ impl Normal3f {
         return Self { x, y, z };
     }
 
+    pub fn nan() -> Self {
+        return Self {
+            x: Float::NAN,
+            y: Float::NAN,
+            z: Float::NAN,
+        };
+    }
+
+    pub fn normalize(&self) -> Normal3f {
+        let length = (sqr(self.x) + sqr(self.y) + sqr(self.z)).sqrt();
+        return Normal3f {
+            x: self.x / length,
+            y: self.y / length,
+            z: self.z / length,
+        };
+    }
+
     pub fn dot(&self, v: Vector3f) -> Float {
         return self.x * v.x + self.y * v.y + self.z * v.z;
     }

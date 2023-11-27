@@ -10,7 +10,7 @@ impl AmbientOcclusion {
     pub fn new(illuminant_spectrum: &'static dyn Spectrum, aggregate: Arc<dyn Primitive>) -> Self {
         let illuminant_scale = 1.0 / illuminant_spectrum.to_photometric();
 
-        return AmbientOcclusion {
+        return Self {
             illuminant_spectrum,
             illuminant_scale,
             aggregate,

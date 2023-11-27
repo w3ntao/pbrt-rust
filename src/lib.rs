@@ -21,5 +21,6 @@ mod shapes;
 mod spectra;
 mod textures;
 mod util;
+mod materials;
 
 pub use pbrt::*;

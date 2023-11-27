@@ -339,15 +339,37 @@ impl Transform {
         return (SimpleRay::new(Point3f::from(offset_o), d), dt);
     }
 
-    pub fn on_surface_interaction(
-        &self,
-        surface_interaction: SurfaceInteraction,
-    ) -> SurfaceInteraction {
-        let pi = self.on_point3fi(surface_interaction.pi);
-        let n = self.on_normal3f(surface_interaction.n);
-        let wo = self.on_vector3f(surface_interaction.wo).normalize();
+    pub fn on_shading(&self, shading: Shading) -> Shading {
+        return Shading {
+            n: self.on_normal3f(shading.n).normalize(),
+            dpdu: self.on_vector3f(shading.dpdu),
+            dpdv: self.on_vector3f(shading.dpdv),
+            dndu: self.on_vector3f(shading.dndu),
+            dndv: self.on_vector3f(shading.dndv),
+        };
+    }
 
-        return SurfaceInteraction { pi, n, wo };
+    pub fn on_surface_interaction(&self, si: SurfaceInteraction) -> SurfaceInteraction {
+        let mut shading = self.on_shading(si.shading);
+        shading.n = shading.n.face_forward(Vector3::from(si.n));
+
+        return SurfaceInteraction {
+            pi: self.on_point3fi(si.pi),
+            n: self.on_normal3f(si.n),
+            wo: self.on_vector3f(si.wo).normalize(),
+            uv: si.uv,
+            dpdx: self.on_vector3f(si.dpdx),
+            dpdy: self.on_vector3f(si.dpdy),
+            dpdu: self.on_vector3f(si.dpdu),
+            dpdv: self.on_vector3f(si.dpdv),
+            dndu: self.on_normal3f(si.dndu),
+            dndv: self.on_normal3f(si.dndv),
+            dudx: si.dudx,
+            dvdx: si.dvdx,
+            dudy: si.dudy,
+            dvdy: si.dvdy,
+            shading,
+        };
     }
 }
 

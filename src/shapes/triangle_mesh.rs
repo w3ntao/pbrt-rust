@@ -20,14 +20,13 @@ impl TriangleMesh {
         let (transformed_points, transformed_normals) = if render_from_object.is_identity() {
             (points, normals)
         } else {
-            // TODO: change all `into_iter` into `into_par_iter` and test
             (
                 points
-                    .into_iter()
+                    .into_par_iter()
                     .map(|x| render_from_object.on_point3f(x))
                     .collect(),
                 normals
-                    .into_iter()
+                    .into_par_iter()
                     .map(|x| render_from_object.on_normal3f(x))
                     .collect(),
             )

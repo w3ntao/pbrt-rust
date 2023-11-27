@@ -36,10 +36,6 @@ pub fn sample_visible_wavelengths(u: Float) -> Float {
     return 538.0 - 138.888889 * (0.85691062 - 1.82750197 * u).atanh();
 }
 
-const fn sqr(x: Float) -> Float {
-    return x * x;
-}
-
 pub fn visible_wavelengths_pdf(lambda: Float) -> Float {
     if lambda < 360.0 || lambda > 830.0 {
         return 0.0;

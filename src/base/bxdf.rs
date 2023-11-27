@@ -77,6 +77,7 @@ pub trait BxDF {
     ) -> Option<BSDFSample>;
 
     fn pdf(
+        &self,
         wo: Vector3f,
         wi: Vector3f,
         mode: TransportMode,

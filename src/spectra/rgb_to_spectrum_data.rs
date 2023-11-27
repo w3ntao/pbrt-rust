@@ -408,10 +408,6 @@ fn gauss_newton(table: &Table, rgb: &[f64; 3], coefficients: &mut [f64; 3]) {
     }
 }
 
-const fn sqr(x: f64) -> f64 {
-    return x * x;
-}
-
 fn single_thread_iterate(
     spectrum_table_data: &mut Arc<Mutex<SpectrumTableData>>,
     job_list: &mut Arc<Mutex<Vec<(usize, usize)>>>,

@@ -44,10 +44,6 @@ impl Spectrum for DenselySampledSpectrum {
     }
 }
 
-fn sqr(x: Float) -> Float {
-    return x * x;
-}
-
 impl DenselySampledSpectrum {
     pub const fn from_const_spectrum<const K: usize>(
         spectrum: &ConstPieceWiseLinearSpectrum<K>,

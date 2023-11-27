@@ -1,9 +1,44 @@
 use crate::pbrt::*;
 
+pub struct Shading {
+    pub n: Normal3f,
+    pub dpdu: Vector3f,
+    pub dpdv: Vector3f,
+    pub dndu: Vector3f,
+    pub dndv: Vector3f,
+}
+
+impl Shading {
+    pub fn nan() -> Self {
+        return Self {
+            n: Normal3f::nan(),
+            dpdu: Vector3::nan(),
+            dpdv: Vector3::nan(),
+            dndu: Vector3::nan(),
+            dndv: Vector3::nan(),
+        };
+    }
+}
+
 pub struct SurfaceInteraction {
     pub pi: Point3fi,
     pub n: Normal3f,
+    pub uv: Point2f,
     pub wo: Vector3f,
+
+    pub dpdx: Vector3f,
+    pub dpdy: Vector3f,
+    pub dpdu: Vector3f,
+    pub dpdv: Vector3f,
+
+    pub dndu: Normal3f,
+    pub dndv: Normal3f,
+    pub dudx: Float,
+    pub dvdx: Float,
+    pub dudy: Float,
+    pub dvdy: Float,
+
+    pub shading: Shading,
 }
 
 pub fn offset_ray_origin(pi: Point3fi, n: Normal3f, w: Vector3f) -> Point3f {
@@ -26,6 +61,34 @@ pub fn offset_ray_origin(pi: Point3fi, n: Normal3f, w: Vector3f) -> Point3f {
 }
 
 impl SurfaceInteraction {
+    pub fn new(
+        pi: Point3fi,
+        uv: Point2f,
+        wo: Vector3f,
+        dpdu: Vector3f,
+        dpdv: Vector3f,
+        dndu: Normal3f,
+        dndv: Normal3f,
+    ) -> Self {
+        return Self {
+            pi,
+            n: Normal3f::from(dpdu.cross(dpdv).normalize()),
+            uv,
+            wo: wo.normalize(),
+            dpdx: Vector3::nan(),
+            dpdy: Vector3::nan(),
+            dpdu,
+            dpdv,
+            dndu,
+            dndv,
+            dudx: 0.0,
+            dvdx: 0.0,
+            dudy: 0.0,
+            dvdy: 0.0,
+            shading: Shading::nan(),
+        };
+    }
+
     pub fn offset_ray_origin(&self, w: Vector3f) -> Point3f {
         return offset_ray_origin(self.pi, self.n, w);
     }

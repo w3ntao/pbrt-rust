@@ -60,6 +60,7 @@ impl BxDF for DiffuseBxDF {
     }
 
     fn pdf(
+        &self,
         wo: Vector3f,
         wi: Vector3f,
         mode: TransportMode,

@@ -1,5 +1,4 @@
 use crate::pbrt::*;
-use std::ffi::c_float;
 
 pub const PI: Float = std::f64::consts::PI as Float;
 
@@ -58,9 +57,26 @@ pub fn evaluate_polynomial(t: Float, args: &[Float]) -> Float {
 
 pub fn difference_of_products(a: Float, b: Float, c: Float, d: Float) -> Float {
     let cd = c * d;
-    let difference_of_products = fma(a, b, -cd);
+    let difference_of_prod = fma(a, b, -cd);
     let error = fma(-c, d, cd);
-    return difference_of_products + error;
+
+    return difference_of_prod + error;
+}
+
+fn fma_f_v3_v3(a: Float, b: Vector3f, c: Vector3f) -> Vector3f {
+    return Vector3f {
+        x: fma(a, b.x, c.x),
+        y: fma(a, b.y, c.y),
+        z: fma(a, b.z, c.z),
+    };
+}
+
+pub fn difference_of_products_vec3(a: Float, b: Vector3f, c: Float, d: Vector3f) -> Vector3f {
+    let cd = c * d;
+    let difference_of_prod = fma_f_v3_v3(a, b, -cd);
+    let error = fma_f_v3_v3(-c, d, cd);
+
+    return difference_of_prod + error;
 }
 
 pub const fn is_power_of_2(v: i32) -> bool {
@@ -76,6 +92,21 @@ pub const fn round_up_pow_2(v: i32) -> i32 {
     x |= x >> 16;
 
     return x + 1;
+}
+
+pub fn safe_acos(x: Float) -> Float {
+    debug_assert!(x >= -1.0001 && x <= 1.0001);
+
+    return clamp_float(x, -1.0, 1.0).acos();
+}
+
+pub fn sqr<T: Mul<Output = T> + Copy>(x: T) -> T {
+    return x * x;
+}
+
+pub fn safe_sqrt(x: Float) -> Float {
+    debug_assert!(x >= -1e-3);
+    return x.max(0.0).sqrt();
 }
 
 // http://www.plunk.org/~hatch/rightway.html

@@ -12,14 +12,14 @@ pub fn json_value_to_floats(value: Value) -> Vec<Float> {
     return value
         .as_array()
         .unwrap()
-        .into_iter()
+        .into_par_iter()
         .map(|x| json_value_to_string(x.clone()).parse::<Float>().unwrap())
         .collect();
 }
 
 pub fn json_values_to_floats(values: &[Value]) -> Vec<Float> {
     return values
-        .into_iter()
+        .into_par_iter()
         .map(|v| json_value_to_string(v.clone()).parse::<Float>().unwrap())
         .collect();
 }

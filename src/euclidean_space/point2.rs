@@ -74,6 +74,17 @@ impl<T: Add<Output = T>> Add<Vector2<T>> for Point2<T> {
     }
 }
 
+impl<T: Sub<Output = T>> Sub<Point2<T>> for Point2<T> {
+    type Output = Vector2<T>;
+
+    fn sub(self, rhs: Point2<T>) -> Self::Output {
+        return Vector2::<T> {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+        };
+    }
+}
+
 impl<T: Sub<Output = T>> Sub<Vector2<T>> for Point2<T> {
     type Output = Point2<T>;
 

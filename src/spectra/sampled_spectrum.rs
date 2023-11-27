@@ -13,11 +13,11 @@ impl SampledSpectrum {
     }
 
     pub fn is_positive(&self) -> bool {
-        return self.values.into_iter().any(|x| x > 0.0);
+        return self.values.into_par_iter().any(|x| x > 0.0);
     }
 
     pub fn new(values: [Float; NUM_SPECTRUM_SAMPLES]) -> Self {
-        debug_assert!(values.into_iter().all(|x| x >= 0.0));
+        debug_assert!(values.into_par_iter().all(|x| x >= 0.0));
         return Self { values };
     }
 

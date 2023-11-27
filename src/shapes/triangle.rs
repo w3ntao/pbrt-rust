@@ -156,23 +156,58 @@ impl Triangle {
 
     fn build_interaction(&self, ti: &TriangleIntersection, wo: Vector3f) -> SurfaceInteraction {
         let (p0, p1, p2) = self.get_points();
+
+        // Compute triangle partial derivatives
+        // Compute deltas and matrix determinant for triangle partial derivatives
+        // Get triangle texture coordinates in _uv_ array
+        let uv = [
+            Point2f::new(0.0, 0.0),
+            Point2f::new(1.0, 0.0),
+            Point2f::new(1.0, 1.0),
+        ];
+
+        let duv02 = uv[0] - uv[2];
+        let duv12 = uv[1] - uv[2];
+
         let dp02 = p0 - p2;
         let dp12 = p1 - p2;
 
+        let determinant = difference_of_products(duv02.x, duv12.y, duv02.y, duv12.x);
+
+        let degenerate_uv = determinant.abs() < 1e-9;
+        let (dpdu, dpdv) = if !degenerate_uv {
+            // Compute triangle $\dpdu$ and $\dpdv$ via matrix inversion
+            let inv_det = 1.0 / determinant;
+            let dpdu = difference_of_products_vec3(duv12.y, dp02, duv02.y, dp12) * inv_det;
+            let dpdv = difference_of_products_vec3(duv02.x, dp12, duv12.y, dp02) * inv_det;
+
+            (dpdu, dpdv)
+        } else {
+            panic!("degenerate_uv is not implemented");
+        };
+
         // Interpolate $(u,v)$ parametric coordinates and hit point
         let p_hit = ti.b0 * p0 + ti.b1 * p1 + ti.b2 * p2;
-        let p_abs_sum = (ti.b0 * p0).abs() + (ti.b1 * p1).abs() + (ti.b2 * p2).abs();
+        let uv_hit = ti.b0 * uv[0] + ti.b1 * uv[1] + ti.b2 * uv[2];
 
+        // Compute error bounds _pError_ for triangle intersection
+        let p_abs_sum = (ti.b0 * p0).abs() + (ti.b1 * p1).abs() + (ti.b2 * p2).abs();
         let p_error = gamma(7) * Vector3f::from(p_abs_sum);
 
-        let n = Normal3f::from(dp02.cross(dp12).normalize());
-        // TODO: flip n with `reverseOrientation` and transformSwapsHandedness?
-
-        return SurfaceInteraction {
-            pi: Point3fi::from_value_and_error(p_hit, p_error),
-            n,
+        let mut isect = SurfaceInteraction::new(
+            Point3fi::from_value_and_error(p_hit, p_error),
+            uv_hit,
             wo,
-        };
+            dpdu,
+            dpdv,
+            Normal3f::nan(),
+            Normal3f::nan(),
+        );
+
+        isect.n = Normal3f::from(dp02.cross(dp12).normalize());
+        isect.shading.n = isect.n;
+
+        return isect;
     }
 }
 

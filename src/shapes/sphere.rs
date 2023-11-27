@@ -150,25 +150,75 @@ impl Sphere {
         });
     }
 
-    fn build_interaction(
+    fn interaction_from_intersection(
         &self,
-        quadric_intersection: &QuadricIntersection,
+        isect: &QuadricIntersection,
         wo: Vector3f,
     ) -> SurfaceInteraction {
-        let p_hit = quadric_intersection.p_obj;
+        let p_hit = isect.p_obj;
+        let phi = isect.phi;
+        // Find parametric representation of sphere hit
+
+        let u = phi / self.phi_max;
+        let cos_theta = p_hit.z / self.radius;
+        let theta = safe_acos(cos_theta);
+        let v = (theta - self.theta_z_min) / (self.theta_z_max - self.theta_z_min);
+
+        // Compute sphere $\dpdu$ and $\dpdv$
+        let z_radius = (sqr(p_hit.x) + sqr(p_hit.y)).sqrt();
+        let cos_phi = p_hit.x / z_radius;
+        let sin_phi = p_hit.y / z_radius;
+
+        let dpdu = Vector3f::new(-self.phi_max * p_hit.y, self.phi_max * p_hit.x, 0.0);
+        let sin_theta = safe_sqrt(1.0 - sqr(cos_theta));
+        let dpdv = (self.theta_z_max - self.theta_z_min)
+            * Vector3f::new(
+                p_hit.z * cos_phi,
+                p_hit.z * sin_phi,
+                -self.radius * sin_theta,
+            );
+
+        // Compute sphere $\dndu$ and $\dndv$
+        let d2Pduu = -sqr(self.phi_max) * Vector3f::new(p_hit.x, p_hit.y, 0.0);
+        let d2Pduv = (self.theta_z_max - self.theta_z_min)
+            * p_hit.z
+            * self.phi_max
+            * Vector3f::new(-sin_phi, cos_phi, 0.0);
+        let d2Pdvv = -sqr(self.theta_z_max - self.theta_z_min) * Vector3f::from(p_hit);
+        // Compute coefficients for fundamental forms
+
+        let E = dpdu.dot(dpdu);
+        let F = dpdu.dot(dpdv);
+        let G = dpdv.dot(dpdv);
+        let n = dpdu.cross(dpdv).normalize();
+        let e = n.dot(d2Pduu);
+        let f = n.dot(d2Pduv);
+        let g = n.dot(d2Pdvv);
+
+        // Compute $\dndu$ and $\dndv$ from fundamental form coefficients
+        let EGF2 = difference_of_products(E, G, F, F);
+        let invEGF2 = if EGF2 == 0.0 { 0.0 } else { 1.0 / EGF2 };
+
+        let dndu =
+            Normal3f::from((f * F - e * G) * invEGF2 * dpdu + (e * F - f * E) * invEGF2 * dpdv);
+        let dndv =
+            Normal3f::from((g * F - f * G) * invEGF2 * dpdu + (f * F - g * E) * invEGF2 * dpdv);
+
+        // Compute error bounds for sphere intersection
         let p_error = gamma(5) * Vector3f::from(p_hit).abs();
 
-        let n = Normal3f::from(Vector3f::from(p_hit).normalize());
-
-        let local_interaction = SurfaceInteraction {
-            pi: Point3fi::from_value_and_error(p_hit, p_error),
-            n,
-            wo,
-        };
-
+        let wo_object = self.object_from_render.on_vector3f(wo);
         return self
-            .render_from_object
-            .on_surface_interaction(local_interaction);
+            .object_from_render
+            .on_surface_interaction(SurfaceInteraction::new(
+                Point3fi::from_value_and_error(p_hit, p_error),
+                Point2f::new(u, v),
+                wo_object,
+                dpdu,
+                dpdv,
+                dndu,
+                dndv,
+            ));
     }
 }
 
@@ -177,7 +227,8 @@ impl Shape for Sphere {
         return match self.basic_intersect(ray, t_max) {
             None => None,
             Some(quadric_intersection) => {
-                let interaction = self.build_interaction(&quadric_intersection, -ray.get_d());
+                let interaction =
+                    self.interaction_from_intersection(&quadric_intersection, -ray.get_d());
 
                 Some(ShapeIntersection {
                     t_hit: quadric_intersection.t_hit,

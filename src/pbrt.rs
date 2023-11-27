@@ -31,11 +31,12 @@ pub use std::{
     time::Instant,
 };
 
+pub use crate::base::bsdf::*;
 pub use crate::{
     accelerator::bvh::*,
     base::{
-        bxdf::*, camera::*, film::*, filter::*, integrator::*, primitive::*, ray::*, sampler::*,
-        shape::*, spectrum::*, texture::*,
+        bxdf::*, camera::*, film::*, filter::*, integrator::*, material::*, primitive::*, ray::*,
+        sampler::*, shape::*, spectrum::*, texture::*,
     },
     bxdfs::diffuse_bxdf::*,
     cameras::perspective::*,
@@ -46,6 +47,7 @@ pub use crate::{
     films::{pixel_sensor::*, rgb_film::*},
     filters::box_filter::*,
     integrators::{ambient_occlusion::*, surface_normal::*},
+    materials::diffuse_material::*,
     primitives::simple_primitive::*,
     samplers::independent::*,
     scene::{parameter_dict::*, renderer::*, scene_builder::*, util::*},

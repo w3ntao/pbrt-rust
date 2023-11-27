@@ -66,7 +66,7 @@ fn resample_weights(old_resolution: usize, new_resolution: usize) -> Vec<Resampl
         }
 
         // Normalize filter weights for pixel resampling
-        let inv_sum_weights = 1.0 / (wt[i].weight.into_iter().sum::<Float>());
+        let inv_sum_weights = 1.0 / (wt[i].weight.into_par_iter().sum::<Float>());
         wt[i].weight = wt[i].weight.map(|x| x * inv_sum_weights);
     }
 

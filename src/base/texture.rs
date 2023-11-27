@@ -10,7 +10,22 @@ pub struct TextureEvalContext {
     pub dudy: Float,
     pub dvdx: Float,
     pub dvdy: Float,
-    pub face_index: usize,
+}
+
+impl TextureEvalContext {
+    pub fn new(si: &SurfaceInteraction) -> Self {
+        return Self {
+            p: Point3f::from(si.pi),
+            dpdx: si.dpdx,
+            dpdy: si.dpdy,
+            n: si.n,
+            uv: si.uv,
+            dudx: 0.0,
+            dudy: 0.0,
+            dvdx: 0.0,
+            dvdy: 0.0,
+        };
+    }
 }
 
 pub struct ImageTextureBase {
@@ -55,7 +70,6 @@ pub fn create_spectrum_texture(
     texture_type: &str,
     render_from_texture: &Transform,
     parameters: &ParameterDict,
-    named_texture: &HashMap<String, Arc<dyn SpectrumTexture>>,
     global_variable: &GlobalVariable,
 ) -> Arc<dyn SpectrumTexture> {
     return match texture_type {
@@ -65,14 +79,7 @@ pub fn create_spectrum_texture(
             global_variable,
         )),
         "scale" => {
-            let texture_id = parameters.get_string("tex", None);
-
-            let spectrum_texture = match named_texture.get(&texture_id) {
-                None => {
-                    panic!("texture `{}` not found", texture_id);
-                }
-                Some(_texture) => _texture.clone(),
-            };
+            let spectrum_texture = parameters.get_texture("tex");
 
             let scale = parameters.get_one_float("scale", Some(1.0));
 

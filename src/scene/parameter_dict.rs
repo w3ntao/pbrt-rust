@@ -7,6 +7,8 @@ pub struct ParameterDict {
     point2s: HashMap<String, Vec<Point2f>>,
     point3s: HashMap<String, Vec<Point3f>>,
     normal3s: HashMap<String, Vec<Normal3f>>,
+    rgbs: HashMap<String, RGB>,
+    textures: HashMap<String, Arc<dyn SpectrumTexture>>,
     bools: HashMap<String, Vec<bool>>,
 }
 
@@ -19,6 +21,8 @@ impl Default for ParameterDict {
             point2s: HashMap::new(),
             point3s: HashMap::new(),
             normal3s: HashMap::new(),
+            rgbs: HashMap::new(),
+            textures: HashMap::new(),
             bools: HashMap::new(),
         };
     }
@@ -33,6 +37,8 @@ impl Clone for ParameterDict {
             point2s: self.point2s.clone(),
             point3s: self.point3s.clone(),
             normal3s: self.normal3s.clone(),
+            rgbs: self.rgbs.clone(),
+            textures: self.textures.clone(),
             bools: self.bools.clone(),
         };
     }
@@ -54,7 +60,7 @@ pub fn fetch_variable_value(value: &Value) -> Vec<String> {
         Some(value_vector) => {
             // if it's a vec of string
             value_vector
-                .into_iter()
+                .into_par_iter()
                 .map(|v| json_value_to_string(v.clone()))
                 .collect()
         }
@@ -110,7 +116,11 @@ fn get_array<T: Copy>(key: &str, dict: &HashMap<String, Vec<T>>) -> Vec<T> {
 }
 
 impl ParameterDict {
-    pub fn build_parameter_dict(array: &[Value], dir_path: Option<String>) -> ParameterDict {
+    pub fn build_parameter_dict(
+        array: &[Value],
+        named_texture: &HashMap<String, Arc<dyn SpectrumTexture>>,
+        dir_path: Option<String>,
+    ) -> ParameterDict {
         // TODO: move this function into scene_builder to directly fetch current_folder and named_textures
         let mut integers = HashMap::<String, Vec<i32>>::new();
         let mut floats = HashMap::<String, Vec<Float>>::new();
@@ -118,6 +128,8 @@ impl ParameterDict {
         let mut point2s = HashMap::<String, Vec<Point2f>>::new();
         let mut point3s = HashMap::<String, Vec<Point3f>>::new();
         let mut normal3s = HashMap::<String, Vec<Normal3f>>::new();
+        let mut rgbs = HashMap::<String, RGB>::new();
+        let mut textures = HashMap::<String, Arc<dyn SpectrumTexture>>::new();
         let mut bools = HashMap::<String, Vec<bool>>::new();
 
         for idx in (0..array.len()).step_by(2) {
@@ -185,9 +197,28 @@ impl ParameterDict {
                     normal3s.insert(variable_name, normal_set);
                 }
 
+                "rgb" => {
+                    let float_numbers = convert_string::<Float>(&variable_values);
+                    assert_eq!(float_numbers.len(), 3);
+
+                    rgbs.insert(
+                        variable_name,
+                        RGB::new(float_numbers[0], float_numbers[1], float_numbers[2]),
+                    );
+                }
+
                 "texture" => {
                     assert_eq!(variable_values.len(), 1);
-                    strings.insert(variable_name, variable_values[0].clone());
+                    let texture_id = variable_values[0].clone();
+
+                    let texture = match named_texture.get(&texture_id) {
+                        None => {
+                            panic!("texture not found: `{}`", texture_id);
+                        }
+                        Some(_texture) => _texture.clone(),
+                    };
+
+                    textures.insert(variable_name, texture);
                 }
 
                 _ => {
@@ -203,26 +234,8 @@ impl ParameterDict {
             point2s,
             point3s,
             normal3s,
-            bools,
-        };
-    }
-
-    pub fn new(
-        integers: HashMap<String, Vec<i32>>,
-        floats: HashMap<String, Vec<Float>>,
-        strings: HashMap<String, String>,
-        point2s: HashMap<String, Vec<Point2f>>,
-        point3s: HashMap<String, Vec<Point3f>>,
-        normal3s: HashMap<String, Vec<Normal3f>>,
-        bools: HashMap<String, Vec<bool>>,
-    ) -> Self {
-        return Self {
-            integers,
-            floats,
-            strings,
-            point2s,
-            point3s,
-            normal3s,
+            rgbs,
+            textures,
             bools,
         };
     }
@@ -261,6 +274,14 @@ impl ParameterDict {
         };
     }
 
+    pub fn get_texture(&self, key: &str) -> Arc<dyn SpectrumTexture> {
+        return match self.textures.get(key) {
+            Some(val) => val.clone(),
+            _ => {
+                panic!("found no key with name `{}`", key);
+            }
+        };
+    }
     pub fn get_one_float(&self, key: &str, default: Option<Float>) -> Float {
         return get_one_val(key, default, &self.floats);
     }
@@ -327,6 +348,14 @@ impl Display for ParameterDict {
 
         write!(f, "normal3s: {}\n", self.normal3s.len()).unwrap();
         display_multi_value_dict(&self.normal3s);
+
+        write!(f, "rgbs: {}\n", self.rgbs.len()).unwrap();
+        display_single_value_dict(&self.rgbs);
+
+        write!(f, "textures: {}\n", self.textures.len()).unwrap();
+        for key in self.textures.keys() {
+            println!("    {}", key);
+        }
 
         write!(f, "bools: {}\n", self.bools.len()).unwrap();
         display_multi_value_dict(&self.bools);

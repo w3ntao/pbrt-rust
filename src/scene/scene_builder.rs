@@ -136,8 +136,9 @@ pub struct SceneBuilder {
     film_entity: SceneEntity,
     camera_entity: SceneEntity,
 
-    root: Option<String>,
+    current_material: Option<Arc<dyn Material>>,
 
+    root: Option<String>,
     global_variable: Arc<GlobalVariable>,
 }
 
@@ -155,6 +156,7 @@ impl SceneBuilder {
 
             film_entity: SceneEntity::default(),
             camera_entity: SceneEntity::default(),
+            current_material: None,
 
             root: None,
             global_variable,
@@ -207,24 +209,15 @@ impl SceneBuilder {
             self.graphics_state.current_transform * transform_look_at;
     }
 
-    fn parse_film(&mut self, tokens: &Vec<Value>) {
-        assert_eq!(json_value_to_string(tokens[0].clone()), "Film");
-
-        self.film_entity.initialized = true;
-        self.film_entity.name = json_value_to_string(tokens[1].clone());
-        if self.film_entity.name != "rgb" {
-            println!("warning: only `rgb` film is supported for the moment.");
-            self.film_entity.name = "rgb".to_string();
-        }
-
-        self.film_entity.parameters = ParameterDict::build_parameter_dict(&tokens[2..], None);
-    }
-
     fn parse_camera(&mut self, tokens: &Vec<Value>) {
         assert_eq!(json_value_to_string(tokens[0].clone()), "Camera");
 
         let name = json_value_to_string(tokens[1].clone());
-        let parameter_dict = ParameterDict::build_parameter_dict(&tokens[2..], self.root.clone());
+        let parameter_dict = ParameterDict::build_parameter_dict(
+            &tokens[2..],
+            &self.named_texture,
+            self.root.clone(),
+        );
 
         let camera_from_world = self.graphics_state.current_transform;
         let world_from_camera = camera_from_world.inverse();
@@ -241,6 +234,35 @@ impl SceneBuilder {
         self.camera_entity.name = name;
         self.camera_entity.camera_transform = camera_transform;
         self.camera_entity.parameters = parameter_dict;
+    }
+
+    fn parse_film(&mut self, tokens: &Vec<Value>) {
+        assert_eq!(json_value_to_string(tokens[0].clone()), "Film");
+
+        self.film_entity.initialized = true;
+        self.film_entity.name = json_value_to_string(tokens[1].clone());
+        if self.film_entity.name != "rgb" {
+            println!("warning: only `rgb` film is supported for the moment.");
+            self.film_entity.name = "rgb".to_string();
+        }
+
+        self.film_entity.parameters =
+            ParameterDict::build_parameter_dict(&tokens[2..], &self.named_texture, None);
+    }
+    fn parse_material(&mut self, tokens: &Vec<Value>) {
+        assert_eq!(json_value_to_string(tokens[0].clone()), "Material");
+
+        let parameter_dict = ParameterDict::build_parameter_dict(
+            &tokens[2..],
+            &self.named_texture,
+            self.root.clone(),
+        );
+
+        let material_type = json_value_to_string(tokens[1].clone());
+
+        self.current_material = Some(create_material(&material_type, &parameter_dict));
+
+        println!("duang duang");
     }
 
     fn parse_rotate(&mut self, tokens: &Vec<Value>) {
@@ -268,7 +290,11 @@ impl SceneBuilder {
     fn parse_shape(&mut self, tokens: &Vec<Value>) {
         assert_eq!(json_value_to_string(tokens[0].clone()), "Shape");
 
-        let parameters = ParameterDict::build_parameter_dict(&tokens[2..], self.root.clone());
+        let parameters = ParameterDict::build_parameter_dict(
+            &tokens[2..],
+            &self.named_texture,
+            self.root.clone(),
+        );
 
         let render_from_object = self.render_from_object();
         let object_from_render = render_from_object.inverse();
@@ -284,7 +310,7 @@ impl SceneBuilder {
             "loopsubdiv" => {
                 let levels = parameters.get_one_integer("levels", Some(3)) as usize;
                 let indices_i32 = parameters.get_integer_array("indices");
-                let indices = indices_i32.into_iter().map(|x| x as usize).collect();
+                let indices = indices_i32.into_par_iter().map(|x| x as usize).collect();
 
                 let points = parameters.get_point3_array("P");
 
@@ -325,7 +351,7 @@ impl SceneBuilder {
                 let mesh = TriangleMesh::new(
                     &render_from_object,
                     points,
-                    indices.into_iter().map(|x| x as usize).collect(),
+                    indices.into_par_iter().map(|x| x as usize).collect(),
                     normals,
                 );
 
@@ -371,15 +397,17 @@ impl SceneBuilder {
 
         match color_type.as_str() {
             "spectrum" => {
-                let parameter_dict =
-                    ParameterDict::build_parameter_dict(&tokens[4..], self.root.clone());
+                let parameter_dict = ParameterDict::build_parameter_dict(
+                    &tokens[4..],
+                    &self.named_texture,
+                    self.root.clone(),
+                );
 
                 //TODO: SpectrumType is missing in creating SpectrumTexture
                 let texture = create_spectrum_texture(
                     &texture_type,
                     &self.render_from_object(),
                     &parameter_dict,
-                    &self.named_texture,
                     self.global_variable.as_ref(),
                 );
 
@@ -514,8 +542,7 @@ impl SceneBuilder {
                 }
 
                 "Material" => {
-                    // TODO: progress 2023/11/26 should work on Material now
-                    panic!("wentao is working on building Material");
+                    self.parse_material(tokens);
                 }
 
                 "MakeNamedMaterial" => {
