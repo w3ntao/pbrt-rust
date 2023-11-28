@@ -32,14 +32,14 @@ impl RandomWalkIntegrator {
 impl Integrator for RandomWalkIntegrator {
     fn li(
         &self,
-        ray: &dyn Ray,
+        ray: &Ray,
         lambda: SampledWavelengths,
         sampler: &mut dyn Sampler,
     ) -> SampledSpectrum {
         unreachable!();
     }
 
-    fn fast_intersect(&self, ray: &dyn Ray, t_max: Float) -> bool {
+    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool {
         unreachable!();
     }
 }

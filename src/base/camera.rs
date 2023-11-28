@@ -70,7 +70,7 @@ impl CameraSample {
 }
 
 pub struct CameraRay {
-    pub ray: SimpleRay,
+    pub ray: Ray,
     pub weight: SampledSpectrum,
 }
 

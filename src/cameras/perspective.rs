@@ -78,16 +78,13 @@ impl Camera for PerspectiveCamera {
         let p_film = Point3f::new(sample.p_film.x, sample.p_film.y, 0.0);
         let p_camera = self.camera_from_raster.on_point3f(p_film);
 
-        let ray = SimpleRay::new(
+        let ray = Ray::new(
             Point3f::new(0.0, 0.0, 0.0),
             Vector3f::from(p_camera).normalize(),
         );
 
         if self.lens_radius == 0.0 {
-            let (transformed_ray, _) = self
-                .camera_transform
-                .render_from_camera
-                .on_ray(ray.to_simple_ray());
+            let (transformed_ray, _) = self.camera_transform.render_from_camera.on_ray(ray);
 
             return CameraRay {
                 ray: transformed_ray,

@@ -23,12 +23,12 @@ pub trait Integrator: Send + Sync {
 
     fn li(
         &self,
-        ray: &dyn Ray,
+        ray: &Ray,
         lambda: SampledWavelengths,
         sampler: &mut dyn Sampler,
     ) -> SampledSpectrum;
 
-    fn fast_intersect(&self, ray: &dyn Ray, t_max: Float) -> bool {
+    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool {
         panic!("not implemented");
     }
 }

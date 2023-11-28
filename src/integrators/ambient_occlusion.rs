@@ -21,7 +21,7 @@ impl AmbientOcclusion {
 impl Integrator for AmbientOcclusion {
     fn li(
         &self,
-        ray: &dyn Ray,
+        ray: &Ray,
         lambda: SampledWavelengths,
         sampler: &mut dyn Sampler,
     ) -> SampledSpectrum {
@@ -35,7 +35,7 @@ impl Integrator for AmbientOcclusion {
 
         let isect = si.interaction;
 
-        let n = isect.n.face_forward(-ray.get_d());
+        let n = isect.n.face_forward(-ray.d);
         let u = sampler.get_2d();
 
         let local_wi = sample_cosine_hemisphere(u);
@@ -50,7 +50,7 @@ impl Integrator for AmbientOcclusion {
 
         // Divide by pi so that fully visible is one.
         let differential_ray = isect.spawn_ray(wi);
-        if !self.fast_intersect(&differential_ray, Float::INFINITY) {
+        if !self.fast_intersect(&differential_ray.ray, Float::INFINITY) {
             return self.illuminant_spectrum.sample(&lambda)
                 * (self.illuminant_scale * n.dot(wi) / (PI * pdf));
         }
@@ -58,7 +58,7 @@ impl Integrator for AmbientOcclusion {
         return SampledSpectrum::zero();
     }
 
-    fn fast_intersect(&self, ray: &dyn Ray, t_max: Float) -> bool {
+    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool {
         return self.aggregate.fast_intersect(ray, t_max);
     }
 }
