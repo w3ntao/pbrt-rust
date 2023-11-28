@@ -74,6 +74,13 @@ pub struct CameraRay {
     pub weight: SampledSpectrum,
 }
 
+pub struct CameraDifferentialRay {
+    pub ray: DifferentialRay,
+    pub weight: SampledSpectrum,
+}
+
 pub trait Camera: Send + Sync {
     fn generate_camera_ray(&self, sample: CameraSample) -> CameraRay;
+
+    fn generate_camera_differential_ray(&self, sample: CameraSample) -> CameraDifferentialRay;
 }

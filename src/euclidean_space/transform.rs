@@ -324,7 +324,7 @@ impl Transform {
         return transformed_bounds;
     }
 
-    pub fn on_ray(&self, r: Ray) -> (Ray, Float) {
+    pub fn on_ray(&self, r: &Ray) -> (Ray, Float) {
         let o = self.on_point3fi(Point3fi::from(r.o));
         let d = self.on_vector3f(r.d);
 
@@ -339,7 +339,23 @@ impl Transform {
         return (Ray::new(Point3f::from(offset_o), d), dt);
     }
 
-    pub fn on_shading(&self, shading: Shading) -> Shading {
+    pub fn on_differential_ray(&self, r: &DifferentialRay) -> (DifferentialRay, Float) {
+        let (transformed_ray, dt) = self.on_ray(&r.ray);
+
+        return (
+            DifferentialRay {
+                ray: transformed_ray,
+                has_differentials: true,
+                rx_origin: self.on_point3f(r.rx_origin),
+                ry_origin: self.on_point3f(r.ry_origin),
+                rx_direction: self.on_vector3f(r.rx_direction),
+                ry_direction: self.on_vector3f(r.ry_direction),
+            },
+            dt,
+        );
+    }
+
+    pub fn on_shading(&self, shading: &Shading) -> Shading {
         return Shading {
             n: self.on_normal3f(shading.n).normalize(),
             dpdu: self.on_vector3f(shading.dpdu),
@@ -350,7 +366,7 @@ impl Transform {
     }
 
     pub fn on_surface_interaction(&self, si: SurfaceInteraction) -> SurfaceInteraction {
-        let mut shading = self.on_shading(si.shading);
+        let mut shading = self.on_shading(&si.shading);
         shading.n = shading.n.face_forward(Vector3::from(si.n));
 
         return SurfaceInteraction {

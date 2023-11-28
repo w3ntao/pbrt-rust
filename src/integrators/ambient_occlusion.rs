@@ -21,12 +21,12 @@ impl AmbientOcclusion {
 impl Integrator for AmbientOcclusion {
     fn li(
         &self,
-        ray: &Ray,
+        ray: &DifferentialRay,
         lambda: SampledWavelengths,
         sampler: &mut dyn Sampler,
     ) -> SampledSpectrum {
         // TODO: this is incomplete, consider BSDF only for now
-        let si = match self.aggregate.intersect(ray, Float::INFINITY) {
+        let si = match self.aggregate.intersect(&ray.ray, Float::INFINITY) {
             None => {
                 return SampledSpectrum::zero();
             }
@@ -35,7 +35,7 @@ impl Integrator for AmbientOcclusion {
 
         let isect = si.interaction;
 
-        let n = isect.n.face_forward(-ray.d);
+        let n = isect.n.face_forward(-ray.ray.d);
         let u = sampler.get_2d();
 
         let local_wi = sample_cosine_hemisphere(u);

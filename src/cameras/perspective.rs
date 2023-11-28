@@ -84,10 +84,51 @@ impl Camera for PerspectiveCamera {
         );
 
         if self.lens_radius == 0.0 {
-            let (transformed_ray, _) = self.camera_transform.render_from_camera.on_ray(ray);
+            let (transformed_ray, _) = self.camera_transform.render_from_camera.on_ray(&ray);
 
             return CameraRay {
                 ray: transformed_ray,
+                weight: SampledSpectrum::new([1.0; NUM_SPECTRUM_SAMPLES]),
+            };
+        }
+
+        //self.lens_radius > 0.0
+        panic!("not implemented");
+    }
+
+    fn generate_camera_differential_ray(&self, sample: CameraSample) -> CameraDifferentialRay {
+        // Compute raster and camera sample positions
+        let p_film = Point3f::new(sample.p_film.x, sample.p_film.y, 0.0);
+        let p_camera = self.camera_from_raster.on_point3f(p_film);
+
+        let ray = Ray::new(
+            Point3f::new(0.0, 0.0, 0.0),
+            Vector3f::from(p_camera).normalize(),
+        );
+
+        if self.lens_radius == 0.0 {
+            let rx_origin = ray.o;
+            let ry_origin = ray.o;
+
+            let rx_direction = (Vector3f::from(p_camera) + self.dx_camera).normalize();
+            let ry_direction = (Vector3f::from(p_camera) + self.dy_camera).normalize();
+
+            let differential_ray = DifferentialRay {
+                ray,
+                has_differentials: true,
+                rx_origin,
+                ry_origin,
+                rx_direction,
+                ry_direction,
+            };
+
+            let (transformed_differential_ray, _) = self
+                .camera_transform
+                .render_from_camera
+                .on_differential_ray(&differential_ray);
+
+            return CameraDifferentialRay {
+                ray: transformed_differential_ray,
                 weight: SampledSpectrum::new([1.0; NUM_SPECTRUM_SAMPLES]),
             };
         }

@@ -6,7 +6,7 @@ pub struct SampledSpectrum {
 }
 
 impl SampledSpectrum {
-    pub fn zero() -> Self {
+    pub const fn zero() -> Self {
         return Self {
             values: [0.0; NUM_SPECTRUM_SAMPLES],
         };

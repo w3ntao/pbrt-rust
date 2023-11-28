@@ -14,7 +14,7 @@ pub trait Integrator: Send + Sync {
 
         let camera_sample = sampler.get_camera_sample(p_pixel.clone(), filter.clone());
 
-        let camera_ray = camera.generate_camera_ray(camera_sample);
+        let camera_ray = camera.generate_camera_differential_ray(camera_sample);
 
         let l = camera_ray.weight * self.li(&camera_ray.ray, lambda, sampler);
 
@@ -23,7 +23,7 @@ pub trait Integrator: Send + Sync {
 
     fn li(
         &self,
-        ray: &Ray,
+        ray: &DifferentialRay,
         lambda: SampledWavelengths,
         sampler: &mut dyn Sampler,
     ) -> SampledSpectrum;

@@ -13,7 +13,7 @@ impl SurfaceNormal {
 impl Integrator for SurfaceNormal {
     fn li(
         &self,
-        camera_ray: &Ray,
+        camera_ray: &DifferentialRay,
         lambda: SampledWavelengths,
         _sampler: &mut dyn Sampler,
     ) -> SampledSpectrum {

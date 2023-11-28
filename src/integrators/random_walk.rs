@@ -32,10 +32,11 @@ impl RandomWalkIntegrator {
 impl Integrator for RandomWalkIntegrator {
     fn li(
         &self,
-        ray: &Ray,
+        ray: &DifferentialRay,
         lambda: SampledWavelengths,
         sampler: &mut dyn Sampler,
     ) -> SampledSpectrum {
+        //TODO: implement RandomWalkIntegrator to test Material and Texture
         unreachable!();
     }
 
