@@ -65,12 +65,20 @@ impl<T: Copy + Add<Output = T> + Mul<Output = T>> Vector3<T> {
     }
 }
 
-impl Vector3<Float> {
+impl Vector3f {
     pub fn nan() -> Self {
         return Self {
             x: Float::NAN,
             y: Float::NAN,
             z: Float::NAN,
+        };
+    }
+
+    pub fn infinity() -> Self {
+        return Self {
+            x: Float::INFINITY,
+            y: Float::INFINITY,
+            z: Float::INFINITY,
         };
     }
 
@@ -159,6 +167,18 @@ impl Vector3<Float> {
     pub fn abs_cos_theta(&self) -> Float {
         return self.z.abs();
     }
+
+    pub fn sample_uniform_sphere(u: Point2f) -> Self {
+        let z = 1.0 - 2.0 * u.x;
+        let r = safe_sqrt(1.0 - sqr(z));
+        let phi = 2.0 * PI * u.y;
+
+        return Self {
+            x: r * phi.cos(),
+            y: r * phi.sin(),
+            z,
+        };
+    }
 }
 
 impl Vector3<Interval> {
@@ -218,7 +238,19 @@ impl<T> Index<usize> for Vector3<T> {
     }
 }
 
-impl<T: Copy + Add<T, Output = T>> Add<Vector3<T>> for Vector3<T> {
+impl<T: Neg<Output = T>> Neg for Vector3<T> {
+    type Output = Vector3<T>;
+
+    fn neg(self) -> Self::Output {
+        return Vector3::<T> {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
+        };
+    }
+}
+
+impl<T: Add<T, Output = T>> Add<Vector3<T>> for Vector3<T> {
     type Output = Vector3<T>;
 
     fn add(self, rhs: Vector3<T>) -> Self::Output {
@@ -230,14 +262,14 @@ impl<T: Copy + Add<T, Output = T>> Add<Vector3<T>> for Vector3<T> {
     }
 }
 
-impl<T: Neg<Output = T>> Neg for Vector3<T> {
+impl<T: Sub<T, Output = T>> Sub<Vector3<T>> for Vector3<T> {
     type Output = Vector3<T>;
 
-    fn neg(self) -> Self::Output {
-        return Vector3::<T> {
-            x: -self.x,
-            y: -self.y,
-            z: -self.z,
+    fn sub(self, rhs: Vector3<T>) -> Self::Output {
+        return Self {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+            z: self.z - rhs.z,
         };
     }
 }

@@ -1,20 +1,21 @@
 use crate::pbrt::*;
 
 pub struct IndependentSampler {
-    pub(crate) rng: StdRng,
-}
-
-impl Default for IndependentSampler {
-    fn default() -> Self {
-        return IndependentSampler {
-            rng: StdRng::from_entropy(),
-        };
-    }
+    samples_per_pixel: usize,
+    pub rng: StdRng,
 }
 
 impl IndependentSampler {
-    pub fn new_from_seed(seed: u64) -> Self {
-        return IndependentSampler {
+    pub fn new(samples_per_pixel: usize) -> Self {
+        return Self {
+            samples_per_pixel,
+            rng: StdRng::from_entropy(),
+        };
+    }
+
+    pub fn new_from_seed(seed: u64, samples_per_pixel: usize) -> Self {
+        return Self {
+            samples_per_pixel,
             rng: StdRng::seed_from_u64(seed),
         };
     }
@@ -22,9 +23,12 @@ impl IndependentSampler {
 
 impl Sampler for IndependentSampler {
     fn fork(&self) -> Box<dyn Sampler> {
-        return Box::new(IndependentSampler::default());
+        return Box::new(IndependentSampler::new(self.samples_per_pixel));
     }
 
+    fn samples_per_pixel(&self) -> usize {
+        return self.samples_per_pixel;
+    }
     fn start_pixel_sample(&mut self, p_pixel: Point2i, sample_index: usize) {
         // do nothing
     }

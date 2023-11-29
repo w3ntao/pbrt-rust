@@ -40,6 +40,16 @@ impl RGB {
             (self.b * factor) as u8,
         ];
     }
+
+    pub fn clamp(&self, low: Float, high: Float) -> Self {
+        let local_clamp = |x: Float| x.max(low).min(high);
+
+        return Self {
+            r: local_clamp(self.r),
+            g: local_clamp(self.g),
+            b: local_clamp(self.b),
+        };
+    }
 }
 
 impl Display for RGB {
@@ -81,6 +91,18 @@ impl Add<RGB> for RGB {
             r: self.r + rhs.r,
             g: self.g + rhs.g,
             b: self.b + rhs.b,
+        };
+    }
+}
+
+impl Sub<RGB> for RGB {
+    type Output = RGB;
+
+    fn sub(self, rhs: RGB) -> Self::Output {
+        return RGB {
+            r: self.r - rhs.r,
+            g: self.g - rhs.g,
+            b: self.b - rhs.b,
         };
     }
 }

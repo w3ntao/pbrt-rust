@@ -8,7 +8,11 @@ pub struct SpectrumScaledTexture {
 
 impl SpectrumTexture for SpectrumScaledTexture {
     fn evaluate(&self, ctx: &TextureEvalContext, lambda: &SampledWavelengths) -> SampledSpectrum {
-        panic!("evaluate() not implemented for SpectrumScaledTexture");
+        if self.scale == 0.0 {
+            return SampledSpectrum::zero();
+        }
+
+        return self.texture.evaluate(ctx, lambda) * self.scale;
     }
 }
 

@@ -16,6 +16,11 @@ pub const fn lerp(x: Float, a: Float, b: Float) -> Float {
     return (1.0 - x) * a + x * b;
 }
 
+pub fn mod_i32(a: i32, b: i32) -> i32 {
+    let result = a - (a / b) * b;
+    return if result < 0 { result + b } else { result };
+}
+
 pub const fn clamp_float(val: Float, low: Float, high: Float) -> Float {
     if val < low {
         return low;

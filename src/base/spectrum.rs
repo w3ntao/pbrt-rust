@@ -11,6 +11,7 @@ pub trait Spectrum: Send + Sync {
 
     fn sample(&self, lambda: &SampledWavelengths) -> SampledSpectrum;
 
+    //TODO: move inner_product() and to_xyz() into a super trait
     fn inner_product(&self, g: &dyn Spectrum) -> Float {
         // The parallel (possibly faster) implementation
         return LAMBDA_RANGE

@@ -1,6 +1,8 @@
 use crate::pbrt::*;
 
 pub trait Integrator: Send + Sync {
+    //TODO: move evaluate_pixel_sample() into a super trait
+
     fn evaluate_pixel_sample(
         &self,
         p_pixel: Point2i,
@@ -16,7 +18,7 @@ pub trait Integrator: Send + Sync {
 
         let camera_ray = camera.generate_camera_differential_ray(camera_sample);
 
-        let l = camera_ray.weight * self.li(&camera_ray.ray, lambda, sampler);
+        let l = camera_ray.weight * self.li(&camera_ray.ray, &lambda, sampler);
 
         film.add_sample(p_pixel, &l, &lambda, camera_sample.filter_weight);
     }
@@ -24,7 +26,7 @@ pub trait Integrator: Send + Sync {
     fn li(
         &self,
         ray: &DifferentialRay,
-        lambda: SampledWavelengths,
+        lambda: &SampledWavelengths,
         sampler: &mut dyn Sampler,
     ) -> SampledSpectrum;
 

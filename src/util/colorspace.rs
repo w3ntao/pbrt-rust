@@ -49,4 +49,10 @@ impl RGBColorSpace {
             rgb_to_spectrum_table,
         };
     }
+
+    pub fn to_rgb_coeffs(&self, rgb: RGB) -> RGBSigmoidPolynomial {
+        return self
+            .rgb_to_spectrum_table
+            .eval(rgb.clamp(0.0, Float::INFINITY));
+    }
 }

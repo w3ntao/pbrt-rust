@@ -12,6 +12,14 @@ pub struct TextureEvalContext {
     pub dvdy: Float,
 }
 
+impl Display for TextureEvalContext {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f,
+               "TextureEvalContext [ p {}  dpdx {}  dpdy {}  n {}  uv {}  dudx {} dudy {}  dvdx {}  dvdy {}]",
+               self.p, self.dpdx, self.dpdy,self.n, self.uv, self.dudx, self.dudy, self.dvdx, self.dvdy)
+    }
+}
+
 impl TextureEvalContext {
     pub fn new(si: &SurfaceInteraction) -> Self {
         return Self {
@@ -29,11 +37,11 @@ impl TextureEvalContext {
 }
 
 pub struct ImageTextureBase {
-    mapping: Arc<dyn TextureMapping2D>,
-    filename: String,
-    scale: Float,
-    invert: bool,
-    mipmap: MIPMap,
+    pub mapping: Arc<dyn TextureMapping2D>,
+    pub filename: String,
+    pub scale: Float,
+    pub invert: bool,
+    pub mipmap: MIPMap,
 }
 
 impl ImageTextureBase {
@@ -62,7 +70,7 @@ pub trait FloatTexture {
     fn evaluate(&self, ctx: &TextureEvalContext) -> Float;
 }
 
-pub trait SpectrumTexture {
+pub trait SpectrumTexture: Send + Sync {
     fn evaluate(&self, ctx: &TextureEvalContext, lambda: &SampledWavelengths) -> SampledSpectrum;
 }
 
@@ -70,12 +78,14 @@ pub fn create_spectrum_texture(
     texture_type: &str,
     render_from_texture: &Transform,
     parameters: &ParameterDict,
+    spectrum_type: SpectrumType,
     global_variable: &GlobalVariable,
 ) -> Arc<dyn SpectrumTexture> {
     return match texture_type {
         "imagemap" => Arc::new(SpectrumImageTexture::new(
             render_from_texture,
             parameters,
+            spectrum_type,
             global_variable,
         )),
         "scale" => {

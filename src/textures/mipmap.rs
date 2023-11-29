@@ -8,6 +8,29 @@ pub enum FilterFunction {
     EWA,
 }
 
+impl Display for FilterFunction {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "[ FilterFunction: {} ]",
+            match *self {
+                FilterFunction::Point => {
+                    "Point"
+                }
+                FilterFunction::Bilinear => {
+                    "Bilnear"
+                }
+                FilterFunction::Trilinear => {
+                    "Trilinear"
+                }
+                FilterFunction::EWA => {
+                    "EWA"
+                }
+            }
+        )
+    }
+}
+
 pub fn parse_filter_function(filter_function: &str) -> FilterFunction {
     return match filter_function {
         "ewa" => FilterFunction::EWA,
@@ -24,6 +47,16 @@ pub fn parse_filter_function(filter_function: &str) -> FilterFunction {
 pub struct MIPMapFilterOptions {
     pub filter: FilterFunction,
     pub max_anisotropy: Float,
+}
+
+impl Display for MIPMapFilterOptions {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "MIPMapFilterOptions [ filter: {}, max_anisotropy: {} ]",
+            self.filter, self.max_anisotropy
+        )
+    }
 }
 
 impl Default for MIPMapFilterOptions {
@@ -55,14 +88,14 @@ impl PartialOrd for MIPMapFilterOptions {
 }
 
 pub struct MIPMap {
-    pyramid: Vec<Image>,
-    color_space: Arc<RGBColorSpace>,
-    wrap_mode: WrapMode,
-    options: MIPMapFilterOptions,
+    pub pyramid: Vec<Image>,
+    pub color_space: Arc<RGBColorSpace>,
+    pub wrap_mode: WrapMode,
+    pub options: MIPMapFilterOptions,
 }
 
 impl MIPMap {
-    fn MIPMap(
+    fn new(
         image: Image,
         color_space: Arc<RGBColorSpace>,
         wrap_mode: WrapMode,
@@ -76,6 +109,18 @@ impl MIPMap {
         };
     }
 
+    fn levels(&self) -> usize {
+        return self.pyramid.len();
+    }
+
+    fn texel(&self, level: usize, st: Point2i) -> RGB {
+        return self.pyramid[level][st.y as usize][st.x as usize];
+    }
+
+    fn bilerp(&self, level: usize, st: Point2f) -> RGB {
+        return self.pyramid[level].bilerp(st, WrapMode2D::new([self.wrap_mode, self.wrap_mode]));
+    }
+
     pub fn create_from_file(
         filename: &str,
         options: MIPMapFilterOptions,
@@ -83,11 +128,45 @@ impl MIPMap {
         global_variable: &GlobalVariable,
     ) -> Self {
         let image = Image::read_from_file(filename);
-        return MIPMap::MIPMap(
+        return MIPMap::new(
             image,
             global_variable.rgb_color_space.clone(),
             wrap_mode,
             options,
         );
+    }
+
+    pub fn filter(&self, st: Point2f, dst0: Vector2f, dst1: Vector2f) -> RGB {
+        if self.options.filter != FilterFunction::EWA {
+            // Handle non-EWA MIP Map filter
+            let width = 2.0
+                * (dst0[0]
+                    .abs()
+                    .max(dst0[1].abs())
+                    .max(dst1[0].abs())
+                    .max(dst1[1].abs()));
+
+            // Compute MIP Map level for _width_ and handle very wide filter
+            let n_levels = self.levels();
+            let level = (n_levels - 1) as Float + (width as Float).max(1e-8).log2();
+
+            if level >= (n_levels - 1) as Float {
+                return self.texel(n_levels - 1, Point2i::new(0, 0));
+            }
+
+            let i_level = (level.floor() as usize).max(0);
+
+            match self.options.filter {
+                FilterFunction::Bilinear => {
+                    return self.bilerp(i_level, st);
+                }
+
+                _ => {
+                    panic!("`{}` not implemented", self.options.filter);
+                }
+            };
+        }
+
+        panic!("`{}` not implemented", self.options.filter);
     }
 }

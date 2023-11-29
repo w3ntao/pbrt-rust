@@ -5,16 +5,16 @@ pub struct DiffuseMaterial {
 }
 
 impl Material for DiffuseMaterial {
-    fn get_bsdf(&self, context: &MaterialEvalContext, lambda: &SampledWavelengths) -> Option<BSDF> {
+    fn get_bsdf(&self, context: &MaterialEvalContext, lambda: &SampledWavelengths) -> BSDF {
         let r = self
             .reflectance
             .evaluate(&context.texture_eval_context, lambda);
 
-        return Some(BSDF::new(
+        return BSDF::new(
             context.ns,
             context.dpdus,
-            Arc::new(DiffuseBxDF::new(r)),
-        ));
+            Some(Arc::new(DiffuseBxDF::new(r))),
+        );
     }
 }
 

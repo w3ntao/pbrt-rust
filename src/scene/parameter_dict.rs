@@ -121,7 +121,6 @@ impl ParameterDict {
         named_texture: &HashMap<String, Arc<dyn SpectrumTexture>>,
         dir_path: Option<String>,
     ) -> ParameterDict {
-        // TODO: move this function into scene_builder to directly fetch current_folder and named_textures
         let mut integers = HashMap::<String, Vec<i32>>::new();
         let mut floats = HashMap::<String, Vec<Float>>::new();
         let mut strings = HashMap::<String, String>::new();
@@ -296,6 +295,10 @@ impl ParameterDict {
 
     pub fn get_integer_array(&self, key: &str) -> Vec<i32> {
         return get_array(key, &self.integers);
+    }
+
+    pub fn get_point2_array(&self, key: &str) -> Vec<Point2f> {
+        return get_array(key, &self.point2s);
     }
 
     pub fn get_point3_array(&self, key: &str) -> Vec<Point3f> {

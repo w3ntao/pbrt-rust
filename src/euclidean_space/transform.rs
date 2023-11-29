@@ -107,6 +107,38 @@ impl Transform {
         };
     }
 
+    pub fn rotate_from_to(from: Vector3f, to: Vector3f) -> Transform {
+        // Compute intermediate vector for vector reflection
+        let threshold = 0.72;
+        let refl = if from.x.abs() < threshold && to.x.abs() < threshold {
+            Vector3f::new(1.0, 0.0, 0.0)
+        } else if from.y.abs() < threshold && to.y.abs() < threshold {
+            Vector3f::new(0.0, 1.0, 0.0)
+        } else {
+            Vector3f::new(0.0, 0.0, 1.0)
+        };
+
+        let u = refl - from;
+        let v = refl - to;
+        let mut r = SquareMatrix::<4>::identity();
+
+        for i in 0..3 {
+            for j in 0..3 {
+                // Initialize matrix element _r[i][j]_
+
+                r[i][j] = if i == j { 1.0 } else { 0.0 }
+                    - 2.0 / u.dot(u) * u[i] * u[j]
+                    - 2.0 / v.dot(v) * v[i] * v[j]
+                    + 4.0 * u.dot(v) / (u.dot(u) * v.dot(v)) * v[i] * u[j];
+            }
+        }
+
+        return Transform {
+            matrix: r,
+            inverted_matrix: r.transpose(),
+        };
+    }
+
     pub fn scale(x: Float, y: Float, z: Float) -> Transform {
         let _matrix = SquareMatrix::<4>::new([
             [x, 0.0, 0.0, 0.0],
@@ -239,6 +271,15 @@ impl Transform {
             m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z,
             m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z,
             m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z,
+        );
+    }
+
+    pub fn inverse_on_vector3f(&self, v: Vector3f) -> Vector3f {
+        let m_inv = self.inverted_matrix;
+        return Vector3f::new(
+            m_inv[0][0] * v.x + m_inv[0][1] * v.y + m_inv[0][2] * v.z,
+            m_inv[1][0] * v.x + m_inv[1][1] * v.y + m_inv[1][2] * v.z,
+            m_inv[2][0] * v.x + m_inv[2][1] * v.y + m_inv[2][2] * v.z,
         );
     }
 
@@ -385,6 +426,7 @@ impl Transform {
             dudy: si.dudy,
             dvdy: si.dvdy,
             shading,
+            material: si.material,
         };
     }
 }

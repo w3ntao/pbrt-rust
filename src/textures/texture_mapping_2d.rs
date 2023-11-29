@@ -9,7 +9,7 @@ pub struct TexCoord2D {
     pub dtdy: Float,
 }
 
-pub trait TextureMapping2D {
+pub trait TextureMapping2D: Send + Sync {
     fn map(&self, ctx: &TextureEvalContext) -> TexCoord2D;
 }
 

@@ -34,7 +34,7 @@ pub trait Film: Send + Sync {
             }
         }
 
-        image.export_to_png(filename);
+        image.export_to_png(filename, true);
         println!("image saved to `{}`", filename);
     }
 }

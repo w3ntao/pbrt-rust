@@ -12,23 +12,23 @@ impl<T> Point2<T> {
     }
 }
 
-impl Point2<Float> {
-    pub fn min(&self, rhs: &Point2<Float>) -> Point2<Float> {
-        return Point2::<Float> {
+impl Point2f {
+    pub fn min(&self, rhs: &Point2f) -> Point2f {
+        return Point2f {
             x: self.x.min(rhs.x),
             y: self.y.min(rhs.y),
         };
     }
 
-    pub fn max(&self, rhs: &Point2<Float>) -> Point2<Float> {
-        return Point2::<Float> {
+    pub fn max(&self, rhs: &Point2f) -> Point2f {
+        return Point2f {
             x: self.x.max(rhs.x),
             y: self.y.max(rhs.y),
         };
     }
 }
 
-impl Default for Point2<Float> {
+impl Default for Point2f {
     fn default() -> Self {
         return Self {
             x: Float::NAN,
@@ -37,7 +37,7 @@ impl Default for Point2<Float> {
     }
 }
 
-impl From<Point2<i32>> for Point2<Float> {
+impl From<Point2<i32>> for Point2f {
     fn from(value: Point2<i32>) -> Self {
         return Self {
             x: value.x as Float,
@@ -49,6 +49,32 @@ impl From<Point2<i32>> for Point2<Float> {
 impl<T: Display> Display for Point2<T> {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         write!(f, "[ {}, {} ]", self.x, self.y)
+    }
+}
+
+impl<T> Index<usize> for Point2<T> {
+    type Output = T;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        return match index {
+            0 => &self.x,
+            1 => &self.y,
+            _ => {
+                panic!("illegal index");
+            }
+        };
+    }
+}
+
+impl<T> IndexMut<usize> for Point2<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        return match index {
+            0 => &mut self.x,
+            1 => &mut self.y,
+            _ => {
+                panic!("illegal index");
+            }
+        };
     }
 }
 
@@ -103,6 +129,17 @@ impl<T: Mul<Output = T> + Copy> Mul<T> for Point2<T> {
         return Self {
             x: self.x * rhs,
             y: self.y * rhs,
+        };
+    }
+}
+
+impl<T: Div<Output = T> + Copy> Div<T> for Point2<T> {
+    type Output = Point2<T>;
+
+    fn div(self, rhs: T) -> Self::Output {
+        return Self {
+            x: self.x / rhs,
+            y: self.y / rhs,
         };
     }
 }

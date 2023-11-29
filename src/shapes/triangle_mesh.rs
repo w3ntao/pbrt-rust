@@ -4,6 +4,7 @@ pub struct TriangleMesh {
     pub indices: Vec<usize>,
     pub points: Vec<Point3f>,
     pub normals: Vec<Normal3f>,
+    pub uv: Vec<Point2f>,
 }
 
 impl TriangleMesh {
@@ -12,6 +13,7 @@ impl TriangleMesh {
         points: Vec<Point3f>,
         indices: Vec<usize>,
         normals: Vec<Normal3f>,
+        uv: Vec<Point2f>,
     ) -> Self {
         if indices.len() % 3 != 0 {
             panic!("TriangleMesh: illegal parameter (indices' length can't be divided to 3)");
@@ -36,6 +38,7 @@ impl TriangleMesh {
             points: transformed_points,
             indices,
             normals: transformed_normals,
+            uv,
         };
     }
 

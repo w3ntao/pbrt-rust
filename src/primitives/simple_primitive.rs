@@ -2,11 +2,22 @@ use crate::pbrt::*;
 
 pub struct SimplePrimitive {
     shape: Arc<dyn Shape>,
+    material: Arc<dyn Material>,
 }
 
 impl Primitive for SimplePrimitive {
     fn intersect(&self, ray: &Ray, t_max: Float) -> Option<ShapeIntersection> {
-        return self.shape.intersect(ray, t_max);
+        let mut si = match self.shape.intersect(ray, t_max) {
+            None => {
+                return None;
+            }
+            Some(_si) => _si,
+        };
+
+        si.interaction
+            .set_intersection_properties(self.material.clone());
+
+        return Some(si);
     }
 
     fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool {
@@ -19,7 +30,7 @@ impl Primitive for SimplePrimitive {
 }
 
 impl SimplePrimitive {
-    pub fn new(shape: Arc<dyn Shape>) -> Self {
-        return Self { shape };
+    pub fn new(shape: Arc<dyn Shape>, material: Arc<dyn Material>) -> Self {
+        return Self { shape, material };
     }
 }

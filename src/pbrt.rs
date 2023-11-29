@@ -46,7 +46,7 @@ pub use crate::{
     },
     films::{pixel_sensor::*, rgb_film::*},
     filters::box_filter::*,
-    integrators::{ambient_occlusion::*, surface_normal::*},
+    integrators::{ambient_occlusion::*, random_walk::*, surface_normal::*},
     materials::diffuse_material::*,
     primitives::simple_primitive::*,
     samplers::independent::*,
@@ -55,8 +55,8 @@ pub use crate::{
     spectra::{
         black_body_spectrum::*, cie_xyz::*, const_piecewise_linear_spectrum::*,
         densely_sampled_spectrum::*, measured_spectra_data::*, piecewise_linear_spectrum::*,
-        rgb::*, rgb_sigmoid_polynomial::*, rgb_to_spectrum_data::*, rgb_to_spectrum_table::*,
-        sampled_spectrum::*, sampled_wavelengths::*,
+        rgb::*, rgb_albedo_spectrum::*, rgb_sigmoid_polynomial::*, rgb_to_spectrum_data::*,
+        rgb_to_spectrum_table::*, sampled_spectrum::*, sampled_wavelengths::*,
     },
     textures::{
         float_constant_texture::*, mipmap::*, spectrum_constant_texture::*,
@@ -68,6 +68,7 @@ pub use crate::{
 
 pub type Point2f = Point2<Float>;
 pub type Point2i = Point2<i32>;
+// TODO: rewrite Point2i to Point2 usize
 pub type Point3f = Point3<Float>;
 pub type Point3fi = Point3<Interval>;
 

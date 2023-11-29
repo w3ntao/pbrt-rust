@@ -1,5 +1,8 @@
 use crate::pbrt::*;
 
+pub const SAMPLES_PER_PIXEL: usize = 16;
+// TODO: make samples_per_pixel configurable through .json file
+
 fn build_look_at_transform(pos: Point3f, look: Point3f, up: Vector3f) -> Transform {
     let mut world_from_camera = SquareMatrix::<4>::zero();
     world_from_camera[0][3] = pos.x;
@@ -259,10 +262,7 @@ impl SceneBuilder {
         );
 
         let material_type = json_value_to_string(tokens[1].clone());
-
         self.current_material = Some(create_material(&material_type, &parameter_dict));
-
-        println!("duang duang");
     }
 
     fn parse_rotate(&mut self, tokens: &Vec<Value>) {
@@ -289,6 +289,14 @@ impl SceneBuilder {
 
     fn parse_shape(&mut self, tokens: &Vec<Value>) {
         assert_eq!(json_value_to_string(tokens[0].clone()), "Shape");
+        assert!(self.current_material.is_some());
+
+        let material = match &self.current_material {
+            None => {
+                panic!("current material is not available");
+            }
+            Some(_material) => _material.clone(),
+        };
 
         let parameters = ParameterDict::build_parameter_dict(
             &tokens[2..],
@@ -317,7 +325,7 @@ impl SceneBuilder {
                 let triangles = loop_subdivide(&render_from_object, levels, indices, points);
 
                 for _triangle in &triangles {
-                    let primitive = SimplePrimitive::new(_triangle.clone());
+                    let primitive = SimplePrimitive::new(_triangle.clone(), material.clone());
                     self.primitives.push(Arc::new(primitive));
                 }
             }
@@ -338,26 +346,27 @@ impl SceneBuilder {
                     phimax,
                 );
 
-                let primitive = SimplePrimitive::new(Arc::new(sphere));
+                let primitive = SimplePrimitive::new(Arc::new(sphere), material.clone());
                 self.primitives.push(Arc::new(primitive));
             }
 
             "trianglemesh" => {
                 let indices = parameters.get_integer_array("indices");
                 let points = parameters.get_point3_array("P");
-
                 let normals = parameters.get_normal3_array("N");
+                let uv = parameters.get_point2_array("uv");
 
                 let mesh = TriangleMesh::new(
                     &render_from_object,
                     points,
                     indices.into_par_iter().map(|x| x as usize).collect(),
                     normals,
+                    uv,
                 );
 
                 let triangles = mesh.create_triangles();
                 for _triangle in &triangles {
-                    let primitive = SimplePrimitive::new(_triangle.clone());
+                    let primitive = SimplePrimitive::new(_triangle.clone(), material.clone());
                     self.primitives.push(Arc::new(primitive));
                 }
             }
@@ -372,11 +381,12 @@ impl SceneBuilder {
                         tri_quad_mesh.p,
                         tri_quad_mesh.tri_indices,
                         tri_quad_mesh.n,
+                        tri_quad_mesh.uv,
                     );
 
                     let triangles = triangle_mesh.create_triangles();
                     for _triangle in &triangles {
-                        let primitive = SimplePrimitive::new(_triangle.clone());
+                        let primitive = SimplePrimitive::new(_triangle.clone(), material.clone());
                         self.primitives.push(Arc::new(primitive));
                     }
                 }
@@ -408,8 +418,10 @@ impl SceneBuilder {
                     &texture_type,
                     &self.render_from_object(),
                     &parameter_dict,
+                    SpectrumType::Albedo,
                     self.global_variable.as_ref(),
                 );
+                // TODO: hardcode all SpectrumType as Albedo for the moment
 
                 self.named_texture.insert(texture_name, texture);
             }
@@ -590,12 +602,24 @@ impl SceneBuilder {
             panic!("default Camera not implemented");
         };
 
-        let sampler = Arc::new(IndependentSampler::default());
+        let sampler = Arc::new(IndependentSampler::new(SAMPLES_PER_PIXEL));
         let bvh_aggregate = Arc::new(BVHAggregate::new(self.primitives.clone()));
 
         let illuminant = self.global_variable.rgb_color_space.illuminant;
 
-        let integrator = Arc::new(AmbientOcclusion::new(illuminant, bvh_aggregate.clone()));
+        //let integrator = Arc::new(AmbientOcclusion::new(illuminant, bvh_aggregate.clone()));
+        let integrator = Arc::new(RandomWalkIntegrator::new(
+            illuminant,
+            camera.clone(),
+            bvh_aggregate.clone(),
+        ));
+
+        /*
+        let integrator = Arc::new(SurfaceNormal::new(
+            bvh_aggregate.clone(),
+            self.global_variable.rgb_color_space.as_ref(),
+        ));
+        */
 
         return Renderer::new(integrator, sampler, camera, film);
     }

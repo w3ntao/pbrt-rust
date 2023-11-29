@@ -8,9 +8,11 @@ use std::path::PathBuf;
 #[derive(Parser)] // requires `derive` feature
 #[command(author, version, about, long_about = None)]
 struct Cli {
+    /*
+    // TODO: hide ssp for the moment
     #[arg(long)]
     spp: Option<usize>,
-
+    */
     scene_file: PathBuf,
 }
 
@@ -54,10 +56,12 @@ fn main() {
 
     let absolute_path = fs::canonicalize(args.scene_file).unwrap();
 
+    /*
     let spp = match args.spp {
         None => 16,
         Some(x) => x,
     };
+    */
 
-    render(&absolute_path.display().to_string(), spp);
+    render(&absolute_path.display().to_string(), SAMPLES_PER_PIXEL);
 }

@@ -154,17 +154,33 @@ impl Triangle {
         );
     }
 
-    fn build_interaction(&self, ti: &TriangleIntersection, wo: Vector3f) -> SurfaceInteraction {
-        let (p0, p1, p2) = self.get_points();
-
+    fn interaction_from_intersection(
+        &self,
+        ti: &TriangleIntersection,
+        wo: Vector3f,
+    ) -> SurfaceInteraction {
         // Compute triangle partial derivatives
         // Compute deltas and matrix determinant for triangle partial derivatives
         // Get triangle texture coordinates in _uv_ array
-        let uv = [
-            Point2f::new(0.0, 0.0),
-            Point2f::new(1.0, 0.0),
-            Point2f::new(1.0, 1.0),
-        ];
+
+        let v0 = self.mesh.indices[self.idx + 0];
+        let v1 = self.mesh.indices[self.idx + 1];
+        let v2 = self.mesh.indices[self.idx + 2];
+
+        let p0 = self.mesh.points[v0];
+        let p1 = self.mesh.points[v1];
+        let p2 = self.mesh.points[v2];
+
+        let uv = if self.mesh.uv.len() > 0 {
+            let _uv = &self.mesh.uv;
+            [_uv[v0], _uv[v1], _uv[v2]]
+        } else {
+            [
+                Point2f::new(0.0, 0.0),
+                Point2f::new(1.0, 0.0),
+                Point2f::new(1.0, 1.0),
+            ]
+        };
 
         let duv02 = uv[0] - uv[2];
         let duv12 = uv[1] - uv[2];
@@ -178,8 +194,8 @@ impl Triangle {
         let (dpdu, dpdv) = if !degenerate_uv {
             // Compute triangle $\dpdu$ and $\dpdv$ via matrix inversion
             let inv_det = 1.0 / determinant;
-            let dpdu = difference_of_products_vec3(duv12.y, dp02, duv02.y, dp12) * inv_det;
-            let dpdv = difference_of_products_vec3(duv02.x, dp12, duv12.y, dp02) * inv_det;
+            let dpdu = difference_of_products_vec3(duv12[1], dp02, duv02[1], dp12) * inv_det;
+            let dpdv = difference_of_products_vec3(duv02[0], dp12, duv12[0], dp02) * inv_det;
 
             (dpdu, dpdv)
         } else {
@@ -224,7 +240,7 @@ impl Shape for Triangle {
 
         return Some(ShapeIntersection {
             t_hit: triangle_intersection.t,
-            interaction: self.build_interaction(&triangle_intersection, -ray.d),
+            interaction: self.interaction_from_intersection(&triangle_intersection, -ray.d),
         });
     }
 

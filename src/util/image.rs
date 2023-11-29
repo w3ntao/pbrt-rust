@@ -1,12 +1,54 @@
 use crate::pbrt::*;
 use image::{ImageBuffer, Rgb, RgbImage};
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum WrapMode {
     Black,
     Clamp,
     Repeat,
     OctahedralSphere,
+}
+
+impl Display for WrapMode {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match *self {
+                WrapMode::Black => {
+                    "Black"
+                }
+                WrapMode::Clamp => {
+                    "Clamp"
+                }
+                WrapMode::Repeat => {
+                    "Repeat"
+                }
+                WrapMode::OctahedralSphere => {
+                    "OctahedralSphere"
+                }
+            }
+        )
+    }
+}
+
+#[derive(Clone, Copy)]
+pub struct WrapMode2D {
+    pub wrap: [WrapMode; 2],
+}
+
+impl Index<usize> for WrapMode2D {
+    type Output = WrapMode;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        return &self.wrap[index];
+    }
+}
+
+impl WrapMode2D {
+    pub fn new(wrap: [WrapMode; 2]) -> Self {
+        return WrapMode2D { wrap };
+    }
 }
 
 #[derive(Clone, Copy)]
@@ -89,32 +131,32 @@ pub fn generate_pyramid(image: Image, wrap_mode: WrapMode) -> Vec<Image> {
 
     // Initialize levels of pyramid from _image_
     let n_levels = 1 + (image.resolution.x.max(image.resolution.y)).ilog2();
-    let mut pyramid = Vec::<Image>::new();
-    pyramid.reserve(n_levels as usize);
-    pyramid.push(image.clone());
 
     let pixel_format = image.pixel_format;
 
-    for i in 0..n_levels - 1 {
+    let mut pyramid = Vec::<Image>::new();
+    pyramid.reserve(n_levels as usize);
+    pyramid.push(image);
+
+    for i in 1..n_levels {
         // TODO: this part is different than PBRT-v4
 
-        let resolution = if i == 0 {
-            image.resolution
-        } else {
-            pyramid[(i - 1) as usize].resolution
-        };
+        let last_image = &pyramid[(i - 1) as usize];
+        let resolution = last_image.resolution;
 
         // Initialize $i+1$st level from $i$th level and copy $i$th into pyramid
         // Initialize _nextImage_ for $i+1$st level
         let next_resolution = Point2i::new(1.max(resolution.x / 2), 1.max(resolution.y / 2));
 
+        //println!("{} - {}, {}", i, resolution, next_resolution);
+
         let mut next_image = Image::new(next_resolution, pixel_format);
         for y in 0..(next_resolution.y as usize) {
             for x in 0..(next_resolution.x as usize) {
-                next_image[y][x] = (image[y][x]
-                    + image[y * 2][x * 2]
-                    + image[y * 2 + 1][x * 2]
-                    + image[y * 2][x * 2 + 1])
+                next_image[y][x] = (last_image[y * 2][x * 2]
+                    + last_image[y * 2][x * 2 + 1]
+                    + last_image[y * 2 + 1][x * 2]
+                    + last_image[y * 2 + 1][x * 2 + 1])
                     / 4.0;
             }
         }
@@ -123,6 +165,31 @@ pub fn generate_pyramid(image: Image, wrap_mode: WrapMode) -> Vec<Image> {
     }
 
     return pyramid;
+}
+
+fn remap_pixel_coord(p: Point2i, resolution: Point2i, wrap_mode2d: WrapMode2D) -> Point2i {
+    if wrap_mode2d[0] == WrapMode::OctahedralSphere || wrap_mode2d[1] == WrapMode::OctahedralSphere
+    {
+        panic!("WrapMode::OctahedralSphere not implemented");
+    }
+
+    let mut coord = p;
+
+    for c in 0..2 {
+        if coord[c] >= 0 && coord[c] < resolution[c] {
+            continue;
+        }
+        match wrap_mode2d[c] {
+            WrapMode::Repeat => {
+                coord[c] = mod_i32(coord[c], resolution[c]);
+            }
+            _ => {
+                panic!("`{}` not implemented", wrap_mode2d[c]);
+            }
+        }
+    }
+
+    return coord;
 }
 
 impl Image {
@@ -192,21 +259,54 @@ impl Image {
         unreachable!();
     }
 
-    pub fn export_to_png(&self, filename: &str) {
+    pub fn export_to_png(&self, filename: &str, gamma_correction: bool) {
         let mut buffer: RgbImage =
             ImageBuffer::new(self.resolution.x as u32, self.resolution.y as u32);
 
         for y in 0..self.resolution.y {
             for x in 0..self.resolution.x {
-                let u256 = self.pixels[y as usize][x as usize]
-                    .gamma_correction()
-                    .to_u256();
+                let u256 = if gamma_correction {
+                    self.pixels[y as usize][x as usize].gamma_correction()
+                } else {
+                    self.pixels[y as usize][x as usize]
+                }
+                .to_u256();
 
                 buffer.put_pixel(x as u32, y as u32, Rgb(u256));
             }
         }
 
         buffer.save(filename).unwrap();
+    }
+
+    fn fetch_pixel(&self, p: Point2i, wrap_mode2d: WrapMode2D) -> RGB {
+        let p = remap_pixel_coord(p, self.resolution, wrap_mode2d);
+        return self.pixels[p.y as usize][p.x as usize];
+    }
+
+    pub fn bilerp(&self, p: Point2f, wrap_mode2d: WrapMode2D) -> RGB {
+        // Compute discrete pixel coordinates and offsets for _p_
+        let x = p[0] * (self.resolution.x as Float) - 0.5;
+        let y = p[1] * (self.resolution.y as Float) - 0.5;
+
+        let xi = x.floor() as i32;
+        let yi = y.floor() as i32;
+
+        let dx = x - (xi as Float);
+        let dy = y - (yi as Float);
+
+        // Load pixel channel values and return bilinearly interpolated value
+        let v = [
+            self.fetch_pixel(Point2i::new(xi, yi), wrap_mode2d),
+            self.fetch_pixel(Point2i::new(xi + 1, yi), wrap_mode2d),
+            self.fetch_pixel(Point2i::new(xi, yi + 1), wrap_mode2d),
+            self.fetch_pixel(Point2i::new(xi + 1, yi + 1), wrap_mode2d),
+        ];
+
+        return (1.0 - dx) * (1.0 - dy) * v[0]
+            + dx * (1.0 - dy) * v[1]
+            + (1.0 - dx) * dy * v[2]
+            + dx * dy * v[3];
     }
 }
 
