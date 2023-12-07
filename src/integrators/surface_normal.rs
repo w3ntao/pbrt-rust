@@ -2,9 +2,7 @@ use crate::pbrt::*;
 
 pub struct SurfaceNormal {
     aggregate: Arc<dyn Primitive>,
-    red: RGBAlbedoSpectrum,
-    green: RGBAlbedoSpectrum,
-    blue: RGBAlbedoSpectrum,
+    rgb: [RGBAlbedoSpectrum; 3],
 }
 
 impl SurfaceNormal {
@@ -12,9 +10,7 @@ impl SurfaceNormal {
         let val = 0.01;
         return SurfaceNormal {
             aggregate,
-            red: RGBAlbedoSpectrum::new(RGB::new(val, 0.0, 0.0), color_space),
-            green: RGBAlbedoSpectrum::new(RGB::new(0.0, val, 0.0), color_space),
-            blue: RGBAlbedoSpectrum::new(RGB::new(0.0, 0.0, val), color_space),
+            rgb: color_space.generate_albedo_rgb(),
         };
     }
 }
@@ -36,9 +32,9 @@ impl Integrator for SurfaceNormal {
 
                 let color = Vector3f::from(n).normalize().softmax_color();
 
-                color.r * self.red.sample(lambda)
-                    + color.g * self.green.sample(lambda)
-                    + color.b * self.blue.sample(lambda)
+                color.r * self.rgb[0].sample(lambda)
+                    + color.g * self.rgb[1].sample(lambda)
+                    + color.b * self.rgb[2].sample(lambda)
             }
         };
     }

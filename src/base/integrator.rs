@@ -1,8 +1,19 @@
 use crate::pbrt::*;
 
 pub trait Integrator: Send + Sync {
-    //TODO: move evaluate_pixel_sample() into a super trait
+    fn li(
+        &self,
+        ray: &DifferentialRay,
+        lambda: &SampledWavelengths,
+        sampler: &mut dyn Sampler,
+    ) -> SampledSpectrum;
 
+    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool {
+        panic!("not implemented");
+    }
+}
+
+pub trait IntegratorDefaultInterface: Integrator {
     fn evaluate_pixel_sample(
         &self,
         p_pixel: Point2i,
@@ -22,15 +33,6 @@ pub trait Integrator: Send + Sync {
 
         film.add_sample(p_pixel, &l, &lambda, camera_sample.filter_weight);
     }
-
-    fn li(
-        &self,
-        ray: &DifferentialRay,
-        lambda: &SampledWavelengths,
-        sampler: &mut dyn Sampler,
-    ) -> SampledSpectrum;
-
-    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool {
-        panic!("not implemented");
-    }
 }
+
+impl<T: ?Sized + Integrator> IntegratorDefaultInterface for T {}

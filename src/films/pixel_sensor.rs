@@ -337,7 +337,7 @@ impl PixelSensor {
         sensor_illum: Option<Arc<impl Spectrum>>,
         imaging_ratio: Float,
     ) -> Self {
-        // TODO: sensor_illum: why can't I change Option<DenselySampledSpectrum> to Option<dyn Spectrum>
+        // TODO: sensor_illum: why can't I change Arc<impl Spectrum> to Arc<dyn Spectrum>
         let r_bar = Arc::new(CIE_X_DENSELY_SAMPLED);
         let g_bar = Arc::new(CIE_Y_DENSELY_SAMPLED);
         let b_bar = Arc::new(CIE_Z_DENSELY_SAMPLED);

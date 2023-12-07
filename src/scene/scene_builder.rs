@@ -1,8 +1,5 @@
 use crate::pbrt::*;
 
-pub const SAMPLES_PER_PIXEL: usize = 16;
-// TODO: make samples_per_pixel configurable through .json file
-
 fn build_look_at_transform(pos: Point3f, look: Point3f, up: Vector3f) -> Transform {
     let mut world_from_camera = SquareMatrix::<4>::zero();
     world_from_camera[0][3] = pos.x;
@@ -442,7 +439,7 @@ impl SceneBuilder {
         assert_eq!(value_list.len(), 16);
 
         self.graphics_state.current_transform =
-            Transform::new(SquareMatrix::<4>::from_vec(value_list)).transpose();
+            Transform::new(SquareMatrix::<4>::from_array(&value_list)).transpose();
     }
 
     fn parse_translate(&mut self, tokens: &Vec<Value>) {
@@ -580,7 +577,7 @@ impl SceneBuilder {
         }
     }
 
-    pub fn parse_scene(&mut self, file_path: &str) -> Renderer {
+    pub fn parse_scene(&mut self, file_path: &str, samples_per_pixel: usize) -> Renderer {
         self.root = Some(get_dirname(file_path));
         self.parse_file(&get_basename(file_path));
 
@@ -602,7 +599,7 @@ impl SceneBuilder {
             panic!("default Camera not implemented");
         };
 
-        let sampler = Arc::new(IndependentSampler::new(SAMPLES_PER_PIXEL));
+        let sampler = Arc::new(IndependentSampler::new(samples_per_pixel));
         let bvh_aggregate = Arc::new(BVHAggregate::new(self.primitives.clone()));
 
         let illuminant = self.global_variable.rgb_color_space.illuminant;

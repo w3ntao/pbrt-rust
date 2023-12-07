@@ -10,8 +10,14 @@ pub trait Spectrum: Send + Sync {
     fn eval(&self, lambda: Float) -> Float;
 
     fn sample(&self, lambda: &SampledWavelengths) -> SampledSpectrum;
+}
 
-    //TODO: move inner_product() and to_xyz() into a super trait
+pub trait SpectrumDefaultInterface: Spectrum {
+    fn to_photometric(&self) -> Float {
+        // TODO: implement a special case for RGBIlluminantSpectrum
+        return self.inner_product(&CIE_Y_DENSELY_SAMPLED);
+    }
+
     fn inner_product(&self, g: &dyn Spectrum) -> Float {
         // The parallel (possibly faster) implementation
         return LAMBDA_RANGE
@@ -27,12 +33,9 @@ pub trait Spectrum: Send + Sync {
             z: self.inner_product(&CIE_Z_PLS),
         } / CIE_Y_INTEGRAL;
     }
-
-    fn to_photometric(&self) -> Float {
-        // TODO: implement a special case for RGBIlluminantSpectrum
-        return self.inner_product(&CIE_Y_DENSELY_SAMPLED);
-    }
 }
+
+impl<T: ?Sized + Spectrum> SpectrumDefaultInterface for T {}
 
 pub const LAMBDA_MIN: Float = 360.0;
 pub const LAMBDA_MAX: Float = 830.0;

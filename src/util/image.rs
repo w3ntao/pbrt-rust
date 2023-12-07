@@ -116,7 +116,6 @@ fn resample_weights(old_resolution: usize, new_resolution: usize) -> Vec<Resampl
 }
 
 pub fn generate_pyramid(image: Image, wrap_mode: WrapMode) -> Vec<Image> {
-    // TODO: generate_pyramid: to verify
     let image = if !is_power_of_2(image.resolution.x) || !is_power_of_2(image.resolution.y) {
         image.float_resize_up(
             Point2i::new(
@@ -200,7 +199,6 @@ impl Image {
         return Self {
             resolution,
             pixels: vec![vec![RGB::black(); resolution.x as usize]; resolution.y as usize],
-            // TODO: swap x and y to make it aligned with RgbImage dimension
             pixel_format,
         };
     }

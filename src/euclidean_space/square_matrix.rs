@@ -31,8 +31,7 @@ impl<const N: usize> SquareMatrix<N> {
         return SquareMatrix { matrix: values };
     }
 
-    pub fn from_vec(values: Vec<Float>) -> SquareMatrix<N> {
-        // TODO: rename to from_array
+    pub fn from_array(values: &[Float]) -> SquareMatrix<N> {
         if values.len() != N * N {
             panic!("size of vector and size of matrix not matched");
         }
@@ -149,14 +148,12 @@ impl<const N: usize> SquareMatrix<N> {
         }
 
         // Swap columns to reflect permutation
-        // TODO: verify this loop
         for j in (0..N).rev() {
             if indxr[j] == indxc[j] {
                 continue;
             }
             for k in 0..N {
                 minv[k].swap(indxr[j], indxc[j]);
-                //swap(&mut minv[k][indxr[j]], &mut minv[k][indxc[j]]);
             }
         }
 

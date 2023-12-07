@@ -55,4 +55,14 @@ impl RGBColorSpace {
             .rgb_to_spectrum_table
             .eval(rgb.clamp(0.0, Float::INFINITY));
     }
+
+    pub fn generate_albedo_rgb(&self) -> [RGBAlbedoSpectrum; 3] {
+        let val = 0.01;
+
+        return [
+            RGBAlbedoSpectrum::new(RGB::new(val, 0.0, 0.0), &self),
+            RGBAlbedoSpectrum::new(RGB::new(0.0, val, 0.0), &self),
+            RGBAlbedoSpectrum::new(RGB::new(0.0, 0.0, val), &self),
+        ];
+    }
 }

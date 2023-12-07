@@ -13,7 +13,6 @@ impl SpectrumImageTexture {
         spectrum_type: SpectrumType,
         global_variable: &GlobalVariable,
     ) -> Self {
-        // TODO: implementing SpectrumImageTexture::Create() (pbrt-v4/src/pbrt/textures.cpp)
         let map = create_texture_mapping_2d(render_from_texture, parameters);
 
         let max_anisotropy = parameters.get_one_float("maxanisotropy", Some(8.0));

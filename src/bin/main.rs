@@ -8,15 +8,12 @@ use std::path::PathBuf;
 #[derive(Parser)] // requires `derive` feature
 #[command(author, version, about, long_about = None)]
 struct Cli {
-    /*
-    // TODO: hide ssp for the moment
     #[arg(long)]
     spp: Option<usize>,
-    */
     scene_file: PathBuf,
 }
 
-fn render(file_path: &str, spp: usize) {
+fn render(file_path: &str, samples_per_pixel: usize) {
     let start = Instant::now();
 
     let srgb_to_spectrum_table = RGBtoSpectrumTable::new("sRGB");
@@ -33,17 +30,17 @@ fn render(file_path: &str, spp: usize) {
     });
 
     let mut builder = SceneBuilder::new(global_variable.clone());
-    let mut scene_config = builder.parse_scene(file_path);
+    let mut scene_config = builder.parse_scene(file_path, samples_per_pixel);
     let preprocessing_finished = Instant::now();
 
     let cpu_num = num_cpus::get();
 
-    scene_config.render(spp, cpu_num);
+    scene_config.render(samples_per_pixel, cpu_num);
     println!(
         "total times: ({} + {}) second ({} spp with {} cores)",
         (preprocessing_finished - start).as_secs(),
         preprocessing_finished.elapsed().as_secs(),
-        spp,
+        samples_per_pixel,
         cpu_num
     );
 }
@@ -56,12 +53,10 @@ fn main() {
 
     let absolute_path = fs::canonicalize(args.scene_file).unwrap();
 
-    /*
     let spp = match args.spp {
         None => 16,
         Some(x) => x,
     };
-    */
 
-    render(&absolute_path.display().to_string(), SAMPLES_PER_PIXEL);
+    render(&absolute_path.display().to_string(), spp);
 }
