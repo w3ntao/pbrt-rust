@@ -23,11 +23,11 @@ impl Display for TextureEvalContext {
 impl TextureEvalContext {
     pub fn new(si: &SurfaceInteraction) -> Self {
         return Self {
-            p: Point3f::from(si.pi),
+            p: Point3f::from(si.interaction.pi),
             dpdx: si.dpdx,
             dpdy: si.dpdy,
-            n: si.n,
-            uv: si.uv,
+            n: si.interaction.n,
+            uv: si.interaction.uv,
             dudx: 0.0,
             dudy: 0.0,
             dvdx: 0.0,

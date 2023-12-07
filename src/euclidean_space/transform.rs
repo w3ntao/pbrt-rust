@@ -29,11 +29,16 @@ impl Transform {
         };
     }
 
-    pub fn new(_matrix: SquareMatrix<4>) -> Self {
+    pub fn from_matrix(matrix: SquareMatrix<4>) -> Self {
         return Transform {
-            matrix: _matrix,
-            inverted_matrix: _matrix.inverse(),
+            matrix,
+            inverted_matrix: matrix.inverse(),
         };
+    }
+
+    pub fn from_array(array: [[Float; 4]; 4]) -> Self {
+        let matrix = SquareMatrix::<4>::new(array);
+        return Transform::from_matrix(matrix);
     }
 
     pub fn new_with_inverse(_matrix: SquareMatrix<4>, _inv_matrix: SquareMatrix<4>) -> Self {
@@ -174,7 +179,7 @@ impl Transform {
         ]);
 
         let inv_tan_ang = 1.0 / (degree_to_radian(fov) / 2.0).tan();
-        return Transform::scale(inv_tan_ang, inv_tan_ang, 1.0) * Transform::new(persp);
+        return Transform::scale(inv_tan_ang, inv_tan_ang, 1.0) * Transform::from_matrix(persp);
     }
 
     pub fn on_point3f(&self, p: Point3f) -> Point3f {
@@ -406,15 +411,22 @@ impl Transform {
         };
     }
 
+    pub fn on_interaction(&self, interaction: Interaction) -> Interaction {
+        return Interaction {
+            pi: self.on_point3fi(interaction.pi),
+            n: self.on_normal3f(interaction.n),
+            wo: self.on_vector3f(interaction.wo).normalize(),
+            uv: interaction.uv,
+        };
+    }
+
     pub fn on_surface_interaction(&self, si: SurfaceInteraction) -> SurfaceInteraction {
         let mut shading = self.on_shading(&si.shading);
-        shading.n = shading.n.face_forward(Vector3::from(si.n));
+        shading.n = shading.n.face_forward(Vector3::from(si.interaction.n));
 
         return SurfaceInteraction {
-            pi: self.on_point3fi(si.pi),
-            n: self.on_normal3f(si.n),
-            wo: self.on_vector3f(si.wo).normalize(),
-            uv: si.uv,
+            interaction: self.on_interaction(si.interaction),
+
             dpdx: self.on_vector3f(si.dpdx),
             dpdy: self.on_vector3f(si.dpdy),
             dpdu: self.on_vector3f(si.dpdu),
@@ -427,6 +439,7 @@ impl Transform {
             dvdy: si.dvdy,
             shading,
             material: si.material,
+            area_light: si.area_light,
         };
     }
 }

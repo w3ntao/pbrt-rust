@@ -220,8 +220,8 @@ impl Triangle {
             Normal3f::nan(),
         );
 
-        isect.n = Normal3f::from(dp02.cross(dp12).normalize());
-        isect.shading.n = isect.n;
+        isect.interaction.n = Normal3f::from(dp02.cross(dp12).normalize());
+        isect.shading.n = isect.interaction.n;
 
         return isect;
     }
@@ -240,7 +240,7 @@ impl Shape for Triangle {
 
         return Some(ShapeIntersection {
             t_hit: triangle_intersection.t,
-            interaction: self.interaction_from_intersection(&triangle_intersection, -ray.d),
+            surface_interaction: self.interaction_from_intersection(&triangle_intersection, -ray.d),
         });
     }
 

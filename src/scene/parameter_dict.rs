@@ -239,6 +239,14 @@ impl ParameterDict {
         };
     }
 
+    pub fn has_rgb(&self, name: &str) -> bool {
+        return self.rgbs.get(name).is_some();
+    }
+
+    pub fn has_texture(&self, name: &str) -> bool {
+        return self.textures.get(name).is_some();
+    }
+
     pub fn insert_integer(&mut self, name: String, value: Vec<i32>) {
         if self.integers.contains_key(&name) {
             panic!("duplicate key: `{}`", name);
@@ -263,12 +271,22 @@ impl ParameterDict {
         self.strings.insert(name, value);
     }
 
+    pub fn get_rgb(&self, key: &str, default: Option<RGB>) -> RGB {
+        return match (self.rgbs.get(key), default) {
+            (None, Some(val)) => val,
+            (Some(val), _) => val.clone(),
+            _ => {
+                panic!("get_rgb(): found no key with name `{}`", key);
+            }
+        };
+    }
+
     pub fn get_string(&self, key: &str, default: Option<String>) -> String {
         return match (self.strings.get(key), default) {
             (None, Some(val)) => val,
             (Some(val), _) => val.clone(),
             _ => {
-                panic!("found no key with name `{}`", key);
+                panic!("get_string(): found no key with name `{}`", key);
             }
         };
     }
@@ -277,7 +295,7 @@ impl ParameterDict {
         return match self.textures.get(key) {
             Some(val) => val.clone(),
             _ => {
-                panic!("found no key with name `{}`", key);
+                panic!("get_texture(): found no key with name `{}`", key);
             }
         };
     }
@@ -299,6 +317,22 @@ impl ParameterDict {
 
     pub fn get_point2_array(&self, key: &str) -> Vec<Point2f> {
         return get_array(key, &self.point2s);
+    }
+
+    pub fn get_one_point3(&self, key: &str, default: Option<Point3f>) -> Point3f {
+        return match (self.point3s.get(key), default) {
+            (Some(val), _) => {
+                if val.len() == 1 {
+                    val[0]
+                } else {
+                    unreachable!();
+                }
+            }
+            (None, Some(val)) => val,
+            _ => {
+                unreachable!();
+            }
+        };
     }
 
     pub fn get_point3_array(&self, key: &str) -> Vec<Point3f> {

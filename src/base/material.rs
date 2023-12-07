@@ -21,7 +21,7 @@ impl MaterialEvalContext {
     pub fn new(si: &SurfaceInteraction) -> Self {
         return Self {
             texture_eval_context: TextureEvalContext::new(si),
-            wo: si.wo,
+            wo: si.interaction.wo,
             ns: si.shading.n,
             dpdus: si.shading.dpdu,
         };
@@ -40,7 +40,15 @@ pub trait Material: Send + Sync {
 pub fn create_material(material_type: &str, parameter_dict: &ParameterDict) -> Arc<dyn Material> {
     return match material_type {
         "diffuse" => {
-            let reflectance = parameter_dict.get_texture("reflectance");
+            let key = "reflectance";
+            let reflectance = if parameter_dict.has_texture(key) {
+                parameter_dict.get_texture(key)
+            } else {
+                Arc::new(SpectrumConstantTexture::new(Arc::new(ConstSpectrum::new(
+                    0.5,
+                ))))
+            };
+
             Arc::new(DiffuseMaterial::new(reflectance))
         }
         _ => {

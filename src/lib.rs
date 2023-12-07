@@ -13,6 +13,9 @@ mod euclidean_space;
 mod films;
 mod filters;
 mod integrators;
+mod light_samplers;
+mod lights;
+mod materials;
 mod pbrt;
 mod primitives;
 mod samplers;
@@ -21,6 +24,5 @@ mod shapes;
 mod spectra;
 mod textures;
 mod util;
-mod materials;
 
 pub use pbrt::*;

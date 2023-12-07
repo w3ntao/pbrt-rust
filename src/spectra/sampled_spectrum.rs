@@ -6,19 +6,19 @@ pub struct SampledSpectrum {
 }
 
 impl SampledSpectrum {
-    pub const fn zero() -> Self {
+    pub const fn same_value(v: Float) -> Self {
         return Self {
-            values: [0.0; NUM_SPECTRUM_SAMPLES],
+            values: [v; NUM_SPECTRUM_SAMPLES],
         };
-    }
-
-    pub fn is_positive(&self) -> bool {
-        return self.values.into_par_iter().any(|x| x > 0.0);
     }
 
     pub fn new(values: [Float; NUM_SPECTRUM_SAMPLES]) -> Self {
         debug_assert!(values.into_par_iter().all(|x| x >= 0.0));
         return Self { values };
+    }
+
+    pub fn is_positive(&self) -> bool {
+        return self.values.into_par_iter().any(|x| x > 0.0);
     }
 
     pub fn safe_div(&self, divisor: &SampledSpectrum) -> SampledSpectrum {
@@ -115,5 +115,25 @@ impl Mul<SampledSpectrum> for Float {
 
     fn mul(self, rhs: SampledSpectrum) -> Self::Output {
         return rhs * self;
+    }
+}
+
+impl MulAssign<SampledSpectrum> for SampledSpectrum {
+    fn mul_assign(&mut self, rhs: SampledSpectrum) {
+        for idx in 0..NUM_SPECTRUM_SAMPLES {
+            self.values[idx] *= rhs.values[idx];
+        }
+    }
+}
+
+impl Div<Float> for SampledSpectrum {
+    type Output = SampledSpectrum;
+
+    fn div(self, rhs: Float) -> Self::Output {
+        let mut values = self.values;
+        for v in &mut values {
+            *v /= rhs;
+        }
+        return SampledSpectrum { values };
     }
 }

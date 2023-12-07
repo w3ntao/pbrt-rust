@@ -10,14 +10,14 @@ pub trait Spectrum: Send + Sync {
     fn eval(&self, lambda: Float) -> Float;
 
     fn sample(&self, lambda: &SampledWavelengths) -> SampledSpectrum;
+
+    fn to_photometric(&self) -> Float {
+        // for non RGBIlluminantSpectrum
+        return self.inner_product(&CIE_Y_DENSELY_SAMPLED);
+    }
 }
 
 pub trait SpectrumDefaultInterface: Spectrum {
-    fn to_photometric(&self) -> Float {
-        // TODO: implement a special case for RGBIlluminantSpectrum
-        return self.inner_product(&CIE_Y_DENSELY_SAMPLED);
-    }
-
     fn inner_product(&self, g: &dyn Spectrum) -> Float {
         // The parallel (possibly faster) implementation
         return LAMBDA_RANGE

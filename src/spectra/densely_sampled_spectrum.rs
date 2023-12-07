@@ -6,6 +6,18 @@ pub struct DenselySampledSpectrum {
     values: [Float; N],
 }
 
+impl Display for DenselySampledSpectrum {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "[").expect("");
+        for x in self.values {
+            write!(f, "{}, ", x).expect("");
+        }
+        write!(f, "]").expect("");
+
+        Ok(())
+    }
+}
+
 impl Spectrum for DenselySampledSpectrum {
     fn eval(&self, lambda: Float) -> Float {
         let floor = lambda.floor();

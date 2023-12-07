@@ -314,7 +314,7 @@ impl PixelSensor {
             white_balance_val
         });
 
-        let sensor_illum = if white_balance_val != 0.0 {
+        let sensor_illum: Option<Arc<dyn Spectrum>> = if white_balance_val != 0.0 {
             Some(Arc::new(d_illum))
         } else {
             None
@@ -334,10 +334,9 @@ impl PixelSensor {
 
     fn cie_1931(
         output_color_space: &RGBColorSpace,
-        sensor_illum: Option<Arc<impl Spectrum>>,
+        sensor_illum: Option<Arc<dyn Spectrum>>,
         imaging_ratio: Float,
     ) -> Self {
-        // TODO: sensor_illum: why can't I change Arc<impl Spectrum> to Arc<dyn Spectrum>
         let r_bar = Arc::new(CIE_X_DENSELY_SAMPLED);
         let g_bar = Arc::new(CIE_Y_DENSELY_SAMPLED);
         let b_bar = Arc::new(CIE_Z_DENSELY_SAMPLED);

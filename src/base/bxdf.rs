@@ -5,6 +5,7 @@ pub enum TransportMode {
     Importance,
 }
 
+#[derive(Copy, Clone)]
 pub enum BxDFReflTransFlags {
     Unset = 0,
     Reflection = 1 << 0,
@@ -28,6 +29,7 @@ impl BitAnd for BxDFReflTransFlags {
     }
 }
 
+#[derive(Copy, Clone)]
 pub enum BxDFFlags {
     Unset = 0,
     Reflection = 1 << 0,
@@ -53,6 +55,14 @@ impl BitOr for BxDFFlags {
     }
 }
 
+impl BitAnd for BxDFFlags {
+    type Output = bool;
+
+    fn bitand(self, rhs: Self) -> Self::Output {
+        return (self as isize) & (rhs as isize) > 0;
+    }
+}
+
 pub struct BSDFSample {
     pub f: SampledSpectrum,
     pub wi: Vector3f,
@@ -60,6 +70,12 @@ pub struct BSDFSample {
     pub flags: BxDFFlags,
     pub eta: Float,
     pub pdf_is_proportional: bool,
+}
+
+impl BSDFSample {
+    pub fn is_specular(&self) -> bool {
+        return self.flags & BxDFFlags::Specular;
+    }
 }
 
 pub trait BxDF {

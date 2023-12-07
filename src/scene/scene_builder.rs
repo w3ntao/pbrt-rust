@@ -47,21 +47,20 @@ fn parse_json(path: &str) -> Value {
 }
 
 struct SceneEntity {
-    pub initialized: bool,
+    pub name: String,
+    pub parameters: ParameterDict,
+}
+
+struct CameraEntity {
     pub name: String,
     pub parameters: ParameterDict,
     pub camera_transform: CameraTransform,
 }
 
-impl Default for SceneEntity {
-    fn default() -> Self {
-        return Self {
-            initialized: false,
-            name: "".parse().unwrap(),
-            parameters: ParameterDict::default(),
-            camera_transform: CameraTransform::nan(),
-        };
-    }
+struct LightEntity {
+    pub name: String,
+    pub parameters: ParameterDict,
+    pub render_from_object: Transform,
 }
 
 fn build_film(
@@ -95,7 +94,7 @@ fn build_film(
     };
 }
 
-fn build_camera(camera_entity: &SceneEntity, resolution: Point2i) -> Arc<dyn Camera> {
+fn build_camera(camera_entity: &CameraEntity, resolution: Point2i) -> Arc<dyn Camera> {
     return Arc::new(match camera_entity.name.as_str() {
         "perspective" => PerspectiveCamera::new(
             camera_entity.camera_transform,
@@ -106,6 +105,68 @@ fn build_camera(camera_entity: &SceneEntity, resolution: Point2i) -> Arc<dyn Cam
             panic!("unknown camera type: `{}`", camera_entity.name);
         }
     });
+}
+
+fn build_lights(
+    light_entities: &Vec<LightEntity>,
+    global_variable: &GlobalVariable,
+) -> Vec<Arc<dyn Light>> {
+    if light_entities.len() == 0 {
+        panic!("no light available");
+    }
+
+    let mut lights: Vec<Arc<dyn Light>> = vec![];
+
+    for light_entity in light_entities {
+        let light_type = light_entity.name.as_str();
+        match light_type {
+            "distant" => {
+                let light = DistantLight::new(
+                    &light_entity.render_from_object,
+                    &light_entity.parameters,
+                    global_variable.rgb_color_space.as_ref(),
+                );
+
+                lights.push(Arc::new(light));
+            }
+            _ => {
+                panic!("`{}` not implemented", light_type)
+            }
+        }
+    }
+
+    return lights;
+}
+
+fn build_integrator(
+    aggregate: Arc<dyn Primitive>,
+    camera: Arc<dyn Camera>,
+    lights: Vec<Arc<dyn Light>>,
+    global_variable: &GlobalVariable,
+) -> Arc<dyn Integrator> {
+    /*
+    let integrator = AmbientOcclusion::new(
+        global_variable.rgb_color_space.illuminant,
+        aggregate,
+        camera,
+    );
+    */
+
+    let integrator = RandomWalkIntegrator::new(
+        global_variable.rgb_color_space.illuminant,
+        aggregate,
+        camera,
+        lights,
+    );
+
+    /*
+    let integrator =
+        SurfaceNormal::new(aggregate, camera, global_variable.rgb_color_space.as_ref());
+    */
+
+    return Arc::new(integrator);
+
+    panic!("build_integrator() not implemented")
 }
 
 #[derive(Copy, Clone)]
@@ -133,8 +194,9 @@ pub struct SceneBuilder {
     render_from_world: Transform,
     primitives: Vec<Arc<dyn Primitive>>,
 
-    film_entity: SceneEntity,
-    camera_entity: SceneEntity,
+    film_entity: Option<SceneEntity>,
+    camera_entity: Option<CameraEntity>,
+    light_entities: Vec<LightEntity>,
 
     current_material: Option<Arc<dyn Material>>,
 
@@ -154,9 +216,10 @@ impl SceneBuilder {
             render_from_world: Transform::identity(),
             primitives: vec![],
 
-            film_entity: SceneEntity::default(),
-            camera_entity: SceneEntity::default(),
+            film_entity: None,
+            camera_entity: None,
             current_material: None,
+            light_entities: vec![],
 
             root: None,
             global_variable,
@@ -186,27 +249,24 @@ impl SceneBuilder {
         };
     }
 
-    fn parse_look_at(&mut self, array: &Vec<Value>) {
-        assert_eq!(json_value_to_string(array[0].clone()), "LookAt");
+    fn parse_area_light_source(&mut self, tokens: &Vec<Value>) {
+        assert_eq!(json_value_to_string(tokens[0].clone()), "AreaLightSource");
 
-        let length = array.len();
-        assert_eq!(length, 10);
-
-        let mut data = [Float::NAN; 9];
-        for idx in 1..length {
-            let number_in_string = trim_quote(json_value_to_string(array[idx].clone()));
-
-            data[idx - 1] = number_in_string.parse::<Float>().unwrap();
+        let name = json_value_to_string(tokens[1].clone());
+        if name != "diffuse" {
+            panic!("only `diffuse` Area Light is supported");
         }
 
-        let position = Point3f::new(data[0], data[1], data[2]);
-        let look = Point3f::new(data[3], data[4], data[5]);
-        let up = Vector3f::new(data[6], data[7], data[8]);
+        let parameter_dict = ParameterDict::build_parameter_dict(
+            &tokens[2..],
+            &self.named_texture,
+            self.root.clone(),
+        );
 
-        let transform_look_at = build_look_at_transform(position, look, up);
+        exit(0);
 
-        self.graphics_state.current_transform =
-            self.graphics_state.current_transform * transform_look_at;
+        // TODO: progress 2023/12/14: having parser/lexer trouble when implementing DiffuseAreaLight
+        panic!("implementing parse_area_light_source()");
     }
 
     fn parse_camera(&mut self, tokens: &Vec<Value>) {
@@ -230,25 +290,75 @@ impl SceneBuilder {
 
         self.render_from_world = camera_transform.render_from_world();
 
-        self.camera_entity.initialized = true;
-        self.camera_entity.name = name;
-        self.camera_entity.camera_transform = camera_transform;
-        self.camera_entity.parameters = parameter_dict;
+        self.camera_entity = Some(CameraEntity {
+            name,
+            parameters: parameter_dict,
+            camera_transform,
+        });
     }
 
     fn parse_film(&mut self, tokens: &Vec<Value>) {
         assert_eq!(json_value_to_string(tokens[0].clone()), "Film");
 
-        self.film_entity.initialized = true;
-        self.film_entity.name = json_value_to_string(tokens[1].clone());
-        if self.film_entity.name != "rgb" {
-            println!("warning: only `rgb` film is supported for the moment.");
-            self.film_entity.name = "rgb".to_string();
+        let name = {
+            let _name = json_value_to_string(tokens[1].clone());
+            if _name != "rgb" {
+                println!("warning: only `rgb` film is supported for the moment.");
+            }
+            "rgb".to_string()
+        };
+
+        self.film_entity = Some(SceneEntity {
+            name,
+            parameters: ParameterDict::build_parameter_dict(
+                &tokens[2..],
+                &self.named_texture,
+                None,
+            ),
+        });
+    }
+
+    fn parse_light_source(&mut self, tokens: &Vec<Value>) {
+        assert_eq!(json_value_to_string(tokens[0].clone()), "LightSource");
+
+        let light_source_type = json_value_to_string(tokens[1].clone());
+
+        let light_entity = LightEntity {
+            name: light_source_type,
+            parameters: ParameterDict::build_parameter_dict(
+                &tokens[2..],
+                &self.named_texture,
+                None,
+            ),
+            render_from_object: self.render_from_object(),
+        };
+
+        self.light_entities.push(light_entity);
+    }
+
+    fn parse_look_at(&mut self, array: &Vec<Value>) {
+        assert_eq!(json_value_to_string(array[0].clone()), "LookAt");
+
+        let length = array.len();
+        assert_eq!(length, 10);
+
+        let mut data = [Float::NAN; 9];
+        for idx in 1..length {
+            let number_in_string = trim_quote(json_value_to_string(array[idx].clone()));
+
+            data[idx - 1] = number_in_string.parse::<Float>().unwrap();
         }
 
-        self.film_entity.parameters =
-            ParameterDict::build_parameter_dict(&tokens[2..], &self.named_texture, None);
+        let position = Point3f::new(data[0], data[1], data[2]);
+        let look = Point3f::new(data[3], data[4], data[5]);
+        let up = Vector3f::new(data[6], data[7], data[8]);
+
+        let transform_look_at = build_look_at_transform(position, look, up);
+
+        self.graphics_state.current_transform =
+            self.graphics_state.current_transform * transform_look_at;
     }
+
     fn parse_material(&mut self, tokens: &Vec<Value>) {
         assert_eq!(json_value_to_string(tokens[0].clone()), "Material");
 
@@ -439,7 +549,7 @@ impl SceneBuilder {
         assert_eq!(value_list.len(), 16);
 
         self.graphics_state.current_transform =
-            Transform::new(SquareMatrix::<4>::from_array(&value_list)).transpose();
+            Transform::from_matrix(SquareMatrix::<4>::from_array(&value_list)).transpose();
     }
 
     fn parse_translate(&mut self, tokens: &Vec<Value>) {
@@ -462,6 +572,12 @@ impl SceneBuilder {
             let first_token = trim_quote(json_value_to_string(tokens[0].clone()));
 
             match first_token.as_ref() {
+                "AreaLightSource" => {
+                    self.parse_area_light_source(tokens);
+                    panic!("done parsing AreaLightSource");
+                    exit(0);
+                }
+
                 "AttributeBegin" => {
                     self.pushed_graphics_state.push(self.graphics_state.clone());
                 }
@@ -489,14 +605,42 @@ impl SceneBuilder {
                     self.parse_film(tokens);
                 }
 
+                "Filter" => {
+                    //TODO: parse Filter
+                }
+
                 "Include" => {
                     assert_eq!(tokens.len(), 2);
                     let included_filename = json_value_to_string(tokens[1].clone());
                     self.parse_file(&included_filename);
                 }
 
+                "Integrator" => {
+                    //TODO: parse Integrator
+                }
+
+                "LightSource" => {
+                    self.parse_light_source(tokens);
+                }
+
                 "LookAt" => {
                     self.parse_look_at(tokens);
+                }
+
+                "Material" => {
+                    self.parse_material(tokens);
+                }
+
+                "MakeNamedMaterial" => {
+                    // TODO: parse MakeNamedMaterial
+                }
+
+                "NamedMaterial" => {
+                    // TODO: parse NamedMaterial
+                }
+
+                "PixelFilter" => {
+                    //TODO: PixelFilter not implemented
                 }
 
                 "Rotate" => {
@@ -508,8 +652,8 @@ impl SceneBuilder {
                         !self.graphics_state.reverse_orientation;
                 }
 
-                "PixelFilter" => {
-                    //TODO: PixelFilter not implemented
+                "Sampler" => {
+                    //TODO: parse Sampler
                 }
 
                 "Scale" => {
@@ -518,6 +662,10 @@ impl SceneBuilder {
 
                 "Shape" => {
                     self.parse_shape(tokens);
+                }
+
+                "Texture" => {
+                    self.parse_texture(tokens);
                 }
 
                 "Transform" => {
@@ -534,42 +682,6 @@ impl SceneBuilder {
                         .insert("world".to_string(), self.graphics_state.current_transform);
                 }
 
-                "AreaLightSource" => {
-                    // TODO: parse AreaLightSource
-                }
-
-                "Filter" => {
-                    //TODO: parse Filter
-                }
-
-                "Integrator" => {
-                    //TODO: parse Integrator
-                }
-
-                "LightSource" => {
-                    // TODO: parse LightSource
-                }
-
-                "Material" => {
-                    self.parse_material(tokens);
-                }
-
-                "MakeNamedMaterial" => {
-                    // TODO: parse MakeNamedMaterial
-                }
-
-                "NamedMaterial" => {
-                    // TODO: parse NamedMaterial
-                }
-
-                "Sampler" => {
-                    //TODO: parse Sampler
-                }
-
-                "Texture" => {
-                    self.parse_texture(tokens);
-                }
-
                 _ => {
                     panic!("unknown token: `{}`", first_token);
                 }
@@ -583,40 +695,35 @@ impl SceneBuilder {
 
         let filter = Arc::new(BoxFilter::new(0.5));
 
-        let film = if self.film_entity.initialized {
-            build_film(
-                &self.film_entity,
-                filter.clone(),
-                self.global_variable.as_ref(),
-            )
-        } else {
-            panic!("default Film not implemented");
+        let film = match &self.film_entity {
+            None => {
+                panic!("default Film not implemented");
+            }
+            Some(film_entity) => {
+                build_film(&film_entity, filter.clone(), self.global_variable.as_ref())
+            }
         };
 
-        let camera = if self.camera_entity.initialized {
-            build_camera(&self.camera_entity, film.lock().unwrap().get_resolution())
-        } else {
-            panic!("default Camera not implemented");
+        let camera = match &self.camera_entity {
+            None => {
+                panic!("default Camera not implemented");
+            }
+            Some(camera_entity) => {
+                build_camera(&camera_entity, film.lock().unwrap().get_resolution())
+            }
         };
 
         let sampler = Arc::new(IndependentSampler::new(samples_per_pixel));
         let bvh_aggregate = Arc::new(BVHAggregate::new(self.primitives.clone()));
 
-        let illuminant = self.global_variable.rgb_color_space.illuminant;
+        let lights = build_lights(&self.light_entities, &self.global_variable);
 
-        //let integrator = Arc::new(AmbientOcclusion::new(illuminant, bvh_aggregate.clone()));
-        let integrator = Arc::new(RandomWalkIntegrator::new(
-            illuminant,
+        let integrator = build_integrator(
+            bvh_aggregate,
             camera.clone(),
-            bvh_aggregate.clone(),
-        ));
-
-        /*
-        let integrator = Arc::new(SurfaceNormal::new(
-            bvh_aggregate.clone(),
-            self.global_variable.rgb_color_space.as_ref(),
-        ));
-        */
+            lights,
+            self.global_variable.as_ref(),
+        );
 
         return Renderer::new(integrator, sampler, camera, film);
     }

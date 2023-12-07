@@ -21,7 +21,7 @@ impl BxDF for DiffuseBxDF {
 
     fn f(&self, wo: Vector3f, wi: Vector3f, mode: TransportMode) -> SampledSpectrum {
         if !wo.same_hemisphere(wi) {
-            return SampledSpectrum::zero();
+            return SampledSpectrum::same_value(0.0);
         }
 
         return self.r * INV_PI;

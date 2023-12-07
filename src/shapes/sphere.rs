@@ -227,7 +227,7 @@ impl Shape for Sphere {
 
                 Some(ShapeIntersection {
                     t_hit: quadric_intersection.t_hit,
-                    interaction,
+                    surface_interaction: interaction,
                 })
             }
         };

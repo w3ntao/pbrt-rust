@@ -14,8 +14,8 @@ impl Primitive for SimplePrimitive {
             Some(_si) => _si,
         };
 
-        si.interaction
-            .set_intersection_properties(self.material.clone());
+        si.surface_interaction
+            .set_intersection_properties(self.material.clone(), None);
 
         return Some(si);
     }
