@@ -32,20 +32,6 @@ fn build_look_at_transform(pos: Point3f, look: Point3f, up: Vector3f) -> Transfo
     return Transform::new_with_inverse(camera_from_world, world_from_camera);
 }
 
-fn parse_json(path: &str) -> Value {
-    let mut file = match File::open(path) {
-        Ok(_file) => _file,
-        Err(_) => {
-            panic!("fail to read `{}`", path);
-        }
-    };
-
-    let mut data = String::new();
-    file.read_to_string(&mut data).unwrap();
-
-    return serde_json::from_str(&data).expect("JSON was not well-formatted");
-}
-
 struct SceneEntity {
     pub name: String,
     pub parameters: ParameterDict,
@@ -111,9 +97,11 @@ fn build_lights(
     light_entities: &Vec<LightEntity>,
     global_variable: &GlobalVariable,
 ) -> Vec<Arc<dyn Light>> {
+    /*
     if light_entities.len() == 0 {
         panic!("no light available");
     }
+    */
 
     let mut lights: Vec<Arc<dyn Light>> = vec![];
 
@@ -152,21 +140,34 @@ fn build_integrator(
     );
     */
 
+    /*
     let integrator = RandomWalkIntegrator::new(
         global_variable.rgb_color_space.illuminant,
         aggregate,
         camera,
         lights,
     );
-
-    /*
-    let integrator =
-        SurfaceNormal::new(aggregate, camera, global_variable.rgb_color_space.as_ref());
     */
 
-    return Arc::new(integrator);
+    let integrator =
+        SurfaceNormal::new(aggregate, camera, global_variable.rgb_color_space.as_ref());
 
-    panic!("build_integrator() not implemented")
+    return Arc::new(integrator);
+}
+
+fn split_tokens_into_statements(tokens: &[Token]) -> Vec<usize> {
+    let mut keyword_range = vec![];
+    for idx in 0..tokens.len() {
+        match tokens[idx].clone() {
+            Token::WorldBegin | Token::AttributeEnd | Token::AttributeBegin | Token::Keyword(_) => {
+                keyword_range.push(idx);
+            }
+            _ => {}
+        }
+    }
+    keyword_range.push(tokens.len());
+
+    return keyword_range;
 }
 
 #[derive(Copy, Clone)]
@@ -226,33 +227,10 @@ impl SceneBuilder {
         };
     }
 
-    fn get_filepath(&self, file_basename: &str) -> String {
-        return match &self.root {
-            None => file_basename.to_string(),
-            Some(root) => format!("{}/{}", root, file_basename),
-        };
-    }
+    fn world_area_light_source(&mut self, tokens: &[Token]) {
+        debug_assert!(tokens[0].clone() == Token::Keyword("AreaLightSource".to_string()));
 
-    fn render_from_object(&self) -> Transform {
-        return self.render_from_world * self.graphics_state.current_transform;
-    }
-
-    fn parse_coord_sys_transform(&mut self, tokens: &Vec<Value>) {
-        assert_eq!(json_value_to_string(tokens[0].clone()), "CoordSysTransform");
-
-        let name = json_value_to_string(tokens[1].clone());
-        self.graphics_state.current_transform = match self.named_coordinate_systems.get(&name) {
-            None => {
-                panic!("couldn't find key {}", name);
-            }
-            Some(transform) => *transform,
-        };
-    }
-
-    fn parse_area_light_source(&mut self, tokens: &Vec<Value>) {
-        assert_eq!(json_value_to_string(tokens[0].clone()), "AreaLightSource");
-
-        let name = json_value_to_string(tokens[1].clone());
+        let name = tokens[1].convert_to_string();
         if name != "diffuse" {
             panic!("only `diffuse` Area Light is supported");
         }
@@ -263,65 +241,38 @@ impl SceneBuilder {
             self.root.clone(),
         );
 
-        exit(0);
-
         // TODO: progress 2023/12/14: having parser/lexer trouble when implementing DiffuseAreaLight
-        panic!("implementing parse_area_light_source()");
+
+        panic!("world_area_light_source() not implemented");
     }
 
-    fn parse_camera(&mut self, tokens: &Vec<Value>) {
-        assert_eq!(json_value_to_string(tokens[0].clone()), "Camera");
+    fn world_coord_sys_transform(&mut self, tokens: &[Token]) {
+        debug_assert!(tokens[0].clone() == Token::Keyword("CoordSysTransform".to_string()));
+        debug_assert!(tokens.len() == 2);
 
-        let name = json_value_to_string(tokens[1].clone());
-        let parameter_dict = ParameterDict::build_parameter_dict(
-            &tokens[2..],
-            &self.named_texture,
-            self.root.clone(),
-        );
-
-        let camera_from_world = self.graphics_state.current_transform;
-        let world_from_camera = camera_from_world.inverse();
-
-        self.named_coordinate_systems
-            .insert("camera".to_string(), camera_from_world.inverse());
-
-        let camera_transform =
-            CameraTransform::new(world_from_camera, RenderingCoordinateSystem::CameraWorld);
-
-        self.render_from_world = camera_transform.render_from_world();
-
-        self.camera_entity = Some(CameraEntity {
-            name,
-            parameters: parameter_dict,
-            camera_transform,
-        });
-    }
-
-    fn parse_film(&mut self, tokens: &Vec<Value>) {
-        assert_eq!(json_value_to_string(tokens[0].clone()), "Film");
-
-        let name = {
-            let _name = json_value_to_string(tokens[1].clone());
-            if _name != "rgb" {
-                println!("warning: only `rgb` film is supported for the moment.");
+        let coord_sys_name = {
+            let token = tokens[1].clone();
+            match token {
+                Token::String(kw) => kw,
+                _ => {
+                    panic!("expect Token::String, get `{:?}`", token);
+                }
             }
-            "rgb".to_string()
         };
 
-        self.film_entity = Some(SceneEntity {
-            name,
-            parameters: ParameterDict::build_parameter_dict(
-                &tokens[2..],
-                &self.named_texture,
-                None,
-            ),
-        });
+        self.graphics_state.current_transform =
+            match self.named_coordinate_systems.get(&coord_sys_name) {
+                None => {
+                    panic!("couldn't find key {}", coord_sys_name);
+                }
+                Some(transform) => *transform,
+            };
     }
 
-    fn parse_light_source(&mut self, tokens: &Vec<Value>) {
-        assert_eq!(json_value_to_string(tokens[0].clone()), "LightSource");
+    fn world_light_source(&mut self, tokens: &[Token]) {
+        debug_assert!(tokens[0].clone() == Token::Keyword("LightSource".to_string()));
 
-        let light_source_type = json_value_to_string(tokens[1].clone());
+        let light_source_type = tokens[1].convert_to_string();
 
         let light_entity = LightEntity {
             name: light_source_type,
@@ -335,32 +286,8 @@ impl SceneBuilder {
 
         self.light_entities.push(light_entity);
     }
-
-    fn parse_look_at(&mut self, array: &Vec<Value>) {
-        assert_eq!(json_value_to_string(array[0].clone()), "LookAt");
-
-        let length = array.len();
-        assert_eq!(length, 10);
-
-        let mut data = [Float::NAN; 9];
-        for idx in 1..length {
-            let number_in_string = trim_quote(json_value_to_string(array[idx].clone()));
-
-            data[idx - 1] = number_in_string.parse::<Float>().unwrap();
-        }
-
-        let position = Point3f::new(data[0], data[1], data[2]);
-        let look = Point3f::new(data[3], data[4], data[5]);
-        let up = Vector3f::new(data[6], data[7], data[8]);
-
-        let transform_look_at = build_look_at_transform(position, look, up);
-
-        self.graphics_state.current_transform =
-            self.graphics_state.current_transform * transform_look_at;
-    }
-
-    fn parse_material(&mut self, tokens: &Vec<Value>) {
-        assert_eq!(json_value_to_string(tokens[0].clone()), "Material");
+    fn world_material(&mut self, tokens: &[Token]) {
+        debug_assert!(tokens[0] == Token::Keyword("Material".to_string()));
 
         let parameter_dict = ParameterDict::build_parameter_dict(
             &tokens[2..],
@@ -368,35 +295,41 @@ impl SceneBuilder {
             self.root.clone(),
         );
 
-        let material_type = json_value_to_string(tokens[1].clone());
+        let material_type = tokens[1].convert_to_string();
         self.current_material = Some(create_material(&material_type, &parameter_dict));
     }
 
-    fn parse_rotate(&mut self, tokens: &Vec<Value>) {
-        assert_eq!(tokens.len(), 5);
-        assert_eq!(json_value_to_string(tokens[0].clone()), "Rotate");
+    fn world_rotate(&mut self, tokens: &[Token]) {
+        debug_assert!(tokens.len() == 5);
+        debug_assert!(tokens[0].clone() == Token::Keyword("Rotate".to_string()));
 
-        let floats = json_values_to_floats(&tokens.clone()[1..]);
-        assert_eq!(floats.len(), 4);
+        let floats = tokens[1..]
+            .into_iter()
+            .map(|t| t.convert_to_float())
+            .collect::<Vec<Float>>();
+
+        debug_assert!(floats.len() == 4);
 
         self.graphics_state.current_transform = self.graphics_state.current_transform
             * Transform::rotate(floats[0], floats[1], floats[2], floats[3]);
     }
 
-    fn parse_scale(&mut self, tokens: &Vec<Value>) {
-        assert_eq!(tokens.len(), 4);
-        assert_eq!(json_value_to_string(tokens[0].clone()), "Scale");
+    fn world_scale(&mut self, tokens: &[Token]) {
+        debug_assert!(tokens.len() == 4);
+        debug_assert!(tokens[0].clone() == Token::Keyword("Scale".to_string()));
 
-        let floats = json_values_to_floats(&tokens.clone()[1..]);
-        assert_eq!(floats.len(), 3);
+        let floats = tokens[1..]
+            .into_iter()
+            .map(|t| t.convert_to_float())
+            .collect::<Vec<Float>>();
+        debug_assert!(floats.len() == 4);
 
         self.graphics_state.current_transform = self.graphics_state.current_transform
             * Transform::scale(floats[0], floats[1], floats[2]);
     }
 
-    fn parse_shape(&mut self, tokens: &Vec<Value>) {
-        assert_eq!(json_value_to_string(tokens[0].clone()), "Shape");
-        assert!(self.current_material.is_some());
+    fn world_shape(&mut self, tokens: &[Token]) {
+        debug_assert!(tokens[0].clone() == Token::Keyword("Shape".to_string()));
 
         let material = match &self.current_material {
             None => {
@@ -416,12 +349,8 @@ impl SceneBuilder {
 
         let reverse_orientation = self.graphics_state.reverse_orientation;
 
-        let name = json_value_to_string(tokens[1].clone());
+        let name = tokens[1].convert_to_string();
         match name.as_str() {
-            "disk" => {
-                // TODO: disk not implemented
-            }
-
             "loopsubdiv" => {
                 let levels = parameters.get_one_integer("levels", Some(3)) as usize;
                 let indices_i32 = parameters.get_integer_array("indices");
@@ -504,13 +433,12 @@ impl SceneBuilder {
         };
     }
 
-    fn parse_texture(&mut self, tokens: &Vec<Value>) {
-        assert_eq!(json_value_to_string(tokens[0].clone()), "Texture");
+    fn world_texture(&mut self, tokens: &[Token]) {
+        debug_assert!(tokens[0].clone() == Token::Keyword("Texture".to_string()));
 
-        let texture_name = json_value_to_string(tokens[1].clone());
-
-        let color_type = json_value_to_string(tokens[2].clone());
-        let texture_type = json_value_to_string(tokens[3].clone());
+        let texture_name = tokens[1].convert_to_string();
+        let color_type = tokens[2].convert_to_string();
+        let texture_type = tokens[3].convert_to_string();
 
         match color_type.as_str() {
             "spectrum" => {
@@ -541,151 +469,251 @@ impl SceneBuilder {
         };
     }
 
-    fn parse_transform(&mut self, tokens: &Vec<Value>) {
-        assert_eq!(tokens.len(), 2);
-        assert_eq!(json_value_to_string(tokens[0].clone()), "Transform");
+    fn world_transform(&mut self, tokens: &[Token]) {
+        debug_assert!(tokens.len() == 2);
+        debug_assert!(tokens[0].clone() == Token::Keyword("Transform".to_string()));
 
-        let value_list = json_value_to_floats(tokens[1].clone());
-        assert_eq!(value_list.len(), 16);
+        let floats = tokens[1..]
+            .into_iter()
+            .map(|t| t.convert_to_float())
+            .collect::<Vec<Float>>();
+        debug_assert!(floats.len() == 16);
 
         self.graphics_state.current_transform =
-            Transform::from_matrix(SquareMatrix::<4>::from_array(&value_list)).transpose();
+            Transform::from_matrix(SquareMatrix::<4>::from_array(&floats)).transpose();
     }
 
-    fn parse_translate(&mut self, tokens: &Vec<Value>) {
-        assert_eq!(tokens.len(), 4);
-        assert_eq!(json_value_to_string(tokens[0].clone()), "Translate");
+    fn world_translate(&mut self, tokens: &[Token]) {
+        debug_assert!(tokens[0].clone() == Token::Keyword("Translate".to_string()));
+        debug_assert!(tokens.len() == 4);
 
-        let floats = json_values_to_floats(&tokens.clone()[1..]);
-        assert_eq!(floats.len(), 3);
+        let floats = tokens[1..]
+            .into_iter()
+            .map(|t| t.convert_to_float())
+            .collect::<Vec<Float>>();
 
         self.graphics_state.current_transform = self.graphics_state.current_transform
             * Transform::translate(floats[0], floats[1], floats[2]);
     }
 
-    fn parse_file(&mut self, filename: &str) {
-        let blocks = parse_json(&self.get_filepath(filename));
-        let block_length = json_value_to_usize(blocks["length"].clone());
+    fn parse_statement(&mut self, tokens: &[Token]) {
+        let first_token = tokens[0].clone();
 
-        for idx in 0..block_length {
-            let tokens = blocks[format!("token_{}", idx)].as_array().unwrap();
-            let first_token = trim_quote(json_value_to_string(tokens[0].clone()));
-
-            match first_token.as_ref() {
-                "AreaLightSource" => {
-                    self.parse_area_light_source(tokens);
-                    panic!("done parsing AreaLightSource");
-                    exit(0);
-                }
-
-                "AttributeBegin" => {
-                    self.pushed_graphics_state.push(self.graphics_state.clone());
-                }
-
-                "AttributeEnd" => {
-                    match self.pushed_graphics_state.pop() {
-                        None => {
-                            panic!("unmatched `AttributeEnd` encountered.");
-                        }
-                        Some(_graphics_state) => {
-                            self.graphics_state = _graphics_state;
-                        }
-                    };
-                }
-
-                "Camera" => {
-                    self.parse_camera(tokens);
-                }
-
-                "CoordSysTransform" => {
-                    self.parse_coord_sys_transform(tokens);
-                }
-
-                "Film" => {
-                    self.parse_film(tokens);
-                }
-
-                "Filter" => {
-                    //TODO: parse Filter
-                }
-
-                "Include" => {
-                    assert_eq!(tokens.len(), 2);
-                    let included_filename = json_value_to_string(tokens[1].clone());
-                    self.parse_file(&included_filename);
-                }
-
-                "Integrator" => {
-                    //TODO: parse Integrator
-                }
-
-                "LightSource" => {
-                    self.parse_light_source(tokens);
-                }
-
-                "LookAt" => {
-                    self.parse_look_at(tokens);
-                }
-
-                "Material" => {
-                    self.parse_material(tokens);
-                }
-
-                "MakeNamedMaterial" => {
-                    // TODO: parse MakeNamedMaterial
-                }
-
-                "NamedMaterial" => {
-                    // TODO: parse NamedMaterial
-                }
-
-                "PixelFilter" => {
-                    //TODO: PixelFilter not implemented
-                }
-
-                "Rotate" => {
-                    self.parse_rotate(tokens);
-                }
-
-                "ReverseOrientation" => {
-                    self.graphics_state.reverse_orientation =
-                        !self.graphics_state.reverse_orientation;
-                }
-
-                "Sampler" => {
-                    //TODO: parse Sampler
-                }
-
-                "Scale" => {
-                    self.parse_scale(tokens);
-                }
-
-                "Shape" => {
-                    self.parse_shape(tokens);
-                }
-
-                "Texture" => {
-                    self.parse_texture(tokens);
-                }
-
-                "Transform" => {
-                    self.parse_transform(tokens);
-                }
-
-                "Translate" => {
-                    self.parse_translate(tokens);
-                }
-
-                "WorldBegin" => {
-                    self.graphics_state.current_transform = Transform::identity();
-                    self.named_coordinate_systems
-                        .insert("world".to_string(), self.graphics_state.current_transform);
-                }
-
-                _ => {
-                    panic!("unknown token: `{}`", first_token);
-                }
+        match first_token {
+            Token::AttributeBegin => {
+                assert_eq!(tokens.len(), 1);
+                self.pushed_graphics_state.push(self.graphics_state.clone());
             }
+
+            Token::AttributeEnd => {
+                assert_eq!(tokens.len(), 1);
+
+                match self.pushed_graphics_state.pop() {
+                    None => {
+                        panic!("unmatched `AttributeEnd` encountered.");
+                    }
+                    Some(_graphics_state) => {
+                        self.graphics_state = _graphics_state;
+                    }
+                };
+            }
+
+            Token::WorldBegin => {
+                // WorldBegin
+                self.graphics_state.current_transform = Transform::identity();
+                self.named_coordinate_systems
+                    .insert("world".to_string(), self.graphics_state.current_transform);
+            }
+
+            Token::Keyword(keyword) => {
+                match keyword.as_str() {
+                    "AreaLightSource" => {
+                        self.world_area_light_source(tokens);
+                    }
+
+                    "Camera" => {
+                        self.option_camera(tokens);
+                    }
+
+                    "CoordSysTransform" => {
+                        self.world_coord_sys_transform(tokens);
+                    }
+
+                    "Film" => {
+                        self.option_film(tokens);
+                    }
+
+                    "Include" => {
+                        assert_eq!(tokens.len(), 2);
+                        let included_filename = tokens[1].convert_to_string();
+                        self.parse_file(&included_filename);
+                    }
+
+                    "Integrator" => {
+                        // TODO: parse Integrator
+                        println!("parse_Integrator() not implemented");
+                    }
+
+                    "LightSource" => {
+                        self.world_light_source(tokens);
+                    }
+
+                    "LookAt" => {
+                        self.option_look_at(tokens);
+                    }
+
+                    "Material" => {
+                        self.world_material(tokens);
+                    }
+
+                    "ReverseOrientation" => {
+                        self.graphics_state.reverse_orientation =
+                            !self.graphics_state.reverse_orientation;
+                    }
+
+                    "Rotate" => {
+                        self.world_rotate(tokens);
+                    }
+
+                    "Scale" => {
+                        self.world_scale(tokens);
+                    }
+
+                    "Sampler" => {
+                        // TODO: parse Sampler
+                        println!("parse_sampler() not implemented");
+                    }
+
+                    "Shape" => {
+                        self.world_shape(tokens);
+                    }
+
+                    "Texture" => {
+                        self.world_texture(tokens);
+                    }
+
+                    "Transform" => {
+                        self.world_transform(tokens);
+                    }
+
+                    "Translate" => {
+                        self.world_translate(tokens);
+                    }
+
+                    _ => {
+                        panic!("unrecognized keyword: `{:?}`", keyword);
+                    }
+                };
+            }
+            _ => {
+                panic!("unrecognized Token: `{:?}`", first_token);
+            }
+        }
+    }
+
+    fn option_camera(&mut self, tokens: &[Token]) {
+        debug_assert!(tokens[0].clone() == Token::Keyword("Camera".to_string()));
+
+        let camera_type = match tokens[1].clone() {
+            Token::String(str) => str,
+            _ => {
+                panic!("expect Token::String");
+            }
+        };
+
+        let parameter_dict = ParameterDict::build_parameter_dict(
+            &tokens[2..],
+            &self.named_texture,
+            self.root.clone(),
+        );
+
+        let camera_from_world = self.graphics_state.current_transform;
+        let world_from_camera = camera_from_world.inverse();
+
+        self.named_coordinate_systems
+            .insert("camera".to_string(), camera_from_world.inverse());
+
+        let camera_transform =
+            CameraTransform::new(world_from_camera, RenderingCoordinateSystem::CameraWorld);
+
+        self.render_from_world = camera_transform.render_from_world();
+
+        self.camera_entity = Some(CameraEntity {
+            name: camera_type.to_string(),
+            parameters: parameter_dict,
+            camera_transform,
+        });
+    }
+
+    fn option_film(&mut self, tokens: &[Token]) {
+        debug_assert!(tokens[0].clone() == Token::Keyword("Film".to_string()));
+
+        let film_type = match tokens[1].clone() {
+            Token::String(str) => {
+                if str != "rgb" {
+                    println!("warning: only `rgb` film is supported for the moment.");
+                }
+                "rgb".to_string()
+            }
+            _ => {
+                panic!("expect Token::String");
+            }
+        };
+
+        self.film_entity = Some(SceneEntity {
+            name: film_type,
+            parameters: ParameterDict::build_parameter_dict(
+                &tokens[2..],
+                &self.named_texture,
+                None,
+            ),
+        });
+    }
+
+    fn option_look_at(&mut self, tokens: &[Token]) {
+        debug_assert!(tokens[0].clone() == Token::Keyword("LookAt".to_string()));
+
+        let data: Vec<Float> = tokens[1..]
+            .into_iter()
+            .map(|token| match token {
+                Token::Number(num) => num.parse::<Float>().unwrap(),
+                _ => {
+                    panic!("expect Token::Number here");
+                }
+            })
+            .collect();
+
+        let position = Point3f::new(data[0], data[1], data[2]);
+        let look = Point3f::new(data[3], data[4], data[5]);
+        let up = Vector3f::new(data[6], data[7], data[8]);
+
+        let transform_look_at = build_look_at_transform(position, look, up);
+
+        self.graphics_state.current_transform =
+            self.graphics_state.current_transform * transform_look_at;
+    }
+
+    fn get_filepath(&self, file_basename: &str) -> String {
+        return match &self.root {
+            None => file_basename.to_string(),
+            Some(root) => format!("{}/{}", root, file_basename),
+        };
+    }
+
+    fn render_from_object(&self) -> Transform {
+        return self.render_from_world * self.graphics_state.current_transform;
+    }
+
+    fn parse_file(&mut self, filename: &str) {
+        let tokens = parse_pbrt_into_token(&self.get_filepath(filename));
+
+        let range_of_statement = split_tokens_into_statements(&tokens);
+
+        for range_idx in 0..(range_of_statement.len() - 1) {
+            let statement =
+                &tokens[range_of_statement[range_idx]..range_of_statement[range_idx + 1]];
+
+            self.parse_statement(statement);
         }
     }
 

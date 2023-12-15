@@ -53,10 +53,7 @@ fn main() {
 
     let absolute_path = fs::canonicalize(args.scene_file).unwrap();
 
-    let spp = match args.spp {
-        None => 16,
-        Some(x) => x,
-    };
+    let spp = args.spp.unwrap_or_else(|| 16);
 
     render(&absolute_path.display().to_string(), spp);
 }

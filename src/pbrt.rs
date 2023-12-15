@@ -11,13 +11,12 @@ pub struct GlobalVariable {
 pub use fma::fma;
 pub use rand::{rngs::StdRng, thread_rng, Rng, SeedableRng};
 pub use rayon::prelude::*;
-pub use serde_json::Value;
 pub use std::{
     any::{type_name, Any, TypeId},
     cmp::Ordering,
     collections::{HashMap, HashSet},
     fmt::{Debug, Display, Formatter},
-    fs::File,
+    fs::{read_to_string, File},
     hash::{Hash, Hasher},
     io::{BufReader, Read},
     iter::Sum,
@@ -53,7 +52,7 @@ pub use crate::{
     materials::diffuse_material::*,
     primitives::simple_primitive::*,
     samplers::independent::*,
-    scene::{parameter_dict::*, renderer::*, scene_builder::*, util::*},
+    scene::{lexer::*, parameter_dict::*, renderer::*, scene_builder::*, util::*},
     shapes::{loop_subdivision::*, sphere::*, tri_quad_mesh::*, triangle::*, triangle_mesh::*},
     spectra::{
         black_body_spectrum::*, cie_xyz::*, const_piecewise_linear_spectrum::*, const_spectrum::*,

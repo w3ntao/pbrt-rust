@@ -51,22 +51,6 @@ pub fn split_variable_type_name(token: String) -> (String, String) {
     return (parts[0].to_string(), parts[1].to_string());
 }
 
-pub fn fetch_variable_value(value: &Value) -> Vec<String> {
-    return match value.as_array() {
-        None => {
-            // if it's a string
-            vec![value.as_str().unwrap().to_string()]
-        }
-        Some(value_vector) => {
-            // if it's a vec of string
-            value_vector
-                .into_par_iter()
-                .map(|v| json_value_to_string(v.clone()))
-                .collect()
-        }
-    };
-}
-
 fn _print<T: Display>(hashmap: &HashMap<String, Vec<T>>) {
     for (k, values) in hashmap {
         print!("{} -> ", k);
@@ -79,7 +63,7 @@ fn _print<T: Display>(hashmap: &HashMap<String, Vec<T>>) {
     println!();
 }
 
-pub fn convert_string<T: FromStr>(string_vec: &Vec<String>) -> Vec<T>
+pub fn convert_string<T: FromStr>(string_vec: &[String]) -> Vec<T>
 where
     <T as FromStr>::Err: Debug,
 {
@@ -117,7 +101,7 @@ fn get_array<T: Copy>(key: &str, dict: &HashMap<String, Vec<T>>) -> Vec<T> {
 
 impl ParameterDict {
     pub fn build_parameter_dict(
-        array: &[Value],
+        array: &[Token],
         named_texture: &HashMap<String, Arc<dyn SpectrumTexture>>,
         dir_path: Option<String>,
     ) -> ParameterDict {
@@ -132,21 +116,28 @@ impl ParameterDict {
         let mut bools = HashMap::<String, Vec<bool>>::new();
 
         for idx in (0..array.len()).step_by(2) {
-            let token = trim_quote(json_value_to_string(array[idx].clone()));
-            let (variable_type, variable_name) = split_variable_type_name(token);
+            let token = array[idx].clone();
+            let (variable_type, variable_name) = match token {
+                Token::Variable((_type, _name)) => (_type, _name),
+                _ => {
+                    panic!("expect Token::Variable here, get {:?}", token);
+                }
+            };
 
-            let variable_values = fetch_variable_value(&array[idx + 1]);
+            let variable_values = match array[idx + 1].clone() {
+                Token::List(ls) => ls,
+                _ => {
+                    panic!("expect Token::List here");
+                }
+            };
 
+            //let variable_values = fetch_variable_value(&array[idx + 1]);
             match variable_type.as_str() {
                 "string" => {
-                    assert_eq!(variable_values.len(), 1);
-
                     match (variable_name.as_str(), &dir_path) {
                         ("filename", Some(dir)) => {
-                            strings.insert(
-                                variable_name,
-                                format!("{}/{}", dir, variable_values[0].clone()),
-                            );
+                            strings
+                                .insert(variable_name, format!("{}/{}", dir, variable_values[0]));
                         }
                         (_, _) => {
                             strings.insert(variable_name, variable_values[0].clone());
@@ -207,7 +198,6 @@ impl ParameterDict {
                 }
 
                 "texture" => {
-                    assert_eq!(variable_values.len(), 1);
                     let texture_id = variable_values[0].clone();
 
                     let texture = match named_texture.get(&texture_id) {
@@ -349,7 +339,6 @@ impl ParameterDict {
     }
 }
 
-//floats: HashMap<String, Vec<Float>>,
 fn display_single_value_dict<T: Display>(dict: &HashMap<String, T>) {
     for (key, value) in dict {
         println!("    {} -> {}", key, value);
