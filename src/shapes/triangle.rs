@@ -188,18 +188,30 @@ impl Triangle {
         let dp02 = p0 - p2;
         let dp12 = p1 - p2;
 
-        let determinant = difference_of_products(duv02.x, duv12.y, duv02.y, duv12.x);
+        let (dpdu, dpdv) = {
+            let mut dpdu = Vector3f::nan();
+            let mut dpdv = Vector3f::nan();
 
-        let degenerate_uv = determinant.abs() < 1e-9;
-        let (dpdu, dpdv) = if !degenerate_uv {
-            // Compute triangle $\dpdu$ and $\dpdv$ via matrix inversion
-            let inv_det = 1.0 / determinant;
-            let dpdu = difference_of_products_vec3(duv12[1], dp02, duv02[1], dp12) * inv_det;
-            let dpdv = difference_of_products_vec3(duv02[0], dp12, duv12[0], dp02) * inv_det;
+            let determinant = difference_of_products(duv02.x, duv12.y, duv02.y, duv12.x);
+            let degenerate_uv = determinant.abs() < 1e-9;
+            if !degenerate_uv {
+                // Compute triangle $\dpdu$ and $\dpdv$ via matrix inversion
+                let inv_det = 1.0 / determinant;
+                dpdu = difference_of_products_vec3(duv12[1], dp02, duv02[1], dp12) * inv_det;
+                dpdv = difference_of_products_vec3(duv02[0], dp12, duv12[0], dp02) * inv_det;
+            }
+            if degenerate_uv || dpdu.cross(dpdv).length_squared() == 0.0 {
+                let _ng = (p2 - p0).cross(p1 - p0);
+                let ng = if _ng.length_squared() == 0.0 {
+                    (p2 - p0).cross(p1 - p0)
+                } else {
+                    _ng
+                };
+
+                (dpdu, dpdv) = ng.normalize().coordinate_system();
+            }
 
             (dpdu, dpdv)
-        } else {
-            panic!("degenerate_uv is not implemented");
         };
 
         // Interpolate $(u,v)$ parametric coordinates and hit point

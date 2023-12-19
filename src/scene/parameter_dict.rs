@@ -124,10 +124,16 @@ impl ParameterDict {
                 }
             };
 
-            let variable_values = match array[idx + 1].clone() {
-                Token::List(ls) => ls,
-                _ => {
-                    panic!("expect Token::List here");
+            let variable_values = {
+                let t = array[idx + 1].clone();
+                match t {
+                    Token::Number(str) => {
+                        vec![str]
+                    }
+                    Token::List(ls) => ls,
+                    _ => {
+                        panic!("fail to parse {:?} into variable values", t);
+                    }
                 }
             };
 
@@ -229,6 +235,10 @@ impl ParameterDict {
         };
     }
 
+    pub fn has_point2(&self, name:&str) -> bool {
+        return self.point2s.get(name).is_some();
+    }
+    
     pub fn has_rgb(&self, name: &str) -> bool {
         return self.rgbs.get(name).is_some();
     }

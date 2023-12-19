@@ -132,13 +132,11 @@ fn build_integrator(
     lights: Vec<Arc<dyn Light>>,
     global_variable: &GlobalVariable,
 ) -> Arc<dyn Integrator> {
-    /*
     let integrator = AmbientOcclusion::new(
         global_variable.rgb_color_space.illuminant,
         aggregate,
         camera,
     );
-    */
 
     /*
     let integrator = RandomWalkIntegrator::new(
@@ -149,8 +147,10 @@ fn build_integrator(
     );
     */
 
+    /*
     let integrator =
         SurfaceNormal::new(aggregate, camera, global_variable.rgb_color_space.as_ref());
+    */
 
     return Arc::new(integrator);
 }
@@ -390,7 +390,11 @@ impl SceneBuilder {
                 let indices = parameters.get_integer_array("indices");
                 let points = parameters.get_point3_array("P");
                 let normals = parameters.get_normal3_array("N");
-                let uv = parameters.get_point2_array("uv");
+                let uv = if parameters.has_point2("uv") {
+                    parameters.get_point2_array("uv")
+                } else {
+                    vec![]
+                };
 
                 let mesh = TriangleMesh::new(
                     &render_from_object,
