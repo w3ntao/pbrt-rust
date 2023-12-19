@@ -273,14 +273,14 @@ pub struct PixelSensor {
     r_bar: Arc<dyn Spectrum>,
     g_bar: Arc<dyn Spectrum>,
     b_bar: Arc<dyn Spectrum>,
-    imaging_ratio: Float,
+    imaging_ratio: f64,
     pub xyz_from_sensor_rgb: SquareMatrix<3>,
 }
 
 impl PixelSensor {
     pub fn create(
         parameters: &ParameterDict,
-        exposure_time: Float,
+        exposure_time: f64,
         global_variable: &GlobalVariable,
     ) -> Self {
         // Imaging ratio parameters
@@ -335,7 +335,7 @@ impl PixelSensor {
     fn cie_1931(
         output_color_space: &RGBColorSpace,
         sensor_illum: Option<Arc<dyn Spectrum>>,
-        imaging_ratio: Float,
+        imaging_ratio: f64,
     ) -> Self {
         let r_bar = Arc::new(CIE_X_DENSELY_SAMPLED);
         let g_bar = Arc::new(CIE_Y_DENSELY_SAMPLED);

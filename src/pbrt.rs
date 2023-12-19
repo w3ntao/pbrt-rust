@@ -1,9 +1,3 @@
-#[cfg(feature = "use_f64")]
-pub type Float = f64;
-
-#[cfg(not(feature = "use_f64"))]
-pub type Float = f32;
-
 pub struct GlobalVariable {
     pub rgb_color_space: Arc<RGBColorSpace>,
 }
@@ -69,18 +63,18 @@ pub use crate::{
     util::{color::*, color_encoding::*, colorspace::*, image::*, math::*, sampling::*},
 };
 
-pub type Point2f = Point2<Float>;
+pub type Point2f = Point2<f64>;
 pub type Point2i = Point2<i32>;
 // TODO: rewrite Point2i to Point2 usize
-pub type Point3f = Point3<Float>;
+pub type Point3f = Point3<f64>;
 pub type Point3fi = Point3<Interval>;
 
-pub type Vector2f = Vector2<Float>;
-pub type Vector3f = Vector3<Float>;
+pub type Vector2f = Vector2<f64>;
+pub type Vector3f = Vector3<f64>;
 pub type Vector3fi = Vector3<Interval>;
 
-pub type Bounds2f = Bounds2<Float>;
-pub type Bounds3f = Bounds3<Float>;
+pub type Bounds2f = Bounds2<f64>;
+pub type Bounds3f = Bounds3<f64>;
 
 pub fn same_type<T0: ?Sized + Any, T1: ?Sized + Any>() -> bool {
     return TypeId::of::<T0>() == TypeId::of::<T1>();

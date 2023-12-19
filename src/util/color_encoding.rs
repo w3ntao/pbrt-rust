@@ -1,7 +1,7 @@
 use crate::pbrt::*;
 
 pub trait ColorEncoding {
-    fn to_linear(&self, vin: &Vec<u8>) -> Vec<Float>;
+    fn to_linear(&self, vin: &Vec<u8>) -> Vec<f64>;
 }
 
 pub struct SRGBColorEncoding {}
@@ -12,12 +12,12 @@ impl SRGBColorEncoding {
     }
 }
 
-const fn srgb8_to_linear(value: u8) -> Float {
+const fn srgb8_to_linear(value: u8) -> f64 {
     return SRGB_TO_LINEAR_LUT[value as usize];
 }
 
 impl ColorEncoding for SRGBColorEncoding {
-    fn to_linear(&self, vin: &Vec<u8>) -> Vec<Float> {
+    fn to_linear(&self, vin: &Vec<u8>) -> Vec<f64> {
         return vin.into_par_iter().map(|x| srgb8_to_linear(*x)).collect();
     }
 }
@@ -34,7 +34,7 @@ pub fn get_color_encoding(encoding_string: &str) -> &'static dyn ColorEncoding {
 }
 
 #[rustfmt::skip]
-const SRGB_TO_LINEAR_LUT: [Float; 256] = [
+const SRGB_TO_LINEAR_LUT: [f64; 256] = [
     0.0000000000, 0.0003035270, 0.0006070540, 0.0009105810, 0.0012141080, 0.0015176350,
     0.0018211619, 0.0021246888, 0.0024282159, 0.0027317430, 0.0030352699, 0.0033465356,
     0.0036765069, 0.0040247170, 0.0043914421, 0.0047769533, 0.0051815170, 0.0056053917,

@@ -5,12 +5,12 @@ pub const NUM_CIE_SAMPLES: usize = 471;
 pub const CIE_LAMBDA_MIN: f64 = 360.0;
 pub const CIE_LAMBDA_MAX: f64 = 830.0;
 
-pub const CIE_LAMBDA_RANGE: [Float; NUM_CIE_SAMPLES] = {
-    let mut lambdas = [Float::NAN; NUM_CIE_SAMPLES];
+pub const CIE_LAMBDA_RANGE: [f64; NUM_CIE_SAMPLES] = {
+    let mut lambdas = [f64::NAN; NUM_CIE_SAMPLES];
     let lambda_min = CIE_LAMBDA_MIN as usize;
     let mut _lambda = lambda_min;
     while _lambda <= (CIE_LAMBDA_MAX as usize) {
-        lambdas[_lambda - lambda_min] = _lambda as Float;
+        lambdas[_lambda - lambda_min] = _lambda as f64;
         _lambda += 1;
     }
     lambdas
@@ -18,12 +18,12 @@ pub const CIE_LAMBDA_RANGE: [Float; NUM_CIE_SAMPLES] = {
 
 pub const N_CIES: usize = 107;
 
-pub const CIE_S_LAMBDA: [Float; N_CIES] = {
-    let mut lambdas = [Float::NAN; N_CIES];
+pub const CIE_S_LAMBDA: [f64; N_CIES] = {
+    let mut lambdas = [f64::NAN; N_CIES];
     let mut lambda = 300;
     let mut idx = 0;
     while idx < N_CIES {
-        lambdas[idx] = lambda as Float;
+        lambdas[idx] = lambda as f64;
         lambda += 5;
         idx += 1;
     }
@@ -31,7 +31,7 @@ pub const CIE_S_LAMBDA: [Float; N_CIES] = {
 };
 
 #[rustfmt::skip]
-pub const CIE_X_VALUE: [Float; NUM_CIE_SAMPLES] = [
+pub const CIE_X_VALUE: [f64; NUM_CIE_SAMPLES] = [
     0.0001299000,   0.0001458470,   0.0001638021,   0.0001840037,   0.0002066902,
     0.0002321000,   0.0002607280,   0.0002930750,   0.0003293880,   0.0003699140,
     0.0004149000,   0.0004641587,   0.0005189860,   0.0005818540,   0.0006552347,
@@ -130,7 +130,7 @@ pub const CIE_X_VALUE: [Float; NUM_CIE_SAMPLES] = [
 ];
 
 #[rustfmt::skip]
-pub const CIE_Y_VALUE: [Float; NUM_CIE_SAMPLES] = [
+pub const CIE_Y_VALUE: [f64; NUM_CIE_SAMPLES] = [
     0.000003917000,  0.000004393581,  0.000004929604,  0.000005532136,  0.000006208245,
     0.000006965000,  0.000007813219,  0.000008767336,  0.000009839844,  0.00001104323,
     0.00001239000,   0.00001388641,   0.00001555728,   0.00001744296,   0.00001958375,
@@ -229,7 +229,7 @@ pub const CIE_Y_VALUE: [Float; NUM_CIE_SAMPLES] = [
 ];
 
 #[rustfmt::skip]
-pub const CIE_Z_VALUE: [Float; NUM_CIE_SAMPLES] = [
+pub const CIE_Z_VALUE: [f64; NUM_CIE_SAMPLES] = [
     0.0006061000,   0.0006808792,   0.0007651456,   0.0008600124,   0.0009665928,
     0.001086000,    0.001220586,    0.001372729,    0.001543579,    0.001734286,
     0.001946000,    0.002177777,    0.002435809,    0.002731953,    0.003078064,
@@ -328,7 +328,7 @@ pub const CIE_Z_VALUE: [Float; NUM_CIE_SAMPLES] = [
 ];
 
 #[rustfmt::skip]
-pub const CIE_ILLUM_D6500: [Float; N_CIES * 2] = [
+pub const CIE_ILLUM_D6500: [f64; N_CIES * 2] = [
     300.000000, 0.034100,   305.000000, 1.664300,   310.000000, 3.294500,   315.000000,
     11.765200,  320.000000, 20.236000,  325.000000, 28.644699,  330.000000, 37.053501,
     335.000000, 38.501099,  340.000000, 39.948799,  345.000000, 42.430199,  350.000000,
@@ -363,7 +363,7 @@ pub const CIE_ILLUM_D6500: [Float; N_CIES * 2] = [
 ];
 
 #[rustfmt::skip]
-pub const CIE_S0: [Float; N_CIES] = [
+pub const CIE_S0: [f64; N_CIES] = [
     0.040000,   3.020000,   6.000000,   17.800000,  29.600000,  42.450000,  55.300000,
     56.300000,  57.300000,  59.550000,  61.800000,  61.650000,  61.500000,  65.150000,
     68.800000,  66.100000,  63.400000,  64.600000,  65.800000,  80.300000,  94.800000,
@@ -383,7 +383,7 @@ pub const CIE_S0: [Float; N_CIES] = [
 ];
 
 #[rustfmt::skip]
-pub const CIE_S1: [Float; N_CIES] = [
+pub const CIE_S1: [f64; N_CIES] = [
     0.020000,   2.260000,   4.500000,   13.450000,  22.400000,  32.200000,  42.000000,
     41.300000,  40.600000,  41.100000,  41.600000,  39.800000,  38.000000,  40.200000,
     42.400000,  40.450000,  38.500000,  36.750000,  35.000000,  39.200000,  43.400000,
@@ -403,7 +403,7 @@ pub const CIE_S1: [Float; N_CIES] = [
 ];
 
 #[rustfmt::skip]
-pub const CIE_S2: [Float; N_CIES] = [
+pub const CIE_S2: [f64; N_CIES] = [
     0.000000,  1.000000,  2.000000,  3.000000,  4.000000,  6.250000,  8.500000,
     8.150000,  7.800000,  7.250000,  6.700000,  6.000000,  5.300000,  5.700000,
     6.100000,  4.550000,  3.000000,  2.100000,  1.200000,  0.050000,  -1.100000,

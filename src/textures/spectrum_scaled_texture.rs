@@ -2,8 +2,8 @@ use crate::pbrt::*;
 
 pub struct SpectrumScaledTexture {
     texture: Arc<dyn SpectrumTexture>,
-    scale: Float,
-    // TODO: change Float to FloatTexture
+    scale: f64,
+    // TODO: change f64 to FloatTexture
 }
 
 impl SpectrumTexture for SpectrumScaledTexture {
@@ -17,7 +17,7 @@ impl SpectrumTexture for SpectrumScaledTexture {
 }
 
 impl SpectrumScaledTexture {
-    pub fn new(texture: Arc<dyn SpectrumTexture>, scale: Float) -> Self {
+    pub fn new(texture: Arc<dyn SpectrumTexture>, scale: f64) -> Self {
         return Self { texture, scale };
     }
 }

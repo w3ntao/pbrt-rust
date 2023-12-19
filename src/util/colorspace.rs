@@ -53,7 +53,7 @@ impl RGBColorSpace {
     pub fn to_rgb_coeffs(&self, rgb: RGB) -> RGBSigmoidPolynomial {
         return self
             .rgb_to_spectrum_table
-            .eval(rgb.clamp(0.0, Float::INFINITY));
+            .eval(rgb.clamp(0.0, f64::INFINITY));
     }
 
     pub fn generate_albedo_rgb(&self) -> [RGBAlbedoSpectrum; 3] {

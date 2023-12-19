@@ -6,7 +6,7 @@ pub struct BoxFilter {
 }
 
 impl BoxFilter {
-    pub fn new(_radius: Float) -> Self {
+    pub fn new(_radius: f64) -> Self {
         return BoxFilter {
             radius: Vector2f::new(_radius, _radius),
         };
@@ -14,7 +14,7 @@ impl BoxFilter {
 }
 
 impl Filter for BoxFilter {
-    fn get_integral(&self) -> Float {
+    fn get_integral(&self) -> f64 {
         return 4.0 * self.radius.x * self.radius.y;
     }
 
@@ -26,11 +26,11 @@ impl Filter for BoxFilter {
 
         return FilterSample {
             p,
-            weight: 1.0 as Float,
+            weight: 1.0 as f64,
         };
     }
 
-    fn evaluate(&self, p: Point2f) -> Float {
+    fn evaluate(&self, p: Point2f) -> f64 {
         return if p.x.abs() <= self.radius.x && p.y.abs() <= self.radius.y {
             1.0
         } else {

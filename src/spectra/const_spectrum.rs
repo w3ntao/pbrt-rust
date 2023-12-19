@@ -1,11 +1,11 @@
 use crate::pbrt::*;
 
 pub struct ConstSpectrum {
-    c: Float,
+    c: f64,
 }
 
 impl Spectrum for ConstSpectrum {
-    fn eval(&self, _: Float) -> Float {
+    fn eval(&self, _: f64) -> f64 {
         return self.c;
     }
 
@@ -15,7 +15,7 @@ impl Spectrum for ConstSpectrum {
 }
 
 impl ConstSpectrum {
-    pub fn new(c: Float) -> Self {
+    pub fn new(c: f64) -> Self {
         return Self { c };
     }
 }

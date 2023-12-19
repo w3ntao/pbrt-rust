@@ -11,7 +11,7 @@ impl Ray {
         return Ray { o, d };
     }
 
-    pub fn at(&self, t: Float) -> Point3f {
+    pub fn at(&self, t: f64) -> Point3f {
         return self.o + t * self.d;
     }
 }
@@ -77,7 +77,7 @@ impl DifferentialRay {
 }
 
 impl DifferentialRay {
-    fn at(&self, t: Float) -> Point3f {
+    fn at(&self, t: f64) -> Point3f {
         return self.ray.at(t);
     }
 }

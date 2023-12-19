@@ -5,8 +5,8 @@ pub struct Bounds2<T> {
     pub p_max: Point2<T>,
 }
 
-impl Bounds2<Float> {
-    pub fn new(points: &[Point2<Float>]) -> Bounds2<Float> {
+impl Bounds2<f64> {
+    pub fn new(points: &[Point2<f64>]) -> Bounds2<f64> {
         let mut _min = points[0];
         let mut _max = points[0];
 
@@ -15,7 +15,7 @@ impl Bounds2<Float> {
             _max = _max.max(&points[idx]);
         }
 
-        return Bounds2::<Float> {
+        return Bounds2::<f64> {
             p_min: _min,
             p_max: _max,
         };
@@ -42,14 +42,14 @@ impl<T> Index<usize> for Bounds3<T> {
     }
 }
 
-impl Bounds3<Float> {
+impl Bounds3<f64> {
     pub fn empty() -> Self {
         return Self {
-            p_min: Point3f::new(Float::INFINITY, Float::INFINITY, Float::INFINITY),
+            p_min: Point3f::new(f64::INFINITY, f64::INFINITY, f64::INFINITY),
             p_max: Point3f::new(
-                Float::NEG_INFINITY,
-                Float::NEG_INFINITY,
-                Float::NEG_INFINITY,
+                f64::NEG_INFINITY,
+                f64::NEG_INFINITY,
+                f64::NEG_INFINITY,
             ),
         };
     }
@@ -85,8 +85,8 @@ impl Bounds3<Float> {
         };
     }
 
-    pub fn union(&self, p: Point3f) -> Bounds3<Float> {
-        return Bounds3::<Float> {
+    pub fn union(&self, p: Point3f) -> Bounds3<f64> {
+        return Bounds3::<f64> {
             p_min: self.p_min.min(p),
             p_max: self.p_max.max(p),
         };
@@ -96,7 +96,7 @@ impl Bounds3<Float> {
         return self.p_max - self.p_min;
     }
 
-    pub fn surface_area(&self) -> Float {
+    pub fn surface_area(&self) -> f64 {
         let d = self.diagonal();
         return 2.0 * (d.x * d.y + d.x * d.z + d.y * d.z);
     }
@@ -104,7 +104,7 @@ impl Bounds3<Float> {
     pub fn fast_intersect(
         &self,
         ray: &Ray,
-        ray_t_max: Float,
+        ray_t_max: f64,
         inv_dir: Vector3f,
         dir_is_neg: [usize; 3],
     ) -> bool {
@@ -154,27 +154,27 @@ impl Bounds3<Float> {
     }
 }
 
-impl Add<Bounds3<Float>> for Bounds3<Float> {
-    type Output = Bounds3<Float>;
+impl Add<Bounds3<f64>> for Bounds3<f64> {
+    type Output = Bounds3<f64>;
 
-    fn add(self, rhs: Bounds3<Float>) -> Self::Output {
-        return Bounds3::<Float> {
+    fn add(self, rhs: Bounds3<f64>) -> Self::Output {
+        return Bounds3::<f64> {
             p_min: self.p_min.min(rhs.p_min),
             p_max: self.p_max.max(rhs.p_max),
         };
     }
 }
 
-impl AddAssign<Bounds3<Float>> for Bounds3<Float> {
-    fn add_assign(&mut self, rhs: Bounds3<Float>) {
+impl AddAssign<Bounds3<f64>> for Bounds3<f64> {
+    fn add_assign(&mut self, rhs: Bounds3<f64>) {
         *self = *self + rhs;
     }
 }
 
-impl Sum for Bounds3<Float> {
+impl Sum for Bounds3<f64> {
     fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
         return match iter.into_iter().reduce(|x, y| x + y) {
-            None => Bounds3::<Float>::empty(),
+            None => Bounds3::<f64>::empty(),
             Some(val) => val,
         };
     }

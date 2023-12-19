@@ -1,12 +1,12 @@
 use crate::pbrt::*;
 
 pub struct Sphere {
-    radius: Float,
-    z_min: Float,
-    z_max: Float,
-    theta_z_min: Float,
-    theta_z_max: Float,
-    phi_max: Float,
+    radius: f64,
+    z_min: f64,
+    z_max: f64,
+    theta_z_min: f64,
+    theta_z_max: f64,
+    phi_max: f64,
     render_from_object: Transform,
     object_from_render: Transform,
     reverse_orientation: bool,
@@ -17,10 +17,10 @@ impl Sphere {
         render_from_object: Transform,
         object_from_render: Transform,
         reverse_orientation: bool,
-        radius: Float,
-        z_min: Float,
-        z_max: Float,
-        phi_max: Float,
+        radius: f64,
+        z_min: f64,
+        z_max: f64,
+        phi_max: f64,
     ) -> Self {
         let z_min = clamp_float(z_min, -radius, radius);
         let z_max = clamp_float(z_max, -radius, radius);
@@ -41,7 +41,7 @@ impl Sphere {
         };
     }
 
-    fn basic_intersect(&self, r: &Ray, t_max: Float) -> Option<QuadricIntersection> {
+    fn basic_intersect(&self, r: &Ray, t_max: f64) -> Option<QuadricIntersection> {
         // Transform _Ray_ origin and direction to object space
         let oi = self.object_from_render.on_point3fi(Point3fi::from(r.o));
         let di = self.object_from_render.on_vector3fi(Vector3fi::from(r.d));
@@ -219,7 +219,7 @@ impl Sphere {
 }
 
 impl Shape for Sphere {
-    fn intersect(&self, ray: &Ray, t_max: Float) -> Option<ShapeIntersection> {
+    fn intersect(&self, ray: &Ray, t_max: f64) -> Option<ShapeIntersection> {
         return match self.basic_intersect(ray, t_max) {
             None => None,
             Some(quadric_intersection) => {
@@ -233,7 +233,7 @@ impl Shape for Sphere {
         };
     }
 
-    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool {
+    fn fast_intersect(&self, ray: &Ray, t_max: f64) -> bool {
         return self.basic_intersect(ray, t_max).is_some();
     }
 

@@ -3,10 +3,10 @@ use crate::textures::uv_mapping::UVMapping;
 
 pub struct TexCoord2D {
     pub st: Point2f,
-    pub dsdx: Float,
-    pub dsdy: Float,
-    pub dtdx: Float,
-    pub dtdy: Float,
+    pub dsdx: f64,
+    pub dsdy: f64,
+    pub dtdx: f64,
+    pub dtdy: f64,
 }
 
 pub trait TextureMapping2D: Send + Sync {

@@ -7,18 +7,18 @@ pub struct Point3<T> {
     pub z: T,
 }
 
-impl Default for Point3<Float> {
+impl Default for Point3<f64> {
     fn default() -> Self {
         return Self {
-            x: Float::NAN,
-            y: Float::NAN,
-            z: Float::NAN,
+            x: f64::NAN,
+            y: f64::NAN,
+            z: f64::NAN,
         };
     }
 }
 
-impl From<Point3<Float>> for Point3<Interval> {
-    fn from(value: Point3<Float>) -> Self {
+impl From<Point3<f64>> for Point3<Interval> {
+    fn from(value: Point3<f64>) -> Self {
         return Point3::<Interval>::new(
             Interval::from(value.x),
             Interval::from(value.y),
@@ -27,7 +27,7 @@ impl From<Point3<Float>> for Point3<Interval> {
     }
 }
 
-impl From<Point3<Interval>> for Point3<Float> {
+impl From<Point3<Interval>> for Point3<f64> {
     fn from(value: Point3<Interval>) -> Self {
         return Point3 {
             x: value.x.midpoint(),
@@ -125,11 +125,11 @@ impl<T: Sub<Output = T>> Sub<Vector3<T>> for Point3<T> {
     }
 }
 
-impl Mul<Float> for Point3<Float> {
-    type Output = Point3<Float>;
+impl Mul<f64> for Point3<f64> {
+    type Output = Point3<f64>;
 
-    fn mul(self, rhs: Float) -> Self::Output {
-        return Point3::<Float> {
+    fn mul(self, rhs: f64) -> Self::Output {
+        return Point3::<f64> {
             x: self.x * rhs,
             y: self.y * rhs,
             z: self.z * rhs,
@@ -137,26 +137,26 @@ impl Mul<Float> for Point3<Float> {
     }
 }
 
-impl Mul<Point3<Float>> for Float {
-    type Output = Point3<Float>;
+impl Mul<Point3<f64>> for f64 {
+    type Output = Point3<f64>;
 
-    fn mul(self, rhs: Point3<Float>) -> Self::Output {
+    fn mul(self, rhs: Point3<f64>) -> Self::Output {
         return rhs * self;
     }
 }
 
-impl MulAssign<Float> for Point3<Float> {
-    fn mul_assign(&mut self, rhs: Float) {
+impl MulAssign<f64> for Point3<f64> {
+    fn mul_assign(&mut self, rhs: f64) {
         *self = *self * rhs;
     }
 }
 
-impl Div<Float> for Point3<Float> {
-    type Output = Point3<Float>;
+impl Div<f64> for Point3<f64> {
+    type Output = Point3<f64>;
 
-    fn div(self, rhs: Float) -> Self::Output {
+    fn div(self, rhs: f64) -> Self::Output {
         let factor = 1.0 / rhs;
-        return Point3::<Float> {
+        return Point3::<f64> {
             x: self.x * factor,
             y: self.y * factor,
             z: self.z * factor,
@@ -184,12 +184,12 @@ impl<T: Copy> Point3<T> {
     }
 }
 
-impl Point3<Float> {
+impl Point3<f64> {
     pub fn nan() -> Self {
         return Self {
-            x: Float::NAN,
-            y: Float::NAN,
-            z: Float::NAN,
+            x: f64::NAN,
+            y: f64::NAN,
+            z: f64::NAN,
         };
     }
     pub fn min(&self, p: Self) -> Self {
@@ -218,15 +218,15 @@ impl Point3<Float> {
 }
 
 impl Point3<Interval> {
-    pub fn from_value_and_error(p: Point3<Float>, e: Vector3<Float>) -> Self {
+    pub fn from_value_and_error(p: Point3<f64>, e: Vector3<f64>) -> Self {
         return Self {
             x: Interval::from_value_and_error(p.x, e.x),
             y: Interval::from_value_and_error(p.y, e.y),
             z: Interval::from_value_and_error(p.z, e.z),
         };
     }
-    pub fn error(&self) -> Vector3<Float> {
-        return Vector3::<Float> {
+    pub fn error(&self) -> Vector3<f64> {
+        return Vector3::<f64> {
             x: self.x.width() / 2.0,
             y: self.y.width() / 2.0,
             z: self.z.width() / 2.0,
@@ -238,10 +238,10 @@ impl Point3<Interval> {
     }
 }
 
-impl Div<Float> for Point3<Interval> {
+impl Div<f64> for Point3<Interval> {
     type Output = Point3<Interval>;
 
-    fn div(self, rhs: Float) -> Self::Output {
+    fn div(self, rhs: f64) -> Self::Output {
         return Point3::<Interval> {
             x: self.x / rhs,
             y: self.y / rhs,

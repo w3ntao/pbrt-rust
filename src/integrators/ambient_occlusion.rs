@@ -2,7 +2,7 @@ use crate::pbrt::*;
 
 pub struct AmbientOcclusion {
     illuminant_spectrum: &'static dyn Spectrum,
-    illuminant_scale: Float,
+    illuminant_scale: f64,
     base: IntegratorBase,
 }
 
@@ -28,7 +28,7 @@ impl AmbientOcclusion {
 }
 
 impl Integrator for AmbientOcclusion {
-    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool {
+    fn fast_intersect(&self, ray: &Ray, t_max: f64) -> bool {
         return self.base.aggregate.fast_intersect(ray, t_max);
     }
 
@@ -39,7 +39,7 @@ impl Integrator for AmbientOcclusion {
         sampler: &mut dyn Sampler,
     ) -> SampledSpectrum {
         // TODO: this is incomplete, consider BSDF only for now
-        let si = match self.base.aggregate.intersect(&ray.ray, Float::INFINITY) {
+        let si = match self.base.aggregate.intersect(&ray.ray, f64::INFINITY) {
             None => {
                 return SampledSpectrum::same_value(0.0);
             }
@@ -66,7 +66,7 @@ impl Integrator for AmbientOcclusion {
         if !self
             .base
             .aggregate
-            .fast_intersect(&differential_ray.ray, Float::INFINITY)
+            .fast_intersect(&differential_ray.ray, f64::INFINITY)
         {
             return self.illuminant_spectrum.sample(&lambda)
                 * (self.illuminant_scale * n.dot(wi) / (PI * pdf));

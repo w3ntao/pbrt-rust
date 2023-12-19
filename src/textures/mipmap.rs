@@ -46,7 +46,7 @@ pub fn parse_filter_function(filter_function: &str) -> FilterFunction {
 #[derive(Clone, Copy)]
 pub struct MIPMapFilterOptions {
     pub filter: FilterFunction,
-    pub max_anisotropy: Float,
+    pub max_anisotropy: f64,
 }
 
 impl Display for MIPMapFilterOptions {
@@ -148,9 +148,9 @@ impl MIPMap {
 
             // Compute MIP Map level for _width_ and handle very wide filter
             let n_levels = self.levels();
-            let level = (n_levels - 1) as Float + (width as Float).max(1e-8).log2();
+            let level = (n_levels - 1) as f64 + (width as f64).max(1e-8).log2();
 
-            if level >= (n_levels - 1) as Float {
+            if level >= (n_levels - 1) as f64 {
                 return self.texel(n_levels - 1, Point2i::new(0, 0));
             }
 

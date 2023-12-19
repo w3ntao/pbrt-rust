@@ -55,20 +55,20 @@ impl WrapMode2D {
 pub enum PixelFormat {
     U256,
     Half,
-    Float,
+    f64,
 }
 
 #[derive(Clone)]
 pub struct ResampleWeight {
     pub first_pixel: usize,
-    pub weight: [Float; 4],
+    pub weight: [f64; 4],
 }
 
 impl Default for ResampleWeight {
     fn default() -> Self {
         return Self {
             first_pixel: usize::MAX,
-            weight: [Float::NAN; 4],
+            weight: [f64::NAN; 4],
         };
     }
 }
@@ -100,15 +100,15 @@ fn resample_weights(old_resolution: usize, new_resolution: usize) -> Vec<Resampl
 
     for i in 0..new_resolution {
         // Compute image resampling weights for _i_th pixel
-        let center = (i as Float + 0.5) * (old_resolution as Float) / (new_resolution as Float);
+        let center = (i as f64 + 0.5) * (old_resolution as f64) / (new_resolution as f64);
         wt[i].first_pixel = ((center - filter_radius) + 0.5).floor() as usize;
         for j in 0..4 {
-            let pos = (wt[i].first_pixel + j) as Float + 0.5;
+            let pos = (wt[i].first_pixel + j) as f64 + 0.5;
             wt[i].weight[j] = windowed_sinc(pos - center, filter_radius, tau)
         }
 
         // Normalize filter weights for pixel resampling
-        let inv_sum_weights = 1.0 / (wt[i].weight.into_par_iter().sum::<Float>());
+        let inv_sum_weights = 1.0 / (wt[i].weight.into_par_iter().sum::<f64>());
         wt[i].weight = wt[i].weight.map(|x| x * inv_sum_weights);
     }
 
@@ -217,7 +217,7 @@ impl Image {
 
         let (width, height) = img.dimensions();
 
-        const DIVISOR: Float = u8::MAX as Float;
+        const DIVISOR: f64 = u8::MAX as f64;
 
         let mut pixels = vec![vec![RGB::black(); width as usize]; height as usize];
         for x in 0..width {
@@ -226,9 +226,9 @@ impl Image {
 
                 // TODO: check if this is reversible with export_png()
                 pixels[y as usize][x as usize] = RGB::new(
-                    rgb_u256[0] as Float / DIVISOR,
-                    rgb_u256[1] as Float / DIVISOR,
-                    rgb_u256[2] as Float / DIVISOR,
+                    rgb_u256[0] as f64 / DIVISOR,
+                    rgb_u256[1] as f64 / DIVISOR,
+                    rgb_u256[2] as f64 / DIVISOR,
                 );
             }
         }
@@ -248,7 +248,7 @@ impl Image {
         assert!(new_resolution.x >= self.resolution.x);
         assert!(new_resolution.y >= self.resolution.y);
 
-        let resampled_image = Image::new(new_resolution, PixelFormat::Float);
+        let resampled_image = Image::new(new_resolution, PixelFormat::f64);
 
         let x_weights = resample_weights(self.resolution.x as usize, new_resolution.x as usize);
 
@@ -284,14 +284,14 @@ impl Image {
 
     pub fn bilerp(&self, p: Point2f, wrap_mode2d: WrapMode2D) -> RGB {
         // Compute discrete pixel coordinates and offsets for _p_
-        let x = p[0] * (self.resolution.x as Float) - 0.5;
-        let y = p[1] * (self.resolution.y as Float) - 0.5;
+        let x = p[0] * (self.resolution.x as f64) - 0.5;
+        let y = p[1] * (self.resolution.y as f64) - 0.5;
 
         let xi = x.floor() as i32;
         let yi = y.floor() as i32;
 
-        let dx = x - (xi as Float);
-        let dy = y - (yi as Float);
+        let dx = x - (xi as f64);
+        let dy = y - (yi as f64);
 
         // Load pixel channel values and return bilinearly interpolated value
         let v = [

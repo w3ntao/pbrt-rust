@@ -72,7 +72,7 @@ impl CameraBase {
         self.min_dir_differential_y = Vector3f::infinity();
 
         let mut sample = CameraSample {
-            p_film: Point2f::new(Float::NAN, Float::NAN),
+            p_film: Point2f::new(f64::NAN, f64::NAN),
             p_lens: Point2f::new(0.5, 0.5),
             filter_weight: 1.0,
         };
@@ -80,8 +80,8 @@ impl CameraBase {
         let n = 512;
         for i in 0..n {
             sample.p_film = Point2f::new(
-                ((i as Float) / (n - 1) as Float) * (resolution.x as Float),
-                ((i as Float) / (n - 1) as Float) * (resolution.y as Float),
+                ((i as f64) / (n - 1) as f64) * (resolution.x as f64),
+                ((i as f64) / (n - 1) as f64) * (resolution.y as f64),
             );
 
             let crd = camera.generate_camera_differential_ray(sample);
@@ -128,11 +128,11 @@ impl CameraBase {
 pub struct CameraSample {
     pub p_film: Point2f,
     pub p_lens: Point2f,
-    pub filter_weight: Float,
+    pub filter_weight: f64,
 }
 
 impl CameraSample {
-    pub fn new(p_film: Point2f, p_lens: Point2f, filter_weight: Float) -> Self {
+    pub fn new(p_film: Point2f, p_lens: Point2f, filter_weight: f64) -> Self {
         return CameraSample {
             p_film,
             p_lens,

@@ -210,7 +210,7 @@ const fn init_table(gamut: Gamut) -> Table {
 }
 
 fn sigmoid(x: f64) -> f64 {
-    // TODO: rust bug: f32.sqrt() can't be made const
+    // TODO: rust bug: f64.sqrt() can't be made const
     // https://github.com/rust-lang/rust/issues/57241
     return 0.5 * x / (1.0 + x * x).sqrt() + 0.5;
 }
@@ -412,13 +412,13 @@ fn single_thread_iterate(
     spectrum_table_data: &mut Arc<Mutex<SpectrumTableData>>,
     job_list: &mut Arc<Mutex<Vec<(usize, usize)>>>,
     table: Table,
-    scale: [f32; RESOLUTION],
+    scale: [f64; RESOLUTION],
 ) {
     let c0 = CIE_LAMBDA_MIN;
     let c1 = 1.0 / (CIE_LAMBDA_MAX - CIE_LAMBDA_MIN);
     let start = RESOLUTION / 5;
 
-    let mut cache = HashMap::<usize, f32>::new();
+    let mut cache = HashMap::<usize, f64>::new();
 
     loop {
         let mut locked_job_list = job_list.lock().unwrap();
@@ -443,7 +443,7 @@ fn single_thread_iterate(
 
                         for k in range {
                             {
-                                let b = scale[k] as f64;
+                                let b = scale[k];
                                 rgb[l] = b;
                                 rgb[(l + 1) % 3] = x * b;
                                 rgb[(l + 2) % 3] = y * b;
@@ -455,10 +455,9 @@ fn single_thread_iterate(
 
                             let idx = ((l * RESOLUTION + k) * RESOLUTION + j) * RESOLUTION + i;
 
-                            cache.insert(3 * idx + 0, (a * (sqr(c1))) as f32);
-                            cache.insert(3 * idx + 1, (b * c1 - 2.0 * a * c0 * (sqr(c1))) as f32);
-                            cache
-                                .insert(3 * idx + 2, (c - b * c0 * c1 + a * (sqr(c0 * c1))) as f32);
+                            cache.insert(3 * idx + 0, a * sqr(c1));
+                            cache.insert(3 * idx + 1, b * c1 - 2.0 * a * c0 * sqr(c1));
+                            cache.insert(3 * idx + 2, c - b * c0 * c1 + a * sqr(c0 * c1));
                         }
                     }
                 }
@@ -470,7 +469,7 @@ fn single_thread_iterate(
 }
 
 struct SpectrumTableData {
-    data: Vec<f32>,
+    data: Vec<f64>,
     // TODO: rust bug: allocating large array triggers main thread overflow
     // https://github.com/rust-lang/rust/issues/53827
 }
@@ -481,19 +480,19 @@ impl SpectrumTableData {
             data: vec![0.0; size],
         };
     }
-    pub fn add_data(&mut self, data_map: HashMap<usize, f32>) {
+    pub fn add_data(&mut self, data_map: HashMap<usize, f64>) {
         for idx in data_map.keys() {
             self.data[*idx] = data_map[idx];
         }
     }
 }
 
-pub fn compute_spectrum_table_data(gamut: Gamut) -> ([f32; RESOLUTION], Vec<f32>) {
+pub fn compute_spectrum_table_data(gamut: Gamut) -> ([f64; RESOLUTION], Vec<f64>) {
     let table = init_table(gamut);
 
     let mut scale = [0.0; RESOLUTION];
     for k in 0..RESOLUTION {
-        scale[k] = smooth_step(smooth_step(k as f64 / (RESOLUTION - 1) as f64)) as f32;
+        scale[k] = smooth_step(smooth_step(k as f64 / (RESOLUTION - 1) as f64));
     }
 
     const BUFFER_SIZE: usize = 3 * 3 * RESOLUTION * RESOLUTION * RESOLUTION;

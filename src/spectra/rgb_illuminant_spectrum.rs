@@ -1,18 +1,18 @@
 use crate::pbrt::*;
 
 pub struct RGBIlluminantSpectrum {
-    scale: Float,
+    scale: f64,
     rsp: RGBSigmoidPolynomial,
     illuminant: &'static dyn Spectrum,
 }
 
 impl Spectrum for RGBIlluminantSpectrum {
-    fn eval(&self, lambda: Float) -> Float {
+    fn eval(&self, lambda: f64) -> f64 {
         return self.scale * self.rsp.eval(lambda) * self.illuminant.eval(lambda);
     }
 
     fn sample(&self, lambda: &SampledWavelengths) -> SampledSpectrum {
-        let mut s = [Float::NAN; NUM_SPECTRUM_SAMPLES];
+        let mut s = [f64::NAN; NUM_SPECTRUM_SAMPLES];
         for i in 0..NUM_SPECTRUM_SAMPLES {
             s[i] = self.scale * self.rsp.eval(lambda[i]);
         }
@@ -20,7 +20,7 @@ impl Spectrum for RGBIlluminantSpectrum {
         return self.illuminant.sample(lambda) * SampledSpectrum::new(s);
     }
 
-    fn to_photometric(&self) -> Float {
+    fn to_photometric(&self) -> f64 {
         // We have to handle RGBIlluminantSpectrum separately here as it's composed of an
         // illuminant spectrum and an RGB multiplier. We only want to consider the
         // illuminant for the sake of this calculation, and we should consider the

@@ -7,7 +7,7 @@ pub struct SimplePath {
 }
 
 impl Integrator for SimplePath {
-    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool {
+    fn fast_intersect(&self, ray: &Ray, t_max: f64) -> bool {
         return self.base.aggregate.fast_intersect(ray, t_max);
     }
 
@@ -28,7 +28,7 @@ impl Integrator for SimplePath {
         while beta.is_positive() {
             // Find next _SimplePathIntegrator_ vertex and accumulate contribution
             // Intersect _ray_ with scene
-            let mut si = match self.base.aggregate.intersect(&ray.ray, Float::INFINITY) {
+            let mut si = match self.base.aggregate.intersect(&ray.ray, f64::INFINITY) {
                 None => {
                     if specular_bounce {
                         for light in &self.base.infinite_lights {

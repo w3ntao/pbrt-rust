@@ -57,47 +57,47 @@ pub fn read_ply(ply_file_path: &str) -> TriQuadMesh {
                         match name2.as_ref() {
                             "x" => {
                                 if let ply::Property::Float(x) = list2 {
-                                    pnt.x = x as Float;
+                                    pnt.x = x as f64;
                                 }
                             }
                             "y" => {
                                 if let ply::Property::Float(y) = list2 {
-                                    pnt.y = y as Float;
+                                    pnt.y = y as f64;
                                 }
                             }
                             "z" => {
                                 if let ply::Property::Float(z) = list2 {
-                                    pnt.z = z as Float;
+                                    pnt.z = z as f64;
                                 }
                             }
                             "nx" => {
                                 has_normals = true;
                                 if let ply::Property::Float(x) = list2 {
-                                    nrm.x = x as Float;
+                                    nrm.x = x as f64;
                                 }
                             }
                             "ny" => {
                                 has_normals = true;
                                 if let ply::Property::Float(y) = list2 {
-                                    nrm.y = y as Float;
+                                    nrm.y = y as f64;
                                 }
                             }
                             "nz" => {
                                 has_normals = true;
                                 if let ply::Property::Float(z) = list2 {
-                                    nrm.z = z as Float;
+                                    nrm.z = z as f64;
                                 }
                             }
                             "u" | "s" => {
                                 has_uvs = true;
                                 if let ply::Property::Float(x) = list2 {
-                                    pt2.x = x as Float;
+                                    pt2.x = x as f64;
                                 }
                             }
                             "v" | "t" => {
                                 has_uvs = true;
                                 if let ply::Property::Float(y) = list2 {
-                                    pt2.y = y as Float;
+                                    pt2.y = y as f64;
                                 }
                             }
                             _ => {
@@ -174,19 +174,19 @@ pub fn read_ply(ply_file_path: &str) -> TriQuadMesh {
                             "nx" => {
                                 has_normals = true;
                                 if let ply::Property::Float(x) = list2 {
-                                    nrm.x = x as Float;
+                                    nrm.x = x as f64;
                                 }
                             }
                             "ny" => {
                                 has_normals = true;
                                 if let ply::Property::Float(y) = list2 {
-                                    nrm.y = y as Float;
+                                    nrm.y = y as f64;
                                 }
                             }
                             "nz" => {
                                 has_normals = true;
                                 if let ply::Property::Float(z) = list2 {
-                                    nrm.z = z as Float;
+                                    nrm.z = z as f64;
                                 }
                             }
                             _ => panic!("couldn't parse {}", name2),

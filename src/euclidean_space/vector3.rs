@@ -27,8 +27,8 @@ impl From<Normal3f> for Vector3f {
     }
 }
 
-impl From<Vector3<Float>> for Vector3<Interval> {
-    fn from(value: Vector3<Float>) -> Self {
+impl From<Vector3<f64>> for Vector3<Interval> {
+    fn from(value: Vector3<f64>) -> Self {
         return Vector3::<Interval>::new(
             Interval::from(value.x),
             Interval::from(value.y),
@@ -37,8 +37,8 @@ impl From<Vector3<Float>> for Vector3<Interval> {
     }
 }
 
-impl From<Point3<Float>> for Vector3<Interval> {
-    fn from(value: Point3<Float>) -> Self {
+impl From<Point3<f64>> for Vector3<Interval> {
+    fn from(value: Point3<f64>) -> Self {
         return Vector3::<Interval>::new(
             Interval::from(value.x),
             Interval::from(value.y),
@@ -68,34 +68,34 @@ impl<T: Copy + Add<Output = T> + Mul<Output = T>> Vector3<T> {
 impl Vector3f {
     pub fn nan() -> Self {
         return Self {
-            x: Float::NAN,
-            y: Float::NAN,
-            z: Float::NAN,
+            x: f64::NAN,
+            y: f64::NAN,
+            z: f64::NAN,
         };
     }
 
     pub fn infinity() -> Self {
         return Self {
-            x: Float::INFINITY,
-            y: Float::INFINITY,
-            z: Float::INFINITY,
+            x: f64::INFINITY,
+            y: f64::INFINITY,
+            z: f64::INFINITY,
         };
     }
 
-    pub fn abs(&self) -> Vector3<Float> {
-        return Vector3::<Float> {
+    pub fn abs(&self) -> Vector3<f64> {
+        return Vector3::<f64> {
             x: self.x.abs(),
             y: self.y.abs(),
             z: self.z.abs(),
         };
     }
 
-    pub fn dot(&self, v: Self) -> Float {
+    pub fn dot(&self, v: Self) -> f64 {
         return self.x * v.x + self.y * v.y + self.z * v.z;
     }
 
-    pub fn length(&self) -> Float {
-        return Float::sqrt(self.length_squared());
+    pub fn length(&self) -> f64 {
+        return f64::sqrt(self.length_squared());
     }
 
     pub fn normalize(&self) -> Vector3f {
@@ -130,12 +130,12 @@ impl Vector3f {
         };
     }
 
-    pub fn max_component_value(&self) -> Float {
+    pub fn max_component_value(&self) -> f64 {
         return self.x.max(self.y).max(self.z);
     }
 
     pub fn coordinate_system(&self) -> (Vector3f, Vector3f) {
-        let sign = (1.0 as Float).copysign(self.z);
+        let sign = (1.0 as f64).copysign(self.z);
 
         let a = -1.0 / (sign + self.z);
         let b = self.x * self.y * a;
@@ -147,7 +147,7 @@ impl Vector3f {
     }
 
     pub fn softmax_color(&self) -> RGB {
-        let base: Float = 10.0;
+        let base: f64 = 10.0;
         let x = base.powf(self.x);
         let y = base.powf(self.y);
         let z = base.powf(self.z);
@@ -164,7 +164,7 @@ impl Vector3f {
         return self.z * wp.z > 0.0;
     }
 
-    pub fn abs_cos_theta(&self) -> Float {
+    pub fn abs_cos_theta(&self) -> f64 {
         return self.z.abs();
     }
 
@@ -194,8 +194,8 @@ impl Vector3<Interval> {
         return self.x.width() == 0.0 && self.y.width() == 0.0 && self.z.width() == 0.0;
     }
 
-    pub fn error(&self) -> Vector3<Float> {
-        return Vector3::<Float> {
+    pub fn error(&self) -> Vector3<f64> {
+        return Vector3::<f64> {
             x: self.x.width() / 2.0,
             y: self.y.width() / 2.0,
             z: self.z.width() / 2.0,
@@ -213,7 +213,7 @@ impl<T: Display> Display for Vector3<T> {
     }
 }
 
-impl From<Vector3<Interval>> for Vector3<Float> {
+impl From<Vector3<Interval>> for Vector3<f64> {
     fn from(value: Vector3<Interval>) -> Self {
         return Self {
             x: value.x.midpoint(),
@@ -286,20 +286,20 @@ impl<T: Copy + Mul<T, Output = T>> Mul<T> for Vector3<T> {
     }
 }
 
-impl Mul<Vector3<Float>> for Float {
-    type Output = Vector3<Float>;
+impl Mul<Vector3<f64>> for f64 {
+    type Output = Vector3<f64>;
 
-    fn mul(self, rhs: Vector3<Float>) -> Self::Output {
+    fn mul(self, rhs: Vector3<f64>) -> Self::Output {
         return rhs * self;
     }
 }
 
-impl Div<Float> for Vector3<Float> {
-    type Output = Vector3<Float>;
+impl Div<f64> for Vector3<f64> {
+    type Output = Vector3<f64>;
 
-    fn div(self, rhs: Float) -> Self::Output {
+    fn div(self, rhs: f64) -> Self::Output {
         let one_over_rhs = 1.0 / rhs;
-        return Vector3::<Float> {
+        return Vector3::<f64> {
             x: self.x * one_over_rhs,
             y: self.y * one_over_rhs,
             z: self.z * one_over_rhs,

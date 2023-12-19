@@ -11,7 +11,7 @@ pub struct PerspectiveCamera {
     pub dx_camera: Vector3f,
     pub dy_camera: Vector3f,
 
-    pub lens_radius: Float,
+    pub lens_radius: f64,
 }
 
 impl PerspectiveCamera {
@@ -22,7 +22,7 @@ impl PerspectiveCamera {
     ) -> Self {
         let _fov = parameters.get_one_float("fov", Some(90.0));
 
-        let frame_aspect_ratio = (resolution.x as Float) / (resolution.y as Float);
+        let frame_aspect_ratio = (resolution.x as f64) / (resolution.y as f64);
 
         let screen_window = if frame_aspect_ratio > 1.0 {
             Bounds2f::new(&[
@@ -43,7 +43,7 @@ impl PerspectiveCamera {
                 1.0,
             ) * Transform::translate(-screen_window.p_min.x, -screen_window.p_max.y, 0.0);
 
-        let raster_from_ndc = Transform::scale(resolution.x as Float, -resolution.y as Float, 1.0);
+        let raster_from_ndc = Transform::scale(resolution.x as f64, -resolution.y as f64, 1.0);
 
         let raster_from_screen = raster_from_ndc * ndc_from_screen;
 
@@ -206,7 +206,7 @@ impl Camera for PerspectiveCamera {
 
         // Estimate $\dpdx$ and $\dpdy$ in tangent plane at intersection point
 
-        let spp_scale = (0.125 as Float).max(1.0 / (samples_per_pixel as Float).sqrt());
+        let spp_scale = (0.125 as f64).max(1.0 / (samples_per_pixel as f64).sqrt());
 
         let dpdx = spp_scale
             * self

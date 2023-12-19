@@ -6,7 +6,7 @@ pub struct SimplePrimitive {
 }
 
 impl Primitive for SimplePrimitive {
-    fn intersect(&self, ray: &Ray, t_max: Float) -> Option<ShapeIntersection> {
+    fn intersect(&self, ray: &Ray, t_max: f64) -> Option<ShapeIntersection> {
         let mut si = match self.shape.intersect(ray, t_max) {
             None => {
                 return None;
@@ -20,7 +20,7 @@ impl Primitive for SimplePrimitive {
         return Some(si);
     }
 
-    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool {
+    fn fast_intersect(&self, ray: &Ray, t_max: f64) -> bool {
         return self.shape.fast_intersect(ray, t_max);
     }
 

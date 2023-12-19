@@ -30,12 +30,12 @@ pub enum Token {
 }
 
 impl Token {
-    pub fn convert_to_float(&self) -> Float {
+    pub fn convert_to_float(&self) -> f64 {
         return match self {
-            Token::Number(num) => match num.parse::<Float>() {
+            Token::Number(num) => match num.parse::<f64>() {
                 Ok(x) => x,
                 Err(_) => {
-                    panic!("fail to convert {:?} into Float", self);
+                    panic!("fail to convert {:?} into f64", self);
                 }
             },
             _ => {

@@ -33,12 +33,12 @@ impl Sampler for IndependentSampler {
         // do nothing
     }
 
-    fn get_1d(&mut self) -> Float {
-        return self.rng.gen::<Float>();
+    fn get_1d(&mut self) -> f64 {
+        return self.rng.gen::<f64>();
     }
 
     fn get_2d(&mut self) -> Point2f {
-        return Point2f::new(self.rng.gen::<Float>(), self.rng.gen::<Float>());
+        return Point2f::new(self.rng.gen::<f64>(), self.rng.gen::<f64>());
     }
 
     fn get_pixel_2d(&mut self) -> Point2f {

@@ -7,15 +7,15 @@ pub struct Triangle {
 }
 
 struct TriangleIntersection {
-    pub b0: Float,
-    pub b1: Float,
-    pub b2: Float,
-    pub t: Float,
+    pub b0: f64,
+    pub b1: f64,
+    pub b2: f64,
+    pub t: f64,
 }
 
 fn intersect_triangle(
     ray: &Ray,
-    t_max: Float,
+    t_max: f64,
     p0: Point3f,
     p1: Point3f,
     p2: Point3f,
@@ -56,20 +56,6 @@ fn intersect_triangle(
     let mut e0 = difference_of_products(p1t.x, p2t.y, p1t.y, p2t.x);
     let mut e1 = difference_of_products(p2t.x, p0t.y, p2t.y, p0t.x);
     let mut e2 = difference_of_products(p0t.x, p1t.y, p0t.y, p1t.x);
-
-    if same_type::<Float, f32>() && (e0 == 0.0 || e1 == 0.0 || e2 == 0.0) {
-        let p2txp1ty = p2t.x as f64 * p1t.y as f64;
-        let p2typ1tx = p2t.y as f64 * p1t.x as f64;
-        e0 = (p2typ1tx - p2txp1ty) as Float;
-
-        let p0txp2ty = p0t.x as f64 * p2t.y as f64;
-        let p0typ2tx = p0t.y as f64 * p2t.x as f64;
-        e1 = (p0typ2tx - p0txp2ty) as Float;
-
-        let p1txp0ty = p1t.x as f64 * p0t.y as f64;
-        let p1typ0tx = p1t.y as f64 * p0t.x as f64;
-        e2 = (p1typ0tx - p1txp0ty) as Float;
-    }
 
     if (e0 < 0.0 || e1 < 0.0 || e2 < 0.0) && (e0 > 0.0 || e1 > 0.0 || e2 > 0.0) {
         return None;
@@ -240,7 +226,7 @@ impl Triangle {
 }
 
 impl Shape for Triangle {
-    fn intersect(&self, ray: &Ray, t_max: Float) -> Option<ShapeIntersection> {
+    fn intersect(&self, ray: &Ray, t_max: f64) -> Option<ShapeIntersection> {
         let (p0, p1, p2) = self.get_points();
 
         let triangle_intersection = match intersect_triangle(ray, t_max, p0, p1, p2) {
@@ -256,7 +242,7 @@ impl Shape for Triangle {
         });
     }
 
-    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool {
+    fn fast_intersect(&self, ray: &Ray, t_max: f64) -> bool {
         let (p0, p1, p2) = self.get_points();
         return intersect_triangle(ray, t_max, p0, p1, p2).is_some();
     }

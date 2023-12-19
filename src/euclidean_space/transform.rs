@@ -36,7 +36,7 @@ impl Transform {
         };
     }
 
-    pub fn from_array(array: [[Float; 4]; 4]) -> Self {
+    pub fn from_array(array: [[f64; 4]; 4]) -> Self {
         let matrix = SquareMatrix::<4>::new(array);
         return Transform::from_matrix(matrix);
     }
@@ -62,7 +62,7 @@ impl Transform {
         };
     }
 
-    pub fn translate(x: Float, y: Float, z: Float) -> Self {
+    pub fn translate(x: f64, y: f64, z: f64) -> Self {
         let _matrix = SquareMatrix::new([
             [1.0, 0.0, 0.0, x],
             [0.0, 1.0, 0.0, y],
@@ -83,7 +83,7 @@ impl Transform {
         };
     }
 
-    pub fn rotate(angle: Float, x: Float, y: Float, z: Float) -> Self {
+    pub fn rotate(angle: f64, x: f64, y: f64, z: f64) -> Self {
         let sin_theta = degree_to_radian(angle).sin();
         let cos_theta = degree_to_radian(angle).cos();
         let axis = Vector3f::new(x, y, z).normalize();
@@ -144,7 +144,7 @@ impl Transform {
         };
     }
 
-    pub fn scale(x: Float, y: Float, z: Float) -> Transform {
+    pub fn scale(x: f64, y: f64, z: f64) -> Transform {
         let _matrix = SquareMatrix::<4>::new([
             [x, 0.0, 0.0, 0.0],
             [0.0, y, 0.0, 0.0],
@@ -165,7 +165,7 @@ impl Transform {
         };
     }
 
-    pub fn perspective(fov: Float, z_near: Float, z_far: Float) -> Transform {
+    pub fn perspective(fov: f64, z_near: f64, z_far: f64) -> Transform {
         let persp = SquareMatrix::<4>::new([
             [1.0, 0.0, 0.0, 0.0],
             [0.0, 1.0, 0.0, 0.0],
@@ -370,7 +370,7 @@ impl Transform {
         return transformed_bounds;
     }
 
-    pub fn on_ray(&self, r: &Ray) -> (Ray, Float) {
+    pub fn on_ray(&self, r: &Ray) -> (Ray, f64) {
         let o = self.on_point3fi(Point3fi::from(r.o));
         let d = self.on_vector3f(r.d);
 
@@ -385,7 +385,7 @@ impl Transform {
         return (Ray::new(Point3f::from(offset_o), d), dt);
     }
 
-    pub fn on_differential_ray(&self, r: &DifferentialRay) -> (DifferentialRay, Float) {
+    pub fn on_differential_ray(&self, r: &DifferentialRay) -> (DifferentialRay, f64) {
         let (transformed_ray, dt) = self.on_ray(&r.ray);
 
         return (

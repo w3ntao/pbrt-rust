@@ -1,12 +1,12 @@
 use crate::pbrt::*;
 
 pub struct PiecewiseLinearSpectrum {
-    lambdas: Vec<Float>,
-    values: Vec<Float>,
+    lambdas: Vec<f64>,
+    values: Vec<f64>,
 }
 
 impl Spectrum for PiecewiseLinearSpectrum {
-    fn eval(&self, lambda: Float) -> Float {
+    fn eval(&self, lambda: f64) -> f64 {
         let size = self.lambdas.len();
         if self.lambdas.len() == 0 || lambda < self.lambdas[0] || lambda > self.lambdas[size - 1] {
             return 0.0;
@@ -27,7 +27,7 @@ impl Spectrum for PiecewiseLinearSpectrum {
 }
 
 impl PiecewiseLinearSpectrum {
-    pub fn new(lambdas: Vec<Float>, values: Vec<Float>) -> Self {
+    pub fn new(lambdas: Vec<f64>, values: Vec<f64>) -> Self {
         assert!(strictly_sorted(&lambdas));
         assert!(finite(&lambdas));
         assert!(finite(&values));
@@ -35,7 +35,7 @@ impl PiecewiseLinearSpectrum {
         return Self { lambdas, values };
     }
 
-    pub fn scale(&self, s: Float) -> Self {
+    pub fn scale(&self, s: f64) -> Self {
         let mut values = self.values.clone();
 
         for v in &mut values {
@@ -48,15 +48,15 @@ impl PiecewiseLinearSpectrum {
         };
     }
 
-    pub fn from_interleaved(samples: Vec<Float>, normalize: bool) -> Self {
+    pub fn from_interleaved(samples: Vec<f64>, normalize: bool) -> Self {
         if samples.len() % 2 != 0 {
             panic!("illegal samples number");
         }
 
         let n = samples.len() / 2;
 
-        let mut lambdas = Vec::<Float>::new();
-        let mut values = Vec::<Float>::new();
+        let mut lambdas = Vec::<f64>::new();
+        let mut values = Vec::<f64>::new();
 
         if samples[0] > LAMBDA_MIN {
             lambdas.push(LAMBDA_MIN - 1.0);

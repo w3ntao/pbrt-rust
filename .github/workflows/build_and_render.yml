@@ -15,7 +15,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build-and-render-release-f64:
+  build-and-render-release:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -26,7 +26,7 @@ jobs:
         git clone https://github.com/w3ntao/pbrt-minus-scenes.git;
         popd;
 
-    - name: cargo build (release, f64 as Float)
+    - name: cargo build (release)
       run:
         cargo build --release;
 

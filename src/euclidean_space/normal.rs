@@ -2,21 +2,21 @@ use crate::pbrt::*;
 
 #[derive(Copy, Clone)]
 pub struct Normal3f {
-    pub x: Float,
-    pub y: Float,
-    pub z: Float,
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
 }
 
 impl Normal3f {
-    pub fn new(x: Float, y: Float, z: Float) -> Self {
+    pub fn new(x: f64, y: f64, z: f64) -> Self {
         return Self { x, y, z };
     }
 
     pub fn nan() -> Self {
         return Self {
-            x: Float::NAN,
-            y: Float::NAN,
-            z: Float::NAN,
+            x: f64::NAN,
+            y: f64::NAN,
+            z: f64::NAN,
         };
     }
 
@@ -29,7 +29,7 @@ impl Normal3f {
         };
     }
 
-    pub fn dot(&self, v: Vector3f) -> Float {
+    pub fn dot(&self, v: Vector3f) -> f64 {
         return self.x * v.x + self.y * v.y + self.z * v.z;
     }
 
@@ -41,9 +41,9 @@ impl Normal3f {
 impl Default for Normal3f {
     fn default() -> Self {
         return Self {
-            x: Float::NAN,
-            y: Float::NAN,
-            z: Float::NAN,
+            x: f64::NAN,
+            y: f64::NAN,
+            z: f64::NAN,
         };
     }
 }

@@ -52,7 +52,7 @@ impl BSDF {
     pub fn sample_f(
         &self,
         wo_render: Vector3f,
-        u: Float,
+        u: f64,
         u2: Point2f,
         mode: TransportMode,
         sample_flags: BxDFReflTransFlags,

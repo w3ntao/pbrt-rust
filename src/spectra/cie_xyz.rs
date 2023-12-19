@@ -3,17 +3,17 @@ use crate::pbrt::*;
 #[derive(Copy, Clone)]
 
 pub struct CIEXYZ {
-    pub x: Float,
-    pub y: Float,
-    pub z: Float,
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
 }
 
 impl CIEXYZ {
-    pub fn new(x: Float, y: Float, z: Float) -> Self {
+    pub fn new(x: f64, y: f64, z: f64) -> Self {
         return Self { x, y, z };
     }
 
-    pub fn from_xy_y(xy: Point2f, y: Float) -> Self {
+    pub fn from_xy_y(xy: Point2f, y: f64) -> Self {
         if xy.y == 0.0 {
             return Self {
                 x: 0.0,
@@ -25,7 +25,7 @@ impl CIEXYZ {
         return Self::new(xy.x * y / xy.y, y, (1.0 - xy.x - xy.y) * y / xy.y);
     }
 
-    pub fn average(&self) -> Float {
+    pub fn average(&self) -> f64 {
         return (self.x + self.y + self.z) / 3.0;
     }
 
@@ -37,7 +37,7 @@ impl CIEXYZ {
 }
 
 impl Index<usize> for CIEXYZ {
-    type Output = Float;
+    type Output = f64;
 
     fn index(&self, index: usize) -> &Self::Output {
         return match index {
@@ -51,10 +51,10 @@ impl Index<usize> for CIEXYZ {
     }
 }
 
-impl Div<Float> for CIEXYZ {
+impl Div<f64> for CIEXYZ {
     type Output = CIEXYZ;
 
-    fn div(self, rhs: Float) -> Self::Output {
+    fn div(self, rhs: f64) -> Self::Output {
         return CIEXYZ {
             x: self.x / rhs,
             y: self.y / rhs,

@@ -51,10 +51,10 @@ pub struct SurfaceInteraction {
 
     pub dndu: Normal3f,
     pub dndv: Normal3f,
-    pub dudx: Float,
-    pub dvdx: Float,
-    pub dudy: Float,
-    pub dvdy: Float,
+    pub dudx: f64,
+    pub dvdx: f64,
+    pub dudy: f64,
+    pub dvdy: f64,
 
     pub shading: Shading,
 
@@ -177,7 +177,7 @@ impl SurfaceInteraction {
         self.dvdy = difference_of_products(ata00, atb1y, ata01, atb0y) * inv_det;
 
         // Clamp derivatives of $u$ and $v$ to reasonable values
-        let local_clamp = |x: Float| {
+        let local_clamp = |x: f64| {
             if x.is_finite() {
                 clamp_float(x, -1e8, 1e8)
             } else {

@@ -2,17 +2,17 @@ use crate::pbrt::*;
 
 #[derive(Clone, Copy)]
 pub struct SampledSpectrum {
-    pub values: [Float; NUM_SPECTRUM_SAMPLES],
+    pub values: [f64; NUM_SPECTRUM_SAMPLES],
 }
 
 impl SampledSpectrum {
-    pub const fn same_value(v: Float) -> Self {
+    pub const fn same_value(v: f64) -> Self {
         return Self {
             values: [v; NUM_SPECTRUM_SAMPLES],
         };
     }
 
-    pub fn new(values: [Float; NUM_SPECTRUM_SAMPLES]) -> Self {
+    pub fn new(values: [f64; NUM_SPECTRUM_SAMPLES]) -> Self {
         debug_assert!(values.into_par_iter().all(|x| x >= 0.0));
         return Self { values };
     }
@@ -22,7 +22,7 @@ impl SampledSpectrum {
     }
 
     pub fn safe_div(&self, divisor: &SampledSpectrum) -> SampledSpectrum {
-        let mut values = [Float::NAN; NUM_SPECTRUM_SAMPLES];
+        let mut values = [f64::NAN; NUM_SPECTRUM_SAMPLES];
         for i in 0..NUM_SPECTRUM_SAMPLES {
             values[i] = if divisor[i] == 0.0 {
                 0.0
@@ -34,8 +34,8 @@ impl SampledSpectrum {
         return SampledSpectrum { values };
     }
 
-    pub fn average(&self) -> Float {
-        return self.values.iter().sum::<Float>() / (NUM_SPECTRUM_SAMPLES as Float);
+    pub fn average(&self) -> f64 {
+        return self.values.iter().sum::<f64>() / (NUM_SPECTRUM_SAMPLES as f64);
     }
 }
 
@@ -51,7 +51,7 @@ impl Display for SampledSpectrum {
 }
 
 impl Index<usize> for SampledSpectrum {
-    type Output = Float;
+    type Output = f64;
 
     fn index(&self, index: usize) -> &Self::Output {
         return &self.values[index];
@@ -98,10 +98,10 @@ impl Mul<SampledSpectrum> for SampledSpectrum {
     }
 }
 
-impl Mul<Float> for SampledSpectrum {
+impl Mul<f64> for SampledSpectrum {
     type Output = SampledSpectrum;
 
-    fn mul(self, rhs: Float) -> Self::Output {
+    fn mul(self, rhs: f64) -> Self::Output {
         let mut values = self.values;
         for v in &mut values {
             *v *= rhs;
@@ -110,7 +110,7 @@ impl Mul<Float> for SampledSpectrum {
     }
 }
 
-impl Mul<SampledSpectrum> for Float {
+impl Mul<SampledSpectrum> for f64 {
     type Output = SampledSpectrum;
 
     fn mul(self, rhs: SampledSpectrum) -> Self::Output {
@@ -126,10 +126,10 @@ impl MulAssign<SampledSpectrum> for SampledSpectrum {
     }
 }
 
-impl Div<Float> for SampledSpectrum {
+impl Div<f64> for SampledSpectrum {
     type Output = SampledSpectrum;
 
-    fn div(self, rhs: Float) -> Self::Output {
+    fn div(self, rhs: f64) -> Self::Output {
         let mut values = self.values;
         for v in &mut values {
             *v /= rhs;

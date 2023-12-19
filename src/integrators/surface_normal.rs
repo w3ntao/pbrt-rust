@@ -25,7 +25,7 @@ impl SurfaceNormal {
 }
 
 impl Integrator for SurfaceNormal {
-    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool {
+    fn fast_intersect(&self, ray: &Ray, t_max: f64) -> bool {
         return self.base.aggregate.fast_intersect(ray, t_max);
     }
 
@@ -38,7 +38,7 @@ impl Integrator for SurfaceNormal {
         return match self
             .base
             .aggregate
-            .intersect(&camera_ray.ray, Float::INFINITY)
+            .intersect(&camera_ray.ray, f64::INFINITY)
         {
             None => SampledSpectrum::same_value(0.0),
             Some(shape_intersection) => {

@@ -5,12 +5,12 @@ pub struct RGBAlbedoSpectrum {
 }
 
 impl Spectrum for RGBAlbedoSpectrum {
-    fn eval(&self, lambda: Float) -> Float {
+    fn eval(&self, lambda: f64) -> f64 {
         return self.rsp.eval(lambda);
     }
 
     fn sample(&self, lambda: &SampledWavelengths) -> SampledSpectrum {
-        let mut values = [Float::NAN; NUM_SPECTRUM_SAMPLES];
+        let mut values = [f64::NAN; NUM_SPECTRUM_SAMPLES];
         for i in 0..NUM_SPECTRUM_SAMPLES {
             values[i] = self.rsp.eval(lambda[i]);
         }

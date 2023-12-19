@@ -67,7 +67,7 @@ impl SpectrumTexture for SpectrumImageTexture {
             } else {
                 _rgb
             }
-            .clamp(0.0, Float::INFINITY)
+            .clamp(0.0, f64::INFINITY)
         };
 
         let cs = self.image_texture_base.mipmap.color_space.as_ref();

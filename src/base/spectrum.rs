@@ -7,18 +7,18 @@ pub enum SpectrumType {
 }
 
 pub trait Spectrum: Send + Sync {
-    fn eval(&self, lambda: Float) -> Float;
+    fn eval(&self, lambda: f64) -> f64;
 
     fn sample(&self, lambda: &SampledWavelengths) -> SampledSpectrum;
 
-    fn to_photometric(&self) -> Float {
+    fn to_photometric(&self) -> f64 {
         // for non RGBIlluminantSpectrum
         return self.inner_product(&CIE_Y_DENSELY_SAMPLED);
     }
 }
 
 pub trait SpectrumDefaultInterface: Spectrum {
-    fn inner_product(&self, g: &dyn Spectrum) -> Float {
+    fn inner_product(&self, g: &dyn Spectrum) -> f64 {
         // The parallel (possibly faster) implementation
         return LAMBDA_RANGE
             .par_iter()
@@ -37,17 +37,17 @@ pub trait SpectrumDefaultInterface: Spectrum {
 
 impl<T: ?Sized + Spectrum> SpectrumDefaultInterface for T {}
 
-pub const LAMBDA_MIN: Float = 360.0;
-pub const LAMBDA_MAX: Float = 830.0;
+pub const LAMBDA_MIN: f64 = 360.0;
+pub const LAMBDA_MAX: f64 = 830.0;
 
-pub const LAMBDA_RANGE: [Float; NUM_CIE_SAMPLES] = {
-    let mut lambdas = [Float::NAN; NUM_CIE_SAMPLES];
+pub const LAMBDA_RANGE: [f64; NUM_CIE_SAMPLES] = {
+    let mut lambdas = [f64::NAN; NUM_CIE_SAMPLES];
 
     let lambda_min_usize = LAMBDA_MIN as usize;
 
     let mut _lambda = lambda_min_usize;
     while _lambda <= (LAMBDA_MAX as usize) {
-        lambdas[_lambda - lambda_min_usize] = _lambda as Float;
+        lambdas[_lambda - lambda_min_usize] = _lambda as f64;
         _lambda += 1;
     }
     lambdas
@@ -60,7 +60,7 @@ const _CHECK_LAMBDA: bool = {
 };
 pub const NUM_SPECTRUM_SAMPLES: usize = 4;
 
-pub const CIE_Y_INTEGRAL: Float = 106.856895;
+pub const CIE_Y_INTEGRAL: f64 = 106.856895;
 // TODO: compute CIE_Y_INTEGRAL during compilation rather than hard coding it
 
 pub const CIE_Y_PLS: ConstPieceWiseLinearSpectrum<NUM_CIE_SAMPLES> =

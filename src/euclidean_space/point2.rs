@@ -31,8 +31,8 @@ impl Point2f {
 impl Default for Point2f {
     fn default() -> Self {
         return Self {
-            x: Float::NAN,
-            y: Float::NAN,
+            x: f64::NAN,
+            y: f64::NAN,
         };
     }
 }
@@ -40,8 +40,8 @@ impl Default for Point2f {
 impl From<Point2<i32>> for Point2f {
     fn from(value: Point2<i32>) -> Self {
         return Self {
-            x: value.x as Float,
-            y: value.y as Float,
+            x: value.x as f64,
+            y: value.y as f64,
         };
     }
 }
@@ -144,7 +144,7 @@ impl<T: Div<Output = T> + Copy> Div<T> for Point2<T> {
     }
 }
 
-impl Mul<Point2f> for Float {
+impl Mul<Point2f> for f64 {
     type Output = Point2f;
 
     fn mul(self, rhs: Point2f) -> Self::Output {

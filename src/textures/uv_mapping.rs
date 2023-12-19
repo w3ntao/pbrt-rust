@@ -1,15 +1,15 @@
 use crate::pbrt::*;
 
 pub struct UVMapping {
-    //Float su, sv, du, dv;
-    su: Float,
-    sv: Float,
-    du: Float,
-    dv: Float,
+    //f64 su, sv, du, dv;
+    su: f64,
+    sv: f64,
+    du: f64,
+    dv: f64,
 }
 
 impl UVMapping {
-    pub fn new(su: Float, sv: Float, du: Float, dv: Float) -> Self {
+    pub fn new(su: f64, sv: f64, du: f64, dv: f64) -> Self {
         return Self { su, sv, du, dv };
     }
 }

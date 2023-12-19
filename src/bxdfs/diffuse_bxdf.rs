@@ -30,7 +30,7 @@ impl BxDF for DiffuseBxDF {
     fn sample_f(
         &self,
         wo: Vector3f,
-        uc: Float,
+        uc: f64,
         u: Point2f,
         mode: TransportMode,
         sample_flags: BxDFReflTransFlags,
@@ -65,7 +65,7 @@ impl BxDF for DiffuseBxDF {
         wi: Vector3f,
         mode: TransportMode,
         sample_flags: BxDFReflTransFlags,
-    ) -> Float {
+    ) -> f64 {
         if !(sample_flags & BxDFReflTransFlags::Reflection) || !wo.same_hemisphere(wi) {
             return 0.0;
         }

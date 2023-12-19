@@ -1,17 +1,17 @@
 use crate::pbrt::*;
 
 pub struct RGBSigmoidPolynomial {
-    c0: Float,
-    c1: Float,
-    c2: Float,
+    c0: f64,
+    c1: f64,
+    c2: f64,
 }
 
 impl RGBSigmoidPolynomial {
-    pub fn new(c0: Float, c1: Float, c2: Float) -> Self {
+    pub fn new(c0: f64, c1: f64, c2: f64) -> Self {
         return Self { c0, c1, c2 };
     }
 
-    pub fn eval(&self, lambda: Float) -> Float {
+    pub fn eval(&self, lambda: f64) -> f64 {
         return sigmoid(evaluate_polynomial(lambda, &[self.c2, self.c1, self.c0]));
     }
 }

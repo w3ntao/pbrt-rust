@@ -1,18 +1,18 @@
 use crate::pbrt::*;
 
-pub const PI: Float = std::f64::consts::PI as Float;
+pub const PI: f64 = std::f64::consts::PI as f64;
 
-pub const PI_OVER_2: Float = PI / 2.0;
+pub const PI_OVER_2: f64 = PI / 2.0;
 
-pub const PI_OVER_4: Float = PI / 4.0;
+pub const PI_OVER_4: f64 = PI / 4.0;
 
-pub const INV_PI: Float = 1.0 / PI;
+pub const INV_PI: f64 = 1.0 / PI;
 
-pub fn degree_to_radian(degree: Float) -> Float {
+pub fn degree_to_radian(degree: f64) -> f64 {
     return (PI / 180.0) * degree;
 }
 
-pub const fn lerp(x: Float, a: Float, b: Float) -> Float {
+pub const fn lerp(x: f64, a: f64, b: f64) -> f64 {
     return (1.0 - x) * a + x * b;
 }
 
@@ -21,7 +21,7 @@ pub fn mod_i32(a: i32, b: i32) -> i32 {
     return if result < 0 { result + b } else { result };
 }
 
-pub const fn clamp_float(val: Float, low: Float, high: Float) -> Float {
+pub const fn clamp_float(val: f64, low: f64, high: f64) -> f64 {
     if val < low {
         return low;
     }
@@ -41,7 +41,7 @@ pub const fn clamp_usize(val: usize, low: usize, high: usize) -> usize {
     return val;
 }
 
-pub fn sigmoid(x: Float) -> Float {
+pub fn sigmoid(x: f64) -> f64 {
     if x.is_infinite() {
         return if x > 0.0 { 1.0 } else { 0.0 };
     }
@@ -49,7 +49,7 @@ pub fn sigmoid(x: Float) -> Float {
     return 0.5 + x / (2.0 * (1.0 + x * x).sqrt());
 }
 
-pub fn evaluate_polynomial(t: Float, args: &[Float]) -> Float {
+pub fn evaluate_polynomial(t: f64, args: &[f64]) -> f64 {
     let c = args[0];
     let length = args.len();
 
@@ -60,7 +60,7 @@ pub fn evaluate_polynomial(t: Float, args: &[Float]) -> Float {
     return fma(t, evaluate_polynomial(t, &args[1..length]), c);
 }
 
-pub fn difference_of_products(a: Float, b: Float, c: Float, d: Float) -> Float {
+pub fn difference_of_products(a: f64, b: f64, c: f64, d: f64) -> f64 {
     let cd = c * d;
     let difference_of_prod = fma(a, b, -cd);
     let error = fma(-c, d, cd);
@@ -68,7 +68,7 @@ pub fn difference_of_products(a: Float, b: Float, c: Float, d: Float) -> Float {
     return difference_of_prod + error;
 }
 
-fn fma_f_v3_v3(a: Float, b: Vector3f, c: Vector3f) -> Vector3f {
+fn fma_f_v3_v3(a: f64, b: Vector3f, c: Vector3f) -> Vector3f {
     return Vector3f {
         x: fma(a, b.x, c.x),
         y: fma(a, b.y, c.y),
@@ -76,7 +76,7 @@ fn fma_f_v3_v3(a: Float, b: Vector3f, c: Vector3f) -> Vector3f {
     };
 }
 
-pub fn difference_of_products_vec3(a: Float, b: Vector3f, c: Float, d: Vector3f) -> Vector3f {
+pub fn difference_of_products_vec3(a: f64, b: Vector3f, c: f64, d: Vector3f) -> Vector3f {
     let cd = c * d;
     let difference_of_prod = fma_f_v3_v3(a, b, -cd);
     let error = fma_f_v3_v3(-c, d, cd);
@@ -99,7 +99,7 @@ pub const fn round_up_pow_2(v: i32) -> i32 {
     return x + 1;
 }
 
-pub fn safe_acos(x: Float) -> Float {
+pub fn safe_acos(x: f64) -> f64 {
     debug_assert!(x >= -1.0001 && x <= 1.0001);
 
     return clamp_float(x, -1.0, 1.0).acos();
@@ -109,13 +109,13 @@ pub fn sqr<T: Mul<Output = T> + Copy>(x: T) -> T {
     return x * x;
 }
 
-pub fn safe_sqrt(x: Float) -> Float {
+pub fn safe_sqrt(x: f64) -> f64 {
     debug_assert!(x >= -1e-3);
     return x.max(0.0).sqrt();
 }
 
 // http://www.plunk.org/~hatch/rightway.html
-pub fn sinx_over_x(x: Float) -> Float {
+pub fn sinx_over_x(x: f64) -> f64 {
     if 1.0 - x * x == 1.0 {
         return 1.0;
     }
@@ -123,11 +123,11 @@ pub fn sinx_over_x(x: Float) -> Float {
     return x.sin() / x;
 }
 
-pub fn sinc(x: Float) -> Float {
+pub fn sinc(x: f64) -> f64 {
     return sinx_over_x(PI * x);
 }
 
-pub fn windowed_sinc(x: Float, radius: Float, tau: Float) -> Float {
+pub fn windowed_sinc(x: f64, radius: f64, tau: f64) -> f64 {
     if x.abs() > radius {
         return 0.0;
     }

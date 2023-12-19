@@ -2,7 +2,7 @@ use crate::pbrt::*;
 
 pub struct RandomWalkIntegrator {
     illuminant_spectrum: &'static dyn Spectrum,
-    illuminant_scale: Float,
+    illuminant_scale: f64,
     base: IntegratorBase,
 }
 
@@ -41,7 +41,7 @@ impl RandomWalkIntegrator {
         sampler: &mut dyn Sampler,
         depth: usize,
     ) -> SampledSpectrum {
-        let mut isect = match self.base.aggregate.intersect(&ray.ray, Float::INFINITY) {
+        let mut isect = match self.base.aggregate.intersect(&ray.ray, f64::INFINITY) {
             None => {
                 // Return emitted light from infinite light sources
                 // to be change later to infinite lights
@@ -82,7 +82,7 @@ impl RandomWalkIntegrator {
 }
 
 impl Integrator for RandomWalkIntegrator {
-    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool {
+    fn fast_intersect(&self, ray: &Ray, t_max: f64) -> bool {
         return self.base.aggregate.fast_intersect(ray, t_max);
     }
 

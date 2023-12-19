@@ -3,8 +3,8 @@ use crate::pbrt::*;
 const RESOLUTION: usize = RGB_TO_SPECTRUM_RESOLUTION;
 
 pub struct RGBtoSpectrumTable {
-    z_nodes: [f32; RESOLUTION],
-    coefficients: Vec<Vec<Vec<Vec<Vec<f32>>>>>,
+    z_nodes: [f64; RESOLUTION],
+    coefficients: Vec<Vec<Vec<Vec<Vec<f64>>>>>,
     // TODO: rust bug: allocating large array triggers main thread overflow
     // https://github.com/rust-lang/rust/issues/53827
 }
@@ -26,7 +26,7 @@ impl RGBtoSpectrumTable {
         return RGBtoSpectrumTable::build(scale, &coefficients);
     }
 
-    pub fn build(z_nodes: [f32; RESOLUTION], raw_data_coefficients: &[f32]) -> Self {
+    pub fn build(z_nodes: [f64; RESOLUTION], raw_data_coefficients: &[f64]) -> Self {
         if raw_data_coefficients.len() != 3 * RESOLUTION * RESOLUTION * RESOLUTION * 3 {
             panic!("data length mismatched");
         }
@@ -58,7 +58,7 @@ impl RGBtoSpectrumTable {
         };
     }
 
-    fn find_interval(&self, z: f32) -> usize {
+    fn find_interval(&self, z: f64) -> usize {
         let sz = self.z_nodes.len();
         let mut size = sz - 2;
         let mut first = 1;
@@ -100,9 +100,9 @@ impl RGBtoSpectrumTable {
             }
         };
 
-        let z = rgb[max_component] as f32;
-        let x = rgb[(max_component + 1) % 3] as f32 * (RESOLUTION - 1) as f32 / z;
-        let y = rgb[(max_component + 2) % 3] as f32 * (RESOLUTION - 1) as f32 / z;
+        let z = rgb[max_component];
+        let x = rgb[(max_component + 1) % 3] * ((RESOLUTION - 1) as f64) / z;
+        let y = rgb[(max_component + 2) % 3] * ((RESOLUTION - 1) as f64) / z;
 
         // Compute integer indices and offsets for coefficient interpolation
 
@@ -111,19 +111,17 @@ impl RGBtoSpectrumTable {
 
         let zi = self.find_interval(z);
 
-        let dx = x - (xi as f32);
-        let dy = y - (yi as f32);
+        let dx = x - (xi as f64);
+        let dy = y - (yi as f64);
         let dz = (z - self.z_nodes[zi]) / (self.z_nodes[zi + 1] - self.z_nodes[zi]);
 
-        let (dx, dy, dz) = (dx as Float, dy as Float, dz as Float);
-
         // Trilinearly interpolate sigmoid polynomial coefficients _c_
-        let mut c = [Float::NAN; 3];
+        let mut c = [f64::NAN; 3];
         for i in 0..3 {
             // Define _co_ lambda for looking up sigmoid polynomial coefficients
-            let co = |dx: Float, dy: Float, dz: Float| -> Float {
+            let co = |dx: f64, dy: f64, dz: f64| -> f64 {
                 self.coefficients[max_component][zi + (dz as usize)][yi + (dy as usize)]
-                    [xi + (dx as usize)][i] as Float
+                    [xi + (dx as usize)][i]
             };
 
             c[i] = lerp(

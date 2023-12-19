@@ -21,20 +21,20 @@ impl Shading {
 }
 
 pub struct ShapeIntersection {
-    pub t_hit: Float,
+    pub t_hit: f64,
     pub surface_interaction: SurfaceInteraction,
 }
 
 pub struct QuadricIntersection {
-    pub t_hit: Float,
+    pub t_hit: f64,
     pub p_obj: Point3f,
-    pub phi: Float,
+    pub phi: f64,
 }
 
 pub trait Shape: Send + Sync {
-    fn intersect(&self, ray: &Ray, t_max: Float) -> Option<ShapeIntersection>;
+    fn intersect(&self, ray: &Ray, t_max: f64) -> Option<ShapeIntersection>;
 
-    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool;
+    fn fast_intersect(&self, ray: &Ray, t_max: f64) -> bool;
 
     fn bounds(&self) -> Bounds3f;
 }

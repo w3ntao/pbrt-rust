@@ -66,9 +66,9 @@ impl BitAnd for BxDFFlags {
 pub struct BSDFSample {
     pub f: SampledSpectrum,
     pub wi: Vector3f,
-    pub pdf: Float,
+    pub pdf: f64,
     pub flags: BxDFFlags,
-    pub eta: Float,
+    pub eta: f64,
     pub pdf_is_proportional: bool,
 }
 
@@ -86,7 +86,7 @@ pub trait BxDF {
     fn sample_f(
         &self,
         wo: Vector3f,
-        uc: Float,
+        uc: f64,
         u: Point2f,
         mode: TransportMode,
         sample_flags: BxDFReflTransFlags,
@@ -98,5 +98,5 @@ pub trait BxDF {
         wi: Vector3f,
         mode: TransportMode,
         sample_flags: BxDFReflTransFlags,
-    ) -> Float;
+    ) -> f64;
 }

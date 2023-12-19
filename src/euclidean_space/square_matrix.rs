@@ -2,7 +2,7 @@ use crate::pbrt::*;
 
 #[derive(Copy, Clone)]
 pub struct SquareMatrix<const N: usize> {
-    matrix: [[Float; N]; N],
+    matrix: [[f64; N]; N],
 }
 
 impl<const N: usize> SquareMatrix<N> {
@@ -23,15 +23,15 @@ impl<const N: usize> SquareMatrix<N> {
 
     pub fn nan() -> Self {
         return SquareMatrix {
-            matrix: [[Float::NAN; N]; N],
+            matrix: [[f64::NAN; N]; N],
         };
     }
 
-    pub const fn new(values: [[Float; N]; N]) -> SquareMatrix<N> {
+    pub const fn new(values: [[f64; N]; N]) -> SquareMatrix<N> {
         return SquareMatrix { matrix: values };
     }
 
-    pub fn from_array(values: &[Float]) -> SquareMatrix<N> {
+    pub fn from_array(values: &[f64]) -> SquareMatrix<N> {
         if values.len() != N * N {
             panic!("size of vector and size of matrix not matched");
         }
@@ -47,7 +47,7 @@ impl<const N: usize> SquareMatrix<N> {
         return SquareMatrix { matrix: data };
     }
 
-    pub fn from_diag(diag: [Float; N]) -> Self {
+    pub fn from_diag(diag: [f64; N]) -> Self {
         let mut matrix = Self::zero();
         for i in 0..N {
             matrix[i][i] = diag[i];
@@ -171,14 +171,14 @@ impl<const N: usize> SquareMatrix<N> {
 }
 
 impl<const N: usize> Index<usize> for SquareMatrix<N> {
-    type Output = [Float; N];
-    fn index(&self, idx: usize) -> &[Float; N] {
+    type Output = [f64; N];
+    fn index(&self, idx: usize) -> &[f64; N] {
         return &self.matrix[idx];
     }
 }
 
 impl<const N: usize> IndexMut<usize> for SquareMatrix<N> {
-    fn index_mut(&mut self, idx: usize) -> &mut [Float; N] {
+    fn index_mut(&mut self, idx: usize) -> &mut [f64; N] {
         return &mut self.matrix[idx];
     }
 }

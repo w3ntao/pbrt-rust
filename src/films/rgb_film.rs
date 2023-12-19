@@ -91,14 +91,14 @@ impl Film for RGBFilm {
     fn get_pixel_rgb(&self, p: Point2i) -> RGB {
         let pixel = self.pixels[p.y as usize][p.x as usize];
         let raw_rgb = RGB::new(
-            pixel.rgb_sum[0] as Float,
-            pixel.rgb_sum[1] as Float,
-            pixel.rgb_sum[2] as Float,
+            pixel.rgb_sum[0] as f64,
+            pixel.rgb_sum[1] as f64,
+            pixel.rgb_sum[2] as f64,
         );
 
         // Normalize _rgb_ with weight sum
         let rgb = if pixel.weight_sum != 0.0 {
-            raw_rgb / (pixel.weight_sum as Float)
+            raw_rgb / (pixel.weight_sum as f64)
         } else {
             raw_rgb
         };
@@ -123,7 +123,7 @@ impl Film for RGBFilm {
         point_film: Point2i,
         l: &SampledSpectrum,
         lambda: &SampledWavelengths,
-        weight: Float,
+        weight: f64,
     ) {
         // Convert sample radiance to _PixelSensor_ RGB
         let rgb = self.sensor.to_sensor_rgb(l, lambda);
@@ -131,7 +131,7 @@ impl Film for RGBFilm {
         /*
         // TODO: clamp m like PBRT-v4
         // Optionally clamp sensor RGB value
-        Float m = std::max({rgb.r, rgb.g, rgb.b});
+        f64 m = std::max({rgb.r, rgb.g, rgb.b});
         if (m > maxComponentValue)
             rgb *= maxComponentValue / m;
         */

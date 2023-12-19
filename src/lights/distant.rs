@@ -3,7 +3,7 @@ use crate::pbrt::*;
 pub struct DistantLight {
     light_base: LightBase,
     lemit: Arc<dyn Spectrum>,
-    scale: Float,
+    scale: f64,
 }
 
 impl Light for DistantLight {

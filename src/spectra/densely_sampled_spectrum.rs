@@ -3,7 +3,7 @@ use crate::pbrt::*;
 const N: usize = (LAMBDA_MAX as usize - LAMBDA_MIN as usize) + 1;
 
 pub struct DenselySampledSpectrum {
-    values: [Float; N],
+    values: [f64; N],
 }
 
 impl Display for DenselySampledSpectrum {
@@ -19,11 +19,11 @@ impl Display for DenselySampledSpectrum {
 }
 
 impl Spectrum for DenselySampledSpectrum {
-    fn eval(&self, lambda: Float) -> Float {
+    fn eval(&self, lambda: f64) -> f64 {
         let floor = lambda.floor();
         let ceil = lambda.ceil();
 
-        if floor < LAMBDA_MIN || ceil > LAMBDA_MAX as Float {
+        if floor < LAMBDA_MIN || ceil > LAMBDA_MAX as f64 {
             return 0.0;
         }
 
@@ -36,12 +36,12 @@ impl Spectrum for DenselySampledSpectrum {
     }
 
     fn sample(&self, lambda: &SampledWavelengths) -> SampledSpectrum {
-        let mut values = [Float::NAN; NUM_SPECTRUM_SAMPLES];
+        let mut values = [f64::NAN; NUM_SPECTRUM_SAMPLES];
 
         for i in 0..NUM_SPECTRUM_SAMPLES {
             let floor = lambda[i].floor();
             let ceil = lambda[i].ceil();
-            values[i] = if floor < LAMBDA_MIN as Float || ceil > LAMBDA_MAX as Float {
+            values[i] = if floor < LAMBDA_MIN as f64 || ceil > LAMBDA_MAX as f64 {
                 0.0
             } else {
                 lerp(
@@ -60,10 +60,10 @@ impl DenselySampledSpectrum {
     pub const fn from_const_spectrum<const K: usize>(
         spectrum: &ConstPieceWiseLinearSpectrum<K>,
     ) -> Self {
-        let mut values = [Float::NAN; N];
+        let mut values = [f64::NAN; N];
         let mut lambda = LAMBDA_MIN as usize;
         while lambda <= LAMBDA_MAX as usize {
-            values[lambda - LAMBDA_MIN as usize] = spectrum.const_eval(lambda as Float);
+            values[lambda - LAMBDA_MIN as usize] = spectrum.const_eval(lambda as f64);
             lambda += 1;
         }
 
@@ -77,7 +77,7 @@ impl DenselySampledSpectrum {
     }
 
     pub fn from_spectrum(spectrum: &dyn Spectrum) -> Self {
-        let mut values = [Float::NAN; N];
+        let mut values = [f64::NAN; N];
 
         for lambda in LAMBDA_RANGE {
             values[lambda as usize - LAMBDA_MIN as usize] = spectrum.eval(lambda);
@@ -86,8 +86,8 @@ impl DenselySampledSpectrum {
         return DenselySampledSpectrum { values };
     }
 
-    pub fn from_sample_function(f: impl Fn(Float) -> Float) -> Self {
-        let mut values = [Float::NAN; N];
+    pub fn from_sample_function(f: impl Fn(f64) -> f64) -> Self {
+        let mut values = [f64::NAN; N];
 
         for lambda in LAMBDA_RANGE {
             values[lambda as usize - LAMBDA_MIN as usize] = f(lambda);
@@ -97,7 +97,7 @@ impl DenselySampledSpectrum {
     }
 
     // D function in PBRT-v4
-    pub fn cie_d(temperature: Float) -> Self {
+    pub fn cie_d(temperature: f64) -> Self {
         let cct = temperature * 1.4338 / 1.4380;
         if cct < 4000.0 {
             // CIE D ill-defined, use blackbody
@@ -124,7 +124,7 @@ impl DenselySampledSpectrum {
         let values = (0..N_CIES)
             .into_par_iter()
             .map(|i| (CIE_S0[i] + CIE_S1[i] * m1 + CIE_S2[i] * m2) * 0.01)
-            .collect::<Vec<Float>>();
+            .collect::<Vec<f64>>();
 
         let piecewise_linear_spectrum = PiecewiseLinearSpectrum::new(CIE_S_LAMBDA.to_vec(), values);
 

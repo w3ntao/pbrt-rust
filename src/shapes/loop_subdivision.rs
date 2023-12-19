@@ -148,7 +148,7 @@ fn one_ring(vertex: &Arc<Mutex<SDVertex>>, p: &mut Vec<Point3f>) {
     }
 }
 
-fn weight_boundary(vertex: &Arc<Mutex<SDVertex>>, beta: Float) -> Point3f {
+fn weight_boundary(vertex: &Arc<Mutex<SDVertex>>, beta: f64) -> Point3f {
     let valence = valence(vertex);
     let mut p_ring = vec![Point3f::new(0.0, 0.0, 0.0); valence];
 
@@ -161,13 +161,13 @@ fn weight_boundary(vertex: &Arc<Mutex<SDVertex>>, beta: Float) -> Point3f {
     return p;
 }
 
-fn weight_one_ring(vertex: &Arc<Mutex<SDVertex>>, beta: Float) -> Point3f {
+fn weight_one_ring(vertex: &Arc<Mutex<SDVertex>>, beta: f64) -> Point3f {
     let valence = valence(vertex);
     let mut p_ring = vec![Point3f::new(0.0, 0.0, 0.0); valence];
 
     one_ring(vertex, &mut p_ring);
 
-    let mut p = (1.0 - (valence as Float) * beta) * vertex.lock().unwrap().p;
+    let mut p = (1.0 - (valence as f64) * beta) * vertex.lock().unwrap().p;
     for idx in 0..valence {
         p += beta * p_ring[idx];
     }
@@ -175,16 +175,16 @@ fn weight_one_ring(vertex: &Arc<Mutex<SDVertex>>, beta: Float) -> Point3f {
     return p;
 }
 
-fn beta(valence: usize) -> Float {
+fn beta(valence: usize) -> f64 {
     return if valence == 3 {
         3.0 / 16.0
     } else {
-        3.0 / (8.0 * (valence as Float))
+        3.0 / (8.0 * (valence as f64))
     };
 }
 
-fn loop_gamma(valence: usize) -> Float {
-    return 1.0 / ((valence as Float) + 3.0 / (8.0 * beta(valence)));
+fn loop_gamma(valence: usize) -> f64 {
+    return 1.0 / ((valence as f64) + 3.0 / (8.0 * beta(valence)));
 }
 
 struct SDFace {
@@ -668,7 +668,7 @@ pub fn loop_subdivide(
     }
 
     // Push vertices to limit surface
-    let mut p_limit = vec![Point3f::new(Float::NAN, Float::NAN, Float::NAN); v.len()];
+    let mut p_limit = vec![Point3f::new(f64::NAN, f64::NAN, f64::NAN); v.len()];
     for i in 0..v.len() {
         p_limit[i] = if v[i].lock().unwrap().boundary {
             weight_boundary(&v[i].clone(), 1.0 / 5.0)

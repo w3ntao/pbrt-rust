@@ -7,7 +7,7 @@ pub struct BVHAggregate {
 }
 
 impl Primitive for BVHAggregate {
-    fn intersect(&self, ray: &Ray, t_max: Float) -> Option<ShapeIntersection> {
+    fn intersect(&self, ray: &Ray, t_max: f64) -> Option<ShapeIntersection> {
         let d = ray.d;
 
         let inv_dir = Vector3f::new(1.0 / d.x, 1.0 / d.y, 1.0 / d.z);
@@ -64,7 +64,7 @@ impl Primitive for BVHAggregate {
         return best_intersection;
     }
 
-    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool {
+    fn fast_intersect(&self, ray: &Ray, t_max: f64) -> bool {
         let d = ray.d;
         let inv_dir = Vector3f::new(1.0 / d.x, 1.0 / d.y, 1.0 / d.z);
         let dir_is_neg = [
@@ -140,8 +140,7 @@ struct BVHBuildNode {
 }
 
 // TODO: benchmark the improvement of memory alignment
-#[cfg_attr(feature = "use_f64", repr(align(64)))]
-#[cfg_attr(not(feature = "use_f64"), repr(align(32)))]
+#[repr(align(64))]
 struct LinearBVHNode {
     bounds: Bounds3f,
     offset: u32,

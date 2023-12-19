@@ -27,7 +27,7 @@ impl LightSampleContext {
 pub struct LightLiSample {
     pub l: SampledSpectrum,
     pub wi: Vector3f,
-    pub pdf: Float,
+    pub pdf: f64,
     pub p_light: Interaction,
 }
 

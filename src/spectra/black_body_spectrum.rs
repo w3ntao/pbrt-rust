@@ -1,18 +1,18 @@
 use crate::pbrt::*;
 
 pub struct BlackBodySpectrum {
-    temperature: Float,
-    normalization_factor: Float,
+    temperature: f64,
+    normalization_factor: f64,
 }
 
-pub fn black_body(lambda: Float, temperature: Float) -> Float {
+pub fn black_body(lambda: f64, temperature: f64) -> f64 {
     if temperature < 0.0 {
         return 0.0;
     }
 
-    let c: Float = 299792458.0;
-    let h: Float = 6.62606957e-34;
-    let kb: Float = 1.3806488e-23;
+    let c: f64 = 299792458.0;
+    let h: f64 = 6.62606957e-34;
+    let kb: f64 = 1.3806488e-23;
     // Return emitted radiance for blackbody at wavelength _lambda_
 
     let l = lambda * 1e-9;
@@ -23,7 +23,7 @@ pub fn black_body(lambda: Float, temperature: Float) -> Float {
 }
 
 impl BlackBodySpectrum {
-    pub fn new(temperature: Float) -> Self {
+    pub fn new(temperature: f64) -> Self {
         // Compute blackbody normalization constant for given temperature
 
         let lambda_max = 2.8977721e-3 / temperature;
@@ -36,7 +36,7 @@ impl BlackBodySpectrum {
 }
 
 impl Spectrum for BlackBodySpectrum {
-    fn eval(&self, lambda: Float) -> Float {
+    fn eval(&self, lambda: f64) -> f64 {
         return black_body(lambda, self.temperature) * self.normalization_factor;
     }
 

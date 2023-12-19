@@ -22,7 +22,7 @@ pub trait Film: Send + Sync {
         point_film: Point2i,
         l: &SampledSpectrum,
         lambda: &SampledWavelengths,
-        weight: Float,
+        weight: f64,
     );
 
     fn export_image(&self, filename: &str, resolution: Point2i) {

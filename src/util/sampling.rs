@@ -28,15 +28,15 @@ pub fn sample_cosine_hemisphere(u: Point2f) -> Vector3f {
     return Vector3f::new(d.x, d.y, z);
 }
 
-pub const fn cosine_hemisphere_pdf(cos_theta: Float) -> Float {
+pub const fn cosine_hemisphere_pdf(cos_theta: f64) -> f64 {
     return cos_theta * INV_PI;
 }
 
-pub fn sample_visible_wavelengths(u: Float) -> Float {
+pub fn sample_visible_wavelengths(u: f64) -> f64 {
     return 538.0 - 138.888889 * (0.85691062 - 1.82750197 * u).atanh();
 }
 
-pub fn visible_wavelengths_pdf(lambda: Float) -> Float {
+pub fn visible_wavelengths_pdf(lambda: f64) -> f64 {
     if lambda < 360.0 || lambda > 830.0 {
         return 0.0;
     }

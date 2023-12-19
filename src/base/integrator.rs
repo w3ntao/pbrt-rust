@@ -8,7 +8,7 @@ pub struct IntegratorBase {
 }
 
 pub trait Integrator: Send + Sync {
-    fn fast_intersect(&self, ray: &Ray, t_max: Float) -> bool;
+    fn fast_intersect(&self, ray: &Ray, t_max: f64) -> bool;
 
     fn li(
         &self,

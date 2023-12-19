@@ -6,10 +6,10 @@ pub struct TextureEvalContext {
     pub dpdy: Vector3f,
     pub n: Normal3f,
     pub uv: Point2f,
-    pub dudx: Float,
-    pub dudy: Float,
-    pub dvdx: Float,
-    pub dvdy: Float,
+    pub dudx: f64,
+    pub dudy: f64,
+    pub dvdx: f64,
+    pub dvdy: f64,
 }
 
 impl Display for TextureEvalContext {
@@ -39,7 +39,7 @@ impl TextureEvalContext {
 pub struct ImageTextureBase {
     pub mapping: Arc<dyn TextureMapping2D>,
     pub filename: String,
-    pub scale: Float,
+    pub scale: f64,
     pub invert: bool,
     pub mipmap: MIPMap,
 }
@@ -50,7 +50,7 @@ impl ImageTextureBase {
         filename: &str,
         filter_options: MIPMapFilterOptions,
         wrap_mode: WrapMode,
-        scale: Float,
+        scale: f64,
         invert: bool,
         global_variable: &GlobalVariable,
     ) -> Self {
@@ -67,7 +67,7 @@ impl ImageTextureBase {
 }
 
 pub trait FloatTexture {
-    fn evaluate(&self, ctx: &TextureEvalContext) -> Float;
+    fn evaluate(&self, ctx: &TextureEvalContext) -> f64;
 }
 
 pub trait SpectrumTexture: Send + Sync {

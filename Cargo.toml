@@ -19,6 +19,3 @@ rayon = "1.7"
 [[bin]]
 name = "pbrt-minus"
 path = "src/bin/main.rs"
-
-[features]
-use_f64 = []

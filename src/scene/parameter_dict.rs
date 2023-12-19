@@ -2,7 +2,7 @@ use crate::pbrt::*;
 
 pub struct ParameterDict {
     integers: HashMap<String, Vec<i32>>,
-    floats: HashMap<String, Vec<Float>>,
+    floats: HashMap<String, Vec<f64>>,
     strings: HashMap<String, String>,
     point2s: HashMap<String, Vec<Point2f>>,
     point3s: HashMap<String, Vec<Point3f>>,
@@ -106,7 +106,7 @@ impl ParameterDict {
         dir_path: Option<String>,
     ) -> ParameterDict {
         let mut integers = HashMap::<String, Vec<i32>>::new();
-        let mut floats = HashMap::<String, Vec<Float>>::new();
+        let mut floats = HashMap::<String, Vec<f64>>::new();
         let mut strings = HashMap::<String, String>::new();
         let mut point2s = HashMap::<String, Vec<Point2f>>::new();
         let mut point3s = HashMap::<String, Vec<Point3f>>::new();
@@ -154,10 +154,10 @@ impl ParameterDict {
                     integers.insert(variable_name, convert_string::<i32>(&variable_values));
                 }
                 "float" => {
-                    floats.insert(variable_name, convert_string::<Float>(&variable_values));
+                    floats.insert(variable_name, convert_string::<f64>(&variable_values));
                 }
                 "point2" => {
-                    let float_numbers = convert_string::<Float>(&variable_values);
+                    let float_numbers = convert_string::<f64>(&variable_values);
 
                     let mut point_set = vec![];
                     for idx in (0..float_numbers.len()).step_by(2) {
@@ -166,7 +166,7 @@ impl ParameterDict {
                     point2s.insert(variable_name, point_set);
                 }
                 "point3" => {
-                    let float_numbers = convert_string::<Float>(&variable_values);
+                    let float_numbers = convert_string::<f64>(&variable_values);
 
                     let mut point_set = vec![];
                     for idx in (0..float_numbers.len()).step_by(3) {
@@ -180,7 +180,7 @@ impl ParameterDict {
                 }
 
                 "normal" => {
-                    let float_numbers = convert_string::<Float>(&variable_values);
+                    let float_numbers = convert_string::<f64>(&variable_values);
 
                     let mut normal_set = vec![];
                     for idx in (0..float_numbers.len()).step_by(3) {
@@ -194,7 +194,7 @@ impl ParameterDict {
                 }
 
                 "rgb" => {
-                    let float_numbers = convert_string::<Float>(&variable_values);
+                    let float_numbers = convert_string::<f64>(&variable_values);
                     assert_eq!(float_numbers.len(), 3);
 
                     rgbs.insert(
@@ -255,7 +255,7 @@ impl ParameterDict {
         self.integers.insert(name, value);
     }
 
-    pub fn insert_float(&mut self, name: String, value: Vec<Float>) {
+    pub fn insert_float(&mut self, name: String, value: Vec<f64>) {
         if self.floats.contains_key(&name) {
             panic!("duplicate key: `{}`", name);
         }
@@ -299,7 +299,7 @@ impl ParameterDict {
             }
         };
     }
-    pub fn get_one_float(&self, key: &str, default: Option<Float>) -> Float {
+    pub fn get_one_float(&self, key: &str, default: Option<f64>) -> f64 {
         return get_one_val(key, default, &self.floats);
     }
 

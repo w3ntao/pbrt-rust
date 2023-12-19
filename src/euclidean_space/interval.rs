@@ -2,12 +2,12 @@ use crate::pbrt::*;
 
 #[derive(Clone, Copy)]
 pub struct Interval {
-    pub low: Float,
-    pub high: Float,
+    pub low: f64,
+    pub high: f64,
 }
 
 impl Interval {
-    pub fn from_value_and_error(v: Float, error: Float) -> Interval {
+    pub fn from_value_and_error(v: f64, error: f64) -> Interval {
         if error == 0.0 {
             return Interval { low: v, high: v };
         }
@@ -18,19 +18,19 @@ impl Interval {
         };
     }
 
-    pub fn exactly(&self, v: Float) -> bool {
+    pub fn exactly(&self, v: f64) -> bool {
         return v == self.low && v == self.high;
     }
 
-    pub fn midpoint(&self) -> Float {
+    pub fn midpoint(&self) -> f64 {
         return (self.low + self.high) * 0.5;
     }
 
-    pub fn width(&self) -> Float {
+    pub fn width(&self) -> f64 {
         return self.high - self.low;
     }
 
-    pub fn contain_float_in_range(&self, v: Float) -> bool {
+    pub fn contain_float_in_range(&self, v: f64) -> bool {
         return v >= self.low && v <= self.high;
     }
 
@@ -71,14 +71,14 @@ impl Display for Interval {
     }
 }
 
-impl From<Interval> for Float {
+impl From<Interval> for f64 {
     fn from(value: Interval) -> Self {
         return value.midpoint();
     }
 }
 
-impl From<Float> for Interval {
-    fn from(value: Float) -> Self {
+impl From<f64> for Interval {
+    fn from(value: f64) -> Self {
         return Interval {
             low: value,
             high: value,
@@ -92,8 +92,8 @@ impl PartialEq<Interval> for Interval {
     }
 }
 
-impl PartialEq<Float> for Interval {
-    fn eq(&self, other: &Float) -> bool {
+impl PartialEq<f64> for Interval {
+    fn eq(&self, other: &f64) -> bool {
         return self.exactly(*other);
     }
 }
@@ -109,10 +109,10 @@ impl Add<Interval> for Interval {
     }
 }
 
-impl Add<Float> for Interval {
+impl Add<f64> for Interval {
     type Output = Interval;
 
-    fn add(self, rhs: Float) -> Self::Output {
+    fn add(self, rhs: f64) -> Self::Output {
         return self + Interval::from(rhs);
     }
 }
@@ -128,10 +128,10 @@ impl Sub<Interval> for Interval {
     }
 }
 
-impl Mul<Float> for Interval {
+impl Mul<f64> for Interval {
     type Output = Interval;
 
-    fn mul(self, f: Float) -> Self::Output {
+    fn mul(self, f: f64) -> Self::Output {
         return if f > 0.0 {
             Interval {
                 low: mul_round_down(f, self.low),
@@ -146,7 +146,7 @@ impl Mul<Float> for Interval {
     }
 }
 
-impl Mul<Interval> for Float {
+impl Mul<Interval> for f64 {
     type Output = Interval;
 
     fn mul(self, rhs: Interval) -> Self::Output {
@@ -173,8 +173,8 @@ impl Mul<Interval> for Interval {
         ];
 
         return Interval {
-            low: lp.iter().fold(Float::INFINITY, |a, &b| a.min(b)),
-            high: hp.iter().fold(-Float::INFINITY, |a, &b| a.max(b)),
+            low: lp.iter().fold(f64::INFINITY, |a, &b| a.min(b)),
+            high: hp.iter().fold(-f64::INFINITY, |a, &b| a.max(b)),
         };
     }
 }
@@ -187,14 +187,14 @@ impl Mul<Vector3<Interval>> for Interval {
     }
 }
 
-impl Div<Float> for Interval {
+impl Div<f64> for Interval {
     type Output = Interval;
 
-    fn div(self, f: Float) -> Self::Output {
+    fn div(self, f: f64) -> Self::Output {
         if f == 0.0 {
             return Interval {
-                low: -Float::INFINITY,
-                high: Float::INFINITY,
+                low: -f64::INFINITY,
+                high: f64::INFINITY,
             };
         }
 
@@ -220,8 +220,8 @@ impl Div<Interval> for Interval {
             // The interval we're dividing by straddles zero, so just
             // return an interval of everything.
             return Interval {
-                low: -Float::INFINITY,
-                high: Float::INFINITY,
+                low: -f64::INFINITY,
+                high: f64::INFINITY,
             };
         }
 
@@ -240,8 +240,8 @@ impl Div<Interval> for Interval {
         ];
 
         return Interval {
-            low: low_quot.iter().fold(Float::INFINITY, |a, &b| a.min(b)),
-            high: high_quot.iter().fold(-Float::INFINITY, |a, &b| a.max(b)),
+            low: low_quot.iter().fold(f64::INFINITY, |a, &b| a.min(b)),
+            high: high_quot.iter().fold(-f64::INFINITY, |a, &b| a.max(b)),
         };
     }
 }

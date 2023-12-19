@@ -2,13 +2,13 @@ use crate::pbrt::*;
 
 #[derive(Clone, Copy)]
 pub struct RGB {
-    pub r: Float,
-    pub g: Float,
-    pub b: Float,
+    pub r: f64,
+    pub g: f64,
+    pub b: f64,
 }
 
 impl RGB {
-    pub fn new(r: Float, g: Float, b: Float) -> Self {
+    pub fn new(r: f64, g: f64, b: f64) -> Self {
         return Self { r, b, g };
     }
 
@@ -20,7 +20,7 @@ impl RGB {
         };
     }
 
-    pub fn max_component(&self) -> Float {
+    pub fn max_component(&self) -> f64 {
         return self.r.max(self.g).max(self.b);
     }
 
@@ -41,8 +41,8 @@ impl RGB {
         ];
     }
 
-    pub fn clamp(&self, low: Float, high: Float) -> Self {
-        let local_clamp = |x: Float| x.max(low).min(high);
+    pub fn clamp(&self, low: f64, high: f64) -> Self {
+        let local_clamp = |x: f64| x.max(low).min(high);
 
         return Self {
             r: local_clamp(self.r),
@@ -69,7 +69,7 @@ impl From<Vector3f> for RGB {
 }
 
 impl Index<usize> for RGB {
-    type Output = Float;
+    type Output = f64;
 
     fn index(&self, index: usize) -> &Self::Output {
         return match index {
@@ -107,10 +107,10 @@ impl Sub<RGB> for RGB {
     }
 }
 
-impl Mul<Float> for RGB {
+impl Mul<f64> for RGB {
     type Output = RGB;
 
-    fn mul(self, rhs: Float) -> Self::Output {
+    fn mul(self, rhs: f64) -> Self::Output {
         return RGB {
             r: self.r * rhs,
             g: self.g * rhs,
@@ -119,7 +119,7 @@ impl Mul<Float> for RGB {
     }
 }
 
-impl Mul<RGB> for Float {
+impl Mul<RGB> for f64 {
     type Output = RGB;
 
     fn mul(self, rhs: RGB) -> Self::Output {
@@ -127,10 +127,10 @@ impl Mul<RGB> for Float {
     }
 }
 
-impl Div<Float> for RGB {
+impl Div<f64> for RGB {
     type Output = RGB;
 
-    fn div(self, rhs: Float) -> Self::Output {
+    fn div(self, rhs: f64) -> Self::Output {
         return RGB {
             r: self.r / rhs,
             g: self.g / rhs,

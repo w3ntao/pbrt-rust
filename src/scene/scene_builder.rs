@@ -306,7 +306,7 @@ impl SceneBuilder {
         let floats = tokens[1..]
             .into_iter()
             .map(|t| t.convert_to_float())
-            .collect::<Vec<Float>>();
+            .collect::<Vec<f64>>();
 
         debug_assert!(floats.len() == 4);
 
@@ -321,7 +321,7 @@ impl SceneBuilder {
         let floats = tokens[1..]
             .into_iter()
             .map(|t| t.convert_to_float())
-            .collect::<Vec<Float>>();
+            .collect::<Vec<f64>>();
         debug_assert!(floats.len() == 4);
 
         self.graphics_state.current_transform = self.graphics_state.current_transform
@@ -480,7 +480,7 @@ impl SceneBuilder {
         let floats = tokens[1..]
             .into_iter()
             .map(|t| t.convert_to_float())
-            .collect::<Vec<Float>>();
+            .collect::<Vec<f64>>();
         debug_assert!(floats.len() == 16);
 
         self.graphics_state.current_transform =
@@ -494,7 +494,7 @@ impl SceneBuilder {
         let floats = tokens[1..]
             .into_iter()
             .map(|t| t.convert_to_float())
-            .collect::<Vec<Float>>();
+            .collect::<Vec<f64>>();
 
         self.graphics_state.current_transform = self.graphics_state.current_transform
             * Transform::translate(floats[0], floats[1], floats[2]);
@@ -677,10 +677,10 @@ impl SceneBuilder {
     fn option_look_at(&mut self, tokens: &[Token]) {
         debug_assert!(tokens[0].clone() == Token::Keyword("LookAt".to_string()));
 
-        let data: Vec<Float> = tokens[1..]
+        let data: Vec<f64> = tokens[1..]
             .into_iter()
             .map(|token| match token {
-                Token::Number(num) => num.parse::<Float>().unwrap(),
+                Token::Number(num) => num.parse::<f64>().unwrap(),
                 _ => {
                     panic!("expect Token::Number here");
                 }

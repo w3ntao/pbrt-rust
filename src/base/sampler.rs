@@ -7,7 +7,7 @@ pub trait Sampler: Send + Sync {
 
     fn start_pixel_sample(&mut self, p_pixel: Point2i, sample_index: usize);
 
-    fn get_1d(&mut self) -> Float;
+    fn get_1d(&mut self) -> f64;
 
     fn get_2d(&mut self) -> Point2f;
 

@@ -4,19 +4,19 @@ pub struct DiffuseAreaLight {
     /*
     Shape shape;
     FloatTexture alpha;
-    Float area;
+    f64 area;
     bool twoSided;
     const DenselySampledSpectrum *Lemit;
-    Float scale;
+    f64 scale;
     Image image;
     const RGBColorSpace *imageColorSpace;
     */
     base: LightBase,
     shape: Arc<dyn Shape>,
-    area: Float,
+    area: f64,
     two_sided: bool,
     lemit: DenselySampledSpectrum,
-    scale: Float,
+    scale: f64,
     image: Option<Image>,
     image_color_space: Arc<RGBColorSpace>,
 }
