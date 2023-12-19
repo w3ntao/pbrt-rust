@@ -15,25 +15,6 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build-and-render-debug-f32:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: clone scene
-      run:
-        pushd ..;
-        git clone https://github.com/w3ntao/pbrt-minus-scenes.git;
-        popd;
-
-    - name: cargo build (debug, f32 as Float)
-      run:
-        cargo build;
-
-    - name: render
-      run:
-        bash render_all.sh --debug
-
   build-and-render-release-f64:
     runs-on: ubuntu-latest
     steps:

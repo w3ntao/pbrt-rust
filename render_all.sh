@@ -17,7 +17,7 @@ else
     mode="release"
 fi
 
-for scene_file in ${scene_dir}/*/*.json; do
+for scene_file in ${scene_dir}/*/*.pbrt; do
     command="./target/${mode}/pbrt-minus --spp=1"
     printf "${command} ${red_start}${scene_file}${red_end}\n"
     eval "${command} ${scene_file}" || {
