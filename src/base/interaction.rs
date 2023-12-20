@@ -97,13 +97,10 @@ impl SurfaceInteraction {
     }
 
     pub fn offset_ray_origin(&self, w: Vector3f) -> Point3f {
-        // TODO: SurfaceInteraction::offset_ray_origin()
         return self.interaction.offset_ray_origin(w);
     }
 
     pub fn spawn_ray(&self, d: Vector3f) -> DifferentialRay {
-        // TODO: SurfaceInteraction::spawn_ray()
-
         return DifferentialRay::new(self.offset_ray_origin(d), d);
     }
 

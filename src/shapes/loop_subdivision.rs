@@ -320,10 +320,11 @@ impl SDEdge {
 
 pub fn loop_subdivide(
     render_from_object: &Transform,
+    reverse_orientation: bool,
     n_levels: usize,
     vertex_indices: Vec<usize>,
     p: Vec<Point3f>,
-) -> Vec<Arc<Triangle>> {
+) -> Vec<Arc<dyn Shape>> {
     let mut vertices: Vec<Arc<Mutex<SDVertex>>> = vec![];
     for i in 0..p.len() {
         vertices.push(Arc::new(Mutex::new(SDVertex::new(p[i]))));
@@ -708,6 +709,7 @@ pub fn loop_subdivide(
 
     let mesh = TriangleMesh::new(
         render_from_object,
+        reverse_orientation,
         p_limit,
         mesh_vertex_indicies,
         vec![],

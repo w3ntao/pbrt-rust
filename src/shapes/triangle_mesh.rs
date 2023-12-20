@@ -1,6 +1,7 @@
 use crate::pbrt::*;
 
 pub struct TriangleMesh {
+    pub reverse_orientation: bool,
     pub indices: Vec<usize>,
     pub points: Vec<Point3f>,
     pub normals: Vec<Normal3f>,
@@ -10,6 +11,7 @@ pub struct TriangleMesh {
 impl TriangleMesh {
     pub fn new(
         render_from_object: &Transform,
+        reverse_orientation: bool,
         points: Vec<Point3f>,
         indices: Vec<usize>,
         normals: Vec<Normal3f>,
@@ -35,6 +37,7 @@ impl TriangleMesh {
         };
 
         return TriangleMesh {
+            reverse_orientation,
             points: transformed_points,
             indices,
             normals: transformed_normals,
@@ -42,10 +45,10 @@ impl TriangleMesh {
         };
     }
 
-    pub fn create_triangles(self) -> Vec<Arc<Triangle>> {
+    pub fn create_triangles(self) -> Vec<Arc<dyn Shape>> {
         let shared_mesh = Arc::new(self);
 
-        let mut triangles = vec![];
+        let mut triangles: Vec<Arc<dyn Shape>> = vec![];
         for idx in (0..shared_mesh.indices.len()).step_by(3) {
             let _triangle = Arc::new(Triangle::new(idx, shared_mesh.clone()));
             triangles.push(_triangle);

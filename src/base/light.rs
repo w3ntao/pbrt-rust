@@ -1,6 +1,6 @@
 use crate::pbrt::*;
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum LightType {
     DeltaPosition,
     DeltaDirection,

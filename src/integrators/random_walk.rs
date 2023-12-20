@@ -45,39 +45,40 @@ impl RandomWalkIntegrator {
             None => {
                 // Return emitted light from infinite light sources
                 // to be change later to infinite lights
-                return self.illuminant_scale * self.illuminant_spectrum.sample(&lambda);
+                return SampledSpectrum::same_value(0.0);
             }
             Some(shape_intersection) => shape_intersection.surface_interaction,
         };
 
+        // Get emitted radiance at surface intersection
+        let wo = -ray.ray.d;
+        let le = isect.le(wo, lambda);
+
         // Terminate random walk if maximum depth has been reached
         if depth >= 5 {
-            return SampledSpectrum::same_value(0.0);
+            return le;
         }
 
         // Compute BSDF at random walk intersection point
         let bsdf = isect.get_bsdf(ray, lambda, self.base.camera.as_ref(), sampler);
         if bsdf.bxdf.is_none() {
-            return SampledSpectrum::same_value(0.0);
+            return le;
         }
-
-        let wo = -ray.ray.d;
 
         // Randomly sample direction leaving surface for random walk
         let u = sampler.get_2d();
         let wp = Vector3f::sample_uniform_sphere(u);
 
         // Evaluate BSDF at surface for sampled direction
-        let fcos =
-            bsdf.f(wo, wp, TransportMode::Radiance) * wp.dot(Vector3f::from(isect.shading.n)).abs();
+        let fcos = bsdf.f(wo, wp, TransportMode::Radiance) * isect.shading.n.dot(wp).abs();
 
         if !fcos.is_positive() {
-            return SampledSpectrum::same_value(0.0);
+            return le;
         }
 
         // Recursively trace ray to estimate incident radiance at surface
         let ray = isect.spawn_ray(wp);
-        return fcos * (4.0 * PI) * self.random_walk_li(&ray, lambda, sampler, depth + 1);
+        return le + fcos * self.random_walk_li(&ray, lambda, sampler, depth + 1) * (4.0 * PI);
     }
 }
 

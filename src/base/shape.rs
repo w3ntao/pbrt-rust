@@ -37,4 +37,6 @@ pub trait Shape: Send + Sync {
     fn fast_intersect(&self, ray: &Ray, t_max: f64) -> bool;
 
     fn bounds(&self) -> Bounds3f;
+
+    fn area(&self) -> f64;
 }

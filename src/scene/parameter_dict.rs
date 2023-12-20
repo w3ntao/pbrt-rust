@@ -235,10 +235,14 @@ impl ParameterDict {
         };
     }
 
-    pub fn has_point2(&self, name:&str) -> bool {
+    pub fn has_string(&self, name: &str) -> bool {
+        return self.strings.get(name).is_some();
+    }
+
+    pub fn has_point2(&self, name: &str) -> bool {
         return self.point2s.get(name).is_some();
     }
-    
+
     pub fn has_rgb(&self, name: &str) -> bool {
         return self.rgbs.get(name).is_some();
     }

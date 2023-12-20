@@ -97,12 +97,6 @@ fn build_lights(
     light_entities: &Vec<LightEntity>,
     global_variable: &GlobalVariable,
 ) -> Vec<Arc<dyn Light>> {
-    /*
-    if light_entities.len() == 0 {
-        panic!("no light available");
-    }
-    */
-
     let mut lights: Vec<Arc<dyn Light>> = vec![];
 
     for light_entity in light_entities {
@@ -127,32 +121,34 @@ fn build_lights(
 }
 
 fn build_integrator(
+    name: &str,
     aggregate: Arc<dyn Primitive>,
     camera: Arc<dyn Camera>,
     lights: Vec<Arc<dyn Light>>,
     global_variable: &GlobalVariable,
 ) -> Arc<dyn Integrator> {
-    let integrator = AmbientOcclusion::new(
-        global_variable.rgb_color_space.illuminant,
-        aggregate,
-        camera,
-    );
+    return match name {
+        "ambientocclusion" => Arc::new(AmbientOcclusion::new(
+            global_variable.rgb_color_space.illuminant,
+            aggregate,
+            camera,
+        )),
 
-    /*
-    let integrator = RandomWalkIntegrator::new(
-        global_variable.rgb_color_space.illuminant,
-        aggregate,
-        camera,
-        lights,
-    );
-    */
-
-    /*
-    let integrator =
-        SurfaceNormal::new(aggregate, camera, global_variable.rgb_color_space.as_ref());
-    */
-
-    return Arc::new(integrator);
+        "randomwalk" => Arc::new(RandomWalkIntegrator::new(
+            global_variable.rgb_color_space.illuminant,
+            aggregate,
+            camera,
+            lights,
+        )),
+        "surfacenormal" => Arc::new(SurfaceNormal::new(
+            aggregate,
+            camera,
+            global_variable.rgb_color_space.as_ref(),
+        )),
+        _ => {
+            panic!("unrecognized integrator: `{}`", name);
+        }
+    };
 }
 
 fn split_tokens_into_statements(tokens: &[Token]) -> Vec<usize> {
@@ -170,17 +166,26 @@ fn split_tokens_into_statements(tokens: &[Token]) -> Vec<usize> {
     return keyword_range;
 }
 
-#[derive(Copy, Clone)]
+#[derive(Clone)]
 struct GraphicsState {
     current_transform: Transform,
+    current_material: Arc<dyn Material>,
     reverse_orientation: bool,
+
+    area_light_name: String,
+    area_light_parameter: ParameterDict,
 }
 
 impl GraphicsState {
     pub fn new() -> Self {
+        let constant_texture = SpectrumConstantTexture::new(Arc::new(ConstSpectrum::new(0.5)));
+
         return GraphicsState {
             current_transform: Transform::identity(),
+            current_material: Arc::new(DiffuseMaterial::new(Arc::new(constant_texture))),
             reverse_orientation: false,
+            area_light_name: "".to_string(),
+            area_light_parameter: ParameterDict::default(),
         };
     }
 }
@@ -195,11 +200,11 @@ pub struct SceneBuilder {
     render_from_world: Transform,
     primitives: Vec<Arc<dyn Primitive>>,
 
+    integrator_name: String,
     film_entity: Option<SceneEntity>,
     camera_entity: Option<CameraEntity>,
     light_entities: Vec<LightEntity>,
-
-    current_material: Option<Arc<dyn Material>>,
+    area_lights: Vec<Arc<dyn Light>>,
 
     root: Option<String>,
     global_variable: Arc<GlobalVariable>,
@@ -217,10 +222,11 @@ impl SceneBuilder {
             render_from_world: Transform::identity(),
             primitives: vec![],
 
+            integrator_name: "ambientocclusion".to_string(),
             film_entity: None,
             camera_entity: None,
-            current_material: None,
             light_entities: vec![],
+            area_lights: vec![],
 
             root: None,
             global_variable,
@@ -235,15 +241,12 @@ impl SceneBuilder {
             panic!("only `diffuse` Area Light is supported");
         }
 
-        let parameter_dict = ParameterDict::build_parameter_dict(
+        self.graphics_state.area_light_name = name;
+        self.graphics_state.area_light_parameter = ParameterDict::build_parameter_dict(
             &tokens[2..],
             &self.named_texture,
             self.root.clone(),
         );
-
-        // TODO: progress 2023/12/14: having parser/lexer trouble when implementing DiffuseAreaLight
-
-        panic!("world_area_light_source() not implemented");
     }
 
     fn world_coord_sys_transform(&mut self, tokens: &[Token]) {
@@ -296,7 +299,7 @@ impl SceneBuilder {
         );
 
         let material_type = tokens[1].convert_to_string();
-        self.current_material = Some(create_material(&material_type, &parameter_dict));
+        self.graphics_state.current_material = create_material(&material_type, &parameter_dict);
     }
 
     fn world_rotate(&mut self, tokens: &[Token]) {
@@ -330,13 +333,7 @@ impl SceneBuilder {
 
     fn world_shape(&mut self, tokens: &[Token]) {
         debug_assert!(tokens[0].clone() == Token::Keyword("Shape".to_string()));
-
-        let material = match &self.current_material {
-            None => {
-                panic!("current material is not available");
-            }
-            Some(_material) => _material.clone(),
-        };
+        let material = self.graphics_state.current_material.clone();
 
         let parameters = ParameterDict::build_parameter_dict(
             &tokens[2..],
@@ -349,8 +346,9 @@ impl SceneBuilder {
 
         let reverse_orientation = self.graphics_state.reverse_orientation;
 
-        let name = tokens[1].convert_to_string();
-        match name.as_str() {
+        let shape_name = tokens[1].convert_to_string();
+
+        let shapes: Vec<Arc<dyn Shape>> = match shape_name.as_str() {
             "loopsubdiv" => {
                 let levels = parameters.get_one_integer("levels", Some(3)) as usize;
                 let indices_i32 = parameters.get_integer_array("indices");
@@ -358,12 +356,13 @@ impl SceneBuilder {
 
                 let points = parameters.get_point3_array("P");
 
-                let triangles = loop_subdivide(&render_from_object, levels, indices, points);
-
-                for _triangle in &triangles {
-                    let primitive = SimplePrimitive::new(_triangle.clone(), material.clone());
-                    self.primitives.push(Arc::new(primitive));
-                }
+                loop_subdivide(
+                    &render_from_object,
+                    reverse_orientation,
+                    levels,
+                    indices,
+                    points,
+                )
             }
 
             "sphere" => {
@@ -372,7 +371,7 @@ impl SceneBuilder {
                 let zmax = parameters.get_one_float("zmax", Some(radius));
                 let phimax = parameters.get_one_float("phimax", Some(360.0));
 
-                let sphere = Sphere::new(
+                vec![Arc::new(Sphere::new(
                     render_from_object,
                     object_from_render,
                     reverse_orientation,
@@ -380,10 +379,7 @@ impl SceneBuilder {
                     zmin,
                     zmax,
                     phimax,
-                );
-
-                let primitive = SimplePrimitive::new(Arc::new(sphere), material.clone());
-                self.primitives.push(Arc::new(primitive));
+                ))]
             }
 
             "trianglemesh" => {
@@ -398,17 +394,14 @@ impl SceneBuilder {
 
                 let mesh = TriangleMesh::new(
                     &render_from_object,
+                    reverse_orientation,
                     points,
                     indices.into_par_iter().map(|x| x as usize).collect(),
                     normals,
                     uv,
                 );
 
-                let triangles = mesh.create_triangles();
-                for _triangle in &triangles {
-                    let primitive = SimplePrimitive::new(_triangle.clone(), material.clone());
-                    self.primitives.push(Arc::new(primitive));
-                }
+                mesh.create_triangles()
             }
 
             "plymesh" => {
@@ -418,23 +411,44 @@ impl SceneBuilder {
                 if tri_quad_mesh.tri_indices.len() > 0 {
                     let triangle_mesh = TriangleMesh::new(
                         &render_from_object,
+                        reverse_orientation,
                         tri_quad_mesh.p,
                         tri_quad_mesh.tri_indices,
                         tri_quad_mesh.n,
                         tri_quad_mesh.uv,
                     );
-
-                    let triangles = triangle_mesh.create_triangles();
-                    for _triangle in &triangles {
-                        let primitive = SimplePrimitive::new(_triangle.clone(), material.clone());
-                        self.primitives.push(Arc::new(primitive));
-                    }
+                    triangle_mesh.create_triangles()
+                } else {
+                    vec![]
                 }
             }
             _ => {
-                panic!("unknown Shape: `{}`", name);
+                panic!("unknown Shape: `{}`", shape_name);
             }
         };
+
+        if self.graphics_state.area_light_name == "" {
+            for shape in shapes {
+                self.primitives
+                    .push(Arc::new(SimplePrimitive::new(shape, material.clone())));
+            }
+        } else {
+            for shape in shapes {
+                let area_light = Arc::new(DiffuseAreaLight::new(
+                    self.render_from_object(),
+                    &self.graphics_state.area_light_parameter,
+                    self.global_variable.rgb_color_space.as_ref(),
+                    shape.clone(),
+                ));
+
+                self.area_lights.push(area_light.clone());
+                self.primitives.push(Arc::new(GeometricPrimitive::new(
+                    shape,
+                    material.clone(),
+                    area_light,
+                )));
+            }
+        }
     }
 
     fn world_texture(&mut self, tokens: &[Token]) {
@@ -554,8 +568,7 @@ impl SceneBuilder {
                     }
 
                     "Integrator" => {
-                        // TODO: parse Integrator
-                        println!("parse_Integrator() not implemented");
+                        self.integrator_name = tokens[1].convert_to_string();
                     }
 
                     "LightSource" => {
@@ -748,9 +761,14 @@ impl SceneBuilder {
         let sampler = Arc::new(IndependentSampler::new(samples_per_pixel));
         let bvh_aggregate = Arc::new(BVHAggregate::new(self.primitives.clone()));
 
-        let lights = build_lights(&self.light_entities, &self.global_variable);
+        let mut lights = build_lights(&self.light_entities, &self.global_variable);
+
+        for area_light in &self.area_lights {
+            lights.push(area_light.clone());
+        }
 
         let integrator = build_integrator(
+            &self.integrator_name,
             bvh_aggregate,
             camera.clone(),
             lights,

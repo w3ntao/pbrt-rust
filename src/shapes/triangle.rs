@@ -218,8 +218,14 @@ impl Triangle {
             Normal3f::nan(),
         );
 
-        isect.interaction.n = Normal3f::from(dp02.cross(dp12).normalize());
-        isect.shading.n = isect.interaction.n;
+        (isect.interaction.n, isect.shading.n) = {
+            let n = Normal3f::from(dp02.cross(dp12).normalize());
+            if self.mesh.reverse_orientation {
+                (-n, -n)
+            } else {
+                (n, n)
+            }
+        };
 
         return isect;
     }
@@ -250,5 +256,10 @@ impl Shape for Triangle {
     fn bounds(&self) -> Bounds3f {
         let (p0, p1, p2) = self.get_points();
         return Bounds3f::from_multiple_points(&[p0, p1, p2]);
+    }
+
+    fn area(&self) -> f64 {
+        let (p0, p1, p2) = self.get_points();
+        return (p1 - p0).cross(p2 - p0).length() * 0.5;
     }
 }

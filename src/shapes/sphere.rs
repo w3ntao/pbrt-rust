@@ -245,4 +245,9 @@ impl Shape for Sphere {
 
         return self.render_from_object.on_bounds(bounds);
     }
+
+    fn area(&self) -> f64 {
+        let r = self.radius;
+        return 4.0 * PI * r * r;
+    }
 }

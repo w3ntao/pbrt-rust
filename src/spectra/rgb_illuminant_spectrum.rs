@@ -6,6 +6,14 @@ pub struct RGBIlluminantSpectrum {
     illuminant: &'static dyn Spectrum,
 }
 
+impl Display for RGBIlluminantSpectrum {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "scale: {}", self.scale).unwrap();
+        write!(f, "rsp: {}", self.rsp).unwrap();
+        Ok(())
+    }
+}
+
 impl Spectrum for RGBIlluminantSpectrum {
     fn eval(&self, lambda: f64) -> f64 {
         return self.scale * self.rsp.eval(lambda) * self.illuminant.eval(lambda);

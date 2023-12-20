@@ -44,7 +44,7 @@ pub use crate::{
     light_samplers::uniform_light_sampler::*,
     lights::{diffuse_area::*, distant::*},
     materials::diffuse_material::*,
-    primitives::simple_primitive::*,
+    primitives::{geometric_primitive::*, simple_primitive::*},
     samplers::independent::*,
     scene::{lexer::*, parameter_dict::*, renderer::*, scene_builder::*, util::*},
     shapes::{loop_subdivision::*, sphere::*, tri_quad_mesh::*, triangle::*, triangle_mesh::*},
