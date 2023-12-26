@@ -1,7 +1,7 @@
 use crate::pbrt::*;
 
 pub struct UniformLightSampler {
-    lights: Vec<Arc<dyn Light>>,
+    pub lights: Vec<Arc<dyn Light>>,
 }
 
 impl LightSampler for UniformLightSampler {

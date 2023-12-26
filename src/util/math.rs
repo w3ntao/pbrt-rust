@@ -21,16 +21,6 @@ pub fn mod_i32(a: i32, b: i32) -> i32 {
     return if result < 0 { result + b } else { result };
 }
 
-pub const fn clamp_float(val: f64, low: f64, high: f64) -> f64 {
-    if val < low {
-        return low;
-    }
-    if val > high {
-        return high;
-    }
-    return val;
-}
-
 pub const fn clamp_usize(val: usize, low: usize, high: usize) -> usize {
     if val < low {
         return low;
@@ -84,6 +74,13 @@ pub fn difference_of_products_vec3(a: f64, b: Vector3f, c: f64, d: Vector3f) -> 
     return difference_of_prod + error;
 }
 
+pub fn sum_of_products(a: f64, b: f64, c: f64, d: f64) -> f64 {
+    let cd = c * d;
+    let sum = fma(a, b, cd);
+    let error = fma(c, d, -cd);
+    return sum + error;
+}
+
 pub const fn is_power_of_2(v: i32) -> bool {
     return v > 0 && !(v & (v - 1) > 0);
 }
@@ -99,10 +96,20 @@ pub const fn round_up_pow_2(v: i32) -> i32 {
     return x + 1;
 }
 
+pub fn safe_asin(x: f64) -> f64 {
+    debug_assert!(x >= -1.0001 && x <= 1.0001);
+
+    return x.clamp(-1.0, 1.0).asin();
+}
+
 pub fn safe_acos(x: f64) -> f64 {
     debug_assert!(x >= -1.0001 && x <= 1.0001);
 
-    return clamp_float(x, -1.0, 1.0).acos();
+    return x.clamp(-1.0, 1.0).acos();
+}
+
+pub fn gram_schmidt(v: Vector3f, w: Vector3f) -> Vector3f {
+    return v - v.dot(w) * w;
 }
 
 pub fn sqr<T: Mul<Output = T> + Copy>(x: T) -> T {
@@ -132,4 +139,12 @@ pub fn windowed_sinc(x: f64, radius: f64, tau: f64) -> f64 {
         return 0.0;
     }
     return sinc(x) * sinc(x / tau);
+}
+
+pub fn spherical_triangle_area(a: Vector3f, b: Vector3f, c: Vector3f) -> f64 {
+    return a
+        .dot(b.cross(c))
+        .atan2(1.0 + a.dot(b) + a.dot(c) + b.dot(c))
+        .abs()
+        * 2.0;
 }

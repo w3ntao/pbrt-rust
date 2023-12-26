@@ -74,7 +74,7 @@ impl RGBtoSpectrumTable {
             };
         }
 
-        return clamp_usize(first - 1, 0, sz - 2);
+        return (first - 1).clamp(0, sz - 2);
     }
 
     pub fn eval(&self, rgb: RGB) -> RGBSigmoidPolynomial {

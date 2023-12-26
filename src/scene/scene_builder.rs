@@ -127,6 +127,8 @@ fn build_integrator(
     lights: Vec<Arc<dyn Light>>,
     global_variable: &GlobalVariable,
 ) -> Arc<dyn Integrator> {
+    println!("Integrator: `{}`", name);
+
     return match name {
         "ambientocclusion" => Arc::new(AmbientOcclusion::new(
             global_variable.rgb_color_space.illuminant,
@@ -140,11 +142,15 @@ fn build_integrator(
             camera,
             lights,
         )),
+
+        "simplepath" => Arc::new(SimplePath::new(aggregate, camera, lights)),
+
         "surfacenormal" => Arc::new(SurfaceNormal::new(
             aggregate,
             camera,
             global_variable.rgb_color_space.as_ref(),
         )),
+
         _ => {
             panic!("unrecognized integrator: `{}`", name);
         }
@@ -491,10 +497,21 @@ impl SceneBuilder {
         debug_assert!(tokens.len() == 2);
         debug_assert!(tokens[0].clone() == Token::Keyword("Transform".to_string()));
 
-        let floats = tokens[1..]
-            .into_iter()
-            .map(|t| t.convert_to_float())
-            .collect::<Vec<f64>>();
+        let floats = match tokens[1].clone() {
+            Token::List(numbers) => {
+                assert_eq!(tokens.len(), 2);
+
+                numbers
+                    .into_iter()
+                    .map(|x| x.parse::<f64>().unwrap())
+                    .collect::<Vec<f64>>()
+            }
+            _ => tokens[1..]
+                .into_iter()
+                .map(|t| t.convert_to_float())
+                .collect::<Vec<f64>>(),
+        };
+
         debug_assert!(floats.len() == 16);
 
         self.graphics_state.current_transform =
@@ -568,7 +585,7 @@ impl SceneBuilder {
                     }
 
                     "Integrator" => {
-                        self.integrator_name = tokens[1].convert_to_string();
+                        self.option_integrator(tokens);
                     }
 
                     "LightSource" => {
@@ -685,6 +702,13 @@ impl SceneBuilder {
                 None,
             ),
         });
+    }
+
+    fn option_integrator(&mut self, tokens: &[Token]) {
+        debug_assert!(tokens[0].clone() == Token::Keyword("Integrator".to_string()));
+
+        self.integrator_name = tokens[1].convert_to_string();
+        //TODO: parse Integrator: "integer pixelsamples" [ 32 ]
     }
 
     fn option_look_at(&mut self, tokens: &[Token]) {

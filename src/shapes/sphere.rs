@@ -22,11 +22,13 @@ impl Sphere {
         z_max: f64,
         phi_max: f64,
     ) -> Self {
-        let z_min = clamp_float(z_min, -radius, radius);
-        let z_max = clamp_float(z_max, -radius, radius);
-        let theta_z_min = clamp_float(z_min.min(z_max) / radius, -1.0, 1.0).acos();
-        let theta_z_max = clamp_float(z_min.max(z_max) / radius, -1.0, 1.0).acos();
-        let phi_max = degree_to_radian(clamp_float(phi_max, 0.0, 360.0));
+        let z_min = z_min.clamp(-radius, radius);
+        let z_max = z_max.clamp(-radius, radius);
+
+        let theta_z_min = (z_min.min(z_max) / radius).clamp(-1.0, 1.0).acos();
+        let theta_z_max = (z_min.max(z_max) / radius).clamp(-1.0, 1.0).acos();
+
+        let phi_max = degree_to_radian(phi_max.clamp(0.0, 360.0));
 
         return Sphere {
             render_from_object,
@@ -249,5 +251,13 @@ impl Shape for Sphere {
     fn area(&self) -> f64 {
         let r = self.radius;
         return 4.0 * PI * r * r;
+    }
+
+    fn sample(&self, u: Point2f) -> Option<ShapeSample> {
+        panic!("Sphere::sample() not implemented");
+    }
+
+    fn sample_with_context(&self, ctx: &ShapeSampleContext, u: Point2f) -> Option<ShapeSample> {
+        panic!("Sphere::sample_with_context() not implemented");
     }
 }

@@ -23,12 +23,7 @@ impl RandomWalkIntegrator {
         }
 
         return Self {
-            base: IntegratorBase {
-                aggregate,
-                camera,
-                lights,
-                infinite_lights,
-            },
+            base: IntegratorBase::new(aggregate, camera, lights),
             illuminant_spectrum,
             illuminant_scale,
         };

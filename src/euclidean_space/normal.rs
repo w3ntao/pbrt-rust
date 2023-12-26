@@ -1,6 +1,6 @@
 use crate::pbrt::*;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct Normal3f {
     pub x: f64,
     pub y: f64,
@@ -18,6 +18,13 @@ impl Normal3f {
             y: f64::NAN,
             z: f64::NAN,
         };
+    }
+
+    pub fn is_valid(&self) -> bool {
+        return self.x.is_finite()
+            && self.y.is_finite()
+            && self.z.is_finite()
+            && (self.x * self.y * self.z != 0.0);
     }
 
     pub fn normalize(&self) -> Normal3f {
@@ -73,5 +80,49 @@ impl Neg for Normal3f {
             y: -self.y,
             z: -self.z,
         };
+    }
+}
+
+impl Add<Normal3f> for Normal3f {
+    type Output = Normal3f;
+
+    fn add(self, rhs: Normal3f) -> Self::Output {
+        return Normal3f {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z,
+        };
+    }
+}
+
+impl Mul<f64> for Normal3f {
+    type Output = Normal3f;
+
+    fn mul(self, rhs: f64) -> Self::Output {
+        return Self {
+            x: self.x * rhs,
+            y: self.y * rhs,
+            z: self.z * rhs,
+        };
+    }
+}
+
+impl Mul<Normal3f> for f64 {
+    type Output = Normal3f;
+
+    fn mul(self, rhs: Normal3f) -> Self::Output {
+        return Normal3f {
+            x: self * rhs.x,
+            y: self * rhs.y,
+            z: self * rhs.z,
+        };
+    }
+}
+
+impl MulAssign<f64> for Normal3f {
+    fn mul_assign(&mut self, rhs: f64) {
+        self.x *= rhs;
+        self.y *= rhs;
+        self.z *= rhs;
     }
 }

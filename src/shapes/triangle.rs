@@ -53,9 +53,9 @@ fn intersect_triangle(
     p2t.x += sx * p2t.z;
     p2t.y += sy * p2t.z;
 
-    let mut e0 = difference_of_products(p1t.x, p2t.y, p1t.y, p2t.x);
-    let mut e1 = difference_of_products(p2t.x, p0t.y, p2t.y, p0t.x);
-    let mut e2 = difference_of_products(p0t.x, p1t.y, p0t.y, p1t.x);
+    let e0 = difference_of_products(p1t.x, p2t.y, p1t.y, p2t.x);
+    let e1 = difference_of_products(p2t.x, p0t.y, p2t.y, p0t.x);
+    let e2 = difference_of_products(p0t.x, p1t.y, p0t.y, p1t.x);
 
     if (e0 < 0.0 || e1 < 0.0 || e2 < 0.0) && (e0 > 0.0 || e1 > 0.0 || e2 > 0.0) {
         return None;
@@ -133,10 +133,16 @@ impl Triangle {
         let v1 = self.mesh.indices[self.idx + 1];
         let v2 = self.mesh.indices[self.idx + 2];
 
-        return (
-            self.mesh.points[v0],
-            self.mesh.points[v1],
-            self.mesh.points[v2],
+        return (self.mesh.p[v0], self.mesh.p[v1], self.mesh.p[v2]);
+    }
+
+    fn solid_angle(&self, p: Point3f) -> f64 {
+        let (p0, p1, p2) = self.get_points();
+
+        return spherical_triangle_area(
+            (p0 - p).normalize(),
+            (p1 - p).normalize(),
+            (p2 - p).normalize(),
         );
     }
 
@@ -153,9 +159,9 @@ impl Triangle {
         let v1 = self.mesh.indices[self.idx + 1];
         let v2 = self.mesh.indices[self.idx + 2];
 
-        let p0 = self.mesh.points[v0];
-        let p1 = self.mesh.points[v1];
-        let p2 = self.mesh.points[v2];
+        let p0 = self.mesh.p[v0];
+        let p1 = self.mesh.p[v1];
+        let p2 = self.mesh.p[v2];
 
         let uv = if self.mesh.uv.len() > 0 {
             let _uv = &self.mesh.uv;
@@ -261,5 +267,183 @@ impl Shape for Triangle {
     fn area(&self) -> f64 {
         let (p0, p1, p2) = self.get_points();
         return (p1 - p0).cross(p2 - p0).length() * 0.5;
+    }
+
+    fn sample(&self, u: Point2f) -> Option<ShapeSample> {
+        // Get triangle vertices in _p0_, _p1_, and _p2_
+
+        let v = [
+            self.mesh.indices[self.idx + 0],
+            self.mesh.indices[self.idx + 1],
+            self.mesh.indices[self.idx + 2],
+        ];
+
+        let p0 = self.mesh.p[v[0]];
+        let p1 = self.mesh.p[v[1]];
+        let p2 = self.mesh.p[v[2]];
+
+        // Sample point on triangle uniformly by area
+        let b = sample_uniform_triangle(u);
+        let p = b[0] * p0 + b[1] * p1 + b[2] * p2;
+
+        // Compute surface normal for sampled point on triangle
+        let n = {
+            let n = Normal3f::from((p1 - p0).cross(p2 - p0)).normalize();
+            if self.mesh.n.len() > 0 {
+                let ns = b[0] * self.mesh.n[v[0]]
+                    + b[1] * self.mesh.n[v[1]]
+                    + (1.0 - b[0] - b[1]) * self.mesh.n[v[2]];
+
+                n.face_forward(ns.into())
+            } else if self.mesh.reverse_orientation {
+                -n
+            } else {
+                n
+            }
+        };
+
+        // Compute $(u,v)$ for sampled point on triangle
+        // Get triangle texture coordinates in _uv_ array
+        let uv = if self.mesh.uv.len() > 0 {
+            [self.mesh.uv[v[0]], self.mesh.uv[v[1]], self.mesh.uv[v[2]]]
+        } else {
+            [
+                Point2f::new(0.0, 0.0),
+                Point2f::new(1.0, 0.0),
+                Point2f::new(1.0, 1.0),
+            ]
+        };
+
+        let uv_sample = b[0] * uv[0] + b[1] * uv[1] + b[2] * uv[2];
+        // Compute error bounds _pError_ for sampled point on triangle
+
+        let p_abs_sum = (b[0] * p0).abs() + (b[1] * p1).abs() + ((1.0 - b[0] - b[1]) * p2).abs();
+        let p_error = gamma(6) * p_abs_sum;
+
+        let shape_sample = ShapeSample {
+            interaction: Interaction {
+                pi: Point3fi::from_value_and_error(p, p_error.into()),
+                n,
+                wo: Vector3f::nan(),
+                uv: uv_sample,
+            },
+            pdf: 1.0 / self.area(),
+        };
+
+        return Some(shape_sample);
+    }
+
+    fn sample_with_context(&self, ctx: &ShapeSampleContext, u: Point2f) -> Option<ShapeSample> {
+        let v = [
+            self.mesh.indices[self.idx + 0],
+            self.mesh.indices[self.idx + 1],
+            self.mesh.indices[self.idx + 2],
+        ];
+        let (p0, p1, p2) = (self.mesh.p[v[0]], self.mesh.p[v[1]], self.mesh.p[v[2]]);
+
+        // Use uniform area sampling for numerically unstable cases
+        let solid_angle = self.solid_angle(ctx.pi.into());
+        if solid_angle < MIN_SPHERICAL_SAMPLE_AREA || solid_angle > MAX_SPHERICAL_SAMPLE_AREA {
+            // Sample shape by area and compute incident direction _wi_
+            let mut ss = self.sample(u).unwrap();
+            let _wi = Point3f::from(ss.interaction.pi) - Point3f::from(ctx.pi);
+
+            if _wi.length_squared() == 0.0 {
+                return None;
+            }
+            let wi = _wi.normalize();
+
+            ss.pdf /= ss.interaction.n.dot(-wi).abs()
+                / (Point3f::from(ctx.pi) - Point3f::from(ss.interaction.pi)).length_squared();
+            if ss.pdf.is_infinite() {
+                return None;
+            }
+
+            return Some(ss);
+        }
+
+        // Sample spherical triangle from reference point
+        // Apply warp product sampling for cosine factor at reference point
+
+        let mut pdf = 1.0;
+        let mut u = u;
+        if ctx.ns.is_valid() {
+            // This part is slightly different with PBRT-v4
+            // Compute $\cos\theta$-based weights _w_ at sample domain corners
+
+            let rp = Point3f::from(ctx.pi);
+            let wi = [
+                (p0 - rp).normalize(),
+                (p1 - rp).normalize(),
+                (p2 - rp).normalize(),
+            ];
+
+            let w = [
+                ctx.ns.dot(wi[1]).abs().max(0.01),
+                ctx.ns.dot(wi[1]).abs().max(0.01),
+                ctx.ns.dot(wi[0]).abs().max(0.01),
+                ctx.ns.dot(wi[2]).abs().max(0.01),
+            ];
+
+            u = sample_bilinear(u, &w);
+            pdf = bilinear_pdf(u, &w);
+        }
+
+        let (b, tri_pdf) = sample_spherical_triangle(&[p0, p1, p2], ctx.pi.into(), u);
+        if tri_pdf == 0.0 {
+            return None;
+        }
+        pdf *= tri_pdf;
+
+        // Compute error bounds _pError_ for sampled point on triangle
+        let p_abs_sum = (b[0] * p0).abs() + (b[1] * p1).abs() + ((1.0 - b[0] - b[1]) * p2).abs();
+        let p_error = Vector3f::from(gamma(6) * p_abs_sum);
+
+        // Return _ShapeSample_ for solid angle sampled point on triangle
+        let p = b[0] * p0 + b[1] * p1 + b[2] * p2;
+
+        // Compute surface normal for sampled point on triangle
+
+        let n = {
+            let n = Normal3f::from((p1 - p0).cross(p2 - p0)).normalize();
+
+            if self.mesh.n.len() > 0 {
+                let ns = b[0] * self.mesh.n[v[0]]
+                    + b[1] * self.mesh.n[v[1]]
+                    + (1.0 - b[0] - b[1]) * self.mesh.n[v[2]];
+
+                n.face_forward(ns.into())
+            } else if self.mesh.reverse_orientation {
+                n * -1.0
+            } else {
+                n
+            }
+        };
+
+        // Compute $(u,v)$ for sampled point on triangle
+        // Get triangle texture coordinates in _uv_ array
+
+        let uv = if self.mesh.uv.len() > 0 {
+            [self.mesh.uv[v[0]], self.mesh.uv[v[1]], self.mesh.uv[v[2]]]
+        } else {
+            [
+                Point2f::new(0.0, 0.0),
+                Point2f::new(1.0, 0.0),
+                Point2f::new(1.0, 1.0),
+            ]
+        };
+
+        let uv_sample = b[0] * uv[0] + b[1] * uv[1] + b[2] * uv[2];
+        let shape_sample = ShapeSample {
+            interaction: Interaction {
+                pi: Point3fi::from_value_and_error(p, p_error),
+                n,
+                wo: Vector3::nan(),
+                uv: uv_sample,
+            },
+            pdf,
+        };
+
+        return Some(shape_sample);
     }
 }

@@ -11,14 +11,8 @@ impl SurfaceNormal {
         camera: Arc<dyn Camera>,
         color_space: &RGBColorSpace,
     ) -> Self {
-        let val = 0.01;
         return SurfaceNormal {
-            base: IntegratorBase {
-                aggregate,
-                camera,
-                lights: vec![],
-                infinite_lights: vec![],
-            },
+            base: IntegratorBase::new(aggregate, camera, vec![]),
             rgb: color_space.generate_albedo_rgb(),
         };
     }

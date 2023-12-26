@@ -382,7 +382,7 @@ impl Transform {
         let dt = d.abs().dot(o.error()) / length_squared;
         let offset_o = o + Vector3fi::from(d * dt);
 
-        return (Ray::new(Point3f::from(offset_o), d), dt);
+        return (Ray::new(offset_o.into(), d), dt);
     }
 
     pub fn on_differential_ray(&self, r: &DifferentialRay) -> (DifferentialRay, f64) {

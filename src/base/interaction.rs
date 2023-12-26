@@ -127,11 +127,11 @@ impl SurfaceInteraction {
             // Compute auxiliary intersection points with plane, _px_ and _py_
             let p = Point3f::from(self.interaction.pi);
 
-            let d = -n.dot(Vector3f::from(p));
-            let tx = (-n.dot(Vector3::from(ray.rx_origin)) - d) / n.dot(ray.rx_direction);
+            let d = -n.dot(p.into());
+            let tx = (-n.dot(ray.rx_origin.into()) - d) / n.dot(ray.rx_direction);
             let px = ray.rx_origin + tx * ray.rx_direction;
 
-            let ty = (-n.dot(Vector3f::from(ray.ry_origin)) - d) / n.dot(ray.ry_direction);
+            let ty = (-n.dot(ray.ry_origin.into()) - d) / n.dot(ray.ry_direction);
 
             let py = ray.ry_origin + ty * ray.ry_direction;
 
@@ -140,7 +140,7 @@ impl SurfaceInteraction {
         } else {
             // Approximate screen-space change in $\pt{}$ based on camera projection
             (self.dpdx, self.dpdy) = camera.approximate_dp_dxy(
-                Point3f::from(self.interaction.pi),
+                self.interaction.pi.into(),
                 self.interaction.n,
                 samples_per_pixel,
             );
@@ -176,7 +176,7 @@ impl SurfaceInteraction {
         // Clamp derivatives of $u$ and $v$ to reasonable values
         let local_clamp = |x: f64| {
             if x.is_finite() {
-                clamp_float(x, -1e8, 1e8)
+                x.clamp(-1e8, 1e8)
             } else {
                 0.0
             }
@@ -223,7 +223,7 @@ impl SurfaceInteraction {
         return match &self.area_light {
             None => SampledSpectrum::same_value(0.0),
             Some(are_light) => are_light.l(
-                Point3f::from(self.interaction.pi),
+                self.interaction.pi.into(),
                 self.interaction.n,
                 self.interaction.uv,
                 w,

@@ -179,6 +179,16 @@ impl Vector3f {
             z,
         };
     }
+
+    // Equivalent to std::acos(Dot(a, b)), but more numerically stable.
+    // via http://www.plunk.org/~hatch/rightway.html
+    pub fn angle_between(&self, v: Vector3f) -> f64 {
+        if self.dot(v) < 0.0 {
+            return PI - 2.0 * safe_asin((*self + v).length() / 2.0);
+        }
+
+        return 2.0 * safe_asin((v - *self).length() / 2.0);
+    }
 }
 
 impl Vector3<Interval> {

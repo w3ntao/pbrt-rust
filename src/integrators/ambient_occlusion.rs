@@ -15,12 +15,7 @@ impl AmbientOcclusion {
         let illuminant_scale = 1.0 / illuminant_spectrum.to_photometric();
 
         return Self {
-            base: IntegratorBase {
-                aggregate,
-                camera,
-                lights: vec![],
-                infinite_lights: vec![],
-            },
+            base: IntegratorBase::new(aggregate, camera, vec![]),
             illuminant_spectrum,
             illuminant_scale,
         };

@@ -2,6 +2,11 @@ pub struct GlobalVariable {
     pub rgb_color_space: Arc<RGBColorSpace>,
 }
 
+pub const ONE_MINUS_EPSILON: f64 = {
+    let bits_of_one = 1.0f64.to_bits();
+    f64::from_bits(bits_of_one - 1)
+};
+
 pub use fma::fma;
 pub use rand::{rngs::StdRng, thread_rng, Rng, SeedableRng};
 pub use rayon::prelude::*;
@@ -65,7 +70,6 @@ pub use crate::{
 
 pub type Point2f = Point2<f64>;
 pub type Point2i = Point2<i32>;
-// TODO: rewrite Point2i to Point2 usize
 pub type Point3f = Point3<f64>;
 pub type Point3fi = Point3<Interval>;
 
@@ -75,7 +79,3 @@ pub type Vector3fi = Vector3<Interval>;
 
 pub type Bounds2f = Bounds2<f64>;
 pub type Bounds3f = Bounds3<f64>;
-
-pub fn same_type<T0: ?Sized + Any, T1: ?Sized + Any>() -> bool {
-    return TypeId::of::<T0>() == TypeId::of::<T1>();
-}

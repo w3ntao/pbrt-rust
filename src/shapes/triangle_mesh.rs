@@ -3,8 +3,8 @@ use crate::pbrt::*;
 pub struct TriangleMesh {
     pub reverse_orientation: bool,
     pub indices: Vec<usize>,
-    pub points: Vec<Point3f>,
-    pub normals: Vec<Normal3f>,
+    pub p: Vec<Point3f>,
+    pub n: Vec<Normal3f>,
     pub uv: Vec<Point2f>,
 }
 
@@ -38,9 +38,9 @@ impl TriangleMesh {
 
         return TriangleMesh {
             reverse_orientation,
-            points: transformed_points,
+            p: transformed_points,
             indices,
-            normals: transformed_normals,
+            n: transformed_normals,
             uv,
         };
     }

@@ -117,16 +117,19 @@ impl Integrator for SimplePath {
 }
 
 impl SimplePath {
-    pub fn new(base: IntegratorBase) -> Self {
-        unreachable!();
-
-        /*
-        return Self {
-            base,
-            sample_bsdf: true,
-            sample_light: true,
-            max_depth: 5,
+    pub fn new(
+        aggregate: Arc<dyn Primitive>,
+        camera: Arc<dyn Camera>,
+        lights: Vec<Arc<dyn Light>>,
+    ) -> Self {
+        let light_sampler = UniformLightSampler {
+            lights: lights.clone(),
         };
-        */
+
+        return Self {
+            base: IntegratorBase::new(aggregate, camera, lights),
+            max_depth: 5,
+            light_sampler,
+        };
     }
 }

@@ -1,4 +1,5 @@
 use crate::pbrt::*;
+use crate::FilterFunction::Point;
 
 pub struct DiffuseAreaLight {
     base: LightBase,
@@ -42,8 +43,47 @@ impl Light for DiffuseAreaLight {
         lambda: &SampledWavelengths,
         allow_incomplete_pdf: bool,
     ) -> Option<LightLiSample> {
-        //TODO: progress 2023/12/20 implement DiffuseAreaLight
-        panic!("DiffuseAreaLight::sample_li() not implemented");
+        // Sample point on shape for _DiffuseAreaLight_
+        let shape_ctx = ShapeSampleContext {
+            pi: ctx.pi,
+            n: ctx.n,
+            ns: ctx.ns,
+        };
+
+        let ss = match self.shape.sample_with_context(&shape_ctx, u) {
+            None => {
+                return None;
+            }
+            Some(_ss) => _ss,
+        };
+
+        if ss.pdf == 0.0
+            || (Point3f::from(ss.interaction.pi) - Point3f::from(ctx.pi)).length_squared() == 0.0
+        {
+            return None;
+        }
+
+        // Return _LightLiSample_ for sampled point on shape
+        let wi = (Point3f::from(ss.interaction.pi) - Point3f::from(ctx.pi)).normalize();
+
+        let Le = self.l(
+            ss.interaction.pi.into(),
+            ss.interaction.n,
+            ss.interaction.uv,
+            -wi,
+            lambda,
+        );
+
+        if !Le.is_positive() {
+            return None;
+        }
+
+        return Some(LightLiSample {
+            l: Le,
+            wi,
+            pdf: ss.pdf,
+            p_light: ss.interaction,
+        });
     }
 }
 

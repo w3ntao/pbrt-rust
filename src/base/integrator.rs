@@ -7,6 +7,28 @@ pub struct IntegratorBase {
     pub infinite_lights: Vec<Arc<dyn Light>>,
 }
 
+impl IntegratorBase {
+    pub fn new(
+        aggregate: Arc<dyn Primitive>,
+        camera: Arc<dyn Camera>,
+        lights: Vec<Arc<dyn Light>>,
+    ) -> Self {
+        let mut infinite_lights = vec![];
+        for _light in &lights {
+            if _light.light_type() == LightType::Infinite {
+                infinite_lights.push(_light.clone());
+            }
+        }
+
+        return Self {
+            camera,
+            aggregate,
+            lights,
+            infinite_lights,
+        };
+    }
+}
+
 pub trait Integrator: Send + Sync {
     fn fast_intersect(&self, ray: &Ray, t_max: f64) -> bool;
 
