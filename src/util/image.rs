@@ -1,5 +1,6 @@
 use crate::pbrt::*;
 use image::{ImageBuffer, Rgb, RgbImage};
+use std::collections::Bound;
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum WrapMode {
@@ -241,12 +242,24 @@ impl Image {
     }
 
     pub fn float_resize_up(&self, new_resolution: Point2i, wrap_mode: WrapMode) -> Image {
-        //TODO: ignore float_resize_up() for the moment
-
-        panic!("Image::float_resize_up() is not implemented");
-
         assert!(new_resolution.x >= self.resolution.x);
         assert!(new_resolution.y >= self.resolution.y);
+
+        let mut resampled_image = Image::new(new_resolution, self.pixel_format);
+
+        for y in 0..(new_resolution.y as usize) {
+            for x in 0..(new_resolution.x as usize) {
+                let low_res_y = (y as f64) / (new_resolution.y as f64) * (self.resolution.y as f64);
+                let low_res_x = (x as f64) / (new_resolution.x as f64) * (self.resolution.x as f64);
+                resampled_image[y][x] = self[low_res_y as usize][low_res_x as usize];
+            }
+        }
+
+        return resampled_image;
+
+        // TODO: progress 2023/12/29 implementing float_resize_up()
+
+        unreachable!();
 
         let resampled_image = Image::new(new_resolution, PixelFormat::f64);
 
@@ -254,7 +267,28 @@ impl Image {
 
         let y_weights = resample_weights(self.resolution.y as usize, new_resolution.y as usize);
 
-        unreachable!();
+        let out_extent = Bounds2i::new(&[Point2i::new(0, 0), new_resolution]);
+
+        let in_extent = {
+            let _in_extent_min = Point2i::new(
+                x_weights[out_extent.p_min.x as usize].first_pixel as i32,
+                y_weights[out_extent.p_min.y as usize].first_pixel as i32,
+            );
+
+            let _in_extent_max = Point2i::new(
+                x_weights[out_extent.p_max.x as usize - 1].first_pixel as i32 + 4,
+                y_weights[out_extent.p_max.y as usize - 1].first_pixel as i32 + 4,
+            );
+
+            Bounds2i::new(&[_in_extent_min, _in_extent_max])
+        };
+
+        /*
+        std::vector<float> inBuf(NChannels() * inExtent.Area());
+        CopyRectOut(inExtent, pstd::span<float>(inBuf), wrapMode);
+        */
+
+        panic!("Image::float_resize_up() is not implemented");
     }
 
     pub fn export_to_png(&self, filename: &str, gamma_correction: bool) {

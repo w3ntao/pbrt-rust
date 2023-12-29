@@ -25,6 +25,7 @@ pub enum Token {
     Keyword(String),
     Number(String),
     String(String),
+    Bool(bool),
     Variable((String, String)),
     List(Vec<String>),
 }
@@ -79,6 +80,7 @@ fn parse_identifier(identifier: &str) -> ParserToken {
         "WorldBegin" => ParserToken::WorldBegin,
         "AttributeBegin" => ParserToken::AttributeBegin,
         "AttributeEnd" => ParserToken::AttributeEnd,
+        "false" | "true" => ParserToken::String(identifier.to_string()),
         _ => ParserToken::Keyword(identifier.to_string()),
     };
 }
@@ -258,7 +260,7 @@ impl Lexer {
                 ParserToken::String(str) => str,
 
                 _ => {
-                    panic!("line {}: list not closed", self.line_number);
+                    panic!("line {}: get {:?}", self.line_number, token);
                 }
             };
 

@@ -5,6 +5,23 @@ pub struct Bounds2<T> {
     pub p_max: Point2<T>,
 }
 
+impl Bounds2<i32> {
+    pub fn new(points: &[Point2<i32>]) -> Bounds2<i32> {
+        let mut _min = points[0];
+        let mut _max = points[0];
+
+        for idx in 1..points.len() {
+            _min = _min.min(&points[idx]);
+            _max = _max.max(&points[idx]);
+        }
+
+        return Bounds2::<i32> {
+            p_min: _min,
+            p_max: _max,
+        };
+    }
+}
+
 impl Bounds2<f64> {
     pub fn new(points: &[Point2<f64>]) -> Bounds2<f64> {
         let mut _min = points[0];
@@ -46,11 +63,7 @@ impl Bounds3<f64> {
     pub fn empty() -> Self {
         return Self {
             p_min: Point3f::new(f64::INFINITY, f64::INFINITY, f64::INFINITY),
-            p_max: Point3f::new(
-                f64::NEG_INFINITY,
-                f64::NEG_INFINITY,
-                f64::NEG_INFINITY,
-            ),
+            p_max: Point3f::new(f64::NEG_INFINITY, f64::NEG_INFINITY, f64::NEG_INFINITY),
         };
     }
 

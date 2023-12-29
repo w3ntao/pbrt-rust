@@ -77,5 +77,6 @@ pub type Vector2f = Vector2<f64>;
 pub type Vector3f = Vector3<f64>;
 pub type Vector3fi = Vector3<Interval>;
 
+pub type Bounds2i = Bounds2<i32>;
 pub type Bounds2f = Bounds2<f64>;
 pub type Bounds3f = Bounds3<f64>;

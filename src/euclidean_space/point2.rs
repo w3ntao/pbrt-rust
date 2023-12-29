@@ -12,6 +12,22 @@ impl<T> Point2<T> {
     }
 }
 
+impl Point2i {
+    pub fn min(&self, rhs: &Point2i) -> Point2i {
+        return Point2i {
+            x: self.x.min(rhs.x),
+            y: self.y.min(rhs.y),
+        };
+    }
+
+    pub fn max(&self, rhs: &Point2i) -> Point2i {
+        return Point2i {
+            x: self.x.max(rhs.x),
+            y: self.y.max(rhs.y),
+        };
+    }
+}
+
 impl Point2f {
     pub fn min(&self, rhs: &Point2f) -> Point2f {
         return Point2f {

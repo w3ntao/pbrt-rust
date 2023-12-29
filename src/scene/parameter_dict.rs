@@ -156,6 +156,11 @@ impl ParameterDict {
                 "float" => {
                     floats.insert(variable_name, convert_string::<f64>(&variable_values));
                 }
+
+                "bool" => {
+                    bools.insert(variable_name, convert_string::<bool>(&variable_values));
+                }
+
                 "point2" => {
                     let float_numbers = convert_string::<f64>(&variable_values);
 
