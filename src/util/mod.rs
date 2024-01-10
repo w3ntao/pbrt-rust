@@ -4,3 +4,4 @@ pub mod colorspace;
 pub mod image;
 pub mod math;
 pub mod sampling;
+pub mod scattering;

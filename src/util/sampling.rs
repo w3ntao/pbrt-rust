@@ -1,18 +1,8 @@
 use crate::pbrt::*;
 
-/*
-PBRT_CPU_GPU inline pstd::array<Float, 3> SampleUniformTriangle(Point2f u) {
-    Float b0, b1;
-    if (u[0] < u[1]) {
-        b0 = u[0] / 2;
-        b1 = u[1] - b0;
-    } else {
-        b1 = u[1] / 2;
-        b0 = u[0] - b1;
-    }
-    return {b0, b1, 1 - b0 - b1};
+pub fn sample_exponential(u: f64, a: f64) -> f64 {
+    return -(1.0 - u).ln() / a;
 }
-*/
 
 pub fn sample_uniform_triangle(u: Point2f) -> [f64; 3] {
     let (b0, b1) = {
@@ -49,6 +39,13 @@ pub fn sample_uniform_disk_concentric(u: Point2f) -> Point2f {
     };
 
     return r * Point2f::new(theta.cos(), theta.sin());
+}
+
+pub fn sample_uniform_disk_polar(u: Point2f) -> Point2f {
+    let r = u[0].sqrt();
+    let theta = 2.0 * PI * u[1];
+
+    return Point2f::new(r * theta.cos(), r * theta.sin());
 }
 
 pub fn sample_cosine_hemisphere(u: Point2f) -> Vector3f {
@@ -203,4 +200,42 @@ pub fn sample_spherical_triangle(v: &[Point3f; 3], p: Point3f, u: Point2f) -> ([
     };
 
     return ([1.0 - b1 - b2, b1, b2], pdf);
+}
+
+pub fn sample_henyey_greenstein(wo: Vector3f, g: f64, u: Point2f) -> (Vector3f, f64) {
+    // When g \approx -1 and u[0] \approx 0 or with g \approx 1 and u[0]
+    // \approx 1, the computation of cosTheta below is unstable and can
+    // give, leading to NaNs. For now we limit g to the range where it is
+    // still ok; it would be nice to come up with a numerically robust
+    // rewrite of the computation instead, but with |g| \approx 1, the
+    // sampling distribution has a very sharp turn to deal with.
+
+    let g = g.clamp(-0.99, 0.99);
+    // Compute $\cos\theta$ for Henyey--Greenstein sample
+
+    let cos_theta = if g.abs() < 1e-3 {
+        1.0 - 2.0 * u[0]
+    } else {
+        -1.0 / (2.0 * g) * (1.0 + sqr(g) - sqr((1.0 - sqr(g)) / (1.0 + g - 2.0 * g * u[0])))
+    };
+
+    // Compute direction _wi_ for Henyey--Greenstein sample
+    let sin_theta = safe_sqrt(1.0 - sqr(cos_theta));
+    let phi = 2.0 * PI * u[1];
+    let w_frame = Frame::from_z(wo);
+    let wi = w_frame.from_local(spherical_direction(sin_theta, cos_theta, phi));
+    let pdf = henyey_greenstein(cos_theta, g);
+
+    return (wi, pdf);
+}
+
+pub fn power_heuristic(nf: i32, f_pdf: f64, ng: i32, g_pdf: f64) -> f64 {
+    let f = (nf as f64) * f_pdf;
+    let g = (ng as f64) * g_pdf;
+
+    let sqr_f = sqr(f);
+    if sqr_f.is_infinite() {
+        return 1.0;
+    }
+    return sqr_f / (sqr_f + sqr(g));
 }

@@ -14,7 +14,7 @@ impl Integrator for SimplePath {
     fn li(
         &self,
         ray: &DifferentialRay,
-        lambda: &SampledWavelengths,
+        lambda: &mut SampledWavelengths,
         sampler: &mut dyn Sampler,
     ) -> SampledSpectrum {
         // Estimate radiance along ray using simple path tracing
@@ -41,7 +41,7 @@ impl Integrator for SimplePath {
             };
 
             // Account for emissive surface if light was not sampled
-            let mut isect = &mut si.surface_interaction;
+            let isect = &mut si.surface_interaction;
             if specular_bounce {
                 L += beta * isect.le(-ray.ray.d, lambda);
             }
@@ -78,7 +78,7 @@ impl Integrator for SimplePath {
                                 // Evaluate BSDF for light and possibly add scattered radiance
                                 let wi = ls.wi;
                                 let f = bsdf.f(wo, wi, TransportMode::Radiance)
-                                    * wi.dot(Vector3f::from(isect.shading.n)).abs();
+                                    * wi.abs_dot(Vector3f::from(isect.shading.n));
 
                                 if f.is_positive()
                                     && self.unoccluded(&isect.interaction, &ls.p_light)
@@ -107,7 +107,8 @@ impl Integrator for SimplePath {
                 Some(_bs) => _bs,
             };
 
-            beta *= bs.f * bs.wi.dot(Vector3f::from(isect.shading.n)).abs() / bs.pdf;
+            beta *= bs.f * bs.wi.abs_dot(Vector3f::from(isect.shading.n)) / bs.pdf;
+
             specular_bounce = bs.is_specular();
             ray = isect.spawn_ray(bs.wi);
         }

@@ -1,6 +1,5 @@
 use crate::pbrt::*;
 use image::{ImageBuffer, Rgb, RgbImage};
-use std::collections::Bound;
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum WrapMode {
@@ -91,6 +90,7 @@ pub struct Image {
     pub resolution: Point2i,
     pixels: Vec<Vec<RGB>>,
     pub pixel_format: PixelFormat,
+    color_encoding: Arc<dyn ColorEncoding>,
 }
 
 fn resample_weights(old_resolution: usize, new_resolution: usize) -> Vec<ResampleWeight> {
@@ -148,8 +148,6 @@ pub fn generate_pyramid(image: Image, wrap_mode: WrapMode) -> Vec<Image> {
         // Initialize _nextImage_ for $i+1$st level
         let next_resolution = Point2i::new(1.max(resolution.x / 2), 1.max(resolution.y / 2));
 
-        //println!("{} - {}, {}", i, resolution, next_resolution);
-
         let mut next_image = Image::new(next_resolution, pixel_format);
         for y in 0..(next_resolution.y as usize) {
             for x in 0..(next_resolution.x as usize) {
@@ -201,6 +199,8 @@ impl Image {
             resolution,
             pixels: vec![vec![RGB::black(); resolution.x as usize]; resolution.y as usize],
             pixel_format,
+            color_encoding: Arc::new(SRGBColorEncoding {}),
+            // TODO: build SRGBColorEncoding according to ColorSpace
         };
     }
 
@@ -216,20 +216,19 @@ impl Image {
             }
         };
 
+        let color_encoding = SRGBColorEncoding {};
+        // TODO: build SRGBColorEncoding according to ColorSpace
+
         let (width, height) = img.dimensions();
-
-        const DIVISOR: f64 = u8::MAX as f64;
-
         let mut pixels = vec![vec![RGB::black(); width as usize]; height as usize];
         for x in 0..width {
             for y in 0..height {
                 let rgb_u256 = img[(x, y)].0;
 
-                // TODO: check if this is reversible with export_png()
                 pixels[y as usize][x as usize] = RGB::new(
-                    rgb_u256[0] as f64 / DIVISOR,
-                    rgb_u256[1] as f64 / DIVISOR,
-                    rgb_u256[2] as f64 / DIVISOR,
+                    color_encoding.to_linear(rgb_u256[0]),
+                    color_encoding.to_linear(rgb_u256[1]),
+                    color_encoding.to_linear(rgb_u256[2]),
                 );
             }
         }
@@ -238,6 +237,8 @@ impl Image {
             resolution: Point2::new(width as i32, height as i32),
             pixels,
             pixel_format: PixelFormat::U256,
+            color_encoding: Arc::new(color_encoding),
+            // TODO: build SRGBColorEncoding according to ColorSpace
         };
     }
 
@@ -291,20 +292,19 @@ impl Image {
         panic!("Image::float_resize_up() is not implemented");
     }
 
-    pub fn export_to_png(&self, filename: &str, gamma_correction: bool) {
+    pub fn export_to_png(&self, filename: &str) {
         let mut buffer: RgbImage =
             ImageBuffer::new(self.resolution.x as u32, self.resolution.y as u32);
 
         for y in 0..self.resolution.y {
             for x in 0..self.resolution.x {
-                let u256 = if gamma_correction {
-                    self.pixels[y as usize][x as usize].gamma_correction()
-                } else {
-                    self.pixels[y as usize][x as usize]
-                }
-                .to_u256();
+                let color = self.pixels[y as usize][x as usize];
 
-                buffer.put_pixel(x as u32, y as u32, Rgb(u256));
+                let red = self.color_encoding.to_srgb8(color.r);
+                let green = self.color_encoding.to_srgb8(color.g);
+                let blue = self.color_encoding.to_srgb8(color.b);
+
+                buffer.put_pixel(x as u32, y as u32, Rgb([red, green, blue]));
             }
         }
 

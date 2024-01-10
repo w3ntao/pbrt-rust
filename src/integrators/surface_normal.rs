@@ -26,7 +26,7 @@ impl Integrator for SurfaceNormal {
     fn li(
         &self,
         camera_ray: &DifferentialRay,
-        lambda: &SampledWavelengths,
+        lambda: &mut SampledWavelengths,
         _sampler: &mut dyn Sampler,
     ) -> SampledSpectrum {
         return match self

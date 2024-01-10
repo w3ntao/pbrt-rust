@@ -3,6 +3,7 @@ use crate::pbrt::*;
 pub const MIN_SPHERICAL_SAMPLE_AREA: f64 = 3e-4;
 pub const MAX_SPHERICAL_SAMPLE_AREA: f64 = 6.22;
 
+#[derive(Clone)]
 pub struct Shading {
     pub n: Normal3f,
     pub dpdu: Vector3f,
@@ -44,6 +45,7 @@ impl ShapeSampleContext {
     }
 }
 
+#[derive(Clone)]
 pub struct ShapeIntersection {
     pub t_hit: f64,
     pub surface_interaction: SurfaceInteraction,

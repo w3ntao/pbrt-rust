@@ -1,5 +1,6 @@
 use crate::pbrt::*;
 
+#[derive(Clone)]
 pub struct Interaction {
     pub pi: Point3fi,
     pub n: Normal3f,
@@ -41,6 +42,7 @@ impl Interaction {
     }
 }
 
+#[derive(Clone)]
 pub struct SurfaceInteraction {
     pub interaction: Interaction,
 
@@ -72,10 +74,12 @@ impl SurfaceInteraction {
         dndu: Normal3f,
         dndv: Normal3f,
     ) -> Self {
+        let n = Normal3f::from(dpdu.cross(dpdv).normalize());
+
         return Self {
             interaction: Interaction {
                 pi,
-                n: Normal3f::from(dpdu.cross(dpdv).normalize()),
+                n,
                 uv,
                 wo: wo.normalize(),
             },
@@ -86,11 +90,17 @@ impl SurfaceInteraction {
             dpdv,
             dndu,
             dndv,
-            dudx: 0.0,
-            dvdx: 0.0,
-            dudy: 0.0,
-            dvdy: 0.0,
-            shading: Shading::nan(),
+            dudx: f64::NAN,
+            dvdx: f64::NAN,
+            dudy: f64::NAN,
+            dvdy: f64::NAN,
+            shading: Shading {
+                n,
+                dpdu,
+                dpdv,
+                dndu: dndu.into(),
+                dndv: dndu.into(),
+            },
             material: None,
             area_light: None,
         };
@@ -191,7 +201,7 @@ impl SurfaceInteraction {
     pub fn get_bsdf(
         &mut self,
         ray: &DifferentialRay,
-        lambda: &SampledWavelengths,
+        lambda: &mut SampledWavelengths,
         camera: &dyn Camera,
         sampler: &mut dyn Sampler,
     ) -> BSDF {

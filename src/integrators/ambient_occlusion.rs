@@ -30,7 +30,7 @@ impl Integrator for AmbientOcclusion {
     fn li(
         &self,
         ray: &DifferentialRay,
-        lambda: &SampledWavelengths,
+        lambda: &mut SampledWavelengths,
         sampler: &mut dyn Sampler,
     ) -> SampledSpectrum {
         // TODO: this is incomplete, consider BSDF only for now

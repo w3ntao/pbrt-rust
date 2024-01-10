@@ -8,6 +8,7 @@ pub mod interaction;
 pub mod light;
 pub mod light_sampler;
 pub mod material;
+pub mod medium;
 pub mod primitive;
 pub mod ray;
 pub mod sampler;

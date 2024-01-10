@@ -35,7 +35,7 @@ pub trait Integrator: Send + Sync {
     fn li(
         &self,
         ray: &DifferentialRay,
-        lambda: &SampledWavelengths,
+        lambda: &mut SampledWavelengths,
         sampler: &mut dyn Sampler,
     ) -> SampledSpectrum;
 }
@@ -56,13 +56,13 @@ pub trait IntegratorDefaultInterface: Integrator {
         film: &mut dyn Film,
     ) {
         let lu = sampler.get_1d();
-        let lambda = SampledWavelengths::sample_visible(lu);
+        let mut lambda = SampledWavelengths::sample_visible(lu);
 
         let camera_sample = sampler.get_camera_sample(p_pixel.clone(), filter.clone());
 
         let camera_ray = camera.generate_camera_differential_ray(camera_sample);
 
-        let l = camera_ray.weight * self.li(&camera_ray.ray, &lambda, sampler);
+        let l = camera_ray.weight * self.li(&camera_ray.ray, &mut lambda, sampler);
 
         film.add_sample(p_pixel, &l, &lambda, camera_sample.filter_weight);
     }

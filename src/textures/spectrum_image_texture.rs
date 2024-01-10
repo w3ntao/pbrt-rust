@@ -51,7 +51,7 @@ impl SpectrumImageTexture {
 impl SpectrumTexture for SpectrumImageTexture {
     fn evaluate(&self, ctx: &TextureEvalContext, lambda: &SampledWavelengths) -> SampledSpectrum {
         let mut c = self.image_texture_base.mapping.map(ctx);
-        c.st.y = 1.0 - c.st.y;
+        c.st[1] = 1.0 - c.st[1];
 
         // Lookup filtered RGB value in _MIPMap_
         let rgb = {

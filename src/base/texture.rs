@@ -28,10 +28,10 @@ impl TextureEvalContext {
             dpdy: si.dpdy,
             n: si.interaction.n,
             uv: si.interaction.uv,
-            dudx: 0.0,
-            dudy: 0.0,
-            dvdx: 0.0,
-            dvdy: 0.0,
+            dudx: f64::NAN,
+            dudy: f64::NAN,
+            dvdx: f64::NAN,
+            dvdy: f64::NAN,
         };
     }
 }
@@ -66,7 +66,7 @@ impl ImageTextureBase {
     }
 }
 
-pub trait FloatTexture {
+pub trait FloatTexture: Send + Sync {
     fn evaluate(&self, ctx: &TextureEvalContext) -> f64;
 }
 

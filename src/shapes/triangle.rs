@@ -353,7 +353,7 @@ impl Shape for Triangle {
             }
             let wi = _wi.normalize();
 
-            ss.pdf /= ss.interaction.n.dot(-wi).abs()
+            ss.pdf /= ss.interaction.n.abs_dot(-wi)
                 / (Point3f::from(ctx.pi) - Point3f::from(ss.interaction.pi)).length_squared();
             if ss.pdf.is_infinite() {
                 return None;
@@ -379,10 +379,10 @@ impl Shape for Triangle {
             ];
 
             let w = [
-                ctx.ns.dot(wi[1]).abs().max(0.01),
-                ctx.ns.dot(wi[1]).abs().max(0.01),
-                ctx.ns.dot(wi[0]).abs().max(0.01),
-                ctx.ns.dot(wi[2]).abs().max(0.01),
+                ctx.ns.abs_dot(wi[1]).max(0.01),
+                ctx.ns.abs_dot(wi[1]).max(0.01),
+                ctx.ns.abs_dot(wi[0]).max(0.01),
+                ctx.ns.abs_dot(wi[2]).max(0.01),
             ];
 
             u = sample_bilinear(u, &w);

@@ -1,1 +1,2 @@
-pub mod diffuse_material;
+pub mod coated_diffuse;
+pub mod diffuse;

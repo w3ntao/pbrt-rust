@@ -240,6 +240,10 @@ impl ParameterDict {
         };
     }
 
+    pub fn has_float(&self, name: &str) -> bool {
+        return self.floats.get(name).is_some();
+    }
+
     pub fn has_string(&self, name: &str) -> bool {
         return self.strings.get(name).is_some();
     }

@@ -1,12 +1,16 @@
 use crate::pbrt::*;
 
-pub const PI: f64 = std::f64::consts::PI as f64;
-
+pub const PI: f64 = std::f64::consts::PI;
 pub const PI_OVER_2: f64 = PI / 2.0;
-
 pub const PI_OVER_4: f64 = PI / 4.0;
-
 pub const INV_PI: f64 = 1.0 / PI;
+pub const INV_4PI: f64 = 1.0 / (4.0 * PI);
+
+pub fn calculate_hash<T: Hash>(t: &T) -> u64 {
+    let mut s = DefaultHasher::new();
+    t.hash(&mut s);
+    s.finish()
+}
 
 pub fn degree_to_radian(degree: f64) -> f64 {
     return (PI / 180.0) * degree;

@@ -8,18 +8,22 @@ pub const ONE_MINUS_EPSILON: f64 = {
 };
 
 pub use fma::fma;
+pub use lazy_static::lazy_static;
 pub use rand::{rngs::StdRng, thread_rng, Rng, SeedableRng};
+pub use rand_distr::num_traits::Float;
 pub use rayon::prelude::*;
 pub use std::{
     any::{type_name, Any, TypeId},
     cmp::Ordering,
-    collections::{HashMap, HashSet},
+    collections::{hash_map::DefaultHasher, HashMap, HashSet},
     fmt::{Debug, Display, Formatter},
     fs::{read_to_string, File},
     hash::{Hash, Hasher},
     io::{BufReader, Read},
     iter::Sum,
-    ops::{Add, AddAssign, BitAnd, BitOr, Div, Index, IndexMut, Mul, MulAssign, Neg, Sub},
+    ops::{
+        Add, AddAssign, BitAnd, BitOr, BitOrAssign, Div, Index, IndexMut, Mul, MulAssign, Neg, Sub,
+    },
     process::exit,
     str::FromStr,
     sync::{
@@ -28,16 +32,18 @@ pub use std::{
     },
     time::Instant,
 };
+pub use strum::IntoEnumIterator;
+pub use strum_macros::EnumIter;
 
 pub use crate::base::bsdf::*;
 pub use crate::{
     accelerator::bvh::*,
     base::{
         bxdf::*, camera::*, film::*, filter::*, integrator::*, interaction::*, light::*,
-        light_sampler::*, material::*, primitive::*, ray::*, sampler::*, shape::*, spectrum::*,
-        texture::*,
+        light_sampler::*, material::*, medium::*, primitive::*, ray::*, sampler::*, shape::*,
+        spectrum::*, texture::*,
     },
-    bxdfs::diffuse_bxdf::*,
+    bxdfs::{coated_diffuse::*, dielectric::*, diffuse::*, layered::*, top_or_bottom::*},
     cameras::perspective::*,
     euclidean_space::{
         bounds::*, compensated_float::*, float::*, frame::*, interval::*, interval::*, normal::*,
@@ -48,7 +54,7 @@ pub use crate::{
     integrators::{ambient_occlusion::*, random_walk::*, simple_path::*, surface_normal::*},
     light_samplers::uniform_light_sampler::*,
     lights::{diffuse_area::*, distant::*},
-    materials::diffuse_material::*,
+    materials::{coated_diffuse::*, diffuse::*},
     primitives::{geometric_primitive::*, simple_primitive::*},
     samplers::independent::*,
     scene::{lexer::*, parameter_dict::*, renderer::*, scene_builder::*, util::*},
@@ -65,7 +71,9 @@ pub use crate::{
         spectrum_image_texture::*, spectrum_scaled_texture::*, texture_mapping_2d::*,
         uv_mapping::*,
     },
-    util::{color::*, color_encoding::*, colorspace::*, image::*, math::*, sampling::*},
+    util::{
+        color::*, color_encoding::*, colorspace::*, image::*, math::*, sampling::*, scattering::*,
+    },
 };
 
 pub type Point2f = Point2<f64>;

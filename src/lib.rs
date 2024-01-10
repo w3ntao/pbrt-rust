@@ -17,6 +17,7 @@ mod integrators;
 mod light_samplers;
 mod lights;
 mod materials;
+mod media;
 mod pbrt;
 mod primitives;
 mod samplers;

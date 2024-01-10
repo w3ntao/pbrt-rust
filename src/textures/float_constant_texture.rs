@@ -9,3 +9,9 @@ impl FloatTexture for FloatConstantTexture {
         return self.value;
     }
 }
+
+impl FloatConstantTexture {
+    pub fn new(value: f64) -> Self {
+        return Self { value };
+    }
+}

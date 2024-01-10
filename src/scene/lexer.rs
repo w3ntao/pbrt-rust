@@ -277,12 +277,22 @@ impl Lexer {
             self.skip_space();
         }
 
-        let tok = match self.current_char {
+        return match self.current_char {
             None => ParserToken::EOF,
             Some(current_char) => match current_char {
+                '[' => {
+                    let token = ParserToken::List(self.read_list());
+                    self.read_char();
+                    token
+                }
+                ']' => {
+                    let token = ParserToken::RightBracket;
+                    self.read_char();
+                    token
+                }
+
                 '"' => self.read_quoted_string(),
-                '[' => ParserToken::List(self.read_list()),
-                ']' => ParserToken::RightBracket,
+
                 _ => {
                     if is_letter(current_char) {
                         return parse_identifier(&self.read_identifier());
@@ -297,11 +307,9 @@ impl Lexer {
                         self.line_number, current_char
                     );
 
-                    return ParserToken::Illegal;
+                    ParserToken::Illegal
                 }
             },
         };
-        self.read_char();
-        return tok;
     }
 }

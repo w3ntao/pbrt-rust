@@ -1,5 +1,6 @@
 use crate::pbrt::*;
 
+#[derive(Clone, Copy)]
 pub struct DiffuseBxDF {
     r: SampledSpectrum,
 }
@@ -11,6 +12,10 @@ impl DiffuseBxDF {
 }
 
 impl BxDF for DiffuseBxDF {
+    fn fork(&self) -> Arc<dyn BxDF> {
+        return Arc::new(self.clone());
+    }
+
     fn flags(&self) -> BxDFFlags {
         return if self.r.is_positive() {
             BxDFFlags::DiffuseReflection
@@ -35,7 +40,7 @@ impl BxDF for DiffuseBxDF {
         mode: TransportMode,
         sample_flags: BxDFReflTransFlags,
     ) -> Option<BSDFSample> {
-        if !(sample_flags & BxDFReflTransFlags::Reflection) {
+        if !(sample_flags & BxDFReflTransFlags::Reflection).is_set() {
             return None;
         }
 
@@ -66,7 +71,7 @@ impl BxDF for DiffuseBxDF {
         mode: TransportMode,
         sample_flags: BxDFReflTransFlags,
     ) -> f64 {
-        if !(sample_flags & BxDFReflTransFlags::Reflection) || !wo.same_hemisphere(wi) {
+        if !(sample_flags & BxDFReflTransFlags::Reflection).is_set() || !wo.same_hemisphere(wi) {
             return 0.0;
         }
 

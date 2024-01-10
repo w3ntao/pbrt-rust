@@ -148,7 +148,7 @@ impl MIPMap {
 
             // Compute MIP Map level for _width_ and handle very wide filter
             let n_levels = self.levels();
-            let level = (n_levels - 1) as f64 + (width as f64).max(1e-8).log2();
+            let level = (n_levels - 1) as f64 + width.max(1e-8).log2();
 
             if level >= (n_levels - 1) as f64 {
                 return self.texel(n_levels - 1, Point2i::new(0, 0));

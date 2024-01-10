@@ -61,7 +61,15 @@ impl<T: Copy + Add<Output = T> + Mul<Output = T>> Vector3<T> {
     }
 
     pub fn length_squared(&self) -> T {
-        return self.x * self.x + self.y * self.y + self.z * self.z;
+        return sqr(self.x) + sqr(self.y) + sqr(self.z);
+    }
+}
+
+impl Hash for Vector3f {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        state.write_u64(self.x.to_bits());
+        state.write_u64(self.y.to_bits());
+        state.write_u64(self.z.to_bits());
     }
 }
 
@@ -82,6 +90,10 @@ impl Vector3f {
         };
     }
 
+    pub fn is_valid(&self) -> bool {
+        return self.x.is_finite() && self.y.is_finite() && self.z.is_finite();
+    }
+
     pub fn abs(&self) -> Vector3<f64> {
         return Vector3::<f64> {
             x: self.x.abs(),
@@ -92,6 +104,10 @@ impl Vector3f {
 
     pub fn dot(&self, v: Self) -> f64 {
         return self.x * v.x + self.y * v.y + self.z * v.z;
+    }
+
+    pub fn abs_dot(&self, v: Self) -> f64 {
+        return self.dot(v).abs();
     }
 
     pub fn length(&self) -> f64 {
@@ -107,6 +123,48 @@ impl Vector3f {
             x: difference_of_products(self.y, rhs.z, self.z, rhs.y),
             y: difference_of_products(self.z, rhs.x, self.x, rhs.z),
             z: difference_of_products(self.x, rhs.y, self.y, rhs.x),
+        };
+    }
+
+    pub fn cos_theta(&self) -> f64 {
+        return self.z;
+    }
+
+    pub fn cos2_theta(&self) -> f64 {
+        return self.z * self.z;
+    }
+
+    pub fn sin2_theta(&self) -> f64 {
+        return (1.0 - self.cos2_theta()).max(0.0);
+    }
+
+    pub fn sin_theta(&self) -> f64 {
+        return self.sin2_theta().sqrt();
+    }
+
+    pub fn tan_theta(&self) -> f64 {
+        return self.sin_theta() / self.cos_theta();
+    }
+
+    pub fn tan2_theta(&self) -> f64 {
+        return self.sin2_theta() / self.cos2_theta();
+    }
+
+    pub fn cos_phi(&self) -> f64 {
+        let sin_theta = self.sin_theta();
+        return if sin_theta == 0.0 {
+            1.0
+        } else {
+            (self.x / sin_theta).clamp(-1.0, 1.0)
+        };
+    }
+
+    pub fn sin_phi(&self) -> f64 {
+        let sin_theta = self.sin_theta();
+        return if sin_theta == 0.0 {
+            0.0
+        } else {
+            (self.y / sin_theta).clamp(-1.0, 1.0)
         };
     }
 
@@ -315,4 +373,13 @@ impl Div<f64> for Vector3<f64> {
             z: self.z * one_over_rhs,
         };
     }
+}
+
+pub fn spherical_direction(sin_theta: f64, cos_theta: f64, phi: f64) -> Vector3f {
+    let clamped_sin_theta = sin_theta.clamp(-1.0, 1.0);
+    return Vector3f {
+        x: clamped_sin_theta * phi.cos(),
+        y: clamped_sin_theta * phi.sin(),
+        z: cos_theta.clamp(-1.0, 1.0),
+    };
 }

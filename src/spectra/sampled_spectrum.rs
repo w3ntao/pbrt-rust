@@ -1,4 +1,5 @@
 use crate::pbrt::*;
+use std::ops::DivAssign;
 
 #[derive(Clone, Copy)]
 pub struct SampledSpectrum {
@@ -21,6 +22,15 @@ impl SampledSpectrum {
         return self.values.into_par_iter().any(|x| x > 0.0);
     }
 
+    pub fn max_component_value(&self) -> f64 {
+        let mut max_val = self.values[0];
+        for i in 1..NUM_SPECTRUM_SAMPLES {
+            max_val = max_val.max(self.values[i]);
+        }
+
+        return max_val;
+    }
+
     pub fn safe_div(&self, divisor: &SampledSpectrum) -> SampledSpectrum {
         let mut values = [f64::NAN; NUM_SPECTRUM_SAMPLES];
         for i in 0..NUM_SPECTRUM_SAMPLES {
@@ -36,6 +46,16 @@ impl SampledSpectrum {
 
     pub fn average(&self) -> f64 {
         return self.values.iter().sum::<f64>() / (NUM_SPECTRUM_SAMPLES as f64);
+    }
+
+    pub fn clamp(&self, low: f64, high: f64) -> Self {
+        let mut values = self.values;
+
+        for v in &mut values {
+            *v = v.clamp(low, high);
+        }
+
+        return Self { values };
     }
 }
 
@@ -126,6 +146,12 @@ impl MulAssign<SampledSpectrum> for SampledSpectrum {
     }
 }
 
+impl MulAssign<f64> for SampledSpectrum {
+    fn mul_assign(&mut self, rhs: f64) {
+        *self = *self * rhs;
+    }
+}
+
 impl Div<f64> for SampledSpectrum {
     type Output = SampledSpectrum;
 
@@ -135,5 +161,11 @@ impl Div<f64> for SampledSpectrum {
             *v /= rhs;
         }
         return SampledSpectrum { values };
+    }
+}
+
+impl DivAssign<f64> for SampledSpectrum {
+    fn div_assign(&mut self, rhs: f64) {
+        *self = *self / rhs;
     }
 }

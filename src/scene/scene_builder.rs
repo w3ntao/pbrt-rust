@@ -305,7 +305,11 @@ impl SceneBuilder {
         );
 
         let material_type = tokens[1].convert_to_string();
-        self.graphics_state.current_material = create_material(&material_type, &parameter_dict);
+        self.graphics_state.current_material = create_material(
+            &material_type,
+            &parameter_dict,
+            &self.global_variable.rgb_color_space,
+        );
     }
 
     fn world_rotate(&mut self, tokens: &[Token]) {

@@ -32,7 +32,7 @@ impl RandomWalkIntegrator {
     fn random_walk_li(
         &self,
         ray: &DifferentialRay,
-        lambda: &SampledWavelengths,
+        lambda: &mut SampledWavelengths,
         sampler: &mut dyn Sampler,
         depth: usize,
     ) -> SampledSpectrum {
@@ -65,7 +65,7 @@ impl RandomWalkIntegrator {
         let wp = Vector3f::sample_uniform_sphere(u);
 
         // Evaluate BSDF at surface for sampled direction
-        let fcos = bsdf.f(wo, wp, TransportMode::Radiance) * isect.shading.n.dot(wp).abs();
+        let fcos = bsdf.f(wo, wp, TransportMode::Radiance) * isect.shading.n.abs_dot(wp);
 
         if !fcos.is_positive() {
             return le;
@@ -85,7 +85,7 @@ impl Integrator for RandomWalkIntegrator {
     fn li(
         &self,
         ray: &DifferentialRay,
-        lambda: &SampledWavelengths,
+        lambda: &mut SampledWavelengths,
         sampler: &mut dyn Sampler,
     ) -> SampledSpectrum {
         return self.random_walk_li(ray, lambda, sampler, 0);

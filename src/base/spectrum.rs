@@ -1,5 +1,6 @@
 use crate::pbrt::*;
 
+#[derive(Debug)]
 pub enum SpectrumType {
     Illuminant,
     Albedo,
@@ -14,6 +15,10 @@ pub trait Spectrum: Send + Sync {
     fn to_photometric(&self) -> f64 {
         // for non RGBIlluminantSpectrum
         return self.inner_product(&CIE_Y_DENSELY_SAMPLED);
+    }
+
+    fn is_constant_spectrum(&self) -> bool {
+        return false;
     }
 }
 

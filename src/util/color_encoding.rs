@@ -1,7 +1,11 @@
 use crate::pbrt::*;
 
-pub trait ColorEncoding {
-    fn to_linear(&self, vin: &Vec<u8>) -> Vec<f64>;
+pub trait ColorEncoding: Send + Sync {
+    fn to_linear(&self, val: u8) -> f64;
+
+    fn to_srgb8(&self, val: f64) -> u8 {
+        panic!("to_srgb8() should be implemented only by SRGBColorEncoding");
+    }
 }
 
 pub struct SRGBColorEncoding {}
@@ -12,13 +16,55 @@ impl SRGBColorEncoding {
     }
 }
 
-const fn srgb8_to_linear(value: u8) -> f64 {
-    return SRGB_TO_LINEAR_LUT[value as usize];
+fn linear_to_srgb(value: f64) -> f64 {
+    if value <= 0.0031308 {
+        return 12.92 * value;
+    }
+    // Minimax polynomial approximation from enoki's color.h.
+    let sqrt_value = safe_sqrt(value);
+
+    let p = evaluate_polynomial(
+        sqrt_value,
+        &[
+            -0.0016829072605308378,
+            0.03453868659826638,
+            0.7642611304733891,
+            2.0041169284241644,
+            0.7551545191665577,
+            -0.016202083165206348,
+        ],
+    );
+
+    let q = evaluate_polynomial(
+        sqrt_value,
+        &[
+            4.178892964897981e-7,
+            -0.00004375359692957097,
+            0.03467195408529984,
+            0.6085338522168684,
+            1.8970238036421054,
+            1.0,
+        ],
+    );
+
+    return p / q * value;
 }
 
 impl ColorEncoding for SRGBColorEncoding {
-    fn to_linear(&self, vin: &Vec<u8>) -> Vec<f64> {
-        return vin.into_par_iter().map(|x| srgb8_to_linear(*x)).collect();
+    fn to_linear(&self, val: u8) -> f64 {
+        return SRGB_TO_LINEAR_LUT[val as usize];
+    }
+
+    fn to_srgb8(&self, val: f64) -> u8 {
+        if val <= 0.0 {
+            return 0;
+        }
+
+        if val >= 1.0 {
+            return 255;
+        }
+
+        return ((255.0 * linear_to_srgb(val)).round() as u8).clamp(0, 255);
     }
 }
 

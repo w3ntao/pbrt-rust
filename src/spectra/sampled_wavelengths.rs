@@ -41,6 +41,31 @@ const LAMBDA_EXTEND: f64 = LAMBDA_MAX - LAMBDA_MIN;
 const DELTA: f64 = LAMBDA_EXTEND / (NUM_SPECTRUM_SAMPLES as f64);
 
 impl SampledWavelengths {
+    pub fn secondary_terminated(&self) -> bool {
+        for i in 1..NUM_SPECTRUM_SAMPLES {
+            if self.pdf[i] != 0.0 {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    pub fn terminate_secondary(&mut self) {
+        if self.secondary_terminated() {
+            return;
+        }
+
+        // Update wavelength probabilities for termination
+        for i in 1..NUM_SPECTRUM_SAMPLES {
+            if self.pdf[i] != 0.0 {
+                self.pdf[i] = 0.0;
+            }
+        }
+
+        self.pdf[0] /= NUM_SPECTRUM_SAMPLES as f64;
+    }
+
     pub fn pdf_as_sampled_spectrum(&self) -> SampledSpectrum {
         return SampledSpectrum { values: self.pdf };
     }

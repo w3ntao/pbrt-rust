@@ -40,6 +40,10 @@ impl Normal3f {
         return self.x * v.x + self.y * v.y + self.z * v.z;
     }
 
+    pub fn abs_dot(&self, v: Vector3f) -> f64 {
+        return self.dot(v).abs();
+    }
+    
     pub fn face_forward(&self, v: Vector3f) -> Normal3f {
         return if self.dot(v) >= 0.0 { *self } else { -*self };
     }

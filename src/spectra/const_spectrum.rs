@@ -12,6 +12,10 @@ impl Spectrum for ConstSpectrum {
     fn sample(&self, _: &SampledWavelengths) -> SampledSpectrum {
         return SampledSpectrum::same_value(self.c);
     }
+
+    fn is_constant_spectrum(&self) -> bool {
+        return true;
+    }
 }
 
 impl ConstSpectrum {
