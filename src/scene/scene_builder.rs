@@ -49,11 +49,7 @@ struct LightEntity {
     pub render_from_object: Transform,
 }
 
-fn build_film(
-    film_entity: &SceneEntity,
-    _filter: Arc<BoxFilter>,
-    global_variable: &GlobalVariable,
-) -> Arc<Mutex<dyn Film>> {
+fn build_film(film_entity: &SceneEntity, _filter: Arc<BoxFilter>) -> Arc<Mutex<dyn Film>> {
     let xresolution = film_entity.parameters.get_one_integer("xresolution", None);
     let yresolution = film_entity.parameters.get_one_integer("yresolution", None);
 
@@ -63,15 +59,13 @@ fn build_film(
     match film_entity.name.as_str() {
         "rgb" => {
             let exposure_time = 1.0;
-            let sensor =
-                PixelSensor::create(&film_entity.parameters, exposure_time, global_variable);
+            let sensor = PixelSensor::create(&film_entity.parameters, exposure_time);
 
             return Arc::new(Mutex::new(RGBFilm::new(
                 resolution,
                 &filename,
                 Arc::new(sensor),
                 _filter,
-                global_variable,
             )));
         }
         _ => {
@@ -93,21 +87,15 @@ fn build_camera(camera_entity: &CameraEntity, resolution: Point2i) -> Arc<dyn Ca
     });
 }
 
-fn build_lights(
-    light_entities: &Vec<LightEntity>,
-    global_variable: &GlobalVariable,
-) -> Vec<Arc<dyn Light>> {
+fn build_lights(light_entities: &Vec<LightEntity>) -> Vec<Arc<dyn Light>> {
     let mut lights: Vec<Arc<dyn Light>> = vec![];
 
     for light_entity in light_entities {
         let light_type = light_entity.name.as_str();
         match light_type {
             "distant" => {
-                let light = DistantLight::new(
-                    &light_entity.render_from_object,
-                    &light_entity.parameters,
-                    global_variable.rgb_color_space.as_ref(),
-                );
+                let light =
+                    DistantLight::new(&light_entity.render_from_object, &light_entity.parameters);
 
                 lights.push(Arc::new(light));
             }
@@ -125,19 +113,18 @@ fn build_integrator(
     aggregate: Arc<dyn Primitive>,
     camera: Arc<dyn Camera>,
     lights: Vec<Arc<dyn Light>>,
-    global_variable: &GlobalVariable,
 ) -> Arc<dyn Integrator> {
     println!("Integrator: `{}`", name);
 
     return match name {
         "ambientocclusion" => Arc::new(AmbientOcclusion::new(
-            global_variable.rgb_color_space.illuminant,
+            COLOR_SPACE.illuminant,
             aggregate,
             camera,
         )),
 
         "randomwalk" => Arc::new(RandomWalkIntegrator::new(
-            global_variable.rgb_color_space.illuminant,
+            COLOR_SPACE.illuminant,
             aggregate,
             camera,
             lights,
@@ -145,11 +132,7 @@ fn build_integrator(
 
         "simplepath" => Arc::new(SimplePath::new(aggregate, camera, lights)),
 
-        "surfacenormal" => Arc::new(SurfaceNormal::new(
-            aggregate,
-            camera,
-            global_variable.rgb_color_space.as_ref(),
-        )),
+        "surfacenormal" => Arc::new(SurfaceNormal::new(aggregate, camera)),
 
         _ => {
             panic!("unrecognized integrator: `{}`", name);
@@ -213,11 +196,10 @@ pub struct SceneBuilder {
     area_lights: Vec<Arc<dyn Light>>,
 
     root: Option<String>,
-    global_variable: Arc<GlobalVariable>,
 }
 
-impl SceneBuilder {
-    pub fn new(global_variable: Arc<GlobalVariable>) -> Self {
+impl Default for SceneBuilder {
+    fn default() -> Self {
         return SceneBuilder {
             graphics_state: GraphicsState::new(),
             pushed_graphics_state: Vec::new(),
@@ -235,10 +217,11 @@ impl SceneBuilder {
             area_lights: vec![],
 
             root: None,
-            global_variable,
         };
     }
+}
 
+impl SceneBuilder {
     fn world_area_light_source(&mut self, tokens: &[Token]) {
         debug_assert!(tokens[0].clone() == Token::Keyword("AreaLightSource".to_string()));
 
@@ -305,11 +288,7 @@ impl SceneBuilder {
         );
 
         let material_type = tokens[1].convert_to_string();
-        self.graphics_state.current_material = create_material(
-            &material_type,
-            &parameter_dict,
-            &self.global_variable.rgb_color_space,
-        );
+        self.graphics_state.current_material = create_material(&material_type, &parameter_dict);
     }
 
     fn world_rotate(&mut self, tokens: &[Token]) {
@@ -447,7 +426,6 @@ impl SceneBuilder {
                 let area_light = Arc::new(DiffuseAreaLight::new(
                     self.render_from_object(),
                     &self.graphics_state.area_light_parameter,
-                    self.global_variable.rgb_color_space.as_ref(),
                     shape.clone(),
                 ));
 
@@ -482,7 +460,6 @@ impl SceneBuilder {
                     &self.render_from_object(),
                     &parameter_dict,
                     SpectrumType::Albedo,
-                    self.global_variable.as_ref(),
                 );
                 // TODO: hardcode all SpectrumType as Albedo for the moment
 
@@ -772,9 +749,7 @@ impl SceneBuilder {
             None => {
                 panic!("default Film not implemented");
             }
-            Some(film_entity) => {
-                build_film(&film_entity, filter.clone(), self.global_variable.as_ref())
-            }
+            Some(film_entity) => build_film(&film_entity, filter.clone()),
         };
 
         let camera = match &self.camera_entity {
@@ -789,19 +764,14 @@ impl SceneBuilder {
         let sampler = Arc::new(IndependentSampler::new(samples_per_pixel));
         let bvh_aggregate = Arc::new(BVHAggregate::new(self.primitives.clone()));
 
-        let mut lights = build_lights(&self.light_entities, &self.global_variable);
+        let mut lights = build_lights(&self.light_entities);
 
         for area_light in &self.area_lights {
             lights.push(area_light.clone());
         }
 
-        let integrator = build_integrator(
-            &self.integrator_name,
-            bvh_aggregate,
-            camera.clone(),
-            lights,
-            self.global_variable.as_ref(),
-        );
+        let integrator =
+            build_integrator(&self.integrator_name, bvh_aggregate, camera.clone(), lights);
 
         return Renderer::new(integrator, sampler, camera, film);
     }

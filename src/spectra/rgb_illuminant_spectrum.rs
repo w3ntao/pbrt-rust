@@ -40,12 +40,12 @@ impl Spectrum for RGBIlluminantSpectrum {
 }
 
 impl RGBIlluminantSpectrum {
-    pub fn new(rgb: RGB, color_space: &RGBColorSpace) -> Self {
-        let illuminant = color_space.illuminant;
+    pub fn new(rgb: RGB) -> Self {
+        let illuminant = COLOR_SPACE.illuminant;
 
         let m = rgb.max_component();
         let scale = 2.0 * m;
-        let rsp = color_space.to_rgb_coeffs(if scale > 0.0 {
+        let rsp = COLOR_SPACE.to_rgb_coeffs(if scale > 0.0 {
             rgb / scale
         } else {
             RGB::new(0.0, 0.0, 0.0)

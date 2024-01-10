@@ -20,9 +20,9 @@ impl Spectrum for RGBAlbedoSpectrum {
 }
 
 impl RGBAlbedoSpectrum {
-    pub fn new(rgb: RGB, color_space: &RGBColorSpace) -> Self {
+    pub fn new(rgb: RGB) -> Self {
         return Self {
-            rsp: color_space.to_rgb_coeffs(rgb),
+            rsp: COLOR_SPACE.to_rgb_coeffs(rgb),
         };
     }
 }

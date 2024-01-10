@@ -28,14 +28,10 @@ impl Light for DistantLight {
 }
 
 impl DistantLight {
-    pub fn new(
-        render_from_light: &Transform,
-        parameters: &ParameterDict,
-        color_space: &RGBColorSpace,
-    ) -> Self {
+    pub fn new(render_from_light: &Transform, parameters: &ParameterDict) -> Self {
         let l = if parameters.has_rgb("L") {
             let rgb = parameters.get_rgb("L", None);
-            RGBIlluminantSpectrum::new(rgb, color_space)
+            RGBIlluminantSpectrum::new(rgb)
         } else {
             panic!("this part is not implemented");
         };

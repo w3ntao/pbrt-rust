@@ -278,11 +278,7 @@ pub struct PixelSensor {
 }
 
 impl PixelSensor {
-    pub fn create(
-        parameters: &ParameterDict,
-        exposure_time: f64,
-        global_variable: &GlobalVariable,
-    ) -> Self {
+    pub fn create(parameters: &ParameterDict, exposure_time: f64) -> Self {
         // Imaging ratio parameters
         // The defaults here represent a "passthrough" setup such that the imaging
         // ratio will be exactly 1. This is a useful default since scenes that
@@ -321,11 +317,7 @@ impl PixelSensor {
         };
 
         return match sensor_name.as_str() {
-            "cie1931" => PixelSensor::cie_1931(
-                &global_variable.rgb_color_space,
-                sensor_illum,
-                imaging_ratio,
-            ),
+            "cie1931" => PixelSensor::cie_1931(&COLOR_SPACE, sensor_illum, imaging_ratio),
             _ => {
                 panic!("sensor `{}` is not implemented", sensor_name);
             }

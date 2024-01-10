@@ -31,7 +31,6 @@ impl RGBFilm {
         filename: &String,
         sensor: Arc<PixelSensor>,
         filter: Arc<dyn Filter>,
-        global_variable: &GlobalVariable,
     ) -> Self {
         let width = resolution.x;
         let height = resolution.y;
@@ -43,8 +42,7 @@ impl RGBFilm {
             change_extension(filename, "png")
         };
 
-        let output_rgb_from_sensor_rgb =
-            global_variable.rgb_color_space.rgb_from_xyz * sensor.xyz_from_sensor_rgb;
+        let output_rgb_from_sensor_rgb = COLOR_SPACE.rgb_from_xyz * sensor.xyz_from_sensor_rgb;
 
         return RGBFilm {
             resolution: resolution.clone(),

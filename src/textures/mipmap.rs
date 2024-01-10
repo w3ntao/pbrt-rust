@@ -89,21 +89,14 @@ impl PartialOrd for MIPMapFilterOptions {
 
 pub struct MIPMap {
     pub pyramid: Vec<Image>,
-    pub color_space: Arc<RGBColorSpace>,
     pub wrap_mode: WrapMode,
     pub options: MIPMapFilterOptions,
 }
 
 impl MIPMap {
-    fn new(
-        image: Image,
-        color_space: Arc<RGBColorSpace>,
-        wrap_mode: WrapMode,
-        options: MIPMapFilterOptions,
-    ) -> Self {
+    fn new(image: Image, wrap_mode: WrapMode, options: MIPMapFilterOptions) -> Self {
         return Self {
             pyramid: generate_pyramid(image, wrap_mode),
-            color_space,
             wrap_mode,
             options,
         };
@@ -125,15 +118,9 @@ impl MIPMap {
         filename: &str,
         options: MIPMapFilterOptions,
         wrap_mode: WrapMode,
-        global_variable: &GlobalVariable,
     ) -> Self {
         let image = Image::read_from_file(filename);
-        return MIPMap::new(
-            image,
-            global_variable.rgb_color_space.clone(),
-            wrap_mode,
-            options,
-        );
+        return MIPMap::new(image, wrap_mode, options);
     }
 
     pub fn filter(&self, st: Point2f, dst0: Vector2f, dst1: Vector2f) -> RGB {

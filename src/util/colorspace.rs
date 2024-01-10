@@ -60,9 +60,9 @@ impl RGBColorSpace {
         let val = 0.01;
 
         return [
-            RGBAlbedoSpectrum::new(RGB::new(val, 0.0, 0.0), &self),
-            RGBAlbedoSpectrum::new(RGB::new(0.0, val, 0.0), &self),
-            RGBAlbedoSpectrum::new(RGB::new(0.0, 0.0, val), &self),
+            RGBAlbedoSpectrum::new(RGB::new(val, 0.0, 0.0)),
+            RGBAlbedoSpectrum::new(RGB::new(0.0, val, 0.0)),
+            RGBAlbedoSpectrum::new(RGB::new(0.0, 0.0, val)),
         ];
     }
 }

@@ -37,11 +37,7 @@ pub trait Material: Send + Sync {
     // in PBRT-minus get_bsdf works like get_bxdf in PBRT-v4
 }
 
-pub fn create_material(
-    material_type: &str,
-    parameter_dict: &ParameterDict,
-    color_space: &RGBColorSpace,
-) -> Arc<dyn Material> {
+pub fn create_material(material_type: &str, parameter_dict: &ParameterDict) -> Arc<dyn Material> {
     return match material_type {
         "diffuse" => {
             let reflectance = {
@@ -50,7 +46,7 @@ pub fn create_material(
                     parameter_dict.get_texture(key)
                 } else if parameter_dict.has_rgb(key) {
                     let rgb_color = parameter_dict.get_rgb(key, None);
-                    let spectrum = RGBAlbedoSpectrum::new(rgb_color, color_space);
+                    let spectrum = RGBAlbedoSpectrum::new(rgb_color);
 
                     Arc::new(SpectrumConstantTexture::new(Arc::new(spectrum)))
                 } else {
@@ -68,10 +64,10 @@ pub fn create_material(
                     parameter_dict.get_texture(key)
                 } else if parameter_dict.has_rgb(key) {
                     let rgb_color = parameter_dict.get_rgb(key, None);
-                    let spectrum = RGBAlbedoSpectrum::new(rgb_color, color_space);
+                    let spectrum = RGBAlbedoSpectrum::new(rgb_color);
                     Arc::new(SpectrumConstantTexture::new(Arc::new(spectrum)))
                 } else {
-                    let spectrum = RGBAlbedoSpectrum::new(RGB::new(0.5, 0.5, 0.5), color_space);
+                    let spectrum = RGBAlbedoSpectrum::new(RGB::new(0.5, 0.5, 0.5));
                     Arc::new(SpectrumConstantTexture::new(Arc::new(spectrum)))
                 }
             };

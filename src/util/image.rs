@@ -90,7 +90,6 @@ pub struct Image {
     pub resolution: Point2i,
     pixels: Vec<Vec<RGB>>,
     pub pixel_format: PixelFormat,
-    color_encoding: Arc<dyn ColorEncoding>,
 }
 
 fn resample_weights(old_resolution: usize, new_resolution: usize) -> Vec<ResampleWeight> {
@@ -199,8 +198,6 @@ impl Image {
             resolution,
             pixels: vec![vec![RGB::black(); resolution.x as usize]; resolution.y as usize],
             pixel_format,
-            color_encoding: Arc::new(SRGBColorEncoding {}),
-            // TODO: build SRGBColorEncoding according to ColorSpace
         };
     }
 
@@ -216,9 +213,6 @@ impl Image {
             }
         };
 
-        let color_encoding = SRGBColorEncoding {};
-        // TODO: build SRGBColorEncoding according to ColorSpace
-
         let (width, height) = img.dimensions();
         let mut pixels = vec![vec![RGB::black(); width as usize]; height as usize];
         for x in 0..width {
@@ -226,9 +220,9 @@ impl Image {
                 let rgb_u256 = img[(x, y)].0;
 
                 pixels[y as usize][x as usize] = RGB::new(
-                    color_encoding.to_linear(rgb_u256[0]),
-                    color_encoding.to_linear(rgb_u256[1]),
-                    color_encoding.to_linear(rgb_u256[2]),
+                    COLOR_ENCODING.to_linear(rgb_u256[0]),
+                    COLOR_ENCODING.to_linear(rgb_u256[1]),
+                    COLOR_ENCODING.to_linear(rgb_u256[2]),
                 );
             }
         }
@@ -237,8 +231,6 @@ impl Image {
             resolution: Point2::new(width as i32, height as i32),
             pixels,
             pixel_format: PixelFormat::U256,
-            color_encoding: Arc::new(color_encoding),
-            // TODO: build SRGBColorEncoding according to ColorSpace
         };
     }
 
@@ -300,9 +292,9 @@ impl Image {
             for x in 0..self.resolution.x {
                 let color = self.pixels[y as usize][x as usize];
 
-                let red = self.color_encoding.to_srgb8(color.r);
-                let green = self.color_encoding.to_srgb8(color.g);
-                let blue = self.color_encoding.to_srgb8(color.b);
+                let red = COLOR_ENCODING.to_srgb8(color.r);
+                let green = COLOR_ENCODING.to_srgb8(color.g);
+                let blue = COLOR_ENCODING.to_srgb8(color.b);
 
                 buffer.put_pixel(x as u32, y as u32, Rgb([red, green, blue]));
             }

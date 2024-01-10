@@ -52,9 +52,8 @@ impl ImageTextureBase {
         wrap_mode: WrapMode,
         scale: f64,
         invert: bool,
-        global_variable: &GlobalVariable,
     ) -> Self {
-        let mipmap = MIPMap::create_from_file(filename, filter_options, wrap_mode, global_variable);
+        let mipmap = MIPMap::create_from_file(filename, filter_options, wrap_mode);
 
         return Self {
             mapping,
@@ -79,14 +78,12 @@ pub fn create_spectrum_texture(
     render_from_texture: &Transform,
     parameters: &ParameterDict,
     spectrum_type: SpectrumType,
-    global_variable: &GlobalVariable,
 ) -> Arc<dyn SpectrumTexture> {
     return match texture_type {
         "imagemap" => Arc::new(SpectrumImageTexture::new(
             render_from_texture,
             parameters,
             spectrum_type,
-            global_variable,
         )),
         "scale" => {
             let spectrum_texture = parameters.get_texture("tex");

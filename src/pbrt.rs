@@ -1,5 +1,16 @@
-pub struct GlobalVariable {
-    pub rgb_color_space: Arc<RGBColorSpace>,
+lazy_static! {
+    pub static ref COLOR_SPACE: RGBColorSpace = {
+        let srgb_to_spectrum_table = RGBtoSpectrumTable::new("sRGB");
+
+        RGBColorSpace::new(
+            Point2f::new(0.64, 0.33),
+            Point2f::new(0.3, 0.6),
+            Point2f::new(0.15, 0.06),
+            get_named_spectrum("stdillum-D65"),
+            srgb_to_spectrum_table,
+        )
+    };
+    pub static ref COLOR_ENCODING: SRGBColorEncoding = SRGBColorEncoding {};
 }
 
 pub const ONE_MINUS_EPSILON: f64 = {

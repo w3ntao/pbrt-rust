@@ -91,11 +91,10 @@ impl DiffuseAreaLight {
     pub fn new(
         render_from_light: Transform,
         parameters: &ParameterDict,
-        color_space: &RGBColorSpace,
         shape: Arc<dyn Shape>,
     ) -> Self {
         let rgb_l = parameters.get_rgb("L", None);
-        let spectrum_l = RGBIlluminantSpectrum::new(rgb_l, color_space);
+        let spectrum_l = RGBIlluminantSpectrum::new(rgb_l);
         let mut scale = parameters.get_one_float("scale", Some(1.0));
         let two_sided = parameters.get_one_bool("twosided", Some(false));
 

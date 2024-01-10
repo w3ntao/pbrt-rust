@@ -9,11 +9,10 @@ impl SurfaceNormal {
     pub fn new(
         aggregate: Arc<dyn Primitive>,
         camera: Arc<dyn Camera>,
-        color_space: &RGBColorSpace,
     ) -> Self {
         return SurfaceNormal {
             base: IntegratorBase::new(aggregate, camera, vec![]),
-            rgb: color_space.generate_albedo_rgb(),
+            rgb: COLOR_SPACE.generate_albedo_rgb(),
         };
     }
 }

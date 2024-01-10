@@ -11,7 +11,6 @@ impl SpectrumImageTexture {
         render_from_texture: &Transform,
         parameters: &ParameterDict,
         spectrum_type: SpectrumType,
-        global_variable: &GlobalVariable,
     ) -> Self {
         let map = create_texture_mapping_2d(render_from_texture, parameters);
 
@@ -31,15 +30,8 @@ impl SpectrumImageTexture {
 
         let filename = parameters.get_string("filename", None);
 
-        let image_texture_base = ImageTextureBase::new(
-            map,
-            &filename,
-            filter_options,
-            wrap_mode,
-            scale,
-            invert,
-            global_variable,
-        );
+        let image_texture_base =
+            ImageTextureBase::new(map, &filename, filter_options, wrap_mode, scale, invert);
 
         return Self {
             image_texture_base,
@@ -70,11 +62,9 @@ impl SpectrumTexture for SpectrumImageTexture {
             .clamp(0.0, f64::INFINITY)
         };
 
-        let cs = self.image_texture_base.mipmap.color_space.as_ref();
-
         match self.spectrum_type {
             SpectrumType::Albedo => {
-                return RGBAlbedoSpectrum::new(rgb.clamp(0.0, 1.0), cs).sample(lambda);
+                return RGBAlbedoSpectrum::new(rgb.clamp(0.0, 1.0)).sample(lambda);
             }
 
             SpectrumType::Illuminant => {

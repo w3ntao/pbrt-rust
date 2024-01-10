@@ -25,11 +25,7 @@ fn render(file_path: &str, samples_per_pixel: usize) {
         srgb_to_spectrum_table,
     );
 
-    let global_variable = Arc::new(GlobalVariable {
-        rgb_color_space: Arc::new(srgb_color_space),
-    });
-
-    let mut builder = SceneBuilder::new(global_variable.clone());
+    let mut builder = SceneBuilder::default();
     let mut scene_config = builder.parse_scene(file_path, samples_per_pixel);
     let preprocessing_finished = Instant::now();
 
