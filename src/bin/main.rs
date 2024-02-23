@@ -16,15 +16,6 @@ struct Cli {
 fn render(file_path: &str, samples_per_pixel: usize) {
     let start = Instant::now();
 
-    let srgb_to_spectrum_table = RGBtoSpectrumTable::new("sRGB");
-    let srgb_color_space: RGBColorSpace = RGBColorSpace::new(
-        Point2f::new(0.64, 0.33),
-        Point2f::new(0.3, 0.6),
-        Point2f::new(0.15, 0.06),
-        get_named_spectrum("stdillum-D65"),
-        srgb_to_spectrum_table,
-    );
-
     let mut builder = SceneBuilder::default();
     let mut scene_config = builder.parse_scene(file_path, samples_per_pixel);
     let preprocessing_finished = Instant::now();

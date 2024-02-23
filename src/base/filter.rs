@@ -1,10 +1,5 @@
 use crate::pbrt::*;
 
-pub struct PixelSample {
-    pub p: Point2f,
-    pub weight: f64,
-}
-
 pub struct FilterSample {
     pub p: Point2f,
     pub weight: f64,
