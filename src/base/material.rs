@@ -34,7 +34,7 @@ pub trait Material: Send + Sync {
     }
 
     fn get_bsdf(&self, ctx: &MaterialEvalContext, lambda: &mut SampledWavelengths) -> BSDF;
-    // in PBRT-minus get_bsdf works like get_bxdf in PBRT-v4
+    // in pbrt-rust get_bsdf works like get_bxdf in PBRT-v4
 }
 
 pub fn create_material(material_type: &str, parameter_dict: &ParameterDict) -> Arc<dyn Material> {

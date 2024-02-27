@@ -23,7 +23,7 @@ jobs:
     - name: clone scene
       run:
         pushd ..;
-        git clone https://github.com/w3ntao/pbrt-minus-scenes.git;
+        git clone https://github.com/w3ntao/pbrt-rust-scenes.git;
         popd;
 
     - name: cargo build (release)

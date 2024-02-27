@@ -1,7 +1,7 @@
 extern crate clap;
 
 use clap::Parser;
-use pbrt_minus::*;
+use pbrt_rust::*;
 use std::fs;
 use std::path::PathBuf;
 
