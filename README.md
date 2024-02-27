@@ -24,7 +24,7 @@ $ bash render_all.sh
 
 ![](https://github.com/w3ntao/pbrt-rust-scenes-preview/blob/main/dragon_10.png)
 
-![](https://github.com/w3ntao/pbrt-rust-scenes-preview/blob/main/ganesha.png)
+![](https://github.com/w3ntao/pbrt-rust-scenes-preview/blob/main/ganesha-ao.png)
 
 ![](https://github.com/w3ntao/pbrt-rust-scenes-preview/blob/main/killeroo-gold.png)
 
@@ -33,3 +33,5 @@ $ bash render_all.sh
 ![](https://github.com/w3ntao/pbrt-rust-scenes-preview/blob/main/lte-orb-simple-ball.png)
 
 ![](https://github.com/w3ntao/pbrt-rust-scenes-preview/blob/main/lte-orb-silver.png)
+
+![](https://github.com/w3ntao/pbrt-rust-scenes-preview/blob/main/ganesha-simplepath.png)
