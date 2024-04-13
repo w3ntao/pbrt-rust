@@ -6,8 +6,8 @@ on:
   pull_request:
     branches: [ "*" ]
   schedule:
-    - cron: "0 0 * * 0"
-    # runs on 00:00 every Sunday (UTC)
+    - cron: "0 0 1 * *"
+    # runs on 00:00 1st day of every month
     # 00:00 UTC = 08:00 Beijing
   workflow_dispatch:
 

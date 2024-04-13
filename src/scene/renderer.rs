@@ -76,6 +76,8 @@ impl Renderer {
     }
 
     pub fn render(&mut self, num_samples: usize, num_cores: usize) {
+        let start = Instant::now();
+
         let resolution = self.film.lock().unwrap().get_resolution();
 
         let job_list = Arc::new(Mutex::new((0..resolution.y).collect::<Vec<i32>>()));
@@ -114,5 +116,14 @@ impl Renderer {
             .lock()
             .unwrap()
             .export_image(&filename, resolution);
+
+        println!(
+            "rendering took: {:.2} seconds ({} spp with {} cores)",
+            start.elapsed().as_secs_f32(),
+            num_samples,
+            num_cores,
+        );
+
+        println!("image saved to `{}`", filename);
     }
 }

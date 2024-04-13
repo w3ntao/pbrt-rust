@@ -18,18 +18,15 @@ fn render(file_path: &str, samples_per_pixel: usize) {
 
     let mut builder = SceneBuilder::default();
     let mut scene_config = builder.parse_scene(file_path, samples_per_pixel);
-    let preprocessing_finished = Instant::now();
+
+    println!(
+        "preprocessing (spectra computing + BVH building): {:.2} seconds",
+        start.elapsed().as_secs_f32(),
+    );
 
     let cpu_num = num_cpus::get();
 
     scene_config.render(samples_per_pixel, cpu_num);
-    println!(
-        "total times: ({} + {}) second ({} spp with {} cores)",
-        (preprocessing_finished - start).as_secs(),
-        preprocessing_finished.elapsed().as_secs(),
-        samples_per_pixel,
-        cpu_num
-    );
 }
 
 fn main() {
