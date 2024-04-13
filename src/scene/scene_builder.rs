@@ -99,6 +99,11 @@ fn build_lights(light_entities: &Vec<LightEntity>) -> Vec<Arc<dyn Light>> {
 
                 lights.push(Arc::new(light));
             }
+
+            "infinite" => {
+                println!("Light `{}` not implemented", light_type);
+            }
+
             _ => {
                 panic!("`{}` not implemented", light_type)
             }
@@ -135,7 +140,16 @@ fn build_integrator(
         "surfacenormal" => Arc::new(SurfaceNormal::new(aggregate, camera)),
 
         _ => {
-            panic!("unrecognized integrator: `{}`", name);
+            println!(
+                "integrator: `{}` not implemented, changed to AmbientOcclusion",
+                name
+            );
+
+            Arc::new(AmbientOcclusion::new(
+                COLOR_SPACE.illuminant,
+                aggregate,
+                camera,
+            ))
         }
     };
 }
@@ -411,6 +425,12 @@ impl SceneBuilder {
                     vec![]
                 }
             }
+
+            "disk" => {
+                println!("ignore `{}` for the moment", shape_name);
+                vec![]
+            }
+
             _ => {
                 panic!("unknown Shape: `{}`", shape_name);
             }
@@ -594,11 +614,6 @@ impl SceneBuilder {
                         self.world_scale(tokens);
                     }
 
-                    "Sampler" => {
-                        // TODO: parse Sampler
-                        println!("parse_sampler() not implemented");
-                    }
-
                     "Shape" => {
                         self.world_shape(tokens);
                     }
@@ -613,6 +628,10 @@ impl SceneBuilder {
 
                     "Translate" => {
                         self.world_translate(tokens);
+                    }
+
+                    "MakeNamedMaterial" | "NamedMaterial" | "Sampler" => {
+                        println!("`{}` not implemented", keyword);
                     }
 
                     _ => {

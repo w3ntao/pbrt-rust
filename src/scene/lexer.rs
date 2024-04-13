@@ -298,7 +298,7 @@ impl Lexer {
                         return parse_identifier(&self.read_identifier());
                     }
 
-                    if current_char == '-' || is_digit(current_char) {
+                    if current_char == '-' || current_char == '.' || is_digit(current_char) {
                         return ParserToken::Number(self.read_number());
                     }
 

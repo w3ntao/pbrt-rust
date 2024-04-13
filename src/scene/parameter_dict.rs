@@ -130,6 +130,11 @@ impl ParameterDict {
                     Token::Number(str) => {
                         vec![str]
                     }
+
+                    Token::String(str) => {
+                        vec![str]
+                    }
+
                     Token::List(ls) => ls,
                     _ => {
                         panic!("fail to parse {:?} into variable values", t);
