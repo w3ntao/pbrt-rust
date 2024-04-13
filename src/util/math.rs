@@ -121,8 +121,7 @@ pub fn sqr<T: Mul<Output = T> + Copy>(x: T) -> T {
 }
 
 pub fn safe_sqrt(x: f64) -> f64 {
-    debug_assert!(x >= -1e-3);
-    return x.max(0.0).sqrt();
+    return if x <= 0.0 { 0.0 } else { x.sqrt() };
 }
 
 // http://www.plunk.org/~hatch/rightway.html

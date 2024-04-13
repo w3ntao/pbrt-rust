@@ -50,7 +50,7 @@ pub fn sample_uniform_disk_polar(u: Point2f) -> Point2f {
 
 pub fn sample_cosine_hemisphere(u: Point2f) -> Vector3f {
     let d = sample_uniform_disk_concentric(u);
-    let z = (1.0 - d.x * d.x - d.y * d.y).sqrt();
+    let z = safe_sqrt(1.0 - d.x * d.x - d.y * d.y);
 
     return Vector3f::new(d.x, d.y, z);
 }
