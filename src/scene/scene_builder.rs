@@ -630,7 +630,7 @@ impl SceneBuilder {
                         self.world_translate(tokens);
                     }
 
-                    "MakeNamedMaterial" | "NamedMaterial" | "Sampler" => {
+                    "MakeNamedMaterial" | "NamedMaterial" | "Sampler" | "PixelFilter" => {
                         println!("`{}` not implemented", keyword);
                     }
 
