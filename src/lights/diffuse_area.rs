@@ -57,14 +57,17 @@ impl Light for DiffuseAreaLight {
             Some(_ss) => _ss,
         };
 
-        if ss.pdf == 0.0
-            || (Point3f::from(ss.interaction.pi) - Point3f::from(ctx.pi)).length_squared() == 0.0
-        {
+        if ss.pdf == 0.0 {
+            return None;
+        }
+
+        let _wi = Point3f::from(ss.interaction.pi) - Point3f::from(ctx.pi);
+        if _wi.length_squared() == 0.0 {
             return None;
         }
 
         // Return _LightLiSample_ for sampled point on shape
-        let wi = (Point3f::from(ss.interaction.pi) - Point3f::from(ctx.pi)).normalize();
+        let wi = _wi.normalize();
 
         let Le = self.l(
             ss.interaction.pi.into(),
