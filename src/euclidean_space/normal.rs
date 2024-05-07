@@ -20,11 +20,12 @@ impl Normal3f {
         };
     }
 
+    pub fn is_non_zero(&self) -> bool {
+        return !(self.x == 0.0 && self.y == 0.0 && self.z == 0.0);
+    }
+
     pub fn is_valid(&self) -> bool {
-        return self.x.is_finite()
-            && self.y.is_finite()
-            && self.z.is_finite()
-            && (self.x * self.y * self.z != 0.0);
+        return self.x.is_finite() && self.y.is_finite() && self.z.is_finite();
     }
 
     pub fn normalize(&self) -> Normal3f {
@@ -43,7 +44,7 @@ impl Normal3f {
     pub fn abs_dot(&self, v: Vector3f) -> f64 {
         return self.dot(v).abs();
     }
-    
+
     pub fn face_forward(&self, v: Vector3f) -> Normal3f {
         return if self.dot(v) >= 0.0 { *self } else { -*self };
     }

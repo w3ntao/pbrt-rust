@@ -42,8 +42,10 @@ impl Integrator for SimplePath {
 
             // Account for emissive surface if light was not sampled
             let isect = &mut si.surface_interaction;
+            let wo = -ray.ray.d;
+
             if specular_bounce {
-                L += beta * isect.le(-ray.ray.d, lambda);
+                L += beta * isect.le(wo, lambda);
             }
 
             // End path if maximum depth reached
@@ -59,7 +61,6 @@ impl Integrator for SimplePath {
             }
 
             // Sample direct illumination if _sampleLights_ is true
-            let wo = -ray.ray.d;
             match self.light_sampler.sample(sampler.get_1d()) {
                 None => {}
                 Some(sampled_light) => {

@@ -367,7 +367,7 @@ impl Shape for Triangle {
 
         let mut pdf = 1.0;
         let mut u = u;
-        if ctx.ns.is_valid() {
+        if ctx.ns.is_non_zero() {
             // This part is slightly different with PBRT-v4
             // Compute $\cos\theta$-based weights _w_ at sample domain corners
 
